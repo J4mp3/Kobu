@@ -51,6 +51,8 @@
   .iconbtn .icon-slot{ font-size:19px; }
   .icon-slot{ display:inline-flex; align-items:center; justify-content:center; }
   .icon-slot svg{ width:1em; height:1em; }
+  @keyframes themeIconOut{ 0%{ opacity:1; transform:rotate(0deg) scale(1); } 100%{ opacity:0; transform:rotate(80deg) scale(0.4); } }
+  @keyframes themeIconIn{ 0%{ opacity:0; transform:rotate(-80deg) scale(0.4); } 100%{ opacity:1; transform:rotate(0deg) scale(1); } }
   .screen{ flex:1; overflow-y:auto; padding:6px 16px 90px; display:none; flex-direction:column; gap:12px; -webkit-overflow-scrolling:touch; }
   .screen.active{ display:flex; }
   /* ---- splash ---- */

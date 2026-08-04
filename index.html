@@ -43,7 +43,7 @@
   body{ display:flex; justify-content:center; align-items:flex-start; font-family:var(--font-sans); }
   button, input, select, textarea{ font-family:var(--font-sans); }
   #app{
-    width:100%; min-height:100dvh; background:var(--k-bg); color:var(--k-text);
+    width:100%; height:100dvh; min-height:100dvh; background:var(--k-bg); color:var(--k-text);
     display:flex; flex-direction:column; position:relative; overflow:hidden;
   }
   @media (min-width:480px){
@@ -1858,6 +1858,7 @@ function unitOptionsHtml(selected){
 const state = { stack:['home'], editingId:null, currentId:null, ovenEditMode:false, draft:null, cookRecipeId:null, cookStep:0, cookTimerHandle:null, wakeLock:null, _newIngredientRow:null, orderDraft:null, editingOrderId:null, activeChatId:null, quickSale:null };
 const TITLES = { home:'Inicio', form:'Receta', detail:'Receta', settings:'Ajustes', shopping:'Lista de compras', chat:'Kobu IA', chatlist:'Chats', ingredients:'Ingredientes', conversion:'Conversión', orders:'Pedidos', orderform:'Nuevo pedido', reports:'Reportes', catalogall:'Catálogo general', clients:'Clientes', clientdetail:'Cliente', quicksell:'Vender', ovens:'Cocina', utensils:'Utensilios' };
 const SCREEN_NAMES = ['home','form','detail','settings','shopping','chat','chatlist','cook','ingredients','conversion','orders','orderform','reports','catalogall','clients','clientdetail','quicksell','ovens','utensils'];
+const NAVBAR_SCREENS = ['home','orders','quicksell','shopping','settings'];
 
 function showScreen(name, opts){
   opts = opts || {};
@@ -1897,7 +1898,7 @@ function render(){
   railEl.style.opacity = isSplash ? '0' : '1';
   railEl.style.pointerEvents = isSplash ? 'none' : '';
   document.getElementById('topbar').style.display = (isSplash || isCook) ? 'none' : 'flex';
-  document.getElementById('navbar').style.display = (isSplash || isCook) ? 'none' : 'flex';
+  document.getElementById('navbar').style.display = (!isSplash && !isCook && NAVBAR_SCREENS.indexOf(cur)>-1) ? 'flex' : 'none';
   SCREEN_NAMES.forEach(function(s){
     document.getElementById('screen-'+s).classList.toggle('active', !isSplash && s===cur);
   });

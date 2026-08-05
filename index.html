@@ -241,7 +241,7 @@
   .navfab-circle img{ width:100%; height:100%; object-fit:cover; display:block; }
   .navitem-fab.active .navfab-circle{ box-shadow:0 0 0 2px var(--k-accent); }
   /* ---- toast ---- */
-  #toast{ position:absolute; bottom:70px; left:50%; transform:translateX(-50%); background:var(--k-text); color:var(--k-bg); font-size:11.5px; padding:8px 16px; border-radius:20px; opacity:0; transition:opacity .2s; pointer-events:none; z-index:60; white-space:nowrap; }
+  #toast{ position:absolute; bottom:70px; left:50%; transform:translateX(-50%); background:var(--k-text); color:var(--k-bg); font-size:11.5px; padding:8px 16px; border-radius:20px; opacity:0; transition:opacity .2s; pointer-events:none; z-index:100; white-space:nowrap; }
   .update-banner{ display:none; position:absolute; top:0; left:0; right:0; z-index:70; background:var(--k-accent); color:var(--k-bg); font-size:11.5px; padding:9px 12px; align-items:center; gap:8px; justify-content:space-between; }
   .update-banner.show{ display:flex; }
   #photoPreview{ width:100%; height:130px; border-radius:12px; background:var(--k-card2) center/cover no-repeat; display:flex; align-items:center; justify-content:center; color:var(--k-muted); font-size:11px; overflow:hidden; }
@@ -287,6 +287,26 @@
   @keyframes shopCelebratePop{ 0%{ transform:scale(0); opacity:0; } 60%{ transform:scale(1.15); opacity:1; } 100%{ transform:scale(1); opacity:1; } }
   .shop-add-panel{ max-height:0; overflow:hidden; transition:max-height .25s ease; }
   .shop-add-panel.open{ max-height:260px; }
+  .settings-hero{ background:var(--k-accent); border-radius:12px; padding:10px 14px; display:flex; align-items:center; gap:10px; }
+  .settings-hero .av{ width:34px; height:34px; border-radius:50%; background:var(--k-bg); color:var(--k-accent); display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+  .settings-hero p{ margin:0; color:var(--k-bg); }
+  .settings-hero .n{ font-size:13px; font-weight:600; }
+  .settings-hero .s{ font-size:10.5px; opacity:.85; }
+  .settings-tilegrid{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; }
+  .settings-tile{ background:var(--k-card); border:0.5px solid var(--k-border); border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; padding:12px 4px; cursor:pointer; }
+  .settings-tile .icon-slot{ font-size:19px; color:var(--k-accent); }
+  .settings-tile span{ font-size:10px; text-align:center; color:var(--k-text); }
+  .oven-tilegrid{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+  .oven-tile{ position:relative; background:var(--k-card); border:0.5px solid var(--k-border); border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; padding:16px 10px; cursor:pointer; transition:transform .08s ease; }
+  .oven-tile:active{ transform:scale(0.96); }
+  .oven-tile .icon-slot{ font-size:22px; color:var(--k-accent); }
+  .oven-tile .nm{ font-size:11.5px; text-align:center; color:var(--k-text); font-weight:500; }
+  .oven-tile-del{ position:absolute; top:4px; right:4px; background:none; border:none; padding:5px; color:var(--k-muted); cursor:pointer; display:flex; }
+  .oe-typegrid{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
+  .oe-typeopt{ display:flex; flex-direction:column; align-items:center; gap:4px; padding:9px 2px; border:1px solid var(--k-border); border-radius:9px; background:var(--k-card); cursor:pointer; font-size:10px; color:var(--k-muted); transition:transform .08s ease; }
+  .oe-typeopt:active{ transform:scale(0.95); }
+  .oe-typeopt .icon-slot{ font-size:17px; }
+  .oe-typeopt.sel{ border-color:var(--k-accent); background:var(--k-card2); color:var(--k-accent); }
   /* ---- action grid ---- */
   .action-grid{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; }
   .action-btn{ display:flex; flex-direction:column; align-items:center; gap:3px; background:var(--k-card2); border:none; border-radius:10px; padding:9px 4px; cursor:pointer; color:var(--k-accent); }
@@ -370,18 +390,6 @@
   .cook-dots span{ width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.25); }
   .cook-dots span.on{ background:var(--k-bg); }
   /* ---- catalog ---- */
-  .menu-item{ display:flex; gap:10px; align-items:center; background:var(--k-card); border-radius:12px; padding:9px; border:0.5px solid var(--k-border); }
-  .menu-item .thumb{ width:46px; height:46px; border-radius:10px; flex-shrink:0; background-size:cover; background-position:center; position:relative; overflow:hidden; }
-  .menu-item .meta{ flex:1; min-width:0; }
-  .menu-item .meta p{ margin:0; }
-  .menu-item .meta .t{ font-size:13px; font-weight:500; color:var(--k-text); }
-  .menu-item .meta .d{ font-size:11px; color:var(--k-muted); margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .menu-item .price{ font-size:13px; font-weight:700; color:var(--k-accent); flex-shrink:0; }
-  @media print{
-    body *{ visibility:hidden; }
-    #print-area-menu, #print-area-menu *{ visibility:visible; }
-    #print-area-menu{ position:absolute; top:0; left:0; width:100%; padding:24px; }
-  }
   /* ---- confirm modal ---- */
   .modal-overlay{ position:absolute; inset:0; background:rgba(0,0,0,.45); display:none; align-items:center; justify-content:center; z-index:80; padding:24px; }
   .modal-overlay.active{ display:flex; }
@@ -465,6 +473,8 @@
     #orderStatusChips{ display:none; }
   }
 </style>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-messaging-compat.js"></script>
 </head>
 <body>
 
@@ -588,12 +598,8 @@
     <div class="modal-box">
       <p class="modal-msg" style="text-align:left;font-weight:600;margin:0;">Editar electrodoméstico</p>
       <div class="field"><label>Nombre</label><input class="input" id="oe-name" placeholder="ej. Horno principal"></div>
-      <div class="field"><label>Tipo</label>
-        <select class="input" id="oe-tipo">
-          <option value="electrico">Eléctrico</option>
-          <option value="gas">Gas</option>
-          <option value="mixto">Mixto</option>
-        </select>
+      <div class="field"><label>Categoría</label>
+        <div class="oe-typegrid" id="oe-tipo-grid"></div>
       </div>
       <div class="btn-row">
         <div class="field" style="flex:1;"><label>Cantidad de filas</label><input class="input" id="oe-filas" type="number" min="1" placeholder="5"></div>
@@ -1071,40 +1077,35 @@
 
   <!-- SETTINGS -->
   <div class="screen" id="screen-settings">
+    <div class="settings-hero">
+      <div class="av"><span class="icon-slot" data-icon="paw"></span></div>
+      <p><span class="n" style="display:block;">Kobu</span><span class="s">Tu dulce emprendimiento</span></p>
+    </div>
     <div class="grp-card">
-      <p class="section-title"><span class="badge-ic"><span class="icon-slot" data-icon="adjustments"></span></span>Tamaño de letra</p>
+      <p class="section-title"><span class="badge-ic"><span class="icon-slot" data-icon="adjustments"></span></span>Apariencia</p>
       <div class="chiprow" id="fontScaleChips"></div>
     </div>
     <div class="grp-card">
       <p class="section-title"><span class="badge-ic"><span class="icon-slot" data-icon="settings"></span></span>Negocio</p>
-      <div class="rowline" onclick="showScreen('ovens')" style="cursor:pointer;">
-        <span class="l">Cocina</span>
-        <span class="icon-slot" data-icon="arrow-left" style="transform:rotate(180deg);color:var(--k-muted);"></span>
-      </div>
-      <div class="rowline" onclick="showScreen('utensils')" style="cursor:pointer;">
-        <span class="l">Utensilios</span>
-        <span class="icon-slot" data-icon="arrow-left" style="transform:rotate(180deg);color:var(--k-muted);"></span>
-      </div>
-      <div class="rowline" onclick="showScreen('ingredients')" style="cursor:pointer;">
-        <span class="l">Ingredientes</span>
-        <span class="icon-slot" data-icon="arrow-left" style="transform:rotate(180deg);color:var(--k-muted);"></span>
-      </div>
-      <div class="rowline" onclick="showScreen('conversion')" style="cursor:pointer;">
-        <span class="l">Conversión</span>
-        <span class="icon-slot" data-icon="arrow-left" style="transform:rotate(180deg);color:var(--k-muted);"></span>
-      </div>
-      <div class="rowline" onclick="showScreen('reports')" style="cursor:pointer;">
-        <span class="l">Reportes</span>
-        <span class="icon-slot" data-icon="arrow-left" style="transform:rotate(180deg);color:var(--k-muted);"></span>
-      </div>
-      <div class="rowline" onclick="showScreen('catalogall')" style="cursor:pointer;">
-        <span class="l">Catálogo general</span>
-        <span class="icon-slot" data-icon="arrow-left" style="transform:rotate(180deg);color:var(--k-muted);"></span>
+      <div class="settings-tilegrid">
+        <button class="settings-tile" onclick="showScreen('ovens')"><span class="icon-slot" data-icon="flame"></span><span>Cocina</span></button>
+        <button class="settings-tile" onclick="showScreen('utensils')"><span class="icon-slot" data-icon="package"></span><span>Utensilios</span></button>
+        <button class="settings-tile" onclick="showScreen('ingredients')"><span class="icon-slot" data-icon="list"></span><span>Ingredientes</span></button>
+        <button class="settings-tile" onclick="showScreen('conversion')"><span class="icon-slot" data-icon="arrows-left-right"></span><span>Conversión</span></button>
+        <button class="settings-tile" onclick="showScreen('reports')"><span class="icon-slot" data-icon="chart-bar"></span><span>Reportes</span></button>
+        <button class="settings-tile" onclick="openAdvancedScreen()"><span class="icon-slot" data-icon="lock"></span><span>Avanzado</span></button>
       </div>
       <div class="rowline">
         <span class="l">Lista de compras automática (desde pedidos)</span>
         <div class="switch" id="autoShopSwitch" onclick="toggleAutoShopping()"><div class="knob-sw"></div></div>
       </div>
+    </div>
+    <div class="grp-card" style="padding:10px 14px;">
+      <div class="rowline" style="padding:0;">
+        <span class="l"><span class="icon-slot" data-icon="bell" style="vertical-align:-3px;margin-right:5px;color:var(--k-accent);"></span>Notificaciones</span>
+        <div class="switch" id="notifEnabledSwitch" onclick="toggleNotifEnabled()"><div class="knob-sw"></div></div>
+      </div>
+      <p id="notifStatusNote" style="font-size:10px;color:var(--k-muted);margin:2px 0 0;"></p>
     </div>
     <div class="grp-card">
       <p class="section-title"><span class="badge-ic"><span class="icon-slot" data-icon="thermometer"></span></span>Conversor de temperatura</p>
@@ -1113,43 +1114,38 @@
         <input class="input" id="cIn" type="number" placeholder="°C" oninput="convertTemp('c')">
       </div>
     </div>
-    <div class="grp-card">
-      <p class="section-title"><span class="badge-ic"><span class="icon-slot" data-icon="cloud"></span></span>Sincronización (nube)</p>
-      <div class="field"><label>URL del script</label><input class="input" id="syncUrlInput" placeholder="https://script.google.com/macros/s/.../exec"></div>
-      <div class="field"><label>Clave</label><input class="input" id="syncKeyInput" type="password" placeholder="clave elegida al crear el script"></div>
-      <button class="btn btn-primary" onclick="saveSyncConfig()">Guardar</button>
-      <p id="syncNote" style="font-size:10.5px;color:var(--k-muted);margin:2px 0 0;"></p>
-      <p style="font-size:10.5px;color:var(--k-muted);margin:2px 0 0;">Ya configurado, se sube solo unos segundos después de cada cambio. Al abrir la app en un dispositivo sin cambios propios pendientes, baja lo último solo. Los botones de abajo son para forzarlo a mano.</p>
-      <div class="rowline">
-        <span class="l">Sincronización activa en este dispositivo</span>
-        <div class="switch" id="syncEnabledSwitch" onclick="toggleSyncEnabled()"><div class="knob-sw"></div></div>
-      </div>
-      <p style="font-size:10.5px;color:var(--k-muted);margin:2px 0 0;">Apagala en un dispositivo para trabajar/probar cosas ahí sin subir ni bajar nada a la nube compartida.</p>
-      <div class="btn-row">
-        <button class="btn btn-ghost" onclick="syncPull()"><span class="icon-slot" data-icon="download" style="vertical-align:-2px;"></span> Bajar de la nube</button>
-        <button class="btn btn-ghost" onclick="syncPush()"><span class="icon-slot" data-icon="upload" style="vertical-align:-2px;"></span> Subir a la nube</button>
-      </div>
-    </div>
-    <div class="grp-card grp-card--action">
-      <p class="section-title"><span class="badge-ic"><span class="icon-slot" data-icon="download"></span></span>Backup</p>
-      <p id="backupReminderNote" style="font-size:11px;margin:-4px 0 0;"></p>
-      <div class="btn-row">
-        <button class="btn btn-ghost" onclick="exportBackup()"><span class="icon-slot" data-icon="upload" style="vertical-align:-2px;"></span> Exportar</button>
-        <button class="btn btn-ghost" onclick="document.getElementById('importInput').click()"><span class="icon-slot" data-icon="download" style="vertical-align:-2px;"></span> Importar</button>
-        <input type="file" accept="application/json" id="importInput" style="display:none;" onchange="importBackup(event)">
-      </div>
-    </div>
-    <div class="grp-card">
-      <p class="section-title"><span class="badge-ic"><span class="icon-slot" data-icon="message-circle"></span></span>Asistente IA</p>
-      <div class="field"><label>Modelo</label><input class="input" id="aiModelInput" placeholder="llama-3.3-70b-versatile" oninput="saveAiModel(this.value)"></div>
-      <p style="font-size:10.5px;color:var(--k-muted);margin:2px 0 0;">Chat gratis con IA. Usa la misma conexión de "Sincronización (nube)" de arriba — configurala primero (una sola vez).</p>
-    </div>
-    <div class="grp-card grp-card--danger">
-      <p class="section-title"><span class="badge-ic"><span class="icon-slot" data-icon="trash"></span></span>Zona de peligro</p>
-      <p style="font-size:11px;color:var(--k-muted);margin:0;">Borra datos de la app de forma permanente, por partes. Ideal para sacar datos de prueba.</p>
-      <button class="btn btn-danger" onclick="openWipeDataModal()">Eliminar todos los datos</button>
-    </div>
     <p style="text-align:center;font-size:10.5px;color:var(--k-muted);margin-top:2px;">Kobu · hecho con ❤ para tu emprendimiento</p>
+  </div>
+
+  <!-- AVANZADO (lista) -->
+  <div class="screen" id="screen-advanced">
+    <div class="grp-card">
+      <div class="rowline" onclick="openAdvDetail('sync')" style="cursor:pointer;">
+        <span class="l"><span class="icon-slot" data-icon="cloud" style="vertical-align:-2px;margin-right:6px;color:var(--k-accent);"></span>Sincronización</span>
+        <span class="icon-slot" data-icon="arrow-left" style="transform:rotate(180deg);color:var(--k-muted);"></span>
+      </div>
+      <div class="rowline" onclick="openAdvDetail('notif')" style="cursor:pointer;">
+        <span class="l"><span class="icon-slot" data-icon="bell" style="vertical-align:-2px;margin-right:6px;color:var(--k-accent);"></span>Notificaciones</span>
+        <span class="icon-slot" data-icon="arrow-left" style="transform:rotate(180deg);color:var(--k-muted);"></span>
+      </div>
+      <div class="rowline" onclick="openAdvDetail('ai')" style="cursor:pointer;">
+        <span class="l"><span class="icon-slot" data-icon="message-circle" style="vertical-align:-2px;margin-right:6px;color:var(--k-accent);"></span>Asistente IA</span>
+        <span class="icon-slot" data-icon="arrow-left" style="transform:rotate(180deg);color:var(--k-muted);"></span>
+      </div>
+      <div class="rowline" onclick="openAdvDetail('backup')" style="cursor:pointer;">
+        <span class="l"><span class="icon-slot" data-icon="download" style="vertical-align:-2px;margin-right:6px;color:var(--k-accent);"></span>Backup</span>
+        <span class="icon-slot" data-icon="arrow-left" style="transform:rotate(180deg);color:var(--k-muted);"></span>
+      </div>
+      <div class="rowline" onclick="openAdvDetail('danger')" style="cursor:pointer;">
+        <span class="l"><span class="icon-slot" data-icon="trash" style="vertical-align:-2px;margin-right:6px;color:var(--k-danger);"></span><span style="color:var(--k-danger);">Zona de peligro</span></span>
+        <span class="icon-slot" data-icon="arrow-left" style="transform:rotate(180deg);color:var(--k-muted);"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- AVANZADO (detalle) -->
+  <div class="screen" id="screen-advdetail">
+    <div class="grp-card" id="advDetailBody"></div>
   </div>
 
   <!-- COCINA -->
@@ -1157,7 +1153,7 @@
     <div class="grp-card">
       <p class="section-title"><span class="badge-ic"><span class="icon-slot" data-icon="flame"></span></span>Cocina</p>
       <p style="font-size:11px;color:var(--k-muted);margin:-4px 0 0;">Tus electrodomésticos: hornos, batidoras, lo que uses para producir.</p>
-      <div id="ovenList" style="display:flex;flex-direction:column;gap:6px;"></div>
+      <div id="ovenList" class="oven-tilegrid"></div>
       <div class="btn-row">
         <input class="input" id="newOvenName" placeholder="nombre del horno nuevo">
         <button class="btn btn-primary" style="flex:0 0 auto;" onclick="addOven()">Añadir</button>
@@ -1311,19 +1307,6 @@
         <div class="rs-box"><div class="v" id="bal-net">$0</div><div class="l">ganancia limpia</div></div>
       </div>
       <p style="font-size:10.5px;color:var(--k-muted);margin:0;text-align:center;">No incluye gastos fijos como luz o gas.</p>
-    </div>
-  </div>
-
-  <!-- CATÁLOGO GENERAL -->
-  <div class="screen" id="screen-catalogall">
-    <div class="chiprow" id="catalogTagChips"></div>
-    <div id="print-area-menu">
-      <p style="font-size:15px;font-weight:600;margin:0 0 6px;">Kobu · catálogo</p>
-      <div id="menu-list" style="display:flex;flex-direction:column;gap:8px;"></div>
-    </div>
-    <div class="btn-row" style="margin-top:6px;">
-      <button class="btn btn-primary" onclick="shareCatalogAllWhatsapp()"><span class="icon-slot" data-icon="share" style="vertical-align:-2px;"></span> WhatsApp</button>
-      <button class="btn btn-ghost" onclick="window.print()"><span class="icon-slot" data-icon="printer" style="vertical-align:-2px;"></span> Imprimir / PDF</button>
     </div>
   </div>
 
@@ -1598,9 +1581,13 @@ const ICONS = {
   'users': '<svg '+SVG_ATTRS+'><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
   'chart-bar': '<svg '+SVG_ATTRS+'><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>',
   'arrow-right': '<svg '+SVG_ATTRS+'><path d="M5 12h14M12 5l7 7-7 7"/></svg>',
+  'arrows-left-right': '<svg '+SVG_ATTRS+'><path d="M3 9l4-4 4 4"/><path d="M7 5v14"/><path d="M21 15l-4 4-4-4"/><path d="M17 19V5"/></svg>',
   'list': '<svg '+SVG_ATTRS+'><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>',
   'thermometer': '<svg '+SVG_ATTRS+'><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>',
   'wallet': '<svg '+SVG_ATTRS+'><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg>',
+  'bell': '<svg '+SVG_ATTRS+'><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>',
+  'lock': '<svg '+SVG_ATTRS+'><rect x="5" y="11" width="14" height="10" rx="2"/><circle cx="12" cy="16" r="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>',
+  'bolt': '<svg '+SVG_ATTRS+'><path d="M13 3l0 7l6 0l-8 11l0 -7l-6 0l8 -11"/></svg>',
   'cloud': '<svg '+SVG_ATTRS+'><path d="M17.5 19a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.4-2A5 5 0 0 0 6.5 19h11z"/></svg>',
   'package': '<svg '+SVG_ATTRS+'><path d="M16.5 9.4 7.5 4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
   'calendar': '<svg '+SVG_ATTRS+'><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
@@ -1972,9 +1959,10 @@ function unitOptionsHtml(selected){
 /* =========================================================
    NAV / SCREEN STATE
    ========================================================= */
-const state = { stack:['home'], editingId:null, currentId:null, ovenEditMode:false, draft:null, cookRecipeId:null, cookStep:0, cookTimerHandle:null, wakeLock:null, _newIngredientRow:null, orderDraft:null, editingOrderId:null, activeChatId:null, quickSale:null };
-const TITLES = { home:'Inicio', form:'Receta', detail:'Receta', settings:'Ajustes', shopping:'Lista de compras', chat:'Kobu IA', chatlist:'Chats', ingredients:'Ingredientes', conversion:'Conversión', orders:'Pedidos', orderform:'Nuevo pedido', reports:'Reportes', catalogall:'Catálogo general', clients:'Clientes', clientdetail:'Cliente', quicksell:'Vender', ovens:'Cocina', utensils:'Utensilios' };
-const SCREEN_NAMES = ['home','form','detail','settings','shopping','chat','chatlist','cook','ingredients','conversion','orders','orderform','reports','catalogall','clientdetail','quicksell','ovens','utensils'];
+const state = { stack:['home'], editingId:null, currentId:null, ovenEditMode:false, draft:null, cookRecipeId:null, cookStep:0, cookTimerHandle:null, wakeLock:null, _newIngredientRow:null, orderDraft:null, editingOrderId:null, activeChatId:null, quickSale:null, advSection:null };
+const TITLES = { home:'Inicio', form:'Receta', detail:'Receta', settings:'Ajustes', shopping:'Lista de compras', chat:'Kobu IA', chatlist:'Chats', ingredients:'Ingredientes', conversion:'Conversión', orders:'Pedidos', orderform:'Nuevo pedido', reports:'Reportes', clients:'Clientes', clientdetail:'Cliente', quicksell:'Vender', ovens:'Cocina', utensils:'Utensilios', advanced:'Avanzado' };
+const SCREEN_NAMES = ['home','form','detail','settings','shopping','chat','chatlist','cook','ingredients','conversion','orders','orderform','reports','clientdetail','quicksell','ovens','utensils','advanced','advdetail'];
+const ADV_SECTION_TITLES = { sync:'Sincronización', notif:'Notificaciones', ai:'Asistente IA', backup:'Backup', danger:'Zona de peligro' };
 const NAVBAR_SCREENS = ['home','orders','quicksell','shopping','settings'];
 
 function showScreen(name, opts){
@@ -2019,7 +2007,7 @@ function render(){
   SCREEN_NAMES.forEach(function(s){
     document.getElementById('screen-'+s).classList.toggle('active', !isSplash && s===cur);
   });
-  document.getElementById('screenTitle').textContent = (cur==='orderform' && state.editingOrderId) ? 'Editar pedido' : (cur==='orders' && ordersTab==='clientes') ? 'Clientes' : (TITLES[cur] || '');
+  document.getElementById('screenTitle').textContent = (cur==='orderform' && state.editingOrderId) ? 'Editar pedido' : (cur==='orders' && ordersTab==='clientes') ? 'Clientes' : (cur==='advdetail') ? (ADV_SECTION_TITLES[state.advSection] || 'Avanzado') : (TITLES[cur] || '');
   document.getElementById('backBtn').style.visibility = state.stack.length>1 ? 'visible':'hidden';
   document.querySelectorAll('.navitem').forEach(function(b){
     b.classList.toggle('active', cur===b.dataset.nav);
@@ -2035,7 +2023,7 @@ function render(){
   if(cur==='conversion') renderConversionScreen();
   if(cur==='orders'){ applyOrdersTabUI(); if(ordersTab==='clientes') renderClientsScreen(); else renderOrdersScreen(); }
   if(cur==='reports') renderReportsScreen();
-  if(cur==='catalogall') renderCatalogAllScreen();
+  if(cur==='advdetail') renderAdvDetail();
   if(cur==='chatlist') renderChatListScreen();
   if(cur==='quicksell') renderQuickSellScreen();
 }
@@ -2210,6 +2198,27 @@ function backupIsOverdue(){
   const days = Math.floor((Date.now() - new Date(last).getTime()) / 86400000);
   return days>=7;
 }
+var HOME_NO_DELIVERY_MSGS = [
+  { icon:'chef-hat', text:'Día de preparación. Aprovechá para adelantar producción.' },
+  { icon:'coffee', text:'Sin entregas hoy. Buen momento para un café y planificar la semana.' },
+  { icon:'sparkles', text:'Día tranquilo. Ideal para probar una receta nueva.' },
+  { icon:'cookie', text:'Hoy no hay pedidos que entregar. A organizar la cocina.' },
+  { icon:'star', text:'Sin entregas por ahora. Aprovechá para revisar tus precios.' },
+  { icon:'sun', text:'Día libre de entregas. Descansá o adelantá trabajo.' },
+  { icon:'chart-bar', text:'Sin entregas hoy. Mirá cómo viene el mes en Reportes.' },
+  { icon:'cart', text:'Día tranquilo. Buen momento para revisar el stock.' },
+  { icon:'chef-hat', text:'Hoy no repartís nada. A planear lo que viene.' },
+  { icon:'heart', text:'Respiro entre pedidos. Disfrutalo.' }
+];
+function simpleDateSeed(str){
+  let h = 0;
+  for(let i=0;i<str.length;i++){ h = (h*31 + str.charCodeAt(i)) % 100000; }
+  return h;
+}
+function homeNoDeliveryMsg(){
+  const idx = simpleDateSeed(todayStr()) % HOME_NO_DELIVERY_MSGS.length;
+  return HOME_NO_DELIVERY_MSGS[idx];
+}
 var homeTickerMsgs = [];
 var homeTickerIdx = 0;
 var homeTickerTimer = null;
@@ -2222,7 +2231,16 @@ function renderHomeSummary(){
   const ordersTomorrow = DATA.orders.filter(function(o){ return o.deliveryDate===tomorrow && o.status!=='cancelado'; }).length;
   const lowStock = DATA.ingredientPrices.filter(function(p){ return (p.minStock||0)>0 && (p.stock||0)<=p.minStock; }).length;
   const msgs = [];
-  msgs.push({ icon:'calendar', color:'var(--k-accent)', text:'Hoy hay '+ordersToday+' entrega'+(ordersToday===1?'':'s')+' y mañana '+ordersTomorrow+' más.', screen:'orders' });
+  if(ordersToday>0 && ordersTomorrow>0){
+    msgs.push({ icon:'calendar', color:'var(--k-accent)', text:'Hoy hay '+ordersToday+' entrega'+(ordersToday===1?'':'s')+' y mañana '+ordersTomorrow+' más.', screen:'orders' });
+  } else if(ordersToday>0){
+    msgs.push({ icon:'calendar', color:'var(--k-accent)', text:'Hoy hay '+ordersToday+' entrega'+(ordersToday===1?'':'s')+'.', screen:'orders' });
+  } else if(ordersTomorrow>0){
+    msgs.push({ icon:'calendar', color:'var(--k-accent)', text:'Mañana hay '+ordersTomorrow+' entrega'+(ordersTomorrow===1?'':'s')+'.', screen:'orders' });
+  } else {
+    const noDeliveryMsg = homeNoDeliveryMsg();
+    msgs.push({ icon:noDeliveryMsg.icon, color:'var(--k-accent)', text:noDeliveryMsg.text, screen:'orders' });
+  }
   if(lowStock>0) msgs.push({ icon:'cart', color:'var(--k-danger)', text: lowStock+' ingrediente'+(lowStock>1?'s':'')+' con stock bajo. Tocá para revisarlos.', screen:'ingredients' });
   if(cloudSyncConfigured()) msgs.push({ icon:'cloud', color:'var(--k-muted)', text: stripTags(cloudSyncStatusText()), screen:null });
   else if(backupIsOverdue()) msgs.push({ icon:'cloud', color:'var(--k-danger)', text: stripTags(backupReminderText()), screen:null });
@@ -2237,7 +2255,7 @@ function renderHomeSummary(){
     (msgs.length>1 ? '<div class="home-ticker-dots" id="homeTickerDots">'+dotsHtml+'</div>' : '');
   mountIcons();
   if(msgs.length>1){
-    homeTickerTimer = setInterval(advanceHomeTicker, 2400);
+    homeTickerTimer = setInterval(advanceHomeTicker, 4000);
   }
 }
 function advanceHomeTicker(){
@@ -3953,9 +3971,11 @@ function renderSettings(){
   renderFontScaleChips();
   const wrap = document.getElementById('ovenList');
   wrap.innerHTML = DATA.ovens.map(function(o){
-    return '<div class="rowline"><span class="l">'+escapeHtml(o.name)+'</span>'+
-      '<button class="iconbtn" onclick="openOvenEditModal(\''+o.id+'\')"><span class="icon-slot" data-icon="pencil"></span></button>'+
-      (DATA.ovens.length>1 ? '<button class="iconbtn" onclick="removeOven(\''+o.id+'\')" style="color:var(--k-danger);"><span class="icon-slot" data-icon="trash"></span></button>' : '')+
+    const icon = ovenTipoIcon(o.tipo);
+    return '<div class="oven-tile" onclick="openOvenEditModal(\''+o.id+'\')">'+
+      (DATA.ovens.length>1 ? '<button class="oven-tile-del" onclick="event.stopPropagation();removeOven(\''+o.id+'\')"><span class="icon-slot" data-icon="trash"></span></button>' : '')+
+      '<span class="icon-slot" data-icon="'+icon+'"></span>'+
+      '<span class="nm">'+escapeHtml(o.name)+'</span>'+
       '</div>';
   }).join('');
   const utWrap = document.getElementById('utensilList');
@@ -3971,14 +3991,159 @@ function renderSettings(){
     }).join('');
   }
   mountIcons();
-  document.getElementById('aiModelInput').value = localStorage.getItem('kobuAiModel') || 'llama-3.3-70b-versatile';
-  document.getElementById('syncUrlInput').value = localStorage.getItem('kobuSyncUrl') || '';
-  document.getElementById('syncKeyInput').value = localStorage.getItem('kobuSyncKey') || '';
-  document.getElementById('syncEnabledSwitch').classList.toggle('on', syncEnabled());
   document.getElementById('autoShopSwitch').classList.toggle('on', !!DATA.settings.autoShoppingFromOrders);
-  document.getElementById('backupReminderNote').innerHTML = backupReminderText();
-  updateSyncNote();
+  document.getElementById('notifEnabledSwitch').classList.toggle('on', notifEnabled());
+  updateNotifNote();
   mountIcons();
+}
+
+/* =========================================================
+   CONFIGURACIÓN AVANZADA (sync/notificaciones/IA) — con contraseña
+   ========================================================= */
+const KOBU_BUILTIN_CONFIG = {
+  syncUrl: 'https://script.google.com/macros/s/AKfycbxl85jHQxoZj8Wgr4w_HDXnkICuql6GK_tbaqQhcAtiemmQou5J53aiZvU2kBY7ZcotMg/exec',
+  syncKey: 'kobulachodulceapp',
+  fcmConfig: '{"apiKey":"AIzaSyAzKAWmh7sobMJXzP1eOhn0Dv_is_qCVuM","authDomain":"kobuapp.firebaseapp.com","projectId":"kobuapp","storageBucket":"kobuapp.firebasestorage.app","messagingSenderId":"432961715945","appId":"1:432961715945:web:617575bffdbd4a2df3ba78"}',
+  fcmVapidKey: 'BLIr6emLTrDRTc2flQ2lxrwVNMGDH69WoEO-kive4i2qybuptlW9OydORc9-C004kYlYdYrXn2fLtdSegLcGpWU',
+  aiModel: 'llama-3.3-70b-versatile'
+};
+function ensureBuiltinConfig(){
+  if(!localStorage.getItem('kobuSyncUrl')) localStorage.setItem('kobuSyncUrl', KOBU_BUILTIN_CONFIG.syncUrl);
+  if(!localStorage.getItem('kobuSyncKey')) localStorage.setItem('kobuSyncKey', KOBU_BUILTIN_CONFIG.syncKey);
+  if(!localStorage.getItem('kobuFcmConfig')) localStorage.setItem('kobuFcmConfig', KOBU_BUILTIN_CONFIG.fcmConfig);
+  if(!localStorage.getItem('kobuFcmVapidKey')) localStorage.setItem('kobuFcmVapidKey', KOBU_BUILTIN_CONFIG.fcmVapidKey);
+  if(!localStorage.getItem('kobuAiModel')) localStorage.setItem('kobuAiModel', KOBU_BUILTIN_CONFIG.aiModel);
+}
+let advSettingsUnlocked = false;
+async function openAdvancedScreen(){
+  if(!advSettingsUnlocked){
+    const pin = await showPinModal('Ingresá la contraseña para ver y editar esta sección');
+    if(pin==null) return;
+    if(pin !== '261023'){ showToast('Contraseña incorrecta'); return; }
+    advSettingsUnlocked = true;
+  }
+  showScreen('advanced');
+}
+function openAdvDetail(section){
+  state.advSection = section;
+  showScreen('advdetail');
+}
+function renderAdvDetail(){
+  const body = document.getElementById('advDetailBody');
+  const s = state.advSection;
+  if(s==='sync'){
+    body.innerHTML =
+      '<div class="field"><label>URL del script</label><input class="input" id="syncUrlInput" placeholder="https://script.google.com/macros/s/.../exec"></div>'+
+      '<div class="field"><label>Clave</label><input class="input" id="syncKeyInput" type="password" placeholder="clave elegida al crear el script"></div>'+
+      '<button class="btn btn-primary" onclick="saveSyncConfig()">Guardar</button>'+
+      '<p id="syncNote" style="font-size:10.5px;color:var(--k-muted);margin:2px 0 0;"></p>'+
+      '<p style="font-size:10.5px;color:var(--k-muted);margin:2px 0 0;">Ya configurado, se sube solo unos segundos después de cada cambio. Al abrir la app en un dispositivo sin cambios propios pendientes, baja lo último solo. Los botones de abajo son para forzarlo a mano.</p>'+
+      '<div class="rowline"><span class="l">Sincronización activa en este dispositivo</span><div class="switch" id="syncEnabledSwitch" onclick="toggleSyncEnabled()"><div class="knob-sw"></div></div></div>'+
+      '<p style="font-size:10.5px;color:var(--k-muted);margin:2px 0 0;">Apagala en un dispositivo para trabajar/probar cosas ahí sin subir ni bajar nada a la nube compartida.</p>'+
+      '<div class="btn-row"><button class="btn btn-ghost" onclick="syncPull()"><span class="icon-slot" data-icon="download" style="vertical-align:-2px;"></span> Bajar de la nube</button><button class="btn btn-ghost" onclick="syncPush()"><span class="icon-slot" data-icon="upload" style="vertical-align:-2px;"></span> Subir a la nube</button></div>';
+    document.getElementById('syncUrlInput').value = localStorage.getItem('kobuSyncUrl') || '';
+    document.getElementById('syncKeyInput').value = localStorage.getItem('kobuSyncKey') || '';
+    document.getElementById('syncEnabledSwitch').classList.toggle('on', syncEnabled());
+    updateSyncNote();
+  } else if(s==='notif'){
+    body.innerHTML =
+      '<p style="font-size:10.5px;color:var(--k-muted);margin:0 0 4px;">Avisos en el celular a las 8:30 y a las 18:00 con tus entregas, y cuando algún ingrediente tenga stock bajo. El interruptor para activarlas está en Ajustes, debajo de "Tamaño de letra".</p>'+
+      '<div class="field"><label>Configuración de Firebase (JSON)</label><textarea class="input" id="fcmConfigInput" rows="3" placeholder=\'{"apiKey":"...","projectId":"...","messagingSenderId":"...","appId":"..."}\'></textarea></div>'+
+      '<div class="field"><label>Clave VAPID</label><input class="input" id="fcmVapidInput" placeholder="clave pública del certificado Web Push"></div>'+
+      '<button class="btn btn-ghost" onclick="saveFcmConfig()">Guardar configuración</button>';
+    document.getElementById('fcmConfigInput').value = localStorage.getItem('kobuFcmConfig') || '';
+    document.getElementById('fcmVapidInput').value = localStorage.getItem('kobuFcmVapidKey') || '';
+  } else if(s==='ai'){
+    body.innerHTML =
+      '<div class="field"><label>Modelo</label><input class="input" id="aiModelInput" placeholder="llama-3.3-70b-versatile" oninput="saveAiModel(this.value)"></div>'+
+      '<p style="font-size:10.5px;color:var(--k-muted);margin:2px 0 0;">Chat gratis con IA. Usa la misma conexión de "Sincronización (nube)".</p>';
+    document.getElementById('aiModelInput').value = localStorage.getItem('kobuAiModel') || KOBU_BUILTIN_CONFIG.aiModel;
+  } else if(s==='backup'){
+    body.innerHTML =
+      '<p id="backupReminderNote" style="font-size:11px;margin:0 0 4px;"></p>'+
+      '<div class="btn-row"><button class="btn btn-ghost" onclick="exportBackup()"><span class="icon-slot" data-icon="upload" style="vertical-align:-2px;"></span> Exportar</button><button class="btn btn-ghost" onclick="document.getElementById(\'importInput\').click()"><span class="icon-slot" data-icon="download" style="vertical-align:-2px;"></span> Importar</button><input type="file" accept="application/json" id="importInput" style="display:none;" onchange="importBackup(event)"></div>';
+    document.getElementById('backupReminderNote').innerHTML = backupReminderText();
+  } else if(s==='danger'){
+    body.innerHTML =
+      '<p style="font-size:11px;color:var(--k-muted);margin:0 0 8px;">Borra datos de la app de forma permanente, por partes. Ideal para sacar datos de prueba.</p>'+
+      '<button class="btn btn-danger" onclick="openWipeDataModal()">Eliminar todos los datos</button>';
+  }
+  mountIcons();
+}
+
+function notifEnabled(){ return localStorage.getItem('kobuNotifEnabled')==='true'; }
+
+function updateNotifNote(){
+  const note = document.getElementById('notifStatusNote');
+  if(!note) return;
+  if(!('Notification' in window)){ note.textContent = 'Tu navegador no soporta notificaciones.'; return; }
+  note.textContent = notifEnabled() ? 'Activas en este dispositivo.' : '';
+}
+
+function saveFcmConfig(){
+  const cfg = document.getElementById('fcmConfigInput').value.trim();
+  const vapid = document.getElementById('fcmVapidInput').value.trim();
+  if(cfg){
+    try{ JSON.parse(cfg); }catch(e){ showToast('El JSON de configuración no es válido'); return; }
+  }
+  localStorage.setItem('kobuFcmConfig', cfg);
+  localStorage.setItem('kobuFcmVapidKey', vapid);
+  showToast('Configuración guardada');
+}
+
+async function toggleNotifEnabled(){
+  const turningOn = !notifEnabled();
+  if(!turningOn){
+    localStorage.setItem('kobuNotifEnabled','false');
+    document.getElementById('notifEnabledSwitch').classList.remove('on');
+    updateNotifNote();
+    return;
+  }
+  const cfgRaw = localStorage.getItem('kobuFcmConfig') || '';
+  const vapid = localStorage.getItem('kobuFcmVapidKey') || '';
+  const syncUrl = localStorage.getItem('kobuSyncUrl') || '';
+  const syncKey = localStorage.getItem('kobuSyncKey') || '';
+  if(!cfgRaw || !vapid){ showToast('Primero guardá la configuración de Firebase y la clave VAPID'); return; }
+  if(!syncUrl || !syncKey){ showToast('Primero configurá la Sincronización (nube) arriba'); return; }
+  let cfg;
+  try{ cfg = JSON.parse(cfgRaw); }catch(e){ showToast('El JSON de configuración no es válido'); return; }
+  try{
+    const ok = await registerPushNotifications(cfg, vapid, syncUrl, syncKey);
+    if(!ok) return;
+    localStorage.setItem('kobuNotifEnabled','true');
+    document.getElementById('notifEnabledSwitch').classList.add('on');
+    updateNotifNote();
+    showToast('Notificaciones activadas');
+  }catch(e){
+    console.error(e);
+    showToast('No se pudo activar. Revisá la configuración.');
+  }
+}
+
+async function registerPushNotifications(cfg, vapidKey, syncUrl, syncKey){
+  if(!('serviceWorker' in navigator) || !('PushManager' in window)){
+    showToast('Este dispositivo no soporta notificaciones push');
+    return false;
+  }
+  const perm = await Notification.requestPermission();
+  if(perm!=='granted'){ showToast('Permiso de notificaciones denegado'); return false; }
+  if(!window.firebase || !firebase.messaging){
+    showToast('No se pudo cargar Firebase');
+    return false;
+  }
+  const reg = await navigator.serviceWorker.ready;
+  if(!firebase.apps || !firebase.apps.length){ firebase.initializeApp(cfg); }
+  const messaging = firebase.messaging();
+  const token = await messaging.getToken({ vapidKey: vapidKey, serviceWorkerRegistration: reg });
+  if(!token){ showToast('No se pudo obtener el token de notificaciones'); return false; }
+  const resp = await fetch(syncUrl+'?key='+encodeURIComponent(syncKey)+'&action=saveToken', {
+    method:'POST',
+    headers:{ 'Content-Type':'text/plain' },
+    body: JSON.stringify({ token: token })
+  });
+  const data = await resp.json().catch(function(){ return {ok:false}; });
+  if(!data || !data.ok){ showToast('No se pudo registrar el token en el servidor'); return false; }
+  return true;
 }
 function toggleAutoShopping(){
   DATA.settings.autoShoppingFromOrders = !DATA.settings.autoShoppingFromOrders;
@@ -4034,15 +4199,41 @@ async function removeOven(id){
     renderSettings();
   });
 }
+const OVEN_TIPOS = [
+  { id:'electrico', label:'Eléctrico', icon:'bolt' },
+  { id:'gas', label:'Gas', icon:'flame' },
+  { id:'mixto', label:'Mixto', icon:'adjustments' },
+  { id:'electrodomestico', label:'Electrodoméstico', icon:'settings' },
+  { id:'batidora', label:'Batidora', icon:'blender' },
+  { id:'microondas', label:'Microondas', icon:'microwave' }
+];
+function ovenTipoIcon(t){
+  const found = OVEN_TIPOS.find(function(x){ return x.id===t; });
+  return found ? found.icon : 'bolt';
+}
 let ovenEditId = null;
 let ovenEditFunciones = [];
+let ovenEditTipo = 'electrico';
+function renderOvenTipoGrid(){
+  const wrap = document.getElementById('oe-tipo-grid');
+  wrap.innerHTML = OVEN_TIPOS.map(function(t){
+    return '<div class="oe-typeopt'+(ovenEditTipo===t.id?' sel':'')+'" onclick="pickOvenTipo(\''+t.id+'\')">'+
+      '<span class="icon-slot" data-icon="'+t.icon+'"></span>'+t.label+'</div>';
+  }).join('');
+  mountIcons();
+}
+function pickOvenTipo(t){
+  ovenEditTipo = t;
+  renderOvenTipoGrid();
+}
 function openOvenEditModal(id){
   const o = DATA.ovens.find(function(x){ return x.id===id; });
   if(!o) return;
   ovenEditId = id;
   ovenEditFunciones = (o.funciones||[]).slice();
+  ovenEditTipo = o.tipo || 'electrico';
   document.getElementById('oe-name').value = o.name || '';
-  document.getElementById('oe-tipo').value = o.tipo || 'electrico';
+  renderOvenTipoGrid();
   document.getElementById('oe-filas').value = o.filas || 5;
   document.getElementById('oe-costo').value = o.costo || 0;
   document.getElementById('oe-tempmax').value = o.tempMax || 250;
@@ -4079,7 +4270,7 @@ function saveOvenEdit(){
   const name = document.getElementById('oe-name').value.trim();
   if(!name){ showToast('Poné un nombre'); return; }
   o.name = name;
-  o.tipo = document.getElementById('oe-tipo').value;
+  o.tipo = ovenEditTipo;
   o.filas = parseInt(document.getElementById('oe-filas').value) || 5;
   o.costo = parseFloat(document.getElementById('oe-costo').value) || 0;
   o.tempMax = parseFloat(document.getElementById('oe-tempmax').value) || 250;
@@ -5113,8 +5304,8 @@ function notifyOrderReady(id){
   const client = o.clientId ? DATA.clients.find(function(c){ return c.id===o.clientId; }) : null;
   const phone = client ? (client.phone||'').replace(/\D/g,'') : '';
   if(!phone){ showToast('Este cliente no tiene teléfono cargado'); return; }
-  const text = 'Hola '+(o.customerName||'')+'! Te escribo de Kobu para avisarte que tu pedido ya está listo. ¡Gracias por tu compra!';
-  window.open('https://wa.me/'+phone+'?text='+encodeURIComponent(text), '_blank');
+  const text = 'Hola *'+(o.customerName||'')+'*, tu pedido ya está listo para retirar/entregar. ¡Gracias por elegirnos! 🍰';
+  location.href = 'https://wa.me/'+phone+'?text='+encodeURIComponent(text);
 }
 function openReviewModal(orderId){
   const o = DATA.orders.find(function(x){ return x.id===orderId; });
@@ -5861,58 +6052,6 @@ function renderQuickSellScreen(){
 }
 
 /* =========================================================
-   CATÁLOGO GENERAL
-   ========================================================= */
-let catalogTagFilter = null;
-function setCatalogTagFilter(t){ catalogTagFilter = t; renderCatalogAllScreen(); }
-function renderCatalogTagChips(){
-  const wrap = document.getElementById('catalogTagChips');
-  const tags = allTags();
-  if(tags.length===0){ wrap.innerHTML=''; return; }
-  let html = '<button class="chip '+(catalogTagFilter===null?'active':'')+'" onclick="setCatalogTagFilter(null)">Todas</button>';
-  tags.forEach(function(t){
-    html += '<button class="chip '+(catalogTagFilter===t?'active':'')+'" onclick="setCatalogTagFilter(\''+t.replace(/'/g,"\\'")+'\')">'+escapeHtml(t)+'</button>';
-  });
-  wrap.innerHTML = html;
-}
-function catalogRecipesFiltered(){
-  return DATA.recipes.filter(function(r){ return !catalogTagFilter || (r.tags||[]).includes(catalogTagFilter); });
-}
-function renderCatalogAllScreen(){
-  renderCatalogTagChips();
-  const wrap = document.getElementById('menu-list');
-  const list = catalogRecipesFiltered();
-  if(DATA.recipes.length===0){
-    wrap.innerHTML = '<p style="font-size:11.5px;color:var(--k-muted);">todavía no hay recetas cargadas.</p>';
-    return;
-  }
-  if(list.length===0){
-    wrap.innerHTML = '<p style="font-size:11.5px;color:var(--k-muted);">no hay recetas con esa etiqueta.</p>';
-    return;
-  }
-  wrap.innerHTML = list.map(function(r){
-    const bg = r.photo ? ('background-image:url('+r.photo+')') : ('background:'+(PLACEHOLDER_COLORS[r.colorIdx % PLACEHOLDER_COLORS.length]));
-    const price = r.salePrice;
-    const tagsHtml = (r.tags||[]).length ? '<div class="badges">'+(r.tags||[]).map(function(t){ return '<span class="badge">'+escapeHtml(t)+'</span>'; }).join('')+'</div>' : '';
-    return '<div class="menu-item">'+
-      '<div class="thumb" style="'+bg+'">'+mediaIconHtml(r,'thumb-icon')+'</div>'+
-      '<div class="meta"><p class="t">'+escapeHtml(r.title)+'</p><p class="d">'+escapeHtml(r.description||r.notes||'')+'</p>'+tagsHtml+'</div>'+
-      '<div class="price">'+(price?fmtMoney(price):'consultar')+'</div>'+
-      '</div>';
-  }).join('');
-}
-function shareCatalogAllWhatsapp(){
-  const list = catalogRecipesFiltered();
-  if(list.length===0){ showToast('Todavía no hay recetas cargadas'); return; }
-  const lines = list.map(function(r){
-    const price = r.salePrice;
-    return r.title+' - '+(price?fmtMoney(price):'consultar precio');
-  });
-  const text = 'Catálogo Kobu:\n'+lines.join('\n');
-  window.open('https://wa.me/?text='+encodeURIComponent(text), '_blank');
-}
-
-/* =========================================================
    SHOPPING LIST
    ========================================================= */
 var shopTab = 'comprar';
@@ -5983,7 +6122,7 @@ function renderShoppingScreen(){
       let qtyText = '';
       if(it.hasNumeric){
         let n = Math.round(it.qty*100)/100;
-        qtyText = n+' '+it.unit;
+        qtyText = n+' '+it.unit+packageNoteText(it);
       }
       if(it.extra.length) qtyText += (qtyText? ' + ':'') + it.extra.join(', ');
       const checked = !!DATA.shopping.checked[it.key];
@@ -6013,7 +6152,7 @@ function closeShoppingList(){
     ts: new Date().toISOString(),
     items: items.map(function(it){
       const isLinked = DATA.ingredientPrices.some(function(p){ return p.id===it.key; });
-      return { name:it.name, unit:it.unit, qty:it.qty, hasNumeric:it.hasNumeric, extra:(it.extra||[]).slice(), priceId: isLinked ? it.key : null, checked: !!DATA.shopping.checked[it.key] };
+      return { name:it.name, unit:it.unit, qty:it.qty, hasNumeric:it.hasNumeric, extra:(it.extra||[]).slice(), priceId: isLinked ? it.key : null, checked: !!DATA.shopping.checked[it.key], packages: it.packages||null };
     }),
     addedToStock: false
   };
@@ -6083,7 +6222,7 @@ function renderShopHistoryModal(){
   const countEl = document.getElementById('shopHistoryModalCount');
   countEl.textContent = '— '+entry.items.length+' item'+(entry.items.length===1?'':'s')+' —';
   document.getElementById('shopHistoryModalItems').innerHTML = entry.items.map(function(it){
-    let qtyText = it.hasNumeric ? (Math.round(it.qty*100)/100)+' '+escapeHtml(it.unit) : '';
+    let qtyText = it.hasNumeric ? (Math.round(it.qty*100)/100)+' '+escapeHtml(it.unit)+packageNoteText(it) : '';
     if(it.extra && it.extra.length) qtyText += (qtyText?' + ':'')+it.extra.join(', ');
     return '<div class="shop-item">'+
       '<span class="n">'+escapeHtml(it.name)+'</span>'+
@@ -6303,6 +6442,10 @@ function roundShoppingItemsToPackages(items){
     it.pkgSize = pkgSize;
   });
   return items;
+}
+function packageNoteText(it){
+  if(!it || !it.packages) return '';
+  return ' ('+it.packages+' paquete'+(it.packages===1?'':'s')+')';
 }
 function computeShoppingListFromOrders(){
   const map = {};
@@ -6969,6 +7112,19 @@ if('serviceWorker' in navigator && (location.protocol==='https:' || location.pro
   window.addEventListener('load', function(){
     navigator.serviceWorker.register('sw.js').catch(function(){});
   });
+  navigator.serviceWorker.addEventListener('message', function(event){
+    const d = event.data || {};
+    if(d.type==='kobu-notification-nav' && d.screen){
+      goTab(d.screen);
+    }
+  });
+}
+function handleNotificationGoto(){
+  try{
+    const params = new URLSearchParams(location.search);
+    const goto = params.get('goto');
+    if(goto){ goTab(goto); }
+  }catch(e){}
 }
 function armBackTrap(){
   try { history.pushState({ kobuNav:true }, ''); } catch(e){}
@@ -7009,12 +7165,13 @@ armBackTrap();
 /* =========================================================
    INIT
    ========================================================= */
+ensureBuiltinConfig();
 mountIcons();
 applyFontScale();
 applyTheme(DATA.settings.theme);
 state.stack = ['splash'];
 render();
-setTimeout(function(){ if(state.stack[state.stack.length-1]==='splash') goHome(); }, 2100);
+setTimeout(function(){ if(state.stack[state.stack.length-1]==='splash'){ goHome(); handleNotificationGoto(); } }, 2100);
 autoPullOnOpen();
 setInterval(renderHomeSummary, 60000);
 // Aviso de nueva versión: desactivado por ahora (queda como opción para activar más adelante).

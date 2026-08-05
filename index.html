@@ -440,6 +440,7 @@
   .modal-overlay{ position:absolute; inset:0; background:rgba(0,0,0,.45); display:none; align-items:center; justify-content:center; z-index:80; padding:24px; }
   .modal-overlay.active{ display:flex; }
   #confirmModal{ z-index:95; }
+  #pinModal{ z-index:96; }
   #globalSearchModal.active .modal-box{ animation:searchModalIn .32s ease; transform-origin:top right; }
   @keyframes searchModalIn{ 0%{ opacity:0; transform:scale(0.9); } 100%{ opacity:1; transform:scale(1); } }
   @keyframes searchIconPop{ 0%{ transform:scale(1); } 40%{ transform:scale(0.8); } 70%{ transform:scale(1.15); } 100%{ transform:scale(1); } }
@@ -472,7 +473,7 @@
   .qs-tile-bar{ position:relative; height:15px; background:var(--k-border); border-radius:8px; overflow:hidden; cursor:pointer; }
   .qs-tile-bar-fill{ height:100%; border-radius:8px; }
   .qs-tile-bar-label{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:8.5px; font-weight:500; color:#fff; }
-  .qs-pmswitch{ position:relative; border-radius:20px; padding:2px; height:32px; margin-bottom:8px; cursor:pointer; transition:background .2s; }
+  .qs-pmswitch{ position:relative; width:100%; box-sizing:border-box; border-radius:20px; padding:2px; height:32px; margin-bottom:8px; cursor:pointer; transition:background .2s; }
   .qs-pmswitch-thumb{ position:absolute; top:2px; width:calc(50% - 2px); height:28px; background:#fff; border-radius:15px; transition:left .2s; }
   .qs-pmswitch-labels{ position:relative; display:flex; height:100%; align-items:center; }
   .qs-pmswitch-labels span{ flex:1; text-align:center; font-size:9.5px; display:flex; align-items:center; justify-content:center; gap:4px; }

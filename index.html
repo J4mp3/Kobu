@@ -47,7 +47,7 @@
   button{ transition:transform .08s ease; }
   button:active{ transform:scale(0.96); }
   #app{
-    width:100%; height:100dvh; min-height:100dvh; background:var(--k-bg); color:var(--k-text);
+    width:100%; height:100vh; min-height:100vh; height:100dvh; min-height:100dvh; background:var(--k-bg); color:var(--k-text);
     display:flex; flex-direction:column; position:relative; overflow:hidden;
   }
   @media (min-width:480px){
@@ -346,6 +346,7 @@
   .stock-row .sr-stats .price-trend{ margin:1px 0 0; font-size:9px; display:flex; align-items:center; justify-content:flex-end; gap:2px; }
   .stock-row .sr-stats .price-trend .icon-slot{ font-size:9px; }
   .stock-row .sr-stats .stock{ margin:0; font-size:10.5px; font-weight:500; }
+  .stock-row .sr-stats .stock-pkg{ margin:0; font-size:9px; color:var(--k-muted); }
   .stock-row .sr-bar{ height:4px; background:var(--k-card2); border-radius:3px; overflow:hidden; margin-top:7px; }
   .stock-row .sr-bar-fill{ height:100%; transition:width .2s ease; }
   .stock-row .sr-stepper{ display:flex; flex-direction:column; flex-shrink:0; }
@@ -520,7 +521,7 @@
   .kanban-card .kc-actions{ display:flex; gap:4px; justify-content:flex-end; }
   .kanban-card .kc-actions .iconbtn{ padding:4px; }
   .kanban-card .kc-actions .iconbtn .icon-slot{ font-size:15px; }
-  @media (min-width:900px){
+  @media (min-width:900px) and (pointer:fine){
     body{ padding:0; align-items:stretch; }
     #app{ max-width:none; width:100%; height:100vh; min-height:100vh; border-radius:0; border:none; box-shadow:none; flex-direction:row; }
     .icon-rail{ display:flex; }
@@ -661,6 +662,7 @@
   <div class="modal-overlay" id="stockEditModal">
     <div class="modal-box">
       <p class="modal-msg" id="stockEditModalTitle" style="text-align:left;font-weight:600;margin:0;">Editar ingrediente</p>
+      <p id="se-stock-info" style="font-size:11px;color:var(--k-muted);margin:0;display:none;"></p>
       <div class="field"><label>Nombre</label><input class="input" id="se-name" placeholder="ej. Harina Flor"></div>
       <div class="btn-row">
         <div class="field" style="flex:1;"><label>Cantidad del envase</label><input class="input" id="se-qty" type="number" placeholder="1000"></div>
@@ -5238,11 +5240,13 @@ function renderPriceRows(wrapId, list, emptyMsg, icon){
     const pct = Math.max(stock>0?4:0, Math.min(100, Math.round((stock/ref)*100)));
     const trend = ingredientPriceTrend(p);
     const trendHtml = trend ? '<p class="price-trend" style="color:'+(trend.up?'var(--k-danger)':'var(--k-success)')+';"><span class="icon-slot" data-icon="'+(trend.up?'trending-up':'trending-down')+'"></span>'+(trend.up?'+':'')+Math.round(trend.pct)+'% · '+trend.periodLabel+'</p>' : '';
+    const pkgCount = ref>0 ? stock/ref : 0;
+    const pkgText = ref>0 ? (Number.isInteger(pkgCount)?pkgCount:pkgCount.toFixed(1))+' paquete'+(pkgCount===1?'':'s') : '';
     return '<div class="stock-row" onclick="openStockEditModal(\''+p.id+'\')">'+
       '<div class="sr-top">'+
         '<span class="sr-ic"><span class="icon-slot" data-icon="'+icon+'"></span></span>'+
         '<div class="sr-info"><p class="nm">'+escapeHtml(p.name)+'</p><p class="sub">'+p.qty+' '+escapeHtml(p.unit)+' el envase</p></div>'+
-        '<div class="sr-stats"><p class="price">$'+p.price+'</p>'+trendHtml+'<p class="stock" style="color:'+color+';">'+stock+' '+escapeHtml(p.unit)+'</p></div>'+
+        '<div class="sr-stats"><p class="price">$'+p.price+'</p>'+trendHtml+'<p class="stock" style="color:'+color+';">'+stock+' '+escapeHtml(p.unit)+'</p>'+(pkgText?'<p class="stock-pkg">'+pkgText+'</p>':'')+'</div>'+
         '<div class="sr-stepper">'+
           '<button type="button" class="sr-step-btn" onclick="adjustStock(\''+p.id+'\',1,event)"><span class="icon-slot" data-icon="chevron-up"></span></button>'+
           '<button type="button" class="sr-step-btn" onclick="adjustStock(\''+p.id+'\',-1,event)"><span class="icon-slot" data-icon="chevron-down"></span></button>'+
@@ -5284,6 +5288,7 @@ function openIngredientCreateModal(){
   document.getElementById('stockEditModalTitle').textContent = 'Nuevo ingrediente';
   document.getElementById('se-delete-row').style.display = 'none';
   document.getElementById('se-price-trend').style.display = 'none';
+  document.getElementById('se-stock-info').style.display = 'none';
   document.getElementById('stockEditModal').classList.add('active');
 }
 function openSupplyCreateModal(){
@@ -5298,6 +5303,7 @@ function openSupplyCreateModal(){
   document.getElementById('stockEditModalTitle').textContent = 'Nuevo insumo';
   document.getElementById('se-delete-row').style.display = 'none';
   document.getElementById('se-price-trend').style.display = 'none';
+  document.getElementById('se-stock-info').style.display = 'none';
   document.getElementById('stockEditModal').classList.add('active');
 }
 function openStockEditModal(id){
@@ -5313,6 +5319,13 @@ function openStockEditModal(id){
   document.getElementById('se-unit').innerHTML = stockUnitOptionsHtml(stockEditType, p.unit);
   document.getElementById('stockEditModalTitle').textContent = stockEditType==='insumo' ? 'Editar insumo' : 'Editar ingrediente';
   document.getElementById('se-delete-row').style.display = '';
+  const stockInfoEl = document.getElementById('se-stock-info');
+  const curStock = p.stock||0;
+  const pkgRef = p.qty>0 ? p.qty : 1;
+  const pkgN = curStock/pkgRef;
+  const pkgTxt = Number.isInteger(pkgN) ? pkgN : pkgN.toFixed(1);
+  stockInfoEl.textContent = 'Stock actual: '+curStock+' '+(p.unit||'')+' ('+pkgTxt+' paquete'+(pkgN===1?'':'s')+')';
+  stockInfoEl.style.display = '';
   const trendEl = document.getElementById('se-price-trend');
   const trend = ingredientPriceTrend(p);
   if(trend){
@@ -5833,7 +5846,7 @@ function orderInitials(name){
   if(parts.length===1) return parts[0].slice(0,2).toUpperCase();
   return (parts[0][0]+parts[1][0]).toUpperCase();
 }
-function isDesktopLayout(){ return window.matchMedia('(min-width:900px)').matches; }
+function isDesktopLayout(){ return window.matchMedia('(min-width:900px) and (pointer:fine)').matches; }
 function orderSortFn(a,b){
   if(a.deliveryDate && b.deliveryDate){
     if(a.deliveryDate !== b.deliveryDate) return a.deliveryDate < b.deliveryDate ? -1 : 1;

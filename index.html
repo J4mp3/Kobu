@@ -71,8 +71,13 @@
   .icon-slot svg{ width:1em; height:1em; }
   @keyframes themeIconOut{ 0%{ opacity:1; transform:rotate(0deg) scale(1); } 100%{ opacity:0; transform:rotate(80deg) scale(0.4); } }
   @keyframes themeIconIn{ 0%{ opacity:0; transform:rotate(-80deg) scale(0.4); } 100%{ opacity:1; transform:rotate(0deg) scale(1); } }
-  .screen{ flex:1; overflow-y:auto; overscroll-behavior-y:contain; padding:6px 16px 90px; display:none; flex-direction:column; gap:12px; -webkit-overflow-scrolling:touch; background-color:var(--k-bg); background-image:var(--k-bg-pattern); background-size:160px 160px; }
+  .screen{ flex:1; min-height:0; overflow-y:auto; overscroll-behavior-y:contain; padding:6px 16px 90px; display:none; flex-direction:column; gap:12px; -webkit-overflow-scrolling:touch; background-color:var(--k-bg); background-image:var(--k-bg-pattern); background-size:160px 160px; }
   .screen.active{ display:flex; }
+  /* Sin esto, los hijos directos de .screen (tabs, botones, buscador, lista...)
+     se pueden achicar entre sí para "hacer lugar" cuando el contenido no entra,
+     en vez de quedarse a su tamaño normal y dejar que .screen scrollee (que es
+     lo que ya habilita min-height:0 arriba). Bloqueamos ese achique acá. */
+  .screen > *{ flex-shrink:0; }
   /* ---- splash ---- */
   #screen-splash{ display:flex; position:absolute; inset:0; align-items:center; justify-content:center; flex-direction:column; gap:10px; background:var(--k-accent); z-index:50; padding:0; opacity:0; pointer-events:none; transition:opacity .45s ease; }
   #screen-splash.active{ opacity:1; pointer-events:auto; }

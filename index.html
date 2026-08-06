@@ -1188,6 +1188,11 @@
         <span class="l">Lista de compras automática (desde pedidos)</span>
         <div class="switch" id="autoShopSwitch" onclick="toggleAutoShopping()"><div class="knob-sw"></div></div>
       </div>
+      <div class="rowline">
+        <span class="l">Descontar stock al vender</span>
+        <div class="switch" id="discountStockSwitch" onclick="toggleDiscountStockOnSale()"><div class="knob-sw"></div></div>
+      </div>
+      <p style="font-size:calc(10px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:2px 0 0;">Desactivalo para cargar ventas pasadas sin que se descuente del stock actual.</p>
     </div>
     <div class="grp-card" style="padding:10px 14px;">
       <div class="rowline" style="padding:0;">
@@ -1862,7 +1867,7 @@ function defaultData(){
       {id:'ip-5', name:'chocolate', qty:200, unit:'g', price:2200, stock:0, minStock:0},
       {id:'ip-6', name:'cacao', qty:100, unit:'g', price:1500, stock:0, minStock:0}
     ],
-    settings: { autoShoppingFromOrders:false, theme:'light', energyPriceKwh:0, gasPriceKg:0 },
+    settings: { autoShoppingFromOrders:false, theme:'light', energyPriceKwh:0, gasPriceKg:0, discountStockOnSale:true },
     chats: {},
     chatSessions: [],
     units: defaultUnits(),
@@ -1961,6 +1966,7 @@ function migrateUtensils(d){
 function migrateClientLinks(d){
   if(!d.clients) d.clients = [];
   if(d.settings && d.settings.autoShoppingFromOrders===undefined) d.settings.autoShoppingFromOrders = false;
+  if(d.settings && d.settings.discountStockOnSale===undefined) d.settings.discountStockOnSale = true;
   (d.orders||[]).forEach(function(o){
     if(o.clientId===undefined) o.clientId = null;
     if(!o.clientId && o.customerName){
@@ -4311,6 +4317,7 @@ function renderSettings(){
   }
   mountIcons();
   document.getElementById('autoShopSwitch').classList.toggle('on', !!DATA.settings.autoShoppingFromOrders);
+  document.getElementById('discountStockSwitch').classList.toggle('on', DATA.settings.discountStockOnSale!==false);
   document.getElementById('notifEnabledSwitch').classList.toggle('on', notifEnabled());
   updateNotifNote();
   mountIcons();
@@ -4460,6 +4467,11 @@ async function registerPushNotifications(cfg, vapidKey, syncUrl, syncKey){
 }
 function toggleAutoShopping(){
   DATA.settings.autoShoppingFromOrders = !DATA.settings.autoShoppingFromOrders;
+  saveData(DATA);
+  renderSettings();
+}
+function toggleDiscountStockOnSale(){
+  DATA.settings.discountStockOnSale = !(DATA.settings.discountStockOnSale!==false);
   saveData(DATA);
   renderSettings();
 }
@@ -5121,7 +5133,6 @@ function autoPushNow(){
     .then(function(res){ return res.json(); })
     .then(function(cloud){
       if(cloud && !cloud.error && knownCloudHash && dataHash(cloud)!==knownCloudHash){
-        showToast('Hay cambios más nuevos en la nube. Sincronizá manualmente en Ajustes.');
         return;
       }
       return doSyncPush(url, key, true);
@@ -5167,7 +5178,6 @@ function autoPullOnOpen(){
       localStorage.setItem('kobuLastSyncedHash', dataHash(DATA));
       render();
       updateSyncNote();
-      showToast('Datos actualizados desde la nube');
     })
     .catch(function(){});
 }
@@ -6144,7 +6154,7 @@ function toggleOrderStatus(id){
   }
   const next = nextOrderStatus(cur);
   const wasDeducted = !!o.stockDeducted;
-  const willDeduct = statusImpliesStockDeducted(next);
+  const willDeduct = statusImpliesStockDeducted(next) && DATA.settings.discountStockOnSale!==false;
   if(willDeduct && !wasDeducted){
     adjustStockForOrder(o, -1);
     o.stockDeducted = true;
@@ -6832,6 +6842,7 @@ function registerQuickSale(){
   if(!r) return;
   const c = computeRecipeCost(r);
   const unitPrice = r.salePrice || 0;
+  const willDeduct = DATA.settings.discountStockOnSale!==false;
   const entry = {
     id: 'qs-'+Date.now()+'-'+Math.random().toString(36).slice(2,7),
     recipeId: r.id,
@@ -6840,11 +6851,14 @@ function registerQuickSale(){
     unitPrice: unitPrice,
     unitCost: c.costPerUnit || 0,
     payMethod: qs.payMethod,
-    ts: new Date().toISOString()
+    ts: new Date().toISOString(),
+    stockDeducted: willDeduct
   };
   DATA.quickSales.push(entry);
-  adjustStockForOrder({ items:[{ recipeId:r.id, qty:qs.qty }] }, -1);
-  r.stock = Math.max(0, (r.stock||0) - qs.qty);
+  if(willDeduct){
+    adjustStockForOrder({ items:[{ recipeId:r.id, qty:qs.qty }] }, -1);
+    r.stock = Math.max(0, (r.stock||0) - qs.qty);
+  }
   state.quickSale = null;
   saveData(DATA);
   if(r.stock<=0) showToast('Venta registrada — sin stock de '+r.title);
@@ -6857,9 +6871,11 @@ async function undoLastQuickSale(){
   const ok = await showConfirm('¿Deshacer la última venta registrada?');
   if(!ok) return;
   const last = DATA.quickSales.pop();
-  adjustStockForOrder({ items:[{ recipeId:last.recipeId, qty:last.qty }] }, 1);
-  const r = DATA.recipes.find(function(x){ return x.id===last.recipeId; });
-  if(r) r.stock = (r.stock||0) + last.qty;
+  if(last.stockDeducted!==false){
+    adjustStockForOrder({ items:[{ recipeId:last.recipeId, qty:last.qty }] }, 1);
+    const r = DATA.recipes.find(function(x){ return x.id===last.recipeId; });
+    if(r) r.stock = (r.stock||0) + last.qty;
+  }
   saveData(DATA);
   showToast('Venta deshecha');
   renderQuickSellScreen();

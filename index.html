@@ -1552,6 +1552,7 @@
         <div class="cook-timer-pill" id="cook-timer-pill">
           <button type="button" id="cook-timer-playbtn" onclick="toggleCookTimer(event)"><span class="icon-slot" data-icon="player-play"></span></button>
           <span id="cook-timer-val">00:00</span>
+          <button type="button" id="cook-timer-stopbtn" onclick="stopCookTimer(event)"><span class="icon-slot" data-icon="x"></span></button>
         </div>
         <button type="button" class="cook-finish-btn" id="cook-finish-btn" onclick="finishCook(event)">
           <span class="icon-slot" data-icon="chef-hat"></span> Finalizar
@@ -2614,14 +2615,10 @@ function renderRecipes(){
   renderHomeSummary();
   renderPrepLibraryCards();
   applyHomeTabUI();
-  const searchEl = document.getElementById('searchInput');
-  const q = (searchEl ? (searchEl.value || '') : '').toLowerCase().trim();
-  const unfiltered = !q && !activeTag;
+  const unfiltered = !activeTag;
   const list = DATA.recipes.filter(function(r){
     if(activeTag && !(r.tags||[]).includes(activeTag)) return false;
-    if(!q) return true;
-    const hay = [r.title, r.notes, (r.tags||[]).join(' '), flatRecipeIngredients(r).map(function(i){return i.name;}).join(' ')].join(' ').toLowerCase();
-    return hay.includes(q);
+    return true;
   }).sort(function(a,b){ return (b.favorite?1:0)-(a.favorite?1:0); });
   const el = document.getElementById('recipeList');
   if(list.length===0){
@@ -3224,22 +3221,6 @@ function removeChip(key, idx){
   state.draft[key].splice(idx,1);
   renderChipField(key, 'f-'+key);
   if(key==='tags') populateTagSelect();
-}
-function renderApplianceChips(){
-  const wrap = document.getElementById('f-ovenIds');
-  if(!wrap) return;
-  state.draft.ovenIds = state.draft.ovenIds || [];
-  if(DATA.ovens.length===0){ wrap.innerHTML = '<p style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;">todavía no cargaste nada en Cocina.</p>'; return; }
-  wrap.innerHTML = DATA.ovens.map(function(o){
-    const active = state.draft.ovenIds.indexOf(o.id)!==-1;
-    return '<button type="button" class="chip '+(active?'active':'')+'" onclick="toggleApplianceChip(\''+o.id+'\')">'+escapeHtml(o.name)+'</button>';
-  }).join('');
-}
-function toggleApplianceChip(id){
-  state.draft.ovenIds = state.draft.ovenIds || [];
-  const idx = state.draft.ovenIds.indexOf(id);
-  if(idx===-1) state.draft.ovenIds.push(id); else state.draft.ovenIds.splice(idx,1);
-  renderApplianceChips();
 }
 function buildIngredientRowHtml(ing, i, kind){
   const isSupply = kind==='insumo';
@@ -8413,6 +8394,7 @@ function renderCookStep(){
   if(match){
     timerPill.style.display = 'flex';
     state.cookTimerSeconds = (parseInt(match[1])||1)*60;
+    state.cookTimerLabel = (r ? r.title : 'Kobu') + ' — paso '+(idx+1);
     updateCookTimerDisplay();
     setCookTimerIcon(false);
   } else {
@@ -8442,37 +8424,132 @@ function updateCookTimerDisplay(){
   if(el) el.textContent = (m<10?'0':'')+m+':'+(sec<10?'0':'')+sec;
 }
 function setCookTimerIcon(running){
-  const btn = document.getElementById('cook-timer-playbtn');
-  if(!btn) return;
-  btn.innerHTML = running ? ICONS['player-pause'] : ICONS['player-play'];
+  const el = document.querySelector('#cook-timer-playbtn .icon-slot');
+  if(!el) return;
+  el.innerHTML = running ? ICONS['player-pause'] : ICONS['player-play'];
+}
+const COOK_TIMER_TAG = 'kobu-cook-timer';
+const COOK_TIMER_STATE_KEY = 'kobuCookTimerState';
+function saveCookTimerState(){
+  try{
+    if(state.cookTimerEndTime){
+      localStorage.setItem(COOK_TIMER_STATE_KEY, JSON.stringify({
+        endTime: state.cookTimerEndTime, label: state.cookTimerLabel||'Kobu', running:true
+      }));
+    } else if(state.cookTimerSeconds>0){
+      localStorage.setItem(COOK_TIMER_STATE_KEY, JSON.stringify({
+        remainingSeconds: state.cookTimerSeconds, label: state.cookTimerLabel||'Kobu', running:false
+      }));
+    } else {
+      localStorage.removeItem(COOK_TIMER_STATE_KEY);
+    }
+  }catch(e){}
+}
+function clearCookTimerState(){
+  try{ localStorage.removeItem(COOK_TIMER_STATE_KEY); }catch(e){}
+}
+function ensureNotifPermission(){
+  if(!('Notification' in window)) return;
+  if(Notification.permission==='default'){ Notification.requestPermission().catch(function(){}); }
+}
+function cookTimerFmt(seconds){
+  const s = Math.max(0, seconds|0);
+  const m = Math.floor(s/60), sec = s%60;
+  return (m<10?'0':'')+m+':'+(sec<10?'0':'')+sec;
+}
+function showCookTimerNotification(running){
+  if(!('Notification' in window) || Notification.permission!=='granted' || !('serviceWorker' in navigator)) return;
+  const label = state.cookTimerLabel || 'Kobu';
+  const body = running
+    ? 'Quedan '+cookTimerFmt(state.cookTimerSeconds)+' — tocá para pausar o detener.'
+    : 'En pausa en '+cookTimerFmt(state.cookTimerSeconds)+'.';
+  const actions = running
+    ? [{ action:'cook-pause', title:'Pausar' }, { action:'cook-stop', title:'Detener' }]
+    : [{ action:'cook-resume', title:'Reanudar' }, { action:'cook-stop', title:'Detener' }];
+  navigator.serviceWorker.ready.then(function(reg){
+    try{
+      reg.showNotification('⏱ '+label, {
+        body: body, tag: COOK_TIMER_TAG, renotify:false, silent:true,
+        icon:'icon-192.png', badge:'icon-192.png', actions:actions,
+        data:{ type:'cook-timer' }
+      });
+    }catch(e){}
+  }).catch(function(){});
+}
+function closeCookTimerNotification(){
+  if(!('serviceWorker' in navigator)) return;
+  navigator.serviceWorker.ready.then(function(reg){
+    reg.getNotifications({ tag: COOK_TIMER_TAG }).then(function(list){
+      list.forEach(function(n){ n.close(); });
+    });
+  }).catch(function(){});
+}
+function showCookTimerDoneNotification(){
+  const label = state.cookTimerLabel || 'Kobu';
+  closeCookTimerNotification();
+  if(!('Notification' in window) || Notification.permission!=='granted' || !('serviceWorker' in navigator)) return;
+  navigator.serviceWorker.ready.then(function(reg){
+    try{
+      reg.showNotification('¡Listo, '+label+'!', {
+        body:'El tiempo se cumplió.', tag: COOK_TIMER_TAG+'-done',
+        icon:'icon-192.png', badge:'icon-192.png', vibrate:[200,100,200,100,400]
+      });
+    }catch(e){}
+  }).catch(function(){});
+}
+function cookTimerTick(){
+  const remaining = Math.max(0, Math.round((state.cookTimerEndTime - Date.now())/1000));
+  state.cookTimerSeconds = remaining;
+  updateCookTimerDisplay();
+  if(remaining<=0){
+    clearInterval(state.cookTimerHandle);
+    state.cookTimerHandle = null;
+    state.cookTimerEndTime = null;
+    setCookTimerIcon(false);
+    showToast('¡Timer terminado!');
+    if(navigator.vibrate) navigator.vibrate([200,100,200,100,400]);
+    showCookTimerDoneNotification();
+    clearCookTimerState();
+  }
 }
 function toggleCookTimer(e){
   if(e) e.stopPropagation();
   if(state.cookTimerHandle){
     clearInterval(state.cookTimerHandle);
     state.cookTimerHandle = null;
+    state.cookTimerSeconds = Math.max(0, Math.round((state.cookTimerEndTime - Date.now())/1000));
+    state.cookTimerEndTime = null;
     setCookTimerIcon(false);
+    saveCookTimerState();
+    showCookTimerNotification(false);
     return;
   }
+  ensureNotifPermission();
   setCookTimerIcon(true);
-  function tick(){
-    updateCookTimerDisplay();
-    if(state.cookTimerSeconds<=0){
-      clearInterval(state.cookTimerHandle);
-      state.cookTimerHandle = null;
-      setCookTimerIcon(false);
-      showToast('¡Timer terminado!');
-      return;
-    }
-    state.cookTimerSeconds--;
-  }
-  tick();
-  state.cookTimerHandle = setInterval(tick, 1000);
+  state.cookTimerEndTime = Date.now() + (state.cookTimerSeconds||0)*1000;
+  saveCookTimerState();
+  showCookTimerNotification(true);
+  cookTimerTick();
+  state.cookTimerHandle = setInterval(cookTimerTick, 1000);
+}
+function stopCookTimer(e){
+  if(e) e.stopPropagation();
+  cancelCookTimer();
+  showToast('Cronómetro detenido');
 }
 function cancelCookTimer(){
   if(state.cookTimerHandle){ clearInterval(state.cookTimerHandle); state.cookTimerHandle = null; }
+  state.cookTimerEndTime = null;
+  state.cookTimerSeconds = 0;
+  clearCookTimerState();
+  closeCookTimerNotification();
   const pill = document.getElementById('cook-timer-pill');
   if(pill) pill.style.display = 'none';
+}
+function handleCookTimerNotifAction(action){
+  if(action==='cook-pause' && state.cookTimerHandle){ toggleCookTimer(null); }
+  else if(action==='cook-resume' && !state.cookTimerHandle && state.cookTimerSeconds>0){ toggleCookTimer(null); }
+  else if(action==='cook-stop'){ stopCookTimer(null); }
 }
 function exitCook(){
   playBackArrowAnim('cookExitBtn');
@@ -8499,6 +8576,8 @@ if('serviceWorker' in navigator && (location.protocol==='https:' || location.pro
     const d = event.data || {};
     if(d.type==='kobu-notification-nav' && d.screen){
       goTab(d.screen);
+    } else if(d.type==='kobu-cook-timer-action' && d.action){
+      handleCookTimerNotifAction(d.action);
     }
   });
 }

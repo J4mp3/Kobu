@@ -230,8 +230,11 @@
   .step-row{ transition:opacity .15s; }
   .step-row.dragging{ opacity:0.4; }
   .step-drag{ cursor:grab; touch-action:none; flex-shrink:0; }
+  .step-row-title{ background:var(--k-card2); border-radius:10px; padding:4px 4px 4px 2px; }
+  .step-title-input{ flex:1; font-weight:700; color:var(--k-accent); }
   .dstep{ display:flex; gap:9px; align-items:flex-start; font-size:calc(12.5px + var(--kobu-font-boost, 0px)); color:var(--k-text); line-height:1.5; }
   .dstep-num{ width:18px; height:18px; border-radius:50%; background:var(--k-card2); color:var(--k-accent); font-size:calc(10px + var(--kobu-font-boost, 0px)); font-weight:600; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
+  .dstep-title{ font-size:calc(12.5px + var(--kobu-font-boost, 0px)); font-weight:700; color:var(--k-accent); margin:10px 0 0; }
   .notes-box{ background:var(--k-card2); border-radius:10px; padding:10px; font-size:calc(12.5px + var(--kobu-font-boost, 0px)); color:var(--k-text); line-height:1.5; white-space:pre-wrap; }
   /* ---- oven knobs ---- */
   .knob-grid{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
@@ -445,6 +448,7 @@
   .cook-tapzone-right{ right:0; }
   .cook-mid{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:16px; padding:10px 14px; position:relative; z-index:1; }
   .cook-text{ font-size:calc(21px + var(--kobu-font-boost, 0px)); color:var(--k-bg); line-height:1.45; font-weight:500; }
+  .cook-text.cook-text-title{ font-size:calc(27px + var(--kobu-font-boost, 0px)); font-weight:800; letter-spacing:.01em; }
   .cook-timer-pill{ display:none; align-items:center; gap:8px; background:rgba(255,255,255,.1); border-radius:20px; padding:8px 16px; position:relative; z-index:4; }
   .cook-timer-pill button{ background:none; border:none; color:var(--k-bg); display:flex; cursor:pointer; padding:0; }
   .cook-timer-pill .icon-slot{ font-size:calc(18px + var(--kobu-font-boost, 0px)); }
@@ -689,7 +693,7 @@
         <div class="field" style="flex:1;"><label>Cantidad del envase</label><input class="input" id="se-qty" type="number" placeholder="1000"></div>
         <div class="field" style="flex:1;"><label>Unidad</label><select class="input" id="se-unit"></select></div>
       </div>
-      <div class="field"><label>Precio del envase ($)</label><input class="input" id="se-price" type="number" placeholder="800"><p id="se-price-trend" style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));margin:4px 0 0;display:none;"></p></div>
+      <div class="field"><label>Precio del envase ($)</label><input class="input" id="se-price" type="text" inputmode="decimal" placeholder="800 (o '-' si no lo sabés)"><p id="se-price-trend" style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));margin:4px 0 0;display:none;"></p></div>
       <div class="field"><label>Proveedor</label><input class="input" id="se-provider" placeholder="ej. Distribuidora Sur"></div>
       <div class="btn-row" id="se-delete-row" style="display:none;">
         <button class="btn btn-ghost" style="flex:1;color:var(--k-danger);" onclick="deleteStockEntry()"><span class="icon-slot" data-icon="trash" style="vertical-align:-2px;"></span> Eliminar</button>
@@ -1073,13 +1077,13 @@
     </div>
     <div class="formtab-panel" data-panel="pasos">
       <div class="grp-card" id="stepsSimpleCard">
-        <p class="section-title"><span class="badge-ic"><span class="icon-slot" data-icon="clipboard"></span></span>Preparación</p>
+        <div class="section-title"><span class="badge-ic"><span class="icon-slot" data-icon="clipboard"></span></span>Preparación<button type="button" class="iconbtn" style="margin-left:auto;" onclick="addMainStepTitle()" title="Agregar título de sección"><span class="icon-slot" data-icon="plus"></span></button></div>
         <div id="f-steps" style="display:flex;flex-direction:column;gap:6px;"></div>
         <button class="btn btn-ghost" onclick="addStepRow()"><span class="icon-slot" data-icon="plus" style="vertical-align:-2px;"></span> Agregar paso</button>
       </div>
       <div id="stepsAccordion" style="display:none;flex-direction:column;gap:10px;"></div>
       <div class="grp-card" id="finalStepsCard" style="display:none;">
-        <p class="section-title"><span class="badge-ic"><span class="icon-slot" data-icon="clipboard"></span></span>Montaje final</p>
+        <div class="section-title"><span class="badge-ic"><span class="icon-slot" data-icon="clipboard"></span></span>Montaje final<button type="button" class="iconbtn" style="margin-left:auto;" onclick="addFinalStepTitle()" title="Agregar título de sección"><span class="icon-slot" data-icon="plus"></span></button></div>
         <p style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:-4px 0 0;">Pasos para combinar las preparaciones: rellenar, decorar, etc.</p>
         <div id="f-finalsteps" style="display:flex;flex-direction:column;gap:6px;"></div>
         <button class="btn btn-ghost" onclick="addFinalStepRow()"><span class="icon-slot" data-icon="plus" style="vertical-align:-2px;"></span> Agregar paso</button>
@@ -1117,6 +1121,7 @@
     <div class="action-grid">
       <button class="action-btn" onclick="openChat()"><span class="icon-slot" data-icon="message-circle"></span><span class="lbl">Preguntar a la IA</span></button>
       <button class="action-btn" onclick="generateVariant(state.currentId)"><span class="icon-slot" data-icon="copy"></span><span class="lbl">Generar variante</span></button>
+      <button class="action-btn" onclick="exportRecipeAsText(state.currentId)"><span class="icon-slot" data-icon="share"></span><span class="lbl">Exportar como texto</span></button>
     </div>
     <div>
       <p class="section-title">Anotaciones</p>
@@ -2787,6 +2792,58 @@ function libPrepDragEnd(){
 }
 function escapeHtml(s){ return (s||'').toString().replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
 function stripTags(s){ return (s||'').toString().replace(/<[^>]*>/g,''); }
+function mdBoldToHtml(s){ return escapeHtml(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>'); }
+function parsePriceInput(raw){
+  const t = (raw==null?'':raw).toString().trim();
+  if(t==='') return { valid:false };
+  if(t==='-') return { valid:true, value:null };
+  const n = parseFloat(t.replace(',','.'));
+  if(isNaN(n)) return { valid:false };
+  return { valid:true, value:n };
+}
+function isStepTitleText(s){ return /^##\s*/.test((s||'').trim()); }
+function stepTitleText(s){ return (s||'').trim().replace(/^##\s*/,''); }
+function applyBoldToTextarea(ta, onChange){
+  if(!ta) return;
+  const start = ta.selectionStart, end = ta.selectionEnd;
+  const val = ta.value;
+  const selected = val.slice(start,end);
+  let newVal, newStart, newEnd;
+  if(selected){
+    if(val.slice(start-2,start)==='**' && val.slice(end,end+2)==='**'){
+      newVal = val.slice(0,start-2)+selected+val.slice(end+2);
+      newStart = start-2; newEnd = newStart+selected.length;
+    } else {
+      newVal = val.slice(0,start)+'**'+selected+'**'+val.slice(end);
+      newStart = start+2; newEnd = newStart+selected.length;
+    }
+  } else {
+    newVal = val.slice(0,start)+'****'+val.slice(end);
+    newStart = start+2; newEnd = newStart;
+  }
+  ta.value = newVal;
+  ta.focus();
+  ta.setSelectionRange(newStart,newEnd);
+  onChange(newVal);
+}
+function boldMainStep(i){ applyBoldToTextarea(document.getElementById('step-ta-'+i), function(v){ updateStep(i,v); }); }
+function boldComponentStep(ci,i){ applyBoldToTextarea(document.getElementById('cstep-ta-'+ci+'-'+i), function(v){ updateComponentStep(ci,i,v); }); }
+function boldFinalStep(i){ applyBoldToTextarea(document.getElementById('finalstep-ta-'+i), function(v){ updateFinalStep(i,v); }); }
+function addComponentStepTitle(ci){
+  state.draft.components[ci].steps.push('## ');
+  renderStepsAccordion();
+  const el = document.getElementById('cstep-ta-'+ci+'-'+(state.draft.components[ci].steps.length-1));
+  if(el) el.focus();
+}
+function updateComponentStepTitleText(ci,i,val){ state.draft.components[ci].steps[i]='## '+val; }
+function addFinalStepTitle(){
+  state.draft.finalSteps = state.draft.finalSteps||[];
+  state.draft.finalSteps.push('## ');
+  renderFinalStepRows();
+  const el = document.getElementById('finalstep-ta-'+(state.draft.finalSteps.length-1));
+  if(el) el.focus();
+}
+function updateFinalStepTitleText(i,val){ state.draft.finalSteps[i]='## '+val; }
 function openGlobalSearch(){
   const iconEl = document.querySelector('#globalSearchBtn .icon-slot');
   if(iconEl){
@@ -3295,7 +3352,7 @@ function renderInlineNewIngredientForm(i){
       '<input class="input" id="ni-qty-'+i+'" type="number" placeholder="cant. envase">'+
       '<select class="input" id="ni-unit-'+i+'">'+unitOptionsHtml('g')+'</select>'+
     '</div>'+
-    '<input class="input" id="ni-price-'+i+'" type="number" placeholder="precio del envase $">'+
+    '<input class="input" id="ni-price-'+i+'" type="text" inputmode="decimal" placeholder="precio del envase $ (o \'-\' si no lo sabés)">'+
     '<button class="btn btn-primary" onclick="confirmNewIngredient('+i+')">Guardar ingrediente</button>'+
     '</div>';
 }
@@ -3306,7 +3363,7 @@ function renderInlineNewSupplyForm(i){
       '<input class="input" id="ni-qty-'+i+'" type="number" placeholder="cant. envase">'+
       '<select class="input" id="ni-unit-'+i+'">'+unitOptionsHtml('u')+'</select>'+
     '</div>'+
-    '<input class="input" id="ni-price-'+i+'" type="number" placeholder="precio del envase $">'+
+    '<input class="input" id="ni-price-'+i+'" type="text" inputmode="decimal" placeholder="precio del envase $ (o \'-\' si no lo sabés)">'+
     '<button class="btn btn-primary" onclick="confirmNewSupply('+i+')">Guardar insumo</button>'+
     '</div>';
 }
@@ -3338,31 +3395,33 @@ function confirmNewIngredient(i){
   const name = document.getElementById('ni-name-'+i).value.trim();
   const qty = parseFloat(document.getElementById('ni-qty-'+i).value);
   const unit = document.getElementById('ni-unit-'+i).value;
-  const price = parseFloat(document.getElementById('ni-price-'+i).value);
-  if(!name || isNaN(qty) || isNaN(price)){ showToast('Completá nombre, cantidad y precio'); return; }
-  const p = { id:'ip-'+Date.now(), name:name, qty:qty, unit:unit, price:price, type:'ingrediente' };
+  const priceParsed = parsePriceInput(document.getElementById('ni-price-'+i).value);
+  if(!name || isNaN(qty) || !priceParsed.valid){ showToast('Completá nombre, cantidad y precio (o poné "-" si no lo sabés)'); return; }
+  const p = { id:'ip-'+Date.now(), name:name, qty:qty, unit:unit, price:priceParsed.value, type:'ingrediente' };
+  if(priceParsed.value!=null) p.priceHistory = [{ price:priceParsed.value, date: todayStr() }];
   DATA.ingredientPrices.push(p);
   saveData(DATA);
   state._newIngredientRow = null;
   const ing = state.draft.ingredients[i];
   ing.priceId = p.id; ing.name = p.name; if(!ing.unit) ing.unit = p.unit; ing.kind = 'ingrediente';
   renderIngredientRows();
-  showToast('Ingrediente creado y vinculado');
+  showToast(priceParsed.value==null ? 'Ingrediente creado (precio pendiente)' : 'Ingrediente creado y vinculado');
 }
 function confirmNewSupply(i){
   const name = document.getElementById('ni-name-'+i).value.trim();
   const qty = parseFloat(document.getElementById('ni-qty-'+i).value);
   const unit = document.getElementById('ni-unit-'+i).value;
-  const price = parseFloat(document.getElementById('ni-price-'+i).value);
-  if(!name || isNaN(qty) || isNaN(price)){ showToast('Completá nombre, cantidad y precio'); return; }
-  const p = { id:'ip-'+Date.now(), name:name, qty:qty, unit:unit, price:price, type:'insumo' };
+  const priceParsed = parsePriceInput(document.getElementById('ni-price-'+i).value);
+  if(!name || isNaN(qty) || !priceParsed.valid){ showToast('Completá nombre, cantidad y precio (o poné "-" si no lo sabés)'); return; }
+  const p = { id:'ip-'+Date.now(), name:name, qty:qty, unit:unit, price:priceParsed.value, type:'insumo' };
+  if(priceParsed.value!=null) p.priceHistory = [{ price:priceParsed.value, date: todayStr() }];
   DATA.ingredientPrices.push(p);
   saveData(DATA);
   state._newSupplyRow = null;
   const ing = state.draft.ingredients[i];
   ing.priceId = p.id; ing.name = p.name; if(!ing.unit) ing.unit = p.unit; ing.kind = 'insumo';
   renderIngredientRows();
-  showToast('Insumo creado y vinculado');
+  showToast(priceParsed.value==null ? 'Insumo creado (precio pendiente)' : 'Insumo creado y vinculado');
 }
 function addIngredientRow(){ state.draft.ingredients.push({priceId:null,name:'',qty:'',unit:'g',kind:'ingrediente'}); renderIngredientRows(); }
 function addSupplyRow(){ state.draft.ingredients.push({priceId:null,name:'',qty:'',unit:'u',kind:'insumo'}); renderIngredientRows(); }
@@ -3377,9 +3436,17 @@ function updateIngredient(i,field,val){ state.draft.ingredients[i][field]=val; u
 function renderStepRows(){
   const wrap = document.getElementById('f-steps');
   wrap.innerHTML = state.draft.steps.map(function(s,i){
+    if(isStepTitleText(s)){
+      return '<div class="btn-row step-row step-row-title" data-idx="'+i+'">'+
+        '<button type="button" class="iconbtn step-drag" onpointerdown="stepDragStart(event,'+i+')"><span class="icon-slot" data-icon="grip"></span></button>'+
+        '<input class="input step-title-input" id="step-ta-'+i+'" type="text" placeholder="título de sección" value="'+escapeHtml(stepTitleText(s))+'" oninput="updateStepTitleText('+i+',this.value)">'+
+        '<button class="iconbtn" onclick="removeStepRow('+i+')" style="color:var(--k-danger);"><span class="icon-slot" data-icon="x"></span></button>'+
+        '</div>';
+    }
     return '<div class="btn-row step-row" data-idx="'+i+'">'+
       '<button type="button" class="iconbtn step-drag" onpointerdown="stepDragStart(event,'+i+')"><span class="icon-slot" data-icon="grip"></span></button>'+
-      '<textarea class="input" style="flex:1;min-height:40px;" placeholder="paso '+(i+1)+'" oninput="updateStep('+i+',this.value)">'+escapeHtml(s)+'</textarea>'+
+      '<textarea class="input" id="step-ta-'+i+'" style="flex:1;min-height:40px;" placeholder="paso '+(i+1)+'" oninput="updateStep('+i+',this.value)">'+escapeHtml(s)+'</textarea>'+
+      '<button type="button" class="iconbtn" onclick="boldMainStep('+i+')" style="font-weight:800;" title="Negrita">N</button>'+
       '<button class="iconbtn" onclick="removeStepRow('+i+')" style="color:var(--k-danger);"><span class="icon-slot" data-icon="x"></span></button>'+
       '</div>';
   }).join('');
@@ -3388,6 +3455,13 @@ function renderStepRows(){
 function addStepRow(){ state.draft.steps.push(''); renderStepRows(); }
 function removeStepRow(i){ state.draft.steps.splice(i,1); renderStepRows(); }
 function updateStep(i,val){ state.draft.steps[i]=val; }
+function updateStepTitleText(i,val){ state.draft.steps[i]='## '+val; }
+function addMainStepTitle(){
+  state.draft.steps.push('## ');
+  renderStepRows();
+  const el = document.getElementById('step-ta-'+(state.draft.steps.length-1));
+  if(el) el.focus();
+}
 function flushActiveComponent(){
   const d = state.draft;
   if(!d.components || !d.components.length || state._activeComponentIdx==null) return;
@@ -3466,9 +3540,18 @@ function renderStepsAccordion(){
   wrap.innerHTML = d.components.map(function(c,ci){
     const collapsed = !!state._stepsCollapsed[c.id];
     const stepsHtml = (c.steps||[]).map(function(s,si){
+      const isTitle = isStepTitleText(s);
+      if(isTitle){
+        return '<div class="btn-row step-row step-row-title" data-idx="'+si+'">'+
+          '<button type="button" class="iconbtn step-drag" onpointerdown="stepDragStart(event,'+ci+','+si+')"><span class="icon-slot" data-icon="grip"></span></button>'+
+          '<input class="input step-title-input" id="cstep-ta-'+ci+'-'+si+'" type="text" placeholder="título de sección" value="'+escapeHtml(stepTitleText(s))+'" oninput="updateComponentStepTitleText('+ci+','+si+',this.value)">'+
+          '<button class="iconbtn" onclick="removeComponentStepRow('+ci+','+si+')" style="color:var(--k-danger);"><span class="icon-slot" data-icon="x"></span></button>'+
+          '</div>';
+      }
       return '<div class="btn-row step-row" data-idx="'+si+'">'+
         '<button type="button" class="iconbtn step-drag" onpointerdown="stepDragStart(event,'+ci+','+si+')"><span class="icon-slot" data-icon="grip"></span></button>'+
-        '<textarea class="input" style="flex:1;min-height:40px;" placeholder="paso '+(si+1)+'" oninput="updateComponentStep('+ci+','+si+',this.value)">'+escapeHtml(s)+'</textarea>'+
+        '<textarea class="input" id="cstep-ta-'+ci+'-'+si+'" style="flex:1;min-height:40px;" placeholder="paso '+(si+1)+'" oninput="updateComponentStep('+ci+','+si+',this.value)">'+escapeHtml(s)+'</textarea>'+
+        '<button type="button" class="iconbtn" onclick="boldComponentStep('+ci+','+si+')" style="font-weight:800;" title="Negrita">N</button>'+
         '<button class="iconbtn" onclick="removeComponentStepRow('+ci+','+si+')" style="color:var(--k-danger);"><span class="icon-slot" data-icon="x"></span></button>'+
         '</div>';
     }).join('') || '<p style="font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;">todavía no agregaste pasos.</p>';
@@ -3476,6 +3559,7 @@ function renderStepsAccordion(){
       '<div class="prep-accordion-head" onclick="togglePrepCollapse(\''+c.id+'\')">'+
         '<button type="button" class="iconbtn prep-accordion-drag" onpointerdown="prepDragStart(event,'+ci+')" onclick="event.stopPropagation()"><span class="icon-slot" data-icon="grip"></span></button>'+
         '<span class="prep-accordion-title">'+escapeHtml(c.name||('Preparación '+(ci+1)))+'</span>'+
+        '<button type="button" class="iconbtn" onclick="event.stopPropagation();addComponentStepTitle('+ci+')" title="Agregar título de sección"><span class="icon-slot" data-icon="plus"></span></button>'+
         '<span class="icon-slot prep-accordion-chevron'+(collapsed?'':' open')+'" data-icon="chevron-right"></span>'+
       '</div>'+
       (collapsed ? '' :
@@ -3552,8 +3636,17 @@ function renderFinalStepRows(){
   if(!wrap) return;
   const steps = state.draft.finalSteps || [];
   wrap.innerHTML = steps.map(function(s,i){
-    return '<div class="btn-row">'+
-      '<textarea class="input" style="flex:1;min-height:40px;" placeholder="paso de armado '+(i+1)+'" oninput="updateFinalStep('+i+',this.value)">'+escapeHtml(s)+'</textarea>'+
+    if(isStepTitleText(s)){
+      return '<div class="btn-row step-row step-row-title" data-idx="'+i+'">'+
+        '<button type="button" class="iconbtn step-drag" onpointerdown="stepDragStart(event,\'final\','+i+')"><span class="icon-slot" data-icon="grip"></span></button>'+
+        '<input class="input step-title-input" id="finalstep-ta-'+i+'" type="text" placeholder="título de sección" value="'+escapeHtml(stepTitleText(s))+'" oninput="updateFinalStepTitleText('+i+',this.value)">'+
+        '<button class="iconbtn" onclick="removeFinalStepRow('+i+')" style="color:var(--k-danger);"><span class="icon-slot" data-icon="x"></span></button>'+
+        '</div>';
+    }
+    return '<div class="btn-row step-row" data-idx="'+i+'">'+
+      '<button type="button" class="iconbtn step-drag" onpointerdown="stepDragStart(event,\'final\','+i+')"><span class="icon-slot" data-icon="grip"></span></button>'+
+      '<textarea class="input" id="finalstep-ta-'+i+'" style="flex:1;min-height:40px;" placeholder="paso de armado '+(i+1)+'" oninput="updateFinalStep('+i+',this.value)">'+escapeHtml(s)+'</textarea>'+
+      '<button type="button" class="iconbtn" onclick="boldFinalStep('+i+')" style="font-weight:800;" title="Negrita">N</button>'+
       '<button class="iconbtn" onclick="removeFinalStepRow('+i+')" style="color:var(--k-danger);"><span class="icon-slot" data-icon="x"></span></button>'+
       '</div>';
   }).join('') || '<p style="font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;">todavía no agregaste pasos de armado.</p>';
@@ -3691,10 +3784,25 @@ function saveLibraryPrep(){
   applyHomeTabUI();
 }
 let stepDrag = null;
+function stepDragWrapId(ci){
+  if(ci==null) return 'f-steps';
+  if(ci==='final') return 'f-finalsteps';
+  return 'f-steps-'+ci;
+}
+function stepDragArr(ci){
+  if(ci==null) return state.draft.steps;
+  if(ci==='final') return state.draft.finalSteps;
+  return state.draft.components[ci].steps;
+}
+function stepDragRerender(ci){
+  if(ci==null) renderStepRows();
+  else if(ci==='final') renderFinalStepRows();
+  else renderStepsAccordion();
+}
 function stepDragStart(e, ci, i){
   e.preventDefault();
   if(i===undefined){ i = ci; ci = null; }
-  const wrap = document.getElementById(ci==null ? 'f-steps' : ('f-steps-'+ci));
+  const wrap = document.getElementById(stepDragWrapId(ci));
   if(!wrap) return;
   const rows = wrap.querySelectorAll('.step-row');
   if(!rows[i]) return;
@@ -3707,7 +3815,7 @@ function stepDragStart(e, ci, i){
 function stepDragMove(e){
   if(!stepDrag) return;
   const ci = stepDrag.ci;
-  const wrap = document.getElementById(ci==null ? 'f-steps' : ('f-steps-'+ci));
+  const wrap = document.getElementById(stepDragWrapId(ci));
   if(!wrap) return;
   const rows = Array.from(wrap.querySelectorAll('.step-row'));
   const y = e.clientY;
@@ -3716,12 +3824,12 @@ function stepDragMove(e){
     const rect = rows[idx].getBoundingClientRect();
     const mid = rect.top + rect.height/2;
     if((idx < stepDrag.currentIndex && y < mid) || (idx > stepDrag.currentIndex && y > mid)){
-      const arr = ci==null ? state.draft.steps : state.draft.components[ci].steps;
+      const arr = stepDragArr(ci);
       const moved = arr.splice(stepDrag.currentIndex,1)[0];
       arr.splice(idx,0,moved);
       stepDrag.currentIndex = idx;
-      if(ci==null) renderStepRows(); else renderStepsAccordion();
-      const newWrap = document.getElementById(ci==null ? 'f-steps' : ('f-steps-'+ci));
+      stepDragRerender(ci);
+      const newWrap = document.getElementById(stepDragWrapId(ci));
       const newRows = newWrap ? newWrap.querySelectorAll('.step-row') : [];
       if(newRows[idx]) newRows[idx].classList.add('dragging');
       break;
@@ -3734,7 +3842,7 @@ function stepDragEnd(){
   document.removeEventListener('pointermove', stepDragMove);
   document.removeEventListener('pointerup', stepDragEnd);
   document.removeEventListener('pointercancel', stepDragEnd);
-  const wrap = document.getElementById(ci==null ? 'f-steps' : ('f-steps-'+ci));
+  const wrap = document.getElementById(stepDragWrapId(ci));
   if(wrap) wrap.querySelectorAll('.step-row.dragging').forEach(function(el){ el.classList.remove('dragging'); });
 }
 
@@ -3874,7 +3982,16 @@ function renderDetailIngredients(r){
   mountIcons();
 }
 function dstepsHtml(steps){
-  return steps.map(function(s,i){ return '<div class="dstep"><span class="dstep-num">'+(i+1)+'</span><span>'+escapeHtml(s)+'</span></div>'; }).join('') || '<p style="font-size:calc(12px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;">sin pasos cargados</p>';
+  let n = 0;
+  const html = steps.map(function(s){
+    if(isStepTitleText(s)){
+      const t = stepTitleText(s);
+      return t ? '<p class="dstep-title">'+mdBoldToHtml(t)+'</p>' : '';
+    }
+    n++;
+    return '<div class="dstep"><span class="dstep-num">'+n+'</span><span>'+mdBoldToHtml(s)+'</span></div>';
+  }).join('');
+  return html || '<p style="font-size:calc(12px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;">sin pasos cargados</p>';
 }
 function renderDetailSteps(r){
   const comps = (r.components && r.components.length) ? r.components : null;
@@ -4135,12 +4252,13 @@ function computeRecipeCost(r, scale){
       const price = matchIngredientPrice(ing.priceId);
       const qty = parseFloat((ing.qty||'').toString().replace(',','.')) * scale;
       let lineCost = null, convertible = true;
-      if(price && !isNaN(qty) && price.qty>0){
+      const pricePending = !!(price && (price.price==null || isNaN(price.price)));
+      if(price && !pricePending && !isNaN(qty) && price.qty>0){
         const convertedQty = convertQty(qty, ing.unit, price.unit);
         if(convertedQty==null){ convertible = false; }
         else { lineCost = (convertedQty/price.qty)*price.price; total += lineCost; }
       }
-      return { name:ing.name, qty:scaledQty(ing.qty, scale), unit:ing.unit, lineCost:lineCost, matched:!!price, convertible:convertible };
+      return { name:ing.name, qty:scaledQty(ing.qty, scale), unit:ing.unit, lineCost:lineCost, matched:!!price, convertible:convertible, pricePending:pricePending };
     });
     return { name:comp.name, breakdown:breakdown };
   });
@@ -4152,12 +4270,91 @@ function computeRecipeCost(r, scale){
   return { groups:groups, breakdown:breakdown, total:total, costPerUnit:costPerUnit, yieldQty:yieldQty, yieldUnit:r.yieldUnit||'unidades', energyCost:energyCost };
 }
 function fmtMoney(n){ if(n==null || isNaN(n)) return '-'; return '$'+ (Math.round(n*100)/100).toLocaleString('es-AR'); }
+function stripMdMarkers(s){ return (s||'').replace(/\*\*(.+?)\*\*/g, '$1'); }
+function capitalizeFirst(s){ s = (s||'').toString(); return s.charAt(0).toUpperCase()+s.slice(1); }
+function buildRecipeIngredientsTextLines(r){
+  const comps = (r.components && r.components.length) ? r.components : [{ name:null, ingredients:r.ingredients||[] }];
+  const lines = [];
+  comps.forEach(function(c){
+    if(c.name && comps.length>1){ lines.push(c.name+':'); }
+    (c.ingredients||[]).filter(function(i){ return ingredientEntryType(i)!=='insumo'; }).forEach(function(i){
+      lines.push('* '+i.name+': '+i.qty+' '+i.unit);
+    });
+  });
+  return lines;
+}
+function buildRecipeStepsTextLines(r){
+  const comps = (r.components && r.components.length) ? r.components : [{ name:null, steps:r.steps||[] }];
+  const lines = [];
+  const pushSteps = function(steps){
+    (steps||[]).forEach(function(s){
+      if(!s) return;
+      if(isStepTitleText(s)){
+        const t = stripMdMarkers(stepTitleText(s));
+        if(!t) return;
+        if(lines.length) lines.push('');
+        lines.push(t);
+      } else {
+        lines.push('> '+stripMdMarkers(s));
+      }
+    });
+  };
+  comps.forEach(function(c){
+    if(c.name && comps.length>1){
+      if(lines.length) lines.push('');
+      lines.push(c.name);
+    }
+    pushSteps(c.steps);
+  });
+  const finalSteps = (r.finalSteps||[]).filter(Boolean);
+  if(finalSteps.length){
+    if(lines.length) lines.push('');
+    lines.push('Montaje final');
+    pushSteps(finalSteps);
+  }
+  return lines;
+}
+function buildRecipeExportText(r){
+  const c = computeRecipeCost(r, 1);
+  const lines = [];
+  lines.push(r.title + (r.yieldQty>0 ? (' - '+r.yieldQty+' '+capitalizeFirst(r.yieldUnit||'unidades')) : ''));
+  const utensilLine = (r.utensilIds||[]).map(function(uid){
+    const u = DATA.utensils.find(function(x){ return x.id===uid; });
+    if(!u) return null;
+    const qtyPrefix = (u.cantidad && u.cantidad>1) ? (u.cantidad+'x ') : '';
+    return (qtyPrefix+(u.nombre||'')+(u.tamano ? ' '+u.tamano : '')).trim();
+  }).filter(Boolean).join(', ');
+  if(utensilLine) lines.push('('+utensilLine+')');
+  lines.push('');
+  lines.push('> Costo total del lote: '+fmtMoney(c.total));
+  lines.push('> Costo unitario final: '+fmtMoney(c.costPerUnit));
+  lines.push('');
+  lines.push('Ingredientes');
+  lines.push.apply(lines, buildRecipeIngredientsTextLines(r));
+  const stepLines = buildRecipeStepsTextLines(r);
+  if(stepLines.length){
+    lines.push('');
+    lines.push.apply(lines, stepLines);
+  }
+  return lines.join('\n');
+}
+function exportRecipeAsText(id){
+  const r = DATA.recipes.find(function(x){ return x.id===id; });
+  if(!r) return;
+  const text = buildRecipeExportText(r);
+  copyTextToClipboard(text).then(function(){
+    showToast('Receta copiada como texto');
+  }).catch(function(){
+    showToast('No se pudo copiar automáticamente');
+  });
+}
 function renderCostSection(r){
   const c = computeRecipeCost(r, scaleFactor);
   const el = document.getElementById('d-cost');
   const rowHtml = function(b){
     let right;
-    if(b.matched && b.convertible) right = fmtMoney(b.lineCost);
+    if(b.pricePending) right = '<span class="miss">precio pendiente</span>';
+    else if(b.matched && b.convertible) right = fmtMoney(b.lineCost);
     else if(b.matched && !b.convertible) right = '<span class="miss">revisar unidad</span>';
     else right = '<span class="miss">sin vincular</span>';
     return '<div class="cost-row"><span>'+escapeHtml(b.name)+' ('+escapeHtml(b.qty)+' '+escapeHtml(b.unit)+')</span>'+
@@ -5303,7 +5500,7 @@ function renderPriceRows(wrapId, list, emptyMsg, icon){
       '<div class="sr-top">'+
         '<span class="sr-ic"><span class="icon-slot" data-icon="'+icon+'"></span></span>'+
         '<div class="sr-info"><p class="nm">'+escapeHtml(p.name)+'</p><p class="sub">'+p.qty+' '+escapeHtml(p.unit)+' el envase</p></div>'+
-        '<div class="sr-stats"><p class="price">$'+p.price+'</p>'+trendHtml+'<p class="stock" style="color:'+color+';">'+stock+' '+escapeHtml(p.unit)+'</p>'+(pkgText?'<p class="stock-pkg">'+pkgText+'</p>':'')+'</div>'+
+        '<div class="sr-stats"><p class="price"'+(p.price==null?' style="color:var(--k-muted);"':'')+'>'+(p.price==null?'precio pendiente':'$'+p.price)+'</p>'+trendHtml+'<p class="stock" style="color:'+color+';">'+stock+' '+escapeHtml(p.unit)+'</p>'+(pkgText?'<p class="stock-pkg">'+pkgText+'</p>':'')+'</div>'+
         '<div class="sr-stepper">'+
           '<button type="button" class="sr-step-btn" onclick="adjustStock(\''+p.id+'\',1,event)"><span class="icon-slot" data-icon="chevron-up"></span></button>'+
           '<button type="button" class="sr-step-btn" onclick="adjustStock(\''+p.id+'\',-1,event)"><span class="icon-slot" data-icon="chevron-down"></span></button>'+
@@ -5371,7 +5568,7 @@ function openStockEditModal(id){
   document.getElementById('se-name').value = p.name || '';
   document.getElementById('se-name').placeholder = stockEditType==='insumo' ? 'ej. Bolsa descartable' : 'ej. Harina Flor';
   document.getElementById('se-qty').value = p.qty || '';
-  document.getElementById('se-price').value = p.price || '';
+  document.getElementById('se-price').value = (p.price==null) ? '-' : p.price;
   document.getElementById('se-provider').value = p.provider || '';
   document.getElementById('se-unit').innerHTML = stockUnitOptionsHtml(stockEditType, p.unit);
   document.getElementById('stockEditModalTitle').textContent = stockEditType==='insumo' ? 'Editar insumo' : 'Editar ingrediente';
@@ -5398,13 +5595,25 @@ function closeStockEditModal(){
   document.getElementById('stockEditModal').classList.remove('active');
   stockEditId = null;
 }
+function cascadeIngredientNameRename(priceId, newName){
+  DATA.recipes.forEach(function(r){
+    (r.ingredients||[]).forEach(function(ing){ if(ing.priceId===priceId) ing.name = newName; });
+    (r.components||[]).forEach(function(c){
+      (c.ingredients||[]).forEach(function(ing){ if(ing.priceId===priceId) ing.name = newName; });
+    });
+  });
+  (DATA.preparationLibrary||[]).forEach(function(prep){
+    (prep.ingredients||[]).forEach(function(ing){ if(ing.priceId===priceId) ing.name = newName; });
+  });
+}
 function saveStockEdit(){
   const name = document.getElementById('se-name').value.trim();
   const qty = parseFloat(document.getElementById('se-qty').value);
   const unit = document.getElementById('se-unit').value;
-  const price = parseFloat(document.getElementById('se-price').value);
+  const priceParsed = parsePriceInput(document.getElementById('se-price').value);
   const provider = document.getElementById('se-provider').value.trim();
-  if(!name || isNaN(qty) || isNaN(price)){ showToast('Completá nombre, cantidad y precio'); return; }
+  if(!name || isNaN(qty) || !priceParsed.valid){ showToast('Completá nombre, cantidad y precio (o poné "-" si no lo sabés)'); return; }
+  const price = priceParsed.value;
   const isNew = !stockEditId;
   let p;
   if(isNew){
@@ -5414,15 +5623,17 @@ function saveStockEdit(){
     if(!p) return;
   }
   const priceChanged = !isNew && p.price !== price;
+  const nameChanged = !isNew && p.name !== name;
   p.name = name;
   p.qty = qty;
   p.unit = unit;
   p.price = price;
   p.provider = provider;
+  if(nameChanged) cascadeIngredientNameRename(p.id, name);
   if(isNew){
-    p.priceHistory = [{ price: price, date: todayStr() }];
+    p.priceHistory = (price!=null) ? [{ price: price, date: todayStr() }] : [];
     DATA.ingredientPrices.push(p);
-  } else if(priceChanged){
+  } else if(priceChanged && price!=null){
     if(!p.priceHistory || !p.priceHistory.length) p.priceHistory = [{ price: price, date: todayStr() }];
     else p.priceHistory.push({ price: price, date: todayStr() });
   }
@@ -5430,7 +5641,7 @@ function saveStockEdit(){
   closeStockEditModal();
   renderIngredientsScreen();
   refreshIngredientPickers();
-  showToast(isNew ? (stockEditType==='insumo'?'Insumo agregado':'Ingrediente agregado') : 'Guardado');
+  showToast(isNew ? (price==null ? (stockEditType==='insumo'?'Insumo agregado (precio pendiente)':'Ingrediente agregado (precio pendiente)') : (stockEditType==='insumo'?'Insumo agregado':'Ingrediente agregado')) : 'Guardado');
 }
 async function deleteStockEntry(){
   if(!stockEditId) return;
@@ -8374,7 +8585,11 @@ function renderCookStep(){
   document.getElementById('cook-switchPrepBtn').style.display = (r && r.components && r.components.length>1) ? '' : 'none';
   const steps = currentCookSteps();
   const idx = state.cookStep;
-  document.getElementById('cook-text').textContent = steps[idx] || '';
+  const rawStep = steps[idx] || '';
+  const isTitle = isStepTitleText(rawStep);
+  const cookTextEl = document.getElementById('cook-text');
+  cookTextEl.classList.toggle('cook-text-title', isTitle);
+  cookTextEl.innerHTML = mdBoldToHtml(isTitle ? stepTitleText(rawStep) : rawStep);
   document.getElementById('cook-dots').innerHTML = steps.map(function(_,i){ return '<span class="'+(i===idx?'on':'')+'"></span>'; }).join('');
   applyCookStepColor(idx);
   const isLast = idx === steps.length-1;
@@ -8385,11 +8600,11 @@ function renderCookStep(){
   const nextText = document.getElementById('cook-next-text');
   if(idx+1 < steps.length){
     nextLabel.style.visibility = 'visible'; nextText.style.visibility = 'visible';
-    nextText.textContent = steps[idx+1];
+    nextText.textContent = isStepTitleText(steps[idx+1]) ? stepTitleText(steps[idx+1]) : steps[idx+1];
   } else {
     nextLabel.style.visibility = 'hidden'; nextText.style.visibility = 'hidden'; nextText.textContent = '';
   }
-  const match = (steps[idx]||'').match(/(\d+)\s*(min|minutos)/i);
+  const match = isTitle ? null : rawStep.match(/(\d+)\s*(min|minutos)/i);
   const timerPill = document.getElementById('cook-timer-pill');
   if(match){
     timerPill.style.display = 'flex';

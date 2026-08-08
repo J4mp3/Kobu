@@ -557,7 +557,7 @@
     #recipeList, #prepCardList{ display:grid !important; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:12px; }
     #recipeList .card, #prepCardList .card{ flex-direction:column; align-items:stretch; padding:0; overflow:hidden; }
     #recipeList .card .thumb, #prepCardList .card .thumb{ width:100%; height:120px; border-radius:0; }
-    #recipeList .card .thumb-icon{ font-size:calc(42px + var(--kobu-font-boost, 0px)); }
+    #recipeList .card .thumb-icon, #prepCardList .card .thumb-icon{ font-size:calc(42px + var(--kobu-font-boost, 0px)); }
     #recipeList .card .card-drag, #prepCardList .card .card-drag{ position:absolute; top:6px; left:6px; z-index:2; background:rgba(255,255,255,.85); border-radius:50%; width:26px; height:26px; padding:6px; color:var(--k-accent); }
     #recipeList .card .meta, #prepCardList .card .meta{ padding:9px 10px 11px; }
     #orderStatusChips{ display:none; }
@@ -1821,6 +1821,12 @@ const ICONS = {
   'birthday-candle': '<svg '+SVG_ATTRS+'><ellipse cx="12" cy="19" rx="7" ry="2"/><path d="M9 19c0-2 1-3 3-3s3 1 3 3"/><rect x="11" y="8" width="2" height="8" rx="0.5"/><path d="M12 4c1 1.5 1 2.5 0 4c-1-1.5-1-2.5 0-4z"/></svg>',
   'loaf-pan': '<svg '+SVG_ATTRS+'><path d="M3 8h18l-1.5 9a1.5 1.5 0 0 1-1.5 1.3H6a1.5 1.5 0 0 1-1.5-1.3z"/><path d="M3 8l1.5-3h15L21 8"/></svg>',
   'cookie-cutter': '<svg '+SVG_ATTRS+'><path d="M12 3l2.2 4.6l5 .7l-3.6 3.6l.9 5l-4.5-2.4l-4.5 2.4l.9-5l-3.6-3.6l5-.7z"/></svg>',
+  'circle': '<svg '+SVG_ATTRS+'><circle cx="12" cy="12" r="8"/></svg>',
+  'butterfly': '<svg '+SVG_ATTRS+'><path d="M12 12c-1-4-5-7-8-5c-2 1.5-1 6 3 7c2 .7 4-.3 5-2z"/><path d="M12 12c1-4 5-7 8-5c2 1.5 1 6-3 7c-2 .7-4-.3-5-2z"/><path d="M12 7v11"/><circle cx="12" cy="6" r="1"/></svg>',
+  'muffin-tray': '<svg '+SVG_ATTRS+'><rect x="3" y="4" width="18" height="16" rx="2"/><rect x="5.5" y="6.5" width="4" height="4" rx="0.5"/><rect x="10" y="6.5" width="4" height="4" rx="0.5"/><rect x="14.5" y="6.5" width="4" height="4" rx="0.5"/><rect x="5.5" y="13.5" width="4" height="4" rx="0.5"/><rect x="10" y="13.5" width="4" height="4" rx="0.5"/><rect x="14.5" y="13.5" width="4" height="4" rx="0.5"/></svg>',
+  'muffin-tray-round': '<svg '+SVG_ATTRS+'><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="7.5" cy="8.5" r="2"/><circle cx="12" cy="8.5" r="2"/><circle cx="16.5" cy="8.5" r="2"/><circle cx="7.5" cy="15.5" r="2"/><circle cx="12" cy="15.5" r="2"/><circle cx="16.5" cy="15.5" r="2"/></svg>',
+  'piping-bag': '<svg '+SVG_ATTRS+'><path d="M7 6l1.5-3h7L17 6z"/><path d="M7 6h10l-3.3 12.5a1.8 1.8 0 0 1-3.4 0z"/><path d="M9 3c1-1 5-1 6 0"/></svg>',
+  'cake-stand': '<svg '+SVG_ATTRS+'><ellipse cx="12" cy="7" rx="6" ry="2"/><path d="M6 7v2a6 2 0 0 0 12 0V7"/><path d="M12 11v5"/><ellipse cx="12" cy="19" rx="5" ry="1.5"/><path d="M8.5 17.3l-1 1.7M15.5 17.3l1 1.7"/></svg>',
 };
 function mountIcons(){
   document.querySelectorAll('[data-icon]').forEach(function(el){
@@ -1854,7 +1860,8 @@ function ovenParamsFor(ovenId){
     {key:'rack',  label:'Rejilla', type:'discrete', options:ovenRackOptions(o.filas), fmt:v=>v}
   ];
 }
-const PLACEHOLDER_COLORS = ['#D9B896','#C9986B','#B98A63','#E0C39D','#CBA37C'];
+const PLACEHOLDER_COLORS = ['#E8A87C','#D9895A','#E6B98F','#CC7A4D','#EDC08A','#D98C6B','#E2A45F','#C97B52','#F0C89A','#DB9868','#D67F4E','#E9B77A','#CE8862','#F2CEA3','#D48A5A','#E5A66D','#C8724A','#EEBE8D','#DA9970','#D2905F'];
+function randomWarmColorIdx(){ return Math.floor(Math.random()*PLACEHOLDER_COLORS.length); }
 
 function defaultData(){
   return {
@@ -2729,10 +2736,11 @@ function renderPrepLibraryCards(){
     const readyBtn = '<button type="button" class="iconbtn card-ready" onclick="event.stopPropagation();toggleLibraryPrepReady(\''+p.id+'\')" title="lista para vender">'+readyMark+'</button>';
     const dragBtn = unfiltered ? '<button type="button" class="iconbtn card-drag" onclick="event.stopPropagation();" onpointerdown="event.stopPropagation();libPrepDragStart(event,\''+p.id+'\')" title="mover"><span class="icon-slot" data-icon="grip"></span></button>' : '';
     const sub = (p.ingredients||[]).length+' ing. · '+(p.steps||[]).length+' pasos';
-    const prepIcon = (p.icon && ICONS[p.icon]) ? ICONS[p.icon] : '<span class="icon-slot" data-icon="flask"></span>';
+    const prepIcon = '<span class="thumb-icon">'+((p.icon && ICONS[p.icon]) ? ICONS[p.icon] : '<span class="icon-slot" data-icon="flask"></span>')+'</span>';
+    const prepBg = PLACEHOLDER_COLORS[(p.colorIdx||0) % PLACEHOLDER_COLORS.length];
     return '<div class="card" data-id="'+p.id+'" data-fav="'+(p.favorite?1:0)+'" onclick="openLibraryPrepEditor(\''+p.id+'\')">'+
       dragBtn + favBtn + readyBtn +
-      '<div class="thumb" style="background:var(--k-card2);display:flex;align-items:center;justify-content:center;color:var(--k-accent);">'+prepIcon+'</div>'+
+      '<div class="thumb" style="background:'+prepBg+';display:flex;align-items:center;justify-content:center;color:var(--k-accent);">'+prepIcon+'</div>'+
       '<div class="meta"><p class="t">'+escapeHtml(p.name)+'</p>'+
       '<p class="s">'+sub+'</p></div>'+
       '</div>';
@@ -2802,6 +2810,11 @@ function parsePriceInput(raw){
   return { valid:true, value:n };
 }
 function isStepTitleText(s){ return /^##\s*/.test((s||'').trim()); }
+function isMeaningfulStepEntry(s){
+  if(!s) return false;
+  if(isStepTitleText(s)) return !!stepTitleText(s);
+  return true;
+}
 function stepTitleText(s){ return (s||'').trim().replace(/^##\s*/,''); }
 function applyBoldToTextarea(ta, onChange){
   if(!ta) return;
@@ -2907,7 +2920,8 @@ function emptyDraft(){
 const ICON_PICKER_GROUPS = [
   { label:'Budines', icons:['budin-clasico','budin-glaseado','budin-frutado','budin-marmolado'] },
   { label:'Panadería', icons:['croissant','medialuna','donut','muffin','cupcake','baguette-loaf','rolling-pin','flour-scoop','dough-ball','bread-slice','bread-loaf-sliced','oven','cooling-rack','sifter','measuring-cup','measuring-spoon','bread-basket','proofing-basket','bagel','tart','waffle','pancake-stack','breadsticks','cake-slice','layer-cake','icing-drizzle','bakery-shop','bakery-box','birthday-candle','loaf-pan','cookie-cutter'] },
-  { label:'Postres y cocina', icons:['cookie','cookie-man','cake','cake-roll','bread','chocolate','ice-cream','milkshake','coffee','wheat','chef-hat','cup','bowl','bowl-spoon','candy','milk','baguette','sparkles','sparkles-2','flower','leaf','rosette','gift','package','gift-card','paper-bag','blender','whisk','teapot','mug','microwave','flame','heart','hearts','stars','book','book-2','fridge','grill-fork','grill-spatula','ladle','salad','salt','soup','stopwatch','tag'] }
+  { label:'Postres y cocina', icons:['cookie','cookie-man','cake','cake-roll','bread','chocolate','ice-cream','milkshake','coffee','wheat','chef-hat','cup','bowl','bowl-spoon','candy','milk','baguette','sparkles','sparkles-2','flower','leaf','rosette','gift','package','gift-card','paper-bag','blender','whisk','teapot','mug','microwave','flame','heart','hearts','stars','book','book-2','fridge','grill-fork','grill-spatula','ladle','salad','salt','soup','stopwatch','tag'] },
+  { label:'Otros', icons:['cloud','butterfly','muffin-tray','muffin-tray-round','piping-bag','cake-stand','circle'] }
 ];
 let iconPickerQuery = '';
 let iconPickerTarget = 'recipe';
@@ -3241,11 +3255,14 @@ function closeUtensilPicker(){
   document.getElementById('utensilPickerModal').classList.remove('active');
   updateUtensilSummary();
 }
+function utensilsSorted(){
+  return DATA.utensils.slice().sort(function(a,b){ return (a.nombre||'').localeCompare(b.nombre||'', 'es', {sensitivity:'base'}); });
+}
 function renderUtensilPickerList(){
   const wrap = document.getElementById('utensil-picker-list');
   state.draft.utensilIds = state.draft.utensilIds || [];
   if(DATA.utensils.length===0){ wrap.innerHTML = '<p style="font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;">Todavía no cargaste utensilios (Ajustes).</p>'; return; }
-  wrap.innerHTML = DATA.utensils.map(function(u){
+  wrap.innerHTML = utensilsSorted().map(function(u){
     const active = state.draft.utensilIds.indexOf(u.id)!==-1;
     const sub = [u.tamano, u.cantidad?('x'+u.cantidad):''].filter(Boolean).join(' · ');
     return '<button type="button" class="chip '+(active?'active':'')+'" style="width:100%;text-align:left;" onclick="toggleUtensilPick(\''+u.id+'\')">'+escapeHtml(u.nombre)+(sub?' ('+escapeHtml(sub)+')':'')+'</button>';
@@ -3664,6 +3681,7 @@ function saveActiveComponentToLibrary(){
   DATA.preparationLibrary.push({
     id: 'replib-'+Date.now(),
     name: name,
+    colorIdx: randomWarmColorIdx(),
     ingredients: JSON.parse(JSON.stringify(active.ingredients||[])),
     steps: JSON.parse(JSON.stringify(active.steps||[]))
   });
@@ -3768,7 +3786,7 @@ function saveLibraryPrep(){
   const d = state.draft;
   const name = document.getElementById('f-title').value.trim();
   if(!name){ showToast('Ponele un nombre a la preparación'); return; }
-  const entry = { id: state.editingLibId || ('replib-'+Date.now()), name:name, icon: d.icon||null, tags: (d.tags||[]), ingredients: d.ingredients||[], steps: (d.steps||[]).filter(Boolean) };
+  const entry = { id: state.editingLibId || ('replib-'+Date.now()), name:name, icon: d.icon||null, tags: (d.tags||[]), colorIdx: randomWarmColorIdx(), ingredients: d.ingredients||[], steps: (d.steps||[]).filter(Boolean) };
   if(state.editingLibId){
     const idx = DATA.preparationLibrary.findIndex(function(x){ return x.id===state.editingLibId; });
     if(idx!==-1) DATA.preparationLibrary[idx] = entry; else DATA.preparationLibrary.push(entry);
@@ -3879,6 +3897,7 @@ function saveRecipe(){
   d.salePrice = isNaN(sp) ? null : sp;
   d.quickNotes = d.quickNotes || [];
   if(d.mediaMode === 'icono'){ d.photo = null; } else { d.icon = null; }
+  d.colorIdx = randomWarmColorIdx();
   if(state.editingId){
     const idx = DATA.recipes.findIndex(function(x){ return x.id===state.editingId; });
     DATA.recipes[idx] = d;
@@ -4011,7 +4030,7 @@ function renderDetailSteps(r){
     stepsEl.innerHTML = '<div class="steps-list">'+dstepsHtml((r.steps||[]).filter(Boolean))+'</div>';
   }
   const finalWrap = document.getElementById('d-finalsteps-wrap');
-  const finalSteps = (r.finalSteps||[]).filter(Boolean);
+  const finalSteps = (r.finalSteps||[]).filter(isMeaningfulStepEntry);
   if(finalSteps.length){
     finalWrap.style.display = '';
     document.getElementById('d-finalsteps').innerHTML = dstepsHtml(finalSteps);
@@ -4306,7 +4325,7 @@ function buildRecipeStepsTextLines(r){
     }
     pushSteps(c.steps);
   });
-  const finalSteps = (r.finalSteps||[]).filter(Boolean);
+  const finalSteps = (r.finalSteps||[]).filter(isMeaningfulStepEntry);
   if(finalSteps.length){
     if(lines.length) lines.push('');
     lines.push('Montaje final');
@@ -4509,11 +4528,10 @@ function renderSettings(){
   if(DATA.utensils.length===0){
     utWrap.innerHTML = '<p style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;">todavía no cargaste utensilios.</p>';
   } else {
-    utWrap.innerHTML = DATA.utensils.map(function(u){
+    utWrap.innerHTML = utensilsSorted().map(function(u){
       const sub = [u.material, u.tamano, u.cantidad?('x'+u.cantidad):''].filter(Boolean).join(' · ');
       const icon = u.icon || 'package';
       return '<div class="ut-row" data-id="'+u.id+'">'+
-        '<button type="button" class="iconbtn card-drag" onclick="event.stopPropagation();" onpointerdown="event.stopPropagation();utensilDragStart(event,\''+u.id+'\')" title="mover"><span class="icon-slot" data-icon="grip"></span></button>'+
         '<span class="ut-ic"><span class="icon-slot" data-icon="'+icon+'"></span></span>'+
         '<div class="ut-info"><p class="nm">'+escapeHtml(u.nombre)+'</p>'+(sub?'<p class="sub">'+escapeHtml(sub)+'</p>':'')+'</div>'+
         '<button class="iconbtn" onclick="openUtensilEditModal(\''+u.id+'\')"><span class="icon-slot" data-icon="pencil"></span></button>'+
@@ -5021,56 +5039,6 @@ function saveOvenEdit(){
 }
 let utensilEditId = null;
 let utensilEditIcon = null;
-let utensilDrag = null;
-function utensilDragStart(e, id){
-  e.preventDefault();
-  const wrap = document.getElementById('utensilList');
-  const row = wrap.querySelector('.ut-row[data-id="'+id+'"]');
-  if(!row) return;
-  utensilDrag = { id:id };
-  row.classList.add('dragging');
-  document.addEventListener('pointermove', utensilDragMove);
-  document.addEventListener('pointerup', utensilDragEnd);
-  document.addEventListener('pointercancel', utensilDragEnd);
-}
-function utensilDragMove(e){
-  if(!utensilDrag) return;
-  const wrap = document.getElementById('utensilList');
-  const rows = Array.from(wrap.querySelectorAll('.ut-row'));
-  const draggedRow = wrap.querySelector('.ut-row[data-id="'+utensilDrag.id+'"]');
-  if(!draggedRow) return;
-  const y = e.clientY;
-  let closest = null, closestDist = Infinity;
-  rows.forEach(function(el){
-    if(el===draggedRow) return;
-    const rect = el.getBoundingClientRect();
-    const cy = rect.top+rect.height/2;
-    const dist = Math.abs(y-cy);
-    if(dist<closestDist){ closestDist=dist; closest=el; }
-  });
-  if(closest && closestDist<40){
-    const fromId = utensilDrag.id, toId = closest.dataset.id;
-    const fromIdx = DATA.utensils.findIndex(function(u){ return u.id===fromId; });
-    const toIdx = DATA.utensils.findIndex(function(u){ return u.id===toId; });
-    if(fromIdx!==-1 && toIdx!==-1 && fromIdx!==toIdx){
-      const moved = DATA.utensils.splice(fromIdx,1)[0];
-      DATA.utensils.splice(toIdx,0,moved);
-      renderSettings();
-      const newRow = document.getElementById('utensilList').querySelector('.ut-row[data-id="'+fromId+'"]');
-      if(newRow) newRow.classList.add('dragging');
-    }
-  }
-  if(e.cancelable) e.preventDefault();
-}
-function utensilDragEnd(){
-  utensilDrag = null;
-  document.removeEventListener('pointermove', utensilDragMove);
-  document.removeEventListener('pointerup', utensilDragEnd);
-  document.removeEventListener('pointercancel', utensilDragEnd);
-  const wrap = document.getElementById('utensilList');
-  if(wrap) wrap.querySelectorAll('.ut-row.dragging').forEach(function(el){ el.classList.remove('dragging'); });
-  saveData(DATA);
-}
 async function removeUtensil(id){
   const ok = await showConfirm('¿Borrar este utensilio?');
   if(!ok) return;
@@ -8547,7 +8515,7 @@ function renderCookPicker(){
     const n = (c.steps||[]).filter(Boolean).length;
     return '<button type="button" class="btn btn-primary" onclick="chooseCookComponent('+i+')">'+escapeHtml(c.name||('Preparación '+(i+1)))+' ('+n+' pasos)</button>';
   }).join('');
-  const finalSteps = (r.finalSteps||[]).filter(Boolean);
+  const finalSteps = (r.finalSteps||[]).filter(isMeaningfulStepEntry);
   const finalBtn = finalSteps.length ? '<button type="button" class="btn btn-ghost" style="color:var(--k-bg);border-color:var(--k-muted);" onclick="chooseCookComponent(\'final\')">Montaje final ('+finalSteps.length+' pasos)</button>' : '';
   document.getElementById('cook-picker-buttons').innerHTML = buttons + finalBtn;
 }
@@ -8560,7 +8528,7 @@ function currentCookSteps(){
   const r = DATA.recipes.find(function(x){ return x.id===state.cookRecipeId; });
   if(!r) return [];
   if(r.components && r.components.length){
-    if(state.cookComponentKey==='final') return (r.finalSteps||[]).filter(Boolean);
+    if(state.cookComponentKey==='final') return (r.finalSteps||[]).filter(isMeaningfulStepEntry);
     if(state.cookComponentKey!=null && r.components[state.cookComponentKey]) return (r.components[state.cookComponentKey].steps||[]).filter(Boolean);
     return [];
   }

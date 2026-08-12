@@ -402,6 +402,10 @@
   .chat-avatar{ width:20px; height:20px; border-radius:50%; background:var(--k-accent); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
   .chat-avatar .icon-slot{ font-size:calc(11px + var(--kobu-font-boost, 0px)); color:var(--k-bg); }
   .chat-msg-actions{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+  .chat-msg-img{ display:block; max-width:100%; max-height:220px; border-radius:10px; margin-bottom:6px; object-fit:cover; }
+  .chat-img-preview{ display:flex; align-items:center; gap:8px; background:var(--k-card2); border-radius:12px; padding:6px 10px; flex-shrink:0; }
+  .chat-img-preview img{ width:36px; height:36px; border-radius:8px; object-fit:cover; }
+  .chat-img-preview span.rm{ margin-left:auto; cursor:pointer; color:var(--k-muted); }
   .chat-quickmenu-wrap{ position:relative; flex-shrink:0; }
   .chat-quickmenu{ position:absolute; bottom:calc(100% + 8px); left:0; min-width:230px; background:var(--k-card); border:0.5px solid var(--k-border); border-radius:14px; box-shadow:0 8px 24px rgba(0,0,0,.18); padding:6px; display:flex; flex-direction:column; gap:2px; z-index:20; }
   .chat-quickmenu-item{ background:none; border:none; text-align:left; padding:9px 10px; border-radius:9px; font-size:calc(12px + var(--kobu-font-boost, 0px)); color:var(--k-text); cursor:pointer; }
@@ -855,6 +859,10 @@
       <p id="odm-delivery" style="font-size:calc(11.5px + var(--kobu-font-boost, 0px));color:var(--k-accent);margin:0;display:none;"></p>
       <p id="odm-balance" style="font-size:calc(11.5px + var(--kobu-font-boost, 0px));color:var(--k-text);margin:0;display:none;"></p>
       <p id="odm-note" style="font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;display:none;"></p>
+      <div class="field" style="gap:6px;">
+        <label>Cómo pagó</label>
+        <div class="btn-row" id="odm-paymethod"></div>
+      </div>
       <div class="btn-row" id="odm-secondary" style="flex-wrap:wrap;"></div>
       <div class="btn-row">
         <button class="btn btn-ghost" style="flex:1;" onclick="modifyOrderFromModal()"><span class="icon-slot" data-icon="pencil" style="vertical-align:-2px;"></span> Modificar</button>
@@ -870,6 +878,7 @@
       <div class="field"><label>Nombre</label><input class="input" id="acm-name" placeholder="ej. María López"></div>
       <div class="field"><label>Teléfono (con código de país, sin +)</label><input class="input" id="acm-phone" placeholder="ej. 5491122334455"></div>
       <div class="field"><label>Mail (opcional)</label><input class="input" id="acm-email" type="email" placeholder="ej. maria@mail.com"></div>
+      <div class="field"><label>Empresa / local (opcional)</label><input class="input" id="acm-company" placeholder="ej. Argus"></div>
       <div class="field">
         <label>Etiquetas</label>
         <div class="chiprow" id="acm-tags"></div>
@@ -1206,6 +1215,11 @@
         <div class="switch" id="discountStockSwitch" onclick="toggleDiscountStockOnSale()"><div class="knob-sw"></div></div>
       </div>
       <p style="font-size:calc(10px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:2px 0 0;">Desactivalo para cargar ventas pasadas sin que se descuente del stock actual.</p>
+      <div class="rowline">
+        <span class="l">Sumar costo al reponer stock</span>
+        <div class="switch" id="addStockExpenseSwitch" onclick="toggleAddStockAsExpense()"><div class="knob-sw"></div></div>
+      </div>
+      <p style="font-size:calc(10px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:2px 0 0;">Desactivalo antes de sumar stock que no compraste (por ejemplo, algo que te regalaron), para que no se cargue como gasto en Reportes.</p>
     </div>
     <div class="grp-card" style="padding:10px 14px;">
       <div class="rowline" style="padding:0;">
@@ -1427,6 +1441,10 @@
       <p class="section-title"><span class="badge-ic"><span class="icon-slot" data-icon="users"></span></span><span id="cd-name"></span></p>
       <p style="font-size:calc(11.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:-4px 0 0;" id="cd-phone"></p>
       <div class="field">
+        <label>Empresa / local (opcional)</label>
+        <input class="input" id="cd-company" placeholder="ej. Argus" onchange="updateClientCompany(this.value)">
+      </div>
+      <div class="field">
         <label>Etiquetas</label>
         <div class="chiprow" id="cd-tags"></div>
         <div class="btn-row">
@@ -1528,11 +1546,14 @@
     <div class="chat-list" id="chat-list"></div>
     <div class="chat-composer">
       <div class="chat-recipe-pill" id="chat-recipe-pill" style="display:none;"></div>
+      <div class="chat-img-preview" id="chatImgPreview" style="display:none;"></div>
       <div class="chat-inputbar">
         <div class="chat-quickmenu-wrap" id="chatQuickMenuWrap" style="display:none;">
           <div class="chat-quickmenu" id="chatQuickMenu" style="display:none;"></div>
           <button type="button" class="iconbtn" id="chatQuickMenuBtn" onclick="toggleChatQuickMenu()"><span class="icon-slot" data-icon="sparkles"></span></button>
         </div>
+        <input type="file" id="chat-image-input" accept="image/*" style="display:none;" onchange="handleChatImageChange(this)">
+        <button type="button" class="iconbtn" onclick="document.getElementById('chat-image-input').click()" title="adjuntar foto"><span class="icon-slot" data-icon="camera"></span></button>
         <input id="chat-input" type="text" placeholder="preguntale algo a Kobu IA..." onkeydown="if(event.key==='Enter'){sendChatMessage();}">
         <button class="iconbtn" onclick="sendChatMessage()"><span class="icon-slot" data-icon="send"></span></button>
       </div>
@@ -1899,7 +1920,7 @@ function defaultData(){
       {id:'ip-5', name:'chocolate', qty:200, unit:'g', price:2200, stock:0, minStock:0},
       {id:'ip-6', name:'cacao', qty:100, unit:'g', price:1500, stock:0, minStock:0}
     ],
-    settings: { autoShoppingFromOrders:false, theme:'light', energyPriceKwh:0, gasPriceKg:0, discountStockOnSale:true },
+    settings: { autoShoppingFromOrders:false, theme:'light', energyPriceKwh:0, gasPriceKg:0, discountStockOnSale:true, addStockAsExpense:true },
     chats: {},
     chatSessions: [],
     units: defaultUnits(),
@@ -1999,6 +2020,7 @@ function migrateClientLinks(d){
   if(!d.clients) d.clients = [];
   if(d.settings && d.settings.autoShoppingFromOrders===undefined) d.settings.autoShoppingFromOrders = false;
   if(d.settings && d.settings.discountStockOnSale===undefined) d.settings.discountStockOnSale = true;
+  if(d.settings && d.settings.addStockAsExpense===undefined) d.settings.addStockAsExpense = true;
   (d.orders||[]).forEach(function(o){
     if(o.clientId===undefined) o.clientId = null;
     if(!o.clientId && o.customerName){
@@ -2140,7 +2162,7 @@ function unitOptionsHtml(selected){
 /* =========================================================
    NAV / SCREEN STATE
    ========================================================= */
-const state = { stack:['home'], editingId:null, currentId:null, ovenEditMode:false, draft:null, cookRecipeId:null, cookStep:0, cookTimerHandle:null, wakeLock:null, _newIngredientRow:null, orderDraft:null, editingOrderId:null, activeChatId:null, quickSale:null, advSection:null };
+const state = { stack:['home'], editingId:null, currentId:null, ovenEditMode:false, draft:null, cookRecipeId:null, cookStep:0, cookTimerHandle:null, wakeLock:null, _newIngredientRow:null, orderDraft:null, editingOrderId:null, activeChatId:null, quickSale:null, advSection:null, chatPendingImage:null };
 const TITLES = { home:'Inicio', form:'Receta', detail:'Receta', settings:'Ajustes', shopping:'Lista de compras', chat:'Kobu IA', chatlist:'Chats', ingredients:'Stock', conversion:'Conversión', orders:'Pedidos', orderform:'Nuevo pedido', reports:'Reportes', clients:'Clientes', clientdetail:'Cliente', quicksell:'Vender', ovens:'Cocina', utensils:'Utensilios', advanced:'Avanzado' };
 const TITLE_ICONS = { home:'home', form:'cookie', detail:'cookie', settings:'settings', shopping:'cart', chat:'message-circle', chatlist:'message-circle', ingredients:'list', conversion:'arrows-left-right', orders:'clipboard', orderform:'clipboard', reports:'chart-bar', clients:'users', clientdetail:'users', quicksell:'wallet', ovens:'flame', utensils:'package', advanced:'lock', advdetail:'lock', cook:'chef-hat' };
 const SCREEN_NAMES = ['home','form','detail','settings','shopping','chat','chatlist','cook','ingredients','conversion','orders','orderform','reports','clientdetail','quicksell','ovens','utensils','advanced','advdetail'];
@@ -2151,6 +2173,8 @@ function showScreen(name, opts){
   opts = opts || {};
   if(!opts.replace) state.stack.push(name); else state.stack[state.stack.length-1] = name;
   render();
+  const scrEl = document.getElementById('screen-'+name);
+  if(scrEl) scrEl.scrollTop = 0;
 }
 function playBackArrowAnim(btnId){
   const btn = document.getElementById(btnId);
@@ -4542,6 +4566,7 @@ function renderSettings(){
   mountIcons();
   document.getElementById('autoShopSwitch').classList.toggle('on', !!DATA.settings.autoShoppingFromOrders);
   document.getElementById('discountStockSwitch').classList.toggle('on', DATA.settings.discountStockOnSale!==false);
+  document.getElementById('addStockExpenseSwitch').classList.toggle('on', DATA.settings.addStockAsExpense!==false);
   document.getElementById('notifEnabledSwitch').classList.toggle('on', notifEnabled());
   updateNotifNote();
   mountIcons();
@@ -4550,7 +4575,8 @@ function renderSettings(){
 /* =========================================================
    CONFIGURACIÓN AVANZADA (sync/notificaciones/IA) — con contraseña
    ========================================================= */
-const KOBU_DEFAULT_AI_MODEL = 'llama-3.3-70b-versatile';
+const KOBU_DEFAULT_AI_MODEL = 'openai/gpt-oss-120b';
+const KOBU_VISION_MODEL = 'qwen/qwen3.6-27b'; // único modelo con visión disponible en Groq — se usa automáticamente cuando el chat lleva una foto adjunta
 let advSettingsUnlocked = false;
 async function openAdvancedScreen(){
   if(!advSettingsUnlocked){
@@ -4592,7 +4618,7 @@ function renderAdvDetail(){
     document.getElementById('fcmVapidInput').value = localStorage.getItem('kobuFcmVapidKey') || '';
   } else if(s==='ai'){
     body.innerHTML =
-      '<div class="field"><label>Modelo</label><input class="input" id="aiModelInput" placeholder="llama-3.3-70b-versatile" oninput="saveAiModel(this.value)"></div>'+
+      '<div class="field"><label>Modelo</label><input class="input" id="aiModelInput" placeholder="openai/gpt-oss-120b" oninput="saveAiModel(this.value)"></div>'+
       '<p style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:2px 0 0;">Chat gratis con IA. Usa la misma conexión de "Sincronización (nube)".</p>';
     document.getElementById('aiModelInput').value = localStorage.getItem('kobuAiModel') || KOBU_DEFAULT_AI_MODEL;
   } else if(s==='backup'){
@@ -4696,6 +4722,11 @@ function toggleAutoShopping(){
 }
 function toggleDiscountStockOnSale(){
   DATA.settings.discountStockOnSale = !(DATA.settings.discountStockOnSale!==false);
+  saveData(DATA);
+  renderSettings();
+}
+function toggleAddStockAsExpense(){
+  DATA.settings.addStockAsExpense = !(DATA.settings.addStockAsExpense!==false);
   saveData(DATA);
   renderSettings();
 }
@@ -5113,7 +5144,7 @@ function saveUtensilEdit(){
   showToast(isNew ? 'Añadido a Utensilios' : 'Guardado');
 }
 function saveAiModel(val){
-  const model = (val||'').trim() || 'llama-3.3-70b-versatile';
+  const model = (val||'').trim() || KOBU_DEFAULT_AI_MODEL;
   localStorage.setItem('kobuAiModel', model);
 }
 function convertTemp(from){
@@ -5489,7 +5520,7 @@ function adjustStock(id, dir, ev){
   if(!p) return;
   const step = p.qty>0 ? p.qty : 1;
   p.stock = Math.max(0, (p.stock||0) + dir*step);
-  if(dir>0 && p.price){
+  if(dir>0 && p.price && DATA.settings.addStockAsExpense!==false){
     DATA.expenses.push({ id:'exp-'+Date.now(), date: todayStr(), amount: p.price, note: 'Stock: '+p.name });
   }
   saveData(DATA);
@@ -5512,6 +5543,7 @@ function openIngredientCreateModal(){
   document.getElementById('se-price-trend').style.display = 'none';
   document.getElementById('se-stock-info').style.display = 'none';
   document.getElementById('stockEditModal').classList.add('active');
+  document.querySelector('#stockEditModal .modal-box').scrollTop = 0;
 }
 function openSupplyCreateModal(){
   stockEditId = null;
@@ -5527,6 +5559,7 @@ function openSupplyCreateModal(){
   document.getElementById('se-price-trend').style.display = 'none';
   document.getElementById('se-stock-info').style.display = 'none';
   document.getElementById('stockEditModal').classList.add('active');
+  document.querySelector('#stockEditModal .modal-box').scrollTop = 0;
 }
 function openStockEditModal(id){
   const p = DATA.ingredientPrices.find(function(x){ return x.id===id; });
@@ -5558,6 +5591,7 @@ function openStockEditModal(id){
     trendEl.style.display = 'none';
   }
   document.getElementById('stockEditModal').classList.add('active');
+  document.querySelector('#stockEditModal .modal-box').scrollTop = 0;
 }
 function closeStockEditModal(){
   document.getElementById('stockEditModal').classList.remove('active');
@@ -5725,10 +5759,11 @@ function renderClientsScreen(){
   wrap.innerHTML = sorted.map(function(c,i){
     const bg = PLACEHOLDER_COLORS[i % PLACEHOLDER_COLORS.length];
     const tagsTxt = (c.tags||[]).length ? (c.tags||[]).map(function(t){return escapeHtml(t);}).join(', ') : (c.phone||'sin teléfono');
+    const nameTxt = escapeHtml(c.name)+(c.company?' <span style="color:var(--k-muted);font-weight:400;">· '+escapeHtml(c.company)+'</span>':'');
     return '<div class="order-card" onclick="openClientDetail(\''+c.id+'\')">'+
       '<div class="order-card-top">'+
         '<div class="order-avatar" style="background:'+bg+';">'+orderInitials(c.name)+'</div>'+
-        '<div class="meta"><p class="t">'+escapeHtml(c.name)+'</p><p class="s">'+tagsTxt+'</p></div>'+
+        '<div class="meta"><p class="t">'+nameTxt+'</p><p class="s">'+tagsTxt+'</p></div>'+
         '<button class="iconbtn" onclick="event.stopPropagation();removeClient(\''+c.id+'\')" style="color:var(--k-danger);flex-shrink:0;"><span class="icon-slot" data-icon="trash"></span></button>'+
       '</div>'+
       '</div>';
@@ -5790,6 +5825,13 @@ function confirmNewClientTag(){
   addClientTagDirect(v);
   document.getElementById('cd-newTagForm').innerHTML = '';
 }
+function updateClientCompany(val){
+  const c = DATA.clients.find(function(x){ return x.id===state.currentClientId; });
+  if(!c) return;
+  c.company = (val||'').trim();
+  saveData(DATA);
+  renderClientsScreen();
+}
 function addClientTagDirect(val){
   const v = (val||'').trim();
   if(!v) return;
@@ -5829,6 +5871,7 @@ function renderClientDetail(){
   if(!c) return;
   document.getElementById('cd-name').textContent = c.name;
   document.getElementById('cd-phone').textContent = c.phone ? ('Tel: '+c.phone) : 'sin teléfono cargado';
+  document.getElementById('cd-company').value = c.company || '';
   document.getElementById('cd-newTagForm').innerHTML = '';
   renderClientTagsField(c);
   const orders = clientOrdersSorted(c.id);
@@ -5876,6 +5919,7 @@ function openAddClientModal(){
   document.getElementById('acm-name').value = '';
   document.getElementById('acm-phone').value = '';
   document.getElementById('acm-email').value = '';
+  document.getElementById('acm-company').value = '';
   document.getElementById('acm-newTagForm').innerHTML = '';
   renderAcmTags();
   document.getElementById('addClientModal').classList.add('active');
@@ -5932,9 +5976,10 @@ function confirmAddClient(){
   const name = document.getElementById('acm-name').value.trim();
   const phone = document.getElementById('acm-phone').value.trim();
   const email = document.getElementById('acm-email').value.trim();
+  const company = document.getElementById('acm-company').value.trim();
   if(!name){ showToast('Poné el nombre del cliente'); return; }
   if(!phone){ showToast('Poné el teléfono del cliente'); return; }
-  DATA.clients.push({ id:'cli-'+Date.now(), name:name, phone:phone, email:email, tags:(state._newClientTags||[]).slice() });
+  DATA.clients.push({ id:'cli-'+Date.now(), name:name, phone:phone, email:email, company:company, tags:(state._newClientTags||[]).slice() });
   saveData(DATA);
   closeAddClientModal();
   renderClientsScreen();
@@ -6421,7 +6466,7 @@ function editOrder(id){
   if(!o) return;
   state.editingOrderId = id;
   state.orderDraft = {
-    items: (o.items||[]).map(function(it){ return {recipeId:it.recipeId, qty:it.qty}; }),
+    items: (o.items||[]).map(function(it){ return {recipeId:it.recipeId, qty:it.qty, customPrice:(it.customPrice?it.unitPrice:null), priceNote:it.priceNote||''}; }),
     clientId: o.clientId || null,
     customerName: o.customerName || '',
     deliveryDate: o.deliveryDate || '',
@@ -6456,7 +6501,8 @@ function openOrderDetailModal(id){
   statusBtn.onclick = (o.status==='entregado') ? null : toggleOrderStatusFromModal;
   statusBtn.style.cursor = (o.status==='entregado') ? 'default' : 'pointer';
   document.getElementById('odm-items').innerHTML = (o.items||[]).map(function(it){
-    return '<div>'+it.qty+' × '+escapeHtml(it.recipeName)+'</div>';
+    const priceTag = it.customPrice ? ' <span style="color:var(--k-accent);">— precio especial '+fmtMoney(it.unitPrice)+(it.priceNote?' ('+escapeHtml(it.priceNote)+')':'')+'</span>' : '';
+    return '<div>'+it.qty+' × '+escapeHtml(it.recipeName)+priceTag+'</div>';
   }).join('') || '<div style="color:var(--k-muted);">sin items</div>';
   document.getElementById('odm-total').querySelector('span:last-child').textContent = fmtMoney(o.total);
   const deliveryEl = document.getElementById('odm-delivery');
@@ -6469,6 +6515,9 @@ function openOrderDetailModal(id){
   const noteEl = document.getElementById('odm-note');
   if(o.note){ noteEl.style.display = 'block'; noteEl.textContent = o.note; }
   else { noteEl.style.display = 'none'; }
+  document.getElementById('odm-paymethod').innerHTML =
+    '<button type="button" class="btn '+(o.payMethod==='efectivo'?'btn-primary':'btn-ghost')+'" style="flex:1;" onclick="setOrderPayMethod(\'efectivo\')"><span class="icon-slot" data-icon="cash" style="vertical-align:-2px;"></span> Efectivo</button>'+
+    '<button type="button" class="btn '+(o.payMethod==='transferencia'?'btn-primary':'btn-ghost')+'" style="flex:1;" onclick="setOrderPayMethod(\'transferencia\')"><span class="icon-slot" data-icon="credit-card" style="vertical-align:-2px;"></span> Transferencia</button>';
   let secondary = '<button type="button" class="btn btn-ghost" style="flex:1;min-width:0;font-size:calc(11px + var(--kobu-font-boost, 0px));padding:6px 8px;justify-content:center;" onclick="notifyOrderReady(\''+o.id+'\')"><span class="icon-slot" data-icon="share" style="vertical-align:-2px;"></span> Avisar</button>';
   if(o.status==='entregado'){
     secondary += '<button type="button" class="btn btn-ghost" style="flex:1;min-width:0;font-size:calc(11px + var(--kobu-font-boost, 0px));padding:6px 8px;justify-content:center;" onclick="closeOrderDetailModal();openReviewModal(\''+o.id+'\')"><span class="icon-slot" data-icon="star" style="vertical-align:-2px;"></span> '+(o.review?'Editar reseña':'Dejar reseña')+'</button>';
@@ -6487,6 +6536,14 @@ function closeOrderDetailModal(){
 function toggleOrderStatusFromModal(){
   if(!state.viewingOrderId) return;
   toggleOrderStatus(state.viewingOrderId);
+  openOrderDetailModal(state.viewingOrderId);
+}
+function setOrderPayMethod(method){
+  if(!state.viewingOrderId) return;
+  const o = DATA.orders.find(function(x){ return x.id===state.viewingOrderId; });
+  if(!o) return;
+  o.payMethod = (o.payMethod===method) ? null : method;
+  saveData(DATA);
   openOrderDetailModal(state.viewingOrderId);
 }
 function modifyOrderFromModal(){
@@ -6577,25 +6634,60 @@ function renderOrderItemRows(){
   wrap.innerHTML = state.orderDraft.items.map(function(it,i){
     const opts = '<option value="">elegí una receta...</option>' +
       recipes.map(function(r){ return '<option value="'+r.id+'" '+(it.recipeId===r.id?'selected':'')+'>'+escapeHtml(r.title)+'</option>'; }).join('');
+    const hasCustom = it.customPrice!=null;
+    const priceOpen = hasCustom || it._priceOpen;
+    const catalogPrice = it.recipeId ? unitPriceForRecipe(it.recipeId) : null;
+    const priceRow = priceOpen ? ('<div class="btn-row" style="padding-left:2px;">'+
+      '<input class="input" style="flex:1;" type="number" min="0" placeholder="precio especial'+(catalogPrice!=null?' (catálogo '+fmtMoney(catalogPrice)+')':'')+'" value="'+(hasCustom?it.customPrice:'')+'" oninput="updateOrderItemPrice('+i+',this.value)">'+
+      '<input class="input" style="flex:1;" type="text" placeholder="motivo (opcional)" value="'+escapeHtml(it.priceNote||'')+'" oninput="updateOrderItemPriceNote('+i+',this.value)">'+
+      '<button type="button" class="iconbtn" onclick="clearOrderItemPrice('+i+')" style="color:var(--k-danger);"><span class="icon-slot" data-icon="x"></span></button>'+
+      '</div>') : '';
     return '<div class="btn-row">'+
       '<select class="input" style="flex:2;" onchange="updateOrderItem('+i+',\'recipeId\',this.value)">'+opts+'</select>'+
       '<input class="input" style="flex:1;" type="number" min="1" placeholder="cant." value="'+(it.qty||'')+'" oninput="updateOrderItem('+i+',\'qty\',this.value)">'+
-      '<button class="iconbtn" onclick="removeOrderItemRow('+i+')" style="color:var(--k-danger);"><span class="icon-slot" data-icon="x"></span></button>'+
-      '</div>';
+      '<button type="button" class="iconbtn" onclick="toggleOrderItemPrice('+i+')" title="precio especial" style="'+(hasCustom?'color:var(--k-accent);':'')+'"><span class="icon-slot" data-icon="tag"></span></button>'+
+      '<button type="button" class="iconbtn" onclick="removeOrderItemRow('+i+')" style="color:var(--k-danger);"><span class="icon-slot" data-icon="x"></span></button>'+
+      '</div>'+priceRow;
   }).join('');
   mountIcons();
   updateOrderTotalPreview();
 }
-function addOrderItemRow(){ state.orderDraft.items.push({recipeId:'', qty:1}); renderOrderItemRows(); }
+function addOrderItemRow(){ state.orderDraft.items.push({recipeId:'', qty:1, customPrice:null, priceNote:''}); renderOrderItemRows(); }
 function removeOrderItemRow(i){ state.orderDraft.items.splice(i,1); renderOrderItemRows(); }
 function updateOrderItem(i, field, val){
   state.orderDraft.items[i][field] = val;
   updateOrderTotalPreview();
 }
+function toggleOrderItemPrice(i){
+  const it = state.orderDraft.items[i];
+  if(it.customPrice!=null || it._priceOpen){
+    it.customPrice = null;
+    it.priceNote = '';
+    it._priceOpen = false;
+  } else {
+    it._priceOpen = true;
+  }
+  renderOrderItemRows();
+}
+function clearOrderItemPrice(i){
+  const it = state.orderDraft.items[i];
+  it.customPrice = null;
+  it.priceNote = '';
+  it._priceOpen = false;
+  renderOrderItemRows();
+}
+function updateOrderItemPrice(i, val){
+  const parsed = parseFloat((val||'').toString().replace(',','.'));
+  state.orderDraft.items[i].customPrice = isNaN(parsed) ? null : parsed;
+  updateOrderTotalPreview();
+}
+function updateOrderItemPriceNote(i, val){
+  state.orderDraft.items[i].priceNote = val;
+}
 function updateOrderTotalPreview(){
   let total = 0, anyMissing = false;
   (state.orderDraft.items||[]).forEach(function(it){
-    const price = it.recipeId ? unitPriceForRecipe(it.recipeId) : null;
+    const price = it.customPrice!=null ? it.customPrice : (it.recipeId ? unitPriceForRecipe(it.recipeId) : null);
     const qty = parseFloat(it.qty)||0;
     if(it.recipeId && price==null) anyMissing = true;
     else total += (price||0)*qty;
@@ -6622,8 +6714,15 @@ function saveOrder(){
   if(items.length===0){ showToast('Agregá al menos un item'); return; }
   const snapItems = items.map(function(it){
     const r = DATA.recipes.find(function(x){ return x.id===it.recipeId; });
-    const unitPrice = unitPriceForRecipe(it.recipeId);
-    return { recipeId:it.recipeId, recipeName: r?r.title:'(receta borrada)', qty:parseFloat(it.qty), unitPrice: unitPrice };
+    const catalogPrice = unitPriceForRecipe(it.recipeId);
+    const unitPrice = it.customPrice!=null ? it.customPrice : catalogPrice;
+    const out = { recipeId:it.recipeId, recipeName: r?r.title:'(receta borrada)', qty:parseFloat(it.qty), unitPrice: unitPrice };
+    if(it.customPrice!=null){
+      out.customPrice = true;
+      out.catalogPrice = catalogPrice;
+      if(it.priceNote) out.priceNote = it.priceNote;
+    }
+    return out;
   });
   const total = snapItems.reduce(function(s,it){ return s + (it.unitPrice||0)*it.qty; }, 0);
   if(state.editingOrderId){
@@ -8177,7 +8276,8 @@ function renderChatScreen(){
         }).join('')+'</div>' : '';
         return '<div class="chat-msg-row"><span class="chat-avatar"><span class="icon-slot" data-icon="paw"></span></span><div class="chat-msg '+m.role+'" style="transform-origin:bottom left;'+animStyle+'">'+escapeHtml(m.text)+actionsHtml+'</div></div>';
       }
-      return '<div class="chat-msg '+m.role+'" style="transform-origin:bottom right;'+animStyle+'">'+escapeHtml(m.text)+'</div>';
+      const imgHtml = m.image ? '<img class="chat-msg-img" src="'+m.image+'">' : '';
+      return '<div class="chat-msg '+m.role+'" style="transform-origin:bottom right;'+animStyle+'">'+imgHtml+escapeHtml(m.text)+'</div>';
     }).join('');
   }
   const quickWrap = document.getElementById('chatQuickMenuWrap');
@@ -8217,47 +8317,117 @@ function chatQuickMenuOutsideClick(e){
   const wrap = document.getElementById('chatQuickMenuWrap');
   if(wrap && !wrap.contains(e.target)) closeChatQuickMenu();
 }
+function buildFullAppContext(){
+  const parts = [];
+  const recetasTxt = DATA.recipes.map(function(r){
+    const c = computeRecipeCost(r,1);
+    const precio = r.salePrice ? fmtMoney(r.salePrice) : 'sin precio';
+    const costo = (c && c.costPerUnit) ? fmtMoney(c.costPerUnit) : 'sin costo calculado';
+    return r.title+' (precio '+precio+', costo '+costo+(r.readyToSell?', lista para vender, stock actual '+(r.stock||0):'')+')';
+  }).join(' | ');
+  parts.push('Recetas: '+(recetasTxt || 'todavía no hay recetas cargadas')+'.');
+  const fmtStockItem = function(p){
+    const precioTxt = (p.price==null) ? 'precio pendiente' : (fmtMoney(p.price)+' cada '+p.qty+' '+p.unit);
+    return p.name+' (stock '+(p.stock||0)+' '+p.unit+', '+precioTxt+(p.provider?', proveedor '+p.provider:'')+')';
+  };
+  const ingredientes = ingredientCatalogSorted().filter(function(p){ return p.type!=='insumo'; });
+  const insumos = suppliesSorted();
+  parts.push('Ingredientes en stock: '+(ingredientes.length ? ingredientes.map(fmtStockItem).join(', ') : 'no hay ingredientes cargados')+'.');
+  parts.push('Insumos/packaging en stock: '+(insumos.length ? insumos.map(fmtStockItem).join(', ') : 'no hay insumos cargados')+'.');
+  const utensilios = utensilsSorted();
+  parts.push('Utensilios: '+(utensilios.length ? utensilios.map(function(u){ return u.nombre+(u.tamano?' ('+u.tamano+')':''); }).join(', ') : 'no hay utensilios cargados')+'.');
+  const cocina = (DATA.ovens||[]).map(function(o){ return o.name+(o.fuente?' ('+o.fuente+')':''); }).join(', ');
+  parts.push('Equipos de cocina: '+(cocina || 'no hay equipos cargados')+'.');
+  const pendientes = (DATA.orders||[]).filter(function(o){ return o.status!=='entregado' && o.status!=='cancelado'; });
+  const porEstado = {};
+  pendientes.forEach(function(o){ porEstado[o.status] = (porEstado[o.status]||0)+1; });
+  const estadosTxt = Object.keys(porEstado).map(function(k){ return (ORDER_STATUS_LABELS[k]||k)+': '+porEstado[k]; }).join(', ');
+  parts.push('Pedidos pendientes (no entregados ni cancelados): '+pendientes.length+(estadosTxt ? ' ('+estadosTxt+')' : '')+'.');
+  const plan = computeProductionPlan(todayStr(), addDaysStr(todayStr(), 6));
+  if(plan.recipes.length){
+    let prod = 'Producción pendiente (pedidos confirmados, todavía no elaborados) para los próximos 7 días: '+
+      plan.recipes.map(function(x){ return 'x'+(Number.isInteger(x.qty)?x.qty:Math.round(x.qty*100)/100)+' '+x.recipe.title; }).join(', ')+'.';
+    if(plan.shortages.length){
+      prod += ' Con el stock actual de ingredientes NO alcanza para esa producción, falta: '+
+        plan.shortages.map(function(s){ return s.name+' (faltan '+(Math.round(s.missing*100)/100)+' '+s.unit+')'; }).join(', ')+'.';
+    } else {
+      prod += ' El stock actual alcanza para esa producción.';
+    }
+    parts.push(prod);
+  }
+  const mes = computeReports('month');
+  const total = computeReports('all');
+  parts.push('Economía del mes actual: facturado '+fmtMoney(mes.totalRevenue)+', gastos '+fmtMoney(mes.totalExpenses)+', ganancia neta '+fmtMoney(mes.netProfit)+' ('+mes.deliveredCount+' pedidos entregados este mes). Total histórico: facturado '+fmtMoney(total.totalRevenue)+', ganancia neta '+fmtMoney(total.netProfit)+'.');
+  return parts.join(' ');
+}
 function buildSystemPrompt(){
   const session = activeChatSession();
   const recipeId = session ? session.recipeId : state.chatRecipeId;
+  const appContext = buildFullAppContext();
+  const base = 'Sos el asistente de la app Kobu, para alguien que vende repostería/panadería casera. Tenés acceso a TODOS los datos cargados en la app (economía, stock de ingredientes e insumos, utensilios, cocina, recetas y pedidos) — usalos para responder cualquier pregunta sobre esos temas. Nunca digas que no tenés acceso a esta información, ya la tenés en el contexto de abajo. Si te mandan una foto, analizala con atención y respondé sobre lo que ves, relacionándolo con estos datos si aplica. Datos actuales de la app: '+appContext;
   if(recipeId){
     const r = DATA.recipes.find(function(x){ return x.id===recipeId; });
     if(r){
       const stepsFlat = recipeComponentsOrFallback(r).reduce(function(acc,c){ return acc.concat(c.steps||[]); }, []).concat(r.finalSteps||[]);
-      return 'Sos el asistente de cocina de la app Kobu. Estás ayudando con esta receta: "'+r.title+'". '+
-        'Ingredientes: '+flatRecipeIngredients(r).map(function(i){return i.name+' '+i.qty+' '+i.unit;}).join(', ')+'. '+
-        'Pasos: '+stepsFlat.join(' / ')+'. Notas: '+(r.notes||'ninguna')+'. '+
-        'Respondé en español, corto y práctico, pensando en alguien que vende repostería casera.';
+      return base+' Ahora mismo estás ayudando puntualmente con esta receta: "'+r.title+'". Ingredientes: '+flatRecipeIngredients(r).map(function(i){return i.name+' '+i.qty+' '+i.unit;}).join(', ')+'. Pasos: '+stepsFlat.join(' / ')+'. Notas: '+(r.notes||'ninguna')+'. '+
+        'Respondé en español, corto y práctico.';
     }
   }
-  const resumen = DATA.recipes.map(function(r){ return r.title+' ('+flatRecipeIngredients(r).map(function(i){return i.name;}).join(', ')+')'; }).join(' | ');
-  let prodContext = '';
-  const plan = computeProductionPlan(todayStr(), addDaysStr(todayStr(), 6));
-  if(plan.recipes.length){
-    prodContext = ' Producción pendiente (pedidos ya confirmados, todavía no elaborados) para los próximos 7 días: '+
-      plan.recipes.map(function(x){ return 'x'+(Number.isInteger(x.qty)?x.qty:Math.round(x.qty*100)/100)+' '+x.recipe.title; }).join(', ')+'.';
-    if(plan.shortages.length){
-      prodContext += ' Con el stock actual de ingredientes NO alcanza para esa producción, falta: '+
-        plan.shortages.map(function(s){ return s.name+' (faltan '+(Math.round(s.missing*100)/100)+' '+s.unit+')'; }).join(', ')+'.';
-    } else {
-      prodContext += ' El stock actual de ingredientes alcanza para esa producción.';
-    }
-  }
-  return 'Sos el asistente de cocina de la app Kobu. Estas son las recetas guardadas del usuario: '+resumen+'.'+prodContext+' '+
-    'Ayudalo con sustituciones de ingredientes, variantes, qué puede hacer con lo que tiene disponible, y ajustes al escalar cantidades. '+
-    'Si te pregunta sobre pedidos pendientes, qué tiene que producir o si le alcanza el stock, respondé con los datos de producción de arriba. '+
-    'Respondé en español, corto y práctico.';
+  return base+' Ayudalo con sustituciones de ingredientes, variantes, qué puede hacer con lo que tiene disponible, ajustes al escalar cantidades, y cualquier pregunta sobre stock, pedidos, economía, utensilios o cocina usando los datos de arriba. Respondé en español, corto y práctico.';
+}
+function handleChatImageChange(inputEl){
+  const file = inputEl.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    const img = new Image();
+    img.onload = function(){
+      const maxDim = 900;
+      let w = img.naturalWidth, h = img.naturalHeight;
+      if(w>maxDim || h>maxDim){
+        const scale = maxDim/Math.max(w,h);
+        w = Math.round(w*scale); h = Math.round(h*scale);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      state.chatPendingImage = canvas.toDataURL('image/jpeg', 0.72);
+      renderChatImgPreview();
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+  inputEl.value = '';
+}
+function removeChatPendingImage(){
+  state.chatPendingImage = null;
+  renderChatImgPreview();
+}
+function renderChatImgPreview(){
+  const wrap = document.getElementById('chatImgPreview');
+  if(!wrap) return;
+  if(!state.chatPendingImage){ wrap.style.display = 'none'; wrap.innerHTML = ''; return; }
+  wrap.style.display = 'flex';
+  wrap.innerHTML = '<img src="'+state.chatPendingImage+'">'+
+    '<span style="font-size:calc(11.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);">foto adjunta</span>'+
+    '<span class="rm icon-slot" data-icon="x" onclick="removeChatPendingImage()"></span>';
+  mountIcons();
 }
 function sendChatMessage(){
   const input = document.getElementById('chat-input');
   const text = input.value.trim();
-  if(!text) return;
+  const pendingImage = state.chatPendingImage;
+  if(!text && !pendingImage) return;
   const session = activeChatSession();
   if(!session) return;
-  session.messages.push({role:'user', text:text});
+  const msg = {role:'user', text:text};
+  if(pendingImage) msg.image = pendingImage;
+  session.messages.push(msg);
+  state.chatPendingImage = null;
+  renderChatImgPreview();
   const userMsgCount = session.messages.filter(function(m){ return m.role==='user'; }).length;
   if(!session.recipeId && userMsgCount===1){
-    session.title = text.length>42 ? text.slice(0,42)+'…' : text;
+    session.title = text ? (text.length>42 ? text.slice(0,42)+'…' : text) : (pendingImage ? 'Foto' : 'Nuevo chat');
   }
   session.updatedAt = new Date().toISOString();
   saveData(DATA);
@@ -8295,10 +8465,22 @@ function callAi(history){
   if(!url || !key){
     return Promise.reject(new Error('configurá "Sincronización (nube)" en Ajustes primero, el chat se conecta por ahí'));
   }
-  const model = localStorage.getItem('kobuAiModel') || 'llama-3.3-70b-versatile';
+  const relevant = history.filter(function(m){ return m.role==='user' || m.role==='model'; });
+  // Groq permite hasta 5 imágenes por request: si hay más, solo se mandan las últimas 5 (las más viejas quedan como texto).
+  let imgBudget = 5;
+  const withImages = relevant.slice().reverse().map(function(m){
+    if(m.image && imgBudget>0){ imgBudget--; return m; }
+    return (m.image && imgBudget<=0) ? Object.assign({}, m, {image:null}) : m;
+  }).reverse();
+  const hasImage = withImages.some(function(m){ return !!m.image; });
+  const model = hasImage ? KOBU_VISION_MODEL : (localStorage.getItem('kobuAiModel') || KOBU_DEFAULT_AI_MODEL);
   const messages = [{ role:'system', content: buildSystemPrompt() }].concat(
-    history.filter(function(m){ return m.role==='user' || m.role==='model'; }).map(function(m){
-      return { role: m.role==='model' ? 'assistant' : 'user', content: m.text };
+    withImages.map(function(m){
+      const role = m.role==='model' ? 'assistant' : 'user';
+      if(m.image){
+        return { role: role, content: [{ type:'text', text: m.text || 'Analizá esta foto.' }, { type:'image_url', image_url:{ url: m.image } }] };
+      }
+      return { role: role, content: m.text };
     })
   );
   return fetch(url+'?key='+encodeURIComponent(key)+'&action=chat', {
@@ -8343,7 +8525,7 @@ function callAiExtractRecipe(rawText){
   if(!url || !key){
     return Promise.reject(new Error('configurá "Sincronización (nube)" en Ajustes primero, la IA se conecta por ahí'));
   }
-  const model = localStorage.getItem('kobuAiModel') || 'llama-3.3-70b-versatile';
+  const model = localStorage.getItem('kobuAiModel') || KOBU_DEFAULT_AI_MODEL;
   const unitList = DATA.units.map(function(u){ return u.name; }).concat(['u']).join(', ');
   const sys = 'Sos un asistente que convierte texto de una receta de cocina o repostería en JSON estructurado. '+
     'Devolvé SOLO un objeto JSON válido, sin texto extra ni markdown, con esta forma exacta: '+
@@ -8787,6 +8969,13 @@ window.addEventListener('popstate', function(){
   }
   if(state.stack.length>1){
     handleBack();
+    armBackTrap();
+    return;
+  }
+  if(cur!=='home'){
+    // estamos en una pestaña (Pedidos, Vender, Compras, Ajustes, etc.) sin pantallas
+    // apiladas encima — un solo "atrás" tiene que llevar a Inicio, no cerrar la app.
+    goTab('home');
     armBackTrap();
     return;
   }

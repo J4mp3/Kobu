@@ -189,6 +189,11 @@
   .ready-mark.active .icon-slot{ font-size:calc(10px + var(--kobu-font-boost, 0px)); color:var(--k-success-bg); }
   .thumb{ width:46px; height:46px; border-radius:10px; flex-shrink:0; background-size:cover; background-position:center; position:relative; overflow:hidden; }
   .thumb-icon{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:var(--k-accent); font-size:calc(20px + var(--kobu-font-boost, 0px)); }
+  .thumb-stock-badge{ position:absolute; top:2px; right:2px; z-index:1; width:18px; height:18px; border-radius:50%; border:1.5px solid rgba(255,255,255,.9); color:#fff; font-size:9px; font-weight:700; display:flex; align-items:center; justify-content:center; padding:0; cursor:pointer; }
+  .stockpick{ margin:4px 0 8px; padding:8px 10px; border-radius:10px; background:var(--k-warning-bg,rgba(230,160,60,.12)); }
+  .stockpick-warn{ font-size:calc(11px + var(--kobu-font-boost, 0px)); color:var(--k-warning); font-weight:600; margin-bottom:6px; display:flex; align-items:center; gap:5px; }
+  .stockpick-note{ font-size:calc(10.5px + var(--kobu-font-boost, 0px)); color:var(--k-muted); margin:6px 0 0; }
+  .stockpick .btn:disabled{ opacity:.4; cursor:not-allowed; }
   .thumb-icon svg, .hero-icon svg{ width:1em; height:1em; flex-shrink:0; }
   .card .meta p{ margin:0; }
   .card .meta .t{ font-size:calc(13px + var(--kobu-font-boost, 0px)); font-weight:500; color:var(--k-text); }
@@ -550,6 +555,35 @@
   .kanban-card .kc-actions{ display:flex; gap:4px; justify-content:flex-end; }
   .kanban-card .kc-actions .iconbtn{ padding:4px; }
   .kanban-card .kc-actions .iconbtn .icon-slot{ font-size:calc(15px + var(--kobu-font-boost, 0px)); }
+  .ordb-card{ position:relative; background:var(--k-card); border-radius:10px; border:0.5px solid var(--k-border); padding:9px 12px; display:flex; flex-direction:row; align-items:center; gap:10px; cursor:pointer; }
+  .ordb-card:active{ transform:scale(0.99); }
+  .ordb-name{ font-size:calc(12.5px + var(--kobu-font-boost, 0px)); font-weight:600; color:var(--k-text); }
+  .ordb-items{ font-size:calc(11px + var(--kobu-font-boost, 0px)); color:var(--k-muted); }
+  .ordb-total{ font-weight:600; color:var(--k-accent); font-size:calc(12.5px + var(--kobu-font-boost, 0px)); white-space:nowrap; flex-shrink:0; }
+  .ordb-avatar{ width:46px; height:46px; border-radius:14px; flex-shrink:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .ordb-avatar-day{ font-size:calc(15px + var(--kobu-font-boost, 0px)); font-weight:700; color:#fff; line-height:1; }
+  .ordb-avatar-month{ font-size:calc(8.5px + var(--kobu-font-boost, 0px)); font-weight:600; color:rgba(255,255,255,0.85); letter-spacing:.03em; margin-top:2px; }
+  .ordb-paypill{ width:24px; height:24px; border-radius:20px; border:none; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; padding:0; }
+  .ordb-paypill .icon-slot{ font-size:13px; }
+  .ordb-kebab{ border:none; background:none; color:var(--k-muted); cursor:pointer; padding:2px 4px; flex-shrink:0; display:flex; align-items:center; }
+  .ordb-kebab .icon-slot{ font-size:16px; }
+  .ordb-menu{ position:absolute; right:10px; top:44px; background:var(--k-card); border:0.5px solid var(--k-border); border-radius:10px; padding:4px; display:none; z-index:6; min-width:120px; }
+  .ordb-menu.on{ display:block; }
+  .ordb-menu button{ width:100%; text-align:left; border:none; background:none; padding:7px 8px; font-size:calc(11.5px + var(--kobu-font-boost, 0px)); border-radius:7px; cursor:pointer; color:var(--k-text); display:flex; align-items:center; gap:6px; }
+  .ordb-menu button .icon-slot{ font-size:14px; }
+  .ordb-menu button.danger{ color:var(--k-danger); }
+  .eop-title{ text-align:center; font-weight:600; font-size:calc(13.5px + var(--kobu-font-boost, 0px)); margin:0; color:var(--k-text); }
+  .eop-sub{ text-align:center; font-size:calc(11px + var(--kobu-font-boost, 0px)); color:var(--k-muted); margin:2px 0 10px; }
+  .eop-dashed{ border-top:1px dashed var(--k-border); }
+  .eop-item-row{ display:flex; align-items:center; gap:6px; padding:6px 0; font-size:calc(12px + var(--kobu-font-boost, 0px)); color:var(--k-text); }
+  .eop-item-name{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .eop-num{ background:var(--k-card2); border:0.5px solid var(--k-border); border-radius:8px; padding:3px 5px; font-size:calc(11px + var(--kobu-font-boost, 0px)); color:var(--k-text); outline:none; }
+  .eop-qty{ width:36px; text-align:center; }
+  .eop-price{ width:68px; text-align:right; }
+  .eop-addrow{ display:flex; justify-content:space-between; align-items:center; padding:7px 0; color:var(--k-accent); font-size:calc(12px + var(--kobu-font-boost, 0px)); font-weight:500; cursor:pointer; border-top:1px dashed var(--k-border); margin-top:2px; background:none; border-left:none; border-right:none; border-bottom:none; width:100%; }
+  .eop-dots{ display:flex; justify-content:center; gap:6px; margin:2px 0 4px; }
+  .eop-dot{ width:6px; height:6px; border-radius:50%; background:var(--k-border); border:none; padding:0; cursor:pointer; }
+  .eop-dot.on{ background:var(--k-accent); }
   @media (min-width:900px) and (pointer:fine){
     body{ padding:0; align-items:stretch; }
     #app{ max-width:none; width:100%; height:100vh; min-height:100vh; border-radius:0; border:none; box-shadow:none; flex-direction:row; }
@@ -564,7 +598,6 @@
     #recipeList .card .thumb-icon, #prepCardList .card .thumb-icon{ font-size:calc(42px + var(--kobu-font-boost, 0px)); }
     #recipeList .card .card-drag, #prepCardList .card .card-drag{ position:absolute; top:6px; left:6px; z-index:2; background:rgba(255,255,255,.85); border-radius:50%; width:26px; height:26px; padding:6px; color:var(--k-accent); }
     #recipeList .card .meta, #prepCardList .card .meta{ padding:9px 10px 11px; }
-    #orderStatusChips{ display:none; }
     .icon-rail [data-nav="quicksell"]{ display:none; }
   }
 </style>
@@ -615,6 +648,19 @@
       <div class="btn-row">
         <button class="btn btn-ghost" onclick="closeStockModal()">Cancelar</button>
         <button class="btn btn-primary" onclick="saveStockModal()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BAKE (REGISTRAR HORNEADA) MODAL -->
+  <div class="modal-overlay" id="bakeModal">
+    <div class="modal-box">
+      <p class="modal-msg" id="bakeModalMsg" style="font-weight:600;"></p>
+      <p id="bakeModalNote" style="font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:-4px 0 6px;"></p>
+      <input class="input" id="bakeModalInput" type="number" min="0" placeholder="porciones que salieron" style="text-align:center;">
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="closeBakeModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="confirmBakeModal()">Registrar</button>
       </div>
     </div>
   </div>
@@ -715,7 +761,8 @@
     <div class="modal-box" style="max-width:300px;">
       <p class="modal-msg" style="text-align:left;font-weight:600;margin:0;">Corregir stock</p>
       <p id="sc-name" style="font-size:calc(12px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:-6px 0 0;"></p>
-      <div class="field"><label>Cantidad actual</label><input class="input" id="sc-qty" type="number" step="any" min="0" placeholder="0"></div>
+      <div class="field"><label>Cantidad actual</label><input class="input" id="sc-qty" type="number" step="any" min="0" placeholder="0" oninput="scSyncFromQty()"></div>
+      <div class="field" id="sc-pkg-field"><label id="sc-pkg-label">Cantidad de paquetes</label><input class="input" id="sc-pkg" type="number" step="any" min="0" placeholder="0" oninput="scSyncFromPkg()"></div>
       <p style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;">Esto solo corrige el número guardado — no genera ni modifica gastos en Reportes.</p>
       <div class="btn-row">
         <button class="btn btn-ghost" onclick="closeStockCorrectModal()">Cancelar</button>
@@ -900,6 +947,34 @@
         <button class="btn btn-ghost" style="flex:1;" onclick="modifyOrderFromModal()"><span class="icon-slot" data-icon="pencil" style="vertical-align:-2px;"></span> Modificar</button>
         <button class="btn btn-danger" style="flex:1;" onclick="deleteOrderFromModal()"><span class="icon-slot" data-icon="trash" style="vertical-align:-2px;"></span> Eliminar</button>
       </div>
+    </div>
+  </div>
+
+  <!-- EDIT ORDER POPUP (ticket, 2 páginas) -->
+  <div class="modal-overlay" id="editOrderModal">
+    <div class="modal-box" style="max-width:340px;">
+      <button class="iconbtn" onclick="closeEditOrderPopup()" style="align-self:flex-end;margin:-6px -6px -8px 0;"><span class="icon-slot" data-icon="x"></span></button>
+      <p class="eop-title" id="eop-title">Detalle del pedido</p>
+      <p class="eop-sub" id="eop-sub"></p>
+      <div class="eop-dashed"></div>
+      <div id="eop-page0">
+        <div id="eop-items"></div>
+        <button type="button" class="eop-addrow" id="eop-addrow" onclick="eopStartAdd()">
+          <span>+ agregar producto</span><span class="icon-slot" data-icon="chevron-right"></span>
+        </button>
+        <div id="eop-addform"></div>
+        <div class="cost-total" id="eop-total"><span>Total</span><span>$0</span></div>
+      </div>
+      <div id="eop-page1" style="display:none;">
+        <div class="field"><label>Cliente</label><select class="input" id="eop-client" onchange="eopClientChange(this.value)"></select></div>
+        <div class="field"><label>Fecha de entrega</label><input class="input" type="date" id="eop-date" onchange="eopDateChange(this.value)"></div>
+        <div class="field"><label>Cómo pagó</label><div class="btn-row" id="eop-paymethod"></div></div>
+      </div>
+      <div class="eop-dots">
+        <button type="button" class="eop-dot" id="eop-dot0" onclick="eopGoTo(0)" aria-label="detalle del pedido"></button>
+        <button type="button" class="eop-dot" id="eop-dot1" onclick="eopGoTo(1)" aria-label="cliente y fecha"></button>
+      </div>
+      <button class="btn btn-primary" style="width:100%;" onclick="saveEditOrderPopup()">Guardar cambios</button>
     </div>
   </div>
 
@@ -1246,7 +1321,7 @@
         <span class="l">Descontar stock al vender</span>
         <div class="switch" id="discountStockSwitch" onclick="toggleDiscountStockOnSale()"><div class="knob-sw"></div></div>
       </div>
-      <p style="font-size:calc(10px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:2px 0 0;">Desactivalo para cargar ventas pasadas sin que se descuente del stock actual.</p>
+      <p style="font-size:calc(10px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:2px 0 0;">Desactivalo para cargar ventas o producción pasada (por ejemplo, al registrar una horneada vieja) sin que se descuente del stock actual.</p>
       <div class="rowline">
         <span class="l">Sumar costo al reponer stock</span>
         <div class="switch" id="addStockExpenseSwitch" onclick="toggleAddStockAsExpense()"><div class="knob-sw"></div></div>
@@ -1651,11 +1726,9 @@
           <input id="orderSearchInput" placeholder="Buscar cliente..." oninput="setOrderSearchQuery(this.value)">
         </div>
         <button type="button" class="ord-toolbtn" id="orderCalToggleBtn" onclick="toggleOrderCalendar()" title="calendario"><span class="icon-slot" data-icon="calendar"></span></button>
-        <button type="button" class="ord-toolbtn" id="orderFilterToggleBtn" onclick="toggleOrderFilters()" title="filtros"><span class="icon-slot" data-icon="filter"></span></button>
         <button type="button" class="ord-toolbtn" onclick="exportDeliveriesIcs()" title="exportar entregas"><span class="icon-slot" data-icon="download"></span></button>
       </div>
       <div class="grp-card" id="orderCalendarWrap" style="display:none;"></div>
-      <div class="chiprow" id="orderStatusChips" style="display:none;"></div>
       <div id="orderList" style="display:flex;flex-direction:column;gap:8px;"></div>
     </div>
     <div id="ordersClientesPanel" style="display:none;flex-direction:column;gap:12px;">
@@ -1741,6 +1814,7 @@ const SVG_ATTRS = 'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-
 const ICONS = {
   'arrow-left': '<svg '+SVG_ATTRS+'><path d="M19 12H5M12 19l-7-7 7-7"/></svg>',
   'search': '<svg '+SVG_ATTRS+'><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>',
+  'dots-vertical': '<svg '+SVG_ATTRS+'><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/><circle cx="12" cy="5" r="1"/></svg>',
   'chevron-right': '<svg '+SVG_ATTRS+'><path d="M9 6l6 6l-6 6"/></svg>',
   'chevron-up': '<svg '+SVG_ATTRS+'><path d="M6 15l6 -6l6 6"/></svg>',
   'chevron-down': '<svg '+SVG_ATTRS+'><path d="M6 9l6 6l6 -6"/></svg>',
@@ -1791,6 +1865,7 @@ const ICONS = {
   'calendar': '<svg '+SVG_ATTRS+'><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
   'filter': '<svg '+SVG_ATTRS+'><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>',
   'ban': '<svg '+SVG_ATTRS+'><circle cx="12" cy="12" r="9"/><line x1="6" y1="18" x2="18" y2="6"/></svg>',
+  'alert-triangle': '<svg '+SVG_ATTRS+'><path d="M12 9v4"/><path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z"/><path d="M12 16h.01"/></svg>',
   'grip': '<svg '+SVG_ATTRS+'><circle cx="9" cy="6" r="1.3" fill="currentColor" stroke="none"/><circle cx="9" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="9" cy="18" r="1.3" fill="currentColor" stroke="none"/><circle cx="15" cy="6" r="1.3" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="15" cy="18" r="1.3" fill="currentColor" stroke="none"/></svg>',
   'star': '<svg '+SVG_ATTRS+' fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>',
   'sun': '<svg '+SVG_ATTRS+'><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>',
@@ -2706,9 +2781,10 @@ function renderRecipes(){
     const readyMark = r.readyToSell ? '<span class="ready-mark active"><span class="icon-slot" data-icon="check"></span></span>' : '<span class="ready-mark"></span>';
     const readyBtn = '<button type="button" class="iconbtn card-ready" onclick="event.stopPropagation();toggleReadyToSell(\''+r.id+'\')" title="lista para vender">'+readyMark+'</button>';
     const dragBtn = unfiltered ? '<button type="button" class="iconbtn card-drag" onclick="event.stopPropagation();" onpointerdown="event.stopPropagation();recipeDragStart(event,\''+r.id+'\')" title="mover"><span class="icon-slot" data-icon="grip"></span></button>' : '';
+    const stockBadge = '<button type="button" class="thumb-stock-badge" style="background:'+stockColor(r.stock||0)+';" onclick="event.stopPropagation();openBakeModal(\''+r.id+'\')" title="stock: '+(r.stock||0)+' — tocá para registrar horneada">'+(r.stock||0)+'</button>';
     return '<div class="card" data-id="'+r.id+'" data-fav="'+(r.favorite?1:0)+'" onclick="openDetail(\''+r.id+'\')">'+
       dragBtn + favBtn + readyBtn +
-      '<div class="thumb" style="'+bg+'">'+mediaIconHtml(r,'thumb-icon')+'</div>'+
+      '<div class="thumb" style="'+bg+'">'+mediaIconHtml(r,'thumb-icon')+stockBadge+'</div>'+
       '<div class="meta"><p class="t">'+escapeHtml(r.title)+'</p>'+
       '<p class="s">'+(r.timeMinutes||'-')+' min · '+escapeHtml(r.difficulty||'')+'</p></div>'+
       '</div>';
@@ -5572,14 +5648,27 @@ function handleStockRowClick(id){
   }, 280);
 }
 let stockCorrectId = null;
+let scPkgRef = 1;
 function openStockCorrectModal(id){
   const p = DATA.ingredientPrices.find(function(x){ return x.id===id; });
   if(!p) return;
   stockCorrectId = id;
+  scPkgRef = p.qty>0 ? p.qty : 1;
   document.getElementById('sc-name').textContent = p.name+' · stock en '+(p.unit||'');
-  document.getElementById('sc-qty').value = fmtQty(roundQty(p.stock||0));
+  const stock = roundQty(p.stock||0);
+  document.getElementById('sc-qty').value = fmtQty(stock);
+  document.getElementById('sc-pkg').value = fmtQty(roundQty(stock/scPkgRef));
+  document.getElementById('sc-pkg-label').textContent = 'Cantidad de paquetes (envase de '+fmtQty(scPkgRef)+' '+(p.unit||'')+')';
   document.getElementById('stockCorrectModal').classList.add('active');
   setTimeout(function(){ const el=document.getElementById('sc-qty'); if(el){ el.focus(); el.select(); } }, 30);
+}
+function scSyncFromQty(){
+  const val = parseFloat((document.getElementById('sc-qty').value||'').toString().replace(',','.'));
+  document.getElementById('sc-pkg').value = isNaN(val) ? '' : fmtQty(roundQty(val/scPkgRef));
+}
+function scSyncFromPkg(){
+  const val = parseFloat((document.getElementById('sc-pkg').value||'').toString().replace(',','.'));
+  document.getElementById('sc-qty').value = isNaN(val) ? '' : fmtQty(roundQty(val*scPkgRef));
 }
 function closeStockCorrectModal(){
   document.getElementById('stockCorrectModal').classList.remove('active');
@@ -6096,29 +6185,120 @@ function unitPriceForRecipe(recipeId){
   return r.salePrice!=null ? r.salePrice : null;
 }
 function adjustStockForOrder(order, direction){
+  // Los ingredientes ya no se descuentan al vender un pedido — se descuentan al hornear (registrarHorneada).
+  // Se mantiene esta función (inerte) por compatibilidad con pedidos que ya tenían stockDeducted=true de antes de este cambio.
+  return;
+}
+function adjustPortionStockForOrder(order, direction){
   (order.items||[]).forEach(function(it){
     if(!it.recipeId) return;
     const r = DATA.recipes.find(function(x){ return x.id===it.recipeId; });
     if(!r) return;
+    const qty = parseFloat(it.qty)||0;
+    r.stock = roundQty(Math.max(0, (r.stock||0) + direction*qty));
+  });
+}
+function registrarHorneada(recipeId, porciones){
+  const r = DATA.recipes.find(function(x){ return x.id===recipeId; });
+  if(!r || !porciones || porciones<=0) return;
+  const willDeduct = DATA.settings.discountStockOnSale!==false;
+  if(willDeduct){
+    const yieldQty = r.yieldQty || 1;
+    const scale = porciones / yieldQty;
     flatRecipeIngredients(r).forEach(function(ing){
       if(!ing.priceId) return;
       const cat = DATA.ingredientPrices.find(function(p){ return p.id===ing.priceId; });
       if(!cat) return;
       const perUnitQty = parseFloat(ing.qty);
       if(isNaN(perUnitQty)) return;
-      const totalQty = perUnitQty * it.qty;
+      const totalQty = perUnitQty * scale;
       const converted = convertQty(totalQty, ing.unit, cat.unit);
       if(converted==null) return;
-      cat.stock = roundQty((cat.stock||0) + direction*converted);
+      cat.stock = roundQty((cat.stock||0) - converted);
     });
+  }
+  r.stock = roundQty((r.stock||0) + porciones);
+}
+let bakeModalRecipeId = null;
+function openBakeModal(id){
+  const r = DATA.recipes.find(function(x){ return x.id===id; });
+  if(!r) return;
+  bakeModalRecipeId = id;
+  document.getElementById('bakeModalMsg').textContent = 'Registrar horneada — '+r.title;
+  document.getElementById('bakeModalNote').textContent = r.yieldQty
+    ? '1 tanda = '+r.yieldQty+' '+(r.yieldUnit||'porciones')+' · stock actual: '+(r.stock||0)
+    : 'Cargá el rinde en la receta para calcular tandas — por ahora, ingresá las porciones a mano. Stock actual: '+(r.stock||0);
+  document.getElementById('bakeModalInput').value = r.yieldQty || '';
+  document.getElementById('bakeModal').classList.add('active');
+}
+function closeBakeModal(){
+  document.getElementById('bakeModal').classList.remove('active');
+  bakeModalRecipeId = null;
+}
+function confirmBakeModal(){
+  const r = DATA.recipes.find(function(x){ return x.id===bakeModalRecipeId; });
+  if(!r) return;
+  const val = parseFloat(document.getElementById('bakeModalInput').value);
+  if(isNaN(val) || val<=0){ showToast('Ingresá cuántas porciones salieron'); return; }
+  registrarHorneada(r.id, val);
+  saveData(DATA);
+  closeBakeModal();
+  showToast('Horneada registrada — stock actual: '+(r.stock||0));
+  renderRecipes();
+  if(document.getElementById('screen-quicksell')) renderQuickSellScreen();
+}
+function recipeStockShortfall(it){
+  if(!it || !it.recipeId) return null;
+  const r = DATA.recipes.find(function(x){ return x.id===it.recipeId; });
+  if(!r) return null;
+  const qty = parseFloat(it.qty)||0;
+  const stock = r.stock||0;
+  const short = qty - stock;
+  if(short<=0) return null;
+  return { r:r, short:short, stock:stock, qty:qty };
+}
+function orderItemStockPickerHtml(it, i){
+  if(DATA.settings.discountStockOnSale===false) return '';
+  const info = recipeStockShortfall(it);
+  if(!info) return '';
+  const r = info.r;
+  const yieldQty = r.yieldQty || 1;
+  const tandas = Math.ceil(info.short/yieldQty);
+  const produced = tandas*yieldQty;
+  const noStock = info.stock<=0;
+  const choice = noStock ? 'bake' : (it.stockChoice || 'stock');
+  const finalStock = Math.max(0, roundQty(info.stock + produced - info.qty));
+  return '<div class="stockpick">'+
+    '<div class="stockpick-warn"><span class="icon-slot" data-icon="alert-triangle"></span> Faltan '+roundQty(info.short)+' porciones de '+escapeHtml(r.title)+'</div>'+
+    '<div class="btn-row">'+
+      '<button type="button" class="btn '+(choice==='stock'?'btn-primary':'btn-ghost')+'" style="flex:1;" '+(noStock?'disabled':'onclick="setOrderItemStockChoice('+i+',\'stock\')"')+'>Usar stock ('+info.stock+')</button>'+
+      '<button type="button" class="btn '+(choice==='bake'?'btn-primary':'btn-ghost')+'" style="flex:1;" onclick="setOrderItemStockChoice('+i+',\'bake\')">Hornear ahora</button>'+
+    '</div>'+
+    (choice==='bake' ? '<p class="stockpick-note">Se registra '+tandas+' tanda'+(tandas>1?'s':'')+' ('+produced+' porciones), se descuentan los ingredientes de esa horneada. Quedan '+finalStock+' en stock después del pedido.</p>' : '<p class="stockpick-note">Se descuentan los '+info.stock+' que hay — el faltante queda sin cubrir.</p>')+
+  '</div>';
+}
+function setOrderItemStockChoice(i, choice){
+  if(!state.orderDraft || !state.orderDraft.items[i]) return;
+  state.orderDraft.items[i].stockChoice = choice;
+  if(document.getElementById('of-items') && document.getElementById('of-items').offsetParent!==null) renderOrderItemRows();
+  if(document.getElementById('eop-items') && document.getElementById('editOrderModal').classList.contains('active')) renderEopItems();
+}
+function resolveOrderBakeChoices(items){
+  (items||[]).forEach(function(it){
+    const info = recipeStockShortfall(it);
+    if(!info) return;
+    const noStock = info.stock<=0;
+    if(it.stockChoice!=='bake' && !noStock) return;
+    const yieldQty = info.r.yieldQty || 1;
+    const tandas = Math.ceil(info.short/yieldQty);
+    const produced = tandas*yieldQty;
+    registrarHorneada(info.r.id, produced);
   });
 }
-let orderStatusFilter = null;
 let orderCalendarOpen = false;
 let orderCalendarMonth = new Date();
 let calendarDayFilter = null;
 function renderOrdersScreen(){
-  renderOrderStatusChips();
   if(orderCalendarOpen) renderOrderCalendar();
   renderOrderList();
 }
@@ -6129,29 +6309,6 @@ function nextOrderStatus(s){
   const idx = ORDER_STATUS_ORDER.indexOf(s);
   if(idx===-1) return ORDER_STATUS_ORDER[0];
   return ORDER_STATUS_ORDER[(idx+1) % ORDER_STATUS_ORDER.length];
-}
-function renderOrderStatusChips(){
-  const wrap = document.getElementById('orderStatusChips');
-  const opts = [
-    {v:null, l:'Todos', cls:'chip'},
-    {v:'pendiente', l:'Pendientes', cls:'status-chip pendiente'},
-    {v:'confirmado', l:'Confirmados', cls:'status-chip confirmado'},
-    {v:'preparacion', l:'En preparación', cls:'status-chip preparacion'},
-    {v:'listo', l:'Listos', cls:'status-chip listo'},
-    {v:'entregado', l:'Entregados', cls:'status-chip entregado'},
-    {v:'cancelado', l:'Cancelados', cls:'status-chip cancelado'}
-  ];
-  wrap.innerHTML = opts.map(function(o){
-    const active = orderStatusFilter===o.v ? 'active' : '';
-    return '<button class="'+o.cls+' '+active+'" onclick="setOrderStatusFilter('+(o.v?("'"+o.v+"'"):'null')+')">'+o.l+'</button>';
-  }).join('');
-}
-function setOrderStatusFilter(v){ orderStatusFilter = v; renderOrderList(); }
-var orderFiltersOpen = false;
-function toggleOrderFilters(){
-  orderFiltersOpen = !orderFiltersOpen;
-  document.getElementById('orderStatusChips').style.display = orderFiltersOpen ? 'flex' : 'none';
-  document.getElementById('orderFilterToggleBtn').classList.toggle('active', orderFiltersOpen);
 }
 var orderSearchQuery = '';
 function setOrderSearchQuery(v){ orderSearchQuery = (v||'').toLowerCase().trim(); renderOrderList(); }
@@ -6258,80 +6415,131 @@ function renderOrderList(){
     mountIcons();
     return;
   }
-  if(isDesktopLayout()){
-    renderOrderKanban(wrap, sortedAll);
-    return;
-  }
-  let list = sortedAll;
-  if(orderStatusFilter) list = list.filter(function(o){ return o.status===orderStatusFilter; });
-  if(list.length===0){
-    wrap.innerHTML = '<div class="empty"><span class="icon-slot" data-icon="clipboard"></span>No hay pedidos en este estado.</div>';
-    mountIcons();
-    return;
-  }
-  let html = '';
-  let lastLabel = null;
-  list.forEach(function(o){
-    const label = orderGroupDateLabel(o.deliveryDate);
-    if(label !== lastLabel){
-      html += '<p class="order-date-group-label">'+label+'</p>';
-      lastLabel = label;
+  renderOrderKanban(wrap, sortedAll, !!(calendarDayFilter || orderSearchQuery));
+}
+const ORDER_STATUS_SHORT = { pendiente:'pend', confirmado:'conf', preparacion:'prep', listo:'listo', entregado:'ent', cancelado:'canc' };
+let orderBoardOpen = {};
+const ORDER_CARD_MONTHS = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
+function orderCardDate(o){
+  const p = o.deliveryDate.split('-');
+  return new Date(parseInt(p[0]), parseInt(p[1])-1, parseInt(p[2]));
+}
+function orderCardDateParts(o){
+  if(!o.deliveryDate) return { day:'–', month:'S/F' };
+  const d = orderCardDate(o);
+  return { day: String(d.getDate()).padStart(2,'0'), month: ORDER_CARD_MONTHS[d.getMonth()] };
+}
+function orderMonthKey(o){ const d = orderCardDate(o); return d.getFullYear()+'-'+d.getMonth(); }
+function orderWeekStartKey(o){
+  const d = orderCardDate(o);
+  const day = d.getDay();
+  const diff = (day===0 ? -6 : 1-day);
+  const ws = new Date(d.getFullYear(), d.getMonth(), d.getDate()+diff);
+  return ws.getFullYear()+'-'+ws.getMonth()+'-'+ws.getDate();
+}
+function orderMonthDividerLabel(o){
+  const d = orderCardDate(o);
+  const lbl = d.toLocaleDateString('es-AR',{month:'long',year:'numeric'});
+  return lbl.charAt(0).toUpperCase()+lbl.slice(1);
+}
+function orderWeekDividerLabel(o){
+  const d = orderCardDate(o);
+  const day = d.getDay();
+  const diff = (day===0 ? -6 : 1-day);
+  const ws = new Date(d.getFullYear(), d.getMonth(), d.getDate()+diff);
+  const we = new Date(ws.getFullYear(), ws.getMonth(), ws.getDate()+6);
+  return 'Semana del '+ws.getDate()+' al '+we.getDate()+' de '+we.toLocaleDateString('es-AR',{month:'long'});
+}
+function orderGroupItemsWithDividersHtml(items){
+  let html = '', lastMonth = null, lastWeek = null, shownNoDate = false;
+  items.forEach(function(o){
+    if(!o.deliveryDate){
+      if(!shownNoDate){
+        html += '<p class="order-date-group-label" style="margin:10px 0 4px;">Sin fecha de entrega</p>';
+        shownNoDate = true;
+      }
+      html += orderBoardCardHtml(o);
+      return;
     }
-    const bg = PLACEHOLDER_COLORS[(o.colorIdx||0) % PLACEHOLDER_COLORS.length];
-    const n = (o.items||[]).length;
-    const itemsSummary = n===1 ? (o.items[0].qty+' × '+escapeHtml(o.items[0].recipeName)) : (n+' item'+(n===1?'':'s'));
-    html += '<div class="order-card" onclick="openOrderDetailModal(\''+o.id+'\')">'+
-      '<div class="order-card-top">'+
-        '<div class="order-avatar" style="background:'+bg+';">'+orderInitials(o.customerName)+'</div>'+
-        '<div class="meta"><p class="t">'+escapeHtml(o.customerName)+'</p><p class="s">'+itemsSummary+' · '+fmtMoney(o.total)+'</p></div>'+
-        '<span class="status-chip '+(o.status||'pendiente')+'" style="pointer-events:none;flex-shrink:0;">'+(ORDER_STATUS_LABELS[o.status]||'Pendiente')+'</span>'+
-      '</div>'+
+    const mk = orderMonthKey(o), wk = orderWeekStartKey(o);
+    if(lastMonth!==null && mk!==lastMonth){
+      html += '<p class="order-date-group-label" style="margin:10px 0 4px;">'+orderMonthDividerLabel(o)+'</p>';
+    } else if(lastWeek!==null && wk!==lastWeek){
+      html += '<div style="display:flex;align-items:center;gap:8px;margin:8px 0 2px;">'+
+        '<div style="flex:1;height:0.5px;background:var(--k-border);"></div>'+
+        '<span style="font-size:calc(9.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);white-space:nowrap;">'+orderWeekDividerLabel(o)+'</span>'+
+        '<div style="flex:1;height:0.5px;background:var(--k-border);"></div>'+
       '</div>';
+    }
+    lastMonth = mk; lastWeek = wk;
+    html += orderBoardCardHtml(o);
   });
+  return html;
+}
+function toggleOrderBoardGroup(status){
+  orderBoardOpen[status] = !orderBoardOpen[status];
+  renderOrderList();
+}
+function renderOrderKanban(wrap, list, forceOpen){
+  const statusesWithCancel = ORDER_STATUS_ORDER.concat(['cancelado']);
+  const html = statusesWithCancel.map(function(status){
+    const items = list.filter(function(o){ return (o.status||'pendiente')===status; });
+    if(!items.length) return '';
+    if(!(status in orderBoardOpen)) orderBoardOpen[status] = (status==='pendiente' || status==='preparacion');
+    const open = forceOpen ? true : orderBoardOpen[status];
+    const shortK = ORDER_STATUS_SHORT[status];
+    return '<div style="margin-bottom:10px;">'+
+      '<button type="button" onclick="toggleOrderBoardGroup(\''+status+'\')" style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;border:none;border-radius:10px;background:var(--k-status-'+shortK+');cursor:pointer;">'+
+        '<span style="color:#fff;font-size:calc(12.5px + var(--kobu-font-boost, 0px));font-weight:600;">'+ORDER_STATUS_LABELS[status]+' · '+items.length+'</span>'+
+        '<span class="icon-slot" data-icon="chevron-down" style="color:#fff;font-size:16px;transition:transform .15s;transform:'+(open?'rotate(0deg)':'rotate(-90deg)')+';"></span>'+
+      '</button>'+
+      '<div style="display:'+(open?'flex':'none')+';flex-direction:column;gap:6px;margin-top:6px;">'+
+        orderGroupItemsWithDividersHtml(items)+
+      '</div>'+
+    '</div>';
+  }).join('');
   wrap.innerHTML = html;
   mountIcons();
 }
-function renderOrderKanban(wrap, list){
-  const statusesWithCancel = ORDER_STATUS_ORDER.concat(['cancelado']);
-  const cols = statusesWithCancel.map(function(status){
-    const items = list.filter(function(o){ return (o.status||'pendiente')===status; });
-    const cardsHtml = items.length ? items.map(kanbanCardHtml).join('') : '<p class="kanban-empty">sin pedidos</p>';
-    return '<div class="kanban-col">'+
-      '<div class="kanban-col-head"><span>'+ORDER_STATUS_LABELS[status]+'</span><span style="color:var(--k-muted);font-weight:400;">'+items.length+'</span></div>'+
-      cardsHtml+
-      '</div>';
-  }).join('');
-  wrap.innerHTML = '<div class="kanban-board">'+cols+'</div>';
-  mountIcons();
+let orderCardMenuOpenId = null;
+function toggleOrderCardMenu(id){
+  orderCardMenuOpenId = (orderCardMenuOpenId===id) ? null : id;
+  renderOrderList();
 }
-function kanbanCardHtml(o){
-  const dt = new Date(o.createdAt);
-  const dtStr = dt.toLocaleDateString('es-AR');
-  const itemsHtml = (o.items||[]).map(function(it){ return it.qty+' × '+escapeHtml(it.recipeName); }).join(', ') || 'sin items';
-  const deliveryHtml = o.deliveryDate ? ' · entrega '+escapeHtml(o.deliveryDate) : '';
-  const balTxt = orderBalanceText(o);
-  const balanceHtml = balTxt ? ' · '+balTxt : '';
-  const noteHtml = o.note ? '<div class="kc-sub" title="'+escapeHtml(o.note)+'"><span class="icon-slot" data-icon="pencil" style="width:11px;height:11px;vertical-align:-1px;"></span> '+escapeHtml(o.note.length>40?o.note.slice(0,40)+'…':o.note)+'</div>' : '';
-  const isCancelled = o.status==='cancelado';
-  const next = nextOrderStatus(o.status||'pendiente');
-  return '<div class="kanban-card">'+
-    '<div class="kc-top">'+
-      '<div><div class="kc-name">'+escapeHtml(o.customerName)+'</div><div class="kc-sub">'+dtStr+deliveryHtml+balanceHtml+'</div>'+noteHtml+'</div>'+
-      '<span style="font-weight:600;color:var(--k-accent);font-size:calc(11.5px + var(--kobu-font-boost, 0px));white-space:nowrap;">'+fmtMoney(o.total)+'</span>'+
+function closeOrderCardMenu(){ orderCardMenuOpenId = null; }
+function orderBoardCardHtml(o){
+  const itemsLine = (o.items||[]).map(function(it){ return escapeHtml(it.recipeName)+' x'+it.qty; }).join(' | ') || 'sin items';
+  const bg = PLACEHOLDER_COLORS[(o.colorIdx||0) % PLACEHOLDER_COLORS.length];
+  const dp = orderCardDateParts(o);
+  const pay = o.payMethod==='transferencia' ? 'transferencia' : 'efectivo';
+  const payIcon = pay==='efectivo' ? 'cash' : 'credit-card';
+  const payColor = pay==='efectivo' ? 'var(--k-success)' : 'var(--k-info)';
+  const payBg = pay==='efectivo' ? 'var(--k-success-bg)' : 'var(--k-info-bg)';
+  const menuOpen = orderCardMenuOpenId===o.id;
+  return '<div class="ordb-card" onclick="openOrderDetailModal(\''+o.id+'\')">'+
+    '<div class="ordb-avatar" style="background:'+bg+';"><span class="ordb-avatar-day">'+dp.day+'</span><span class="ordb-avatar-month">'+dp.month+'</span></div>'+
+    '<div style="min-width:0;flex:1;">'+
+      '<div class="ordb-name" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+escapeHtml(o.customerName)+'</div>'+
+      '<div class="ordb-items" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">• '+itemsLine+'</div>'+
     '</div>'+
-    '<div class="kc-items">'+itemsHtml+'</div>'+
-    '<div class="kc-actions">'+
-      '<button class="iconbtn" onclick="notifyOrderReady(\''+o.id+'\')" title="avisar"><span class="icon-slot" data-icon="share"></span></button>'+
-      (o.status==='entregado' ? '<button class="iconbtn" onclick="openReviewModal(\''+o.id+'\')" title="'+(o.review?'editar reseña':'dejar reseña')+'" style="color:var(--k-accent);"><span class="icon-slot" data-icon="star"></span></button>' : '')+
-      '<button class="iconbtn" onclick="editOrder(\''+o.id+'\')" title="editar"><span class="icon-slot" data-icon="pencil"></span></button>'+
-      '<button class="iconbtn" onclick="deleteOrder(\''+o.id+'\')" style="color:var(--k-danger);" title="borrar"><span class="icon-slot" data-icon="trash"></span></button>'+
-      (isCancelled ?
-        '<button class="iconbtn" onclick="toggleOrderStatus(\''+o.id+'\')" title="reactivar" style="color:var(--k-accent);"><span class="icon-slot" data-icon="arrow-right"></span></button>' :
-        (o.status==='entregado' ? '' :
-        '<button class="iconbtn" onclick="cancelOrder(\''+o.id+'\')" title="cancelar pedido" style="color:var(--k-status-canc);"><span class="icon-slot" data-icon="ban"></span></button>'+
-        '<button class="iconbtn" onclick="toggleOrderStatus(\''+o.id+'\')" title="mover a '+ORDER_STATUS_LABELS[next]+'" style="color:var(--k-accent);"><span class="icon-slot" data-icon="arrow-right"></span></button>'))+
+    '<div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">'+
+      '<div class="ordb-total">'+fmtMoney(o.total)+'</div>'+
+      '<button type="button" class="ordb-paypill" style="background:'+payBg+';color:'+payColor+';" title="cambiar método de pago" onclick="event.stopPropagation();toggleOrderPayMethod(\''+o.id+'\')"><span class="icon-slot" data-icon="'+payIcon+'"></span></button>'+
+      '<button type="button" class="ordb-kebab" title="opciones" onclick="event.stopPropagation();toggleOrderCardMenu(\''+o.id+'\')"><span class="icon-slot" data-icon="dots-vertical"></span></button>'+
     '</div>'+
-    '</div>';
+    '<div class="ordb-menu'+(menuOpen?' on':'')+'">'+
+      '<button type="button" onclick="event.stopPropagation();closeOrderCardMenu();openEditOrderPopup(\''+o.id+'\')"><span class="icon-slot" data-icon="pencil"></span>Editar</button>'+
+      '<button type="button" class="danger" onclick="event.stopPropagation();closeOrderCardMenu();deleteOrder(\''+o.id+'\')"><span class="icon-slot" data-icon="trash"></span>Eliminar</button>'+
+    '</div>'+
+  '</div>';
+}
+function toggleOrderPayMethod(id){
+  const o = DATA.orders.find(function(x){ return x.id===id; });
+  if(!o) return;
+  const cur = o.payMethod==='transferencia' ? 'transferencia' : 'efectivo';
+  o.payMethod = cur==='efectivo' ? 'transferencia' : 'efectivo';
+  saveData(DATA);
+  renderOrderList();
 }
 function notifyOrderReady(id){
   const o = DATA.orders.find(function(x){ return x.id===id; });
@@ -6499,9 +6707,10 @@ async function cancelOrder(id){
   const o = DATA.orders.find(function(x){ return x.id===id; });
   if(!o) return false;
   if(o.status==='cancelado'){ showToast('Ya está cancelado'); return false; }
-  const ok = await showConfirm('¿Cancelar este pedido?'+(o.stockDeducted?' Se repone el stock ya descontado.':''));
+  const ok = await showConfirm('¿Cancelar este pedido?'+((o.stockDeducted||o.portionsDeducted)?' Se repone el stock ya descontado.':''));
   if(!ok) return false;
   if(o.stockDeducted){ adjustStockForOrder(o, 1); o.stockDeducted = false; }
+  if(o.portionsDeducted){ adjustPortionStockForOrder(o, 1); o.portionsDeducted = false; }
   o.status = 'cancelado';
   saveData(DATA);
   renderOrderList();
@@ -6520,11 +6729,13 @@ async function deleteOrder(id){
   if(idx===-1) return;
   const removed = DATA.orders[idx];
   if(removed.stockDeducted) adjustStockForOrder(removed, 1);
+  if(removed.portionsDeducted) adjustPortionStockForOrder(removed, 1);
   DATA.orders.splice(idx,1);
   saveData(DATA);
   renderOrderList();
   showUndoToast('Pedido borrado', function(){
     if(removed.stockDeducted) adjustStockForOrder(removed, -1);
+    if(removed.portionsDeducted) adjustPortionStockForOrder(removed, -1);
     DATA.orders.splice(idx,0,removed);
     saveData(DATA);
     renderOrderList();
@@ -6566,6 +6777,161 @@ function editOrder(id){
   document.getElementById('of-savebtn').textContent = 'Guardar cambios';
   document.getElementById('of-cancelorderbtn').style.display = (o.status==='cancelado' || o.status==='entregado') ? 'none' : '';
   renderOrderItemRows();
+}
+function openEditOrderPopup(id){
+  const o = DATA.orders.find(function(x){ return x.id===id; });
+  if(!o) return;
+  state.editingOrderId = id;
+  state.orderDraft = {
+    items: (o.items||[]).map(function(it){ return {recipeId:it.recipeId, qty:it.qty, customPrice:(it.customPrice?it.unitPrice:null), priceNote:it.priceNote||''}; }),
+    clientId: o.clientId || null,
+    customerName: o.customerName || '',
+    deliveryDate: o.deliveryDate || '',
+    payMethod: o.payMethod || null
+  };
+  document.getElementById('eop-date').value = o.deliveryDate || '';
+  document.getElementById('eop-addform').innerHTML = '';
+  document.getElementById('eop-addrow').style.display = 'flex';
+  populateEopClientSelect();
+  renderEopPayMethod();
+  renderEopItems();
+  eopGoTo(0);
+  document.getElementById('editOrderModal').classList.add('active');
+}
+function closeEditOrderPopup(){
+  document.getElementById('editOrderModal').classList.remove('active');
+  state.editingOrderId = null;
+}
+function eopGoTo(n){
+  document.getElementById('eop-page0').style.display = n===0 ? 'block' : 'none';
+  document.getElementById('eop-page1').style.display = n===1 ? 'block' : 'none';
+  document.getElementById('eop-dot0').classList.toggle('on', n===0);
+  document.getElementById('eop-dot1').classList.toggle('on', n===1);
+  const nm = state.orderDraft.customerName || '';
+  if(n===0){
+    document.getElementById('eop-title').textContent = 'Detalle del pedido';
+    document.getElementById('eop-sub').textContent = nm+(state.orderDraft.deliveryDate?' · '+state.orderDraft.deliveryDate:'');
+  } else {
+    document.getElementById('eop-title').textContent = 'Cliente y fecha';
+    const n2 = (state.orderDraft.items||[]).length;
+    document.getElementById('eop-sub').textContent = n2+' producto'+(n2===1?'':'s');
+  }
+}
+function populateEopClientSelect(){
+  const sel = document.getElementById('eop-client');
+  const clients = clientsSorted();
+  sel.innerHTML = clients.map(function(c){ return '<option value="'+c.id+'" '+(state.orderDraft.clientId===c.id?'selected':'')+'>'+escapeHtml(c.name)+'</option>'; }).join('');
+}
+function eopClientChange(val){
+  state.orderDraft.clientId = val || null;
+  const c = DATA.clients.find(function(x){ return x.id===val; });
+  if(c) state.orderDraft.customerName = c.name;
+  eopGoTo(1);
+}
+function eopDateChange(val){ state.orderDraft.deliveryDate = val || ''; eopGoTo(1); }
+function renderEopPayMethod(){
+  const pay = state.orderDraft.payMethod;
+  document.getElementById('eop-paymethod').innerHTML =
+    '<button type="button" class="btn '+(pay==='efectivo'?'btn-primary':'btn-ghost')+'" style="flex:1;" onclick="eopSetPay(\'efectivo\')"><span class="icon-slot" data-icon="cash" style="vertical-align:-2px;"></span> Efectivo</button>'+
+    '<button type="button" class="btn '+(pay==='transferencia'?'btn-primary':'btn-ghost')+'" style="flex:1;" onclick="eopSetPay(\'transferencia\')"><span class="icon-slot" data-icon="credit-card" style="vertical-align:-2px;"></span> Transferencia</button>';
+  mountIcons();
+}
+function eopSetPay(method){
+  state.orderDraft.payMethod = (state.orderDraft.payMethod===method) ? null : method;
+  renderEopPayMethod();
+}
+function renderEopItems(){
+  const wrap = document.getElementById('eop-items');
+  wrap.innerHTML = (state.orderDraft.items||[]).map(function(it,i){
+    const r = DATA.recipes.find(function(x){ return x.id===it.recipeId; });
+    const name = r ? r.title : '(receta borrada)';
+    const catalogPrice = it.recipeId ? unitPriceForRecipe(it.recipeId) : null;
+    const price = it.customPrice!=null ? it.customPrice : catalogPrice;
+    return '<div class="eop-item-row">'+
+      '<input type="number" min="1" class="eop-num eop-qty" value="'+(it.qty||1)+'" onchange="eopUpdateQty('+i+',this.value)">'+
+      '<span class="eop-item-name">'+escapeHtml(name)+'</span>'+
+      '<input type="number" min="0" class="eop-num eop-price" value="'+(price!=null?price:'')+'" onchange="eopUpdatePrice('+i+',this.value)">'+
+      '<button type="button" class="iconbtn" style="color:var(--k-danger);padding:2px;" onclick="eopRemoveItem('+i+')"><span class="icon-slot" data-icon="x" style="font-size:14px;"></span></button>'+
+    '</div>'+'<div id="eop-sp-'+i+'">'+orderItemStockPickerHtml(it,i)+'</div>';
+  }).join('') || '<p style="font-size:calc(11.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:4px 0;">Sin productos</p>';
+  mountIcons();
+  updateEopTotal();
+}
+function eopUpdateQty(i, val){
+  state.orderDraft.items[i].qty = val;
+  updateEopTotal();
+  const spEl = document.getElementById('eop-sp-'+i);
+  if(spEl){ spEl.innerHTML = orderItemStockPickerHtml(state.orderDraft.items[i], i); mountIcons(); }
+}
+function eopUpdatePrice(i, val){
+  const parsed = parseFloat((val||'').toString().replace(',','.'));
+  state.orderDraft.items[i].customPrice = isNaN(parsed) ? null : parsed;
+  updateEopTotal();
+}
+function eopRemoveItem(i){ state.orderDraft.items.splice(i,1); renderEopItems(); }
+function eopStartAdd(){
+  const recipes = recipesSorted();
+  const opts = '<option value="">elegí una receta...</option>'+recipes.map(function(r){ return '<option value="'+r.id+'">'+escapeHtml(r.title)+'</option>'; }).join('');
+  document.getElementById('eop-addform').innerHTML =
+    '<div class="btn-row" style="margin-top:6px;">'+
+      '<select class="input" id="eop-newrecipe" style="flex:2;">'+opts+'</select>'+
+      '<input class="input" id="eop-newqty" type="number" min="1" value="1" style="flex:1;">'+
+      '<button type="button" class="iconbtn" onclick="eopConfirmAdd()"><span class="icon-slot" data-icon="check"></span></button>'+
+    '</div>';
+  document.getElementById('eop-addrow').style.display = 'none';
+  mountIcons();
+}
+function eopConfirmAdd(){
+  const recipeId = document.getElementById('eop-newrecipe').value;
+  const qty = parseFloat(document.getElementById('eop-newqty').value)||1;
+  if(!recipeId){ showToast('Elegí una receta'); return; }
+  state.orderDraft.items.push({ recipeId:recipeId, qty:qty, customPrice:null, priceNote:'' });
+  document.getElementById('eop-addform').innerHTML = '';
+  document.getElementById('eop-addrow').style.display = 'flex';
+  renderEopItems();
+}
+function updateEopTotal(){
+  let total = 0;
+  (state.orderDraft.items||[]).forEach(function(it){
+    const price = it.customPrice!=null ? it.customPrice : (it.recipeId ? unitPriceForRecipe(it.recipeId) : null);
+    const qty = parseFloat(it.qty)||0;
+    total += (price||0)*qty;
+  });
+  document.getElementById('eop-total').innerHTML = '<span>Total</span><span>'+fmtMoney(total)+'</span>';
+}
+function saveEditOrderPopup(){
+  const o = DATA.orders.find(function(x){ return x.id===state.editingOrderId; });
+  if(!o) return;
+  const items = (state.orderDraft.items||[]).filter(function(it){ return it.recipeId && parseFloat(it.qty)>0; });
+  if(items.length===0){ showToast('Agregá al menos un producto'); return; }
+  const client = state.orderDraft.clientId ? DATA.clients.find(function(c){ return c.id===state.orderDraft.clientId; }) : null;
+  const name = client ? client.name : (state.orderDraft.customerName || o.customerName);
+  if(!name){ showToast('Falta el cliente'); return; }
+  const snapItems = items.map(function(it){
+    const r = DATA.recipes.find(function(x){ return x.id===it.recipeId; });
+    const catalogPrice = unitPriceForRecipe(it.recipeId);
+    const unitPrice = it.customPrice!=null ? it.customPrice : catalogPrice;
+    const out = { recipeId:it.recipeId, recipeName: r?r.title:'(receta borrada)', qty:parseFloat(it.qty), unitPrice: unitPrice };
+    if(it.customPrice!=null){ out.customPrice = true; out.catalogPrice = catalogPrice; if(it.priceNote) out.priceNote = it.priceNote; }
+    return out;
+  });
+  const total = snapItems.reduce(function(s,it){ return s + (it.unitPrice||0)*it.qty; }, 0);
+  const willDeductPortions = DATA.settings.discountStockOnSale!==false;
+  if(o.stockDeducted) adjustStockForOrder(o, 1);
+  if(o.portionsDeducted) adjustPortionStockForOrder(o, 1);
+  if(state.orderDraft.clientId) o.clientId = state.orderDraft.clientId;
+  o.customerName = name;
+  o.deliveryDate = state.orderDraft.deliveryDate || '';
+  o.payMethod = state.orderDraft.payMethod || null;
+  o.items = snapItems;
+  o.total = total;
+  if(willDeductPortions){ resolveOrderBakeChoices(state.orderDraft.items); adjustPortionStockForOrder(o, -1); o.portionsDeducted = true; }
+  else { o.portionsDeducted = false; }
+  if(o.stockDeducted) adjustStockForOrder(o, -1);
+  saveData(DATA);
+  closeEditOrderPopup();
+  renderOrderList();
+  showToast('Pedido actualizado — total y economía recalculados');
 }
 function openOrderDetailModal(id){
   const o = DATA.orders.find(function(x){ return x.id===id; });
@@ -6730,7 +7096,7 @@ function renderOrderItemRows(){
       '<input class="input" style="flex:1;" type="number" min="1" placeholder="cant." value="'+(it.qty||'')+'" oninput="updateOrderItem('+i+',\'qty\',this.value)">'+
       '<button type="button" class="iconbtn" onclick="toggleOrderItemPrice('+i+')" title="precio especial" style="'+(hasCustom?'color:var(--k-accent);':'')+'"><span class="icon-slot" data-icon="tag"></span></button>'+
       '<button type="button" class="iconbtn" onclick="removeOrderItemRow('+i+')" style="color:var(--k-danger);"><span class="icon-slot" data-icon="x"></span></button>'+
-      '</div>'+priceRow;
+      '</div>'+priceRow+'<div id="sp-'+i+'">'+orderItemStockPickerHtml(it,i)+'</div>';
   }).join('');
   mountIcons();
   updateOrderTotalPreview();
@@ -6740,6 +7106,8 @@ function removeOrderItemRow(i){ state.orderDraft.items.splice(i,1); renderOrderI
 function updateOrderItem(i, field, val){
   state.orderDraft.items[i][field] = val;
   updateOrderTotalPreview();
+  const spEl = document.getElementById('sp-'+i);
+  if(spEl){ spEl.innerHTML = orderItemStockPickerHtml(state.orderDraft.items[i], i); mountIcons(); }
 }
 function toggleOrderItemPrice(i){
   const it = state.orderDraft.items[i];
@@ -6808,11 +7176,13 @@ function saveOrder(){
     return out;
   });
   const total = snapItems.reduce(function(s,it){ return s + (it.unitPrice||0)*it.qty; }, 0);
+  const willDeductPortions = DATA.settings.discountStockOnSale!==false;
   if(state.editingOrderId){
     const idx = DATA.orders.findIndex(function(o){ return o.id===state.editingOrderId; });
     if(idx===-1){ showToast('No se encontró el pedido'); return; }
     const o = DATA.orders[idx];
     if(o.stockDeducted) adjustStockForOrder(o, 1);
+    if(o.portionsDeducted) adjustPortionStockForOrder(o, 1);
     o.clientId = state.orderDraft.clientId;
     o.customerName = name;
     o.deliveryDate = deliveryDate;
@@ -6820,11 +7190,14 @@ function saveOrder(){
     o.note = note;
     o.items = snapItems;
     o.total = total;
+    if(willDeductPortions){ resolveOrderBakeChoices(state.orderDraft.items); adjustPortionStockForOrder(o, -1); o.portionsDeducted = true; }
+    else { o.portionsDeducted = false; }
     if(o.stockDeducted) adjustStockForOrder(o, -1);
     saveData(DATA);
     showToast('Pedido actualizado');
   } else {
-    DATA.orders.push({
+    if(willDeductPortions) resolveOrderBakeChoices(state.orderDraft.items);
+    const newOrder = {
       id: 'ord-'+Date.now(),
       clientId: state.orderDraft.clientId,
       customerName: name,
@@ -6836,8 +7209,11 @@ function saveOrder(){
       status: 'pendiente',
       colorIdx: DATA.orders.length % PLACEHOLDER_COLORS.length,
       items: snapItems,
-      total: total
-    });
+      total: total,
+      portionsDeducted: willDeductPortions
+    };
+    if(willDeductPortions) adjustPortionStockForOrder(newOrder, -1);
+    DATA.orders.push(newOrder);
     saveData(DATA);
     showToast('Pedido guardado');
   }
@@ -7311,7 +7687,6 @@ function registerQuickSale(){
   };
   DATA.quickSales.push(entry);
   if(willDeduct){
-    adjustStockForOrder({ items:[{ recipeId:r.id, qty:qs.qty }] }, -1);
     r.stock = Math.max(0, (r.stock||0) - qs.qty);
   }
   state.quickSale = null;
@@ -7327,7 +7702,6 @@ async function undoLastQuickSale(){
   if(!ok) return;
   const last = DATA.quickSales.pop();
   if(last.stockDeducted!==false){
-    adjustStockForOrder({ items:[{ recipeId:last.recipeId, qty:last.qty }] }, 1);
     const r = DATA.recipes.find(function(x){ return x.id===last.recipeId; });
     if(r) r.stock = (r.stock||0) + last.qty;
   }

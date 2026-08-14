@@ -565,6 +565,7 @@
     #recipeList .card .card-drag, #prepCardList .card .card-drag{ position:absolute; top:6px; left:6px; z-index:2; background:rgba(255,255,255,.85); border-radius:50%; width:26px; height:26px; padding:6px; color:var(--k-accent); }
     #recipeList .card .meta, #prepCardList .card .meta{ padding:9px 10px 11px; }
     #orderStatusChips{ display:none; }
+    .icon-rail [data-nav="quicksell"]{ display:none; }
   }
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
@@ -706,6 +707,37 @@
         <button class="btn btn-ghost" onclick="closeStockEditModal()">Cancelar</button>
         <button class="btn btn-primary" onclick="saveStockEdit()">Guardar</button>
       </div>
+    </div>
+  </div>
+
+  <!-- STOCK CORRECT MODAL (doble toque: corregir cantidad a mano) -->
+  <div class="modal-overlay" id="stockCorrectModal">
+    <div class="modal-box" style="max-width:300px;">
+      <p class="modal-msg" style="text-align:left;font-weight:600;margin:0;">Corregir stock</p>
+      <p id="sc-name" style="font-size:calc(12px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:-6px 0 0;"></p>
+      <div class="field"><label>Cantidad actual</label><input class="input" id="sc-qty" type="number" step="any" min="0" placeholder="0"></div>
+      <p style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;">Esto solo corrige el número guardado — no genera ni modifica gastos en Reportes.</p>
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="closeStockCorrectModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveStockCorrect()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BALANCE ADJUST MODAL (triple toque en Reportes) -->
+  <div class="modal-overlay" id="balanceAdjustModal">
+    <div class="modal-box" style="max-width:320px;">
+      <p class="modal-msg" style="text-align:left;font-weight:600;margin:0;">Corregir balance</p>
+      <p id="ba-period" style="font-size:calc(12px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:-6px 0 0;"></p>
+      <div class="field"><label>Facturado</label><input class="input" id="ba-revenue" type="number" step="any" placeholder="0" oninput="updateBalanceAdjustPreview()"></div>
+      <div class="field"><label>Invertido en stock</label><input class="input" id="ba-expenses" type="number" step="any" placeholder="0" oninput="updateBalanceAdjustPreview()"></div>
+      <div class="cost-total"><span>Ganancia limpia</span><span id="ba-net">$0</span></div>
+      <p style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;">Corrige solo el período elegido arriba en Reportes. Los pedidos, ventas y gastos que cargues de acá en adelante se siguen sumando solos sobre este número.</p>
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="closeBalanceAdjustModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveBalanceAdjust()">Guardar</button>
+      </div>
+      <button class="btn btn-ghost" id="ba-clear-btn" style="color:var(--k-danger);display:none;" onclick="clearBalanceAdjust()"><span class="icon-slot" data-icon="trash" style="vertical-align:-2px;"></span> Quitar corrección</button>
     </div>
   </div>
 
@@ -1386,12 +1418,12 @@
     <div class="chiprow" id="reportsPeriodChips"></div>
     <div class="grp-card grp-card--action">
       <p class="section-title"><span class="badge-ic"><span class="icon-slot" data-icon="wallet"></span></span>Balance</p>
-      <div class="report-summary">
+      <div class="report-summary" onclick="handleBalanceTripleTap()">
         <div class="rs-box"><div class="v" id="bal-revenue">$0</div><div class="l">facturado</div></div>
         <div class="rs-box"><div class="v" id="bal-expenses">$0</div><div class="l">invertido en stock</div></div>
         <div class="rs-box"><div class="v" id="bal-net">$0</div><div class="l">ganancia limpia</div></div>
       </div>
-      <p style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;text-align:center;">No incluye gastos fijos como luz o gas.</p>
+      <p style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;text-align:center;" id="bal-adjust-note">No incluye gastos fijos como luz o gas.</p>
     </div>
     <div class="grp-card">
       <p class="section-title"><span class="badge-ic"><span class="icon-slot" data-icon="trending-up"></span></span>Tendencia</p>
@@ -1928,7 +1960,8 @@ function defaultData(){
     clients: [],
     expenses: [],
     quickSales: [],
-    cashClosures: []
+    cashClosures: [],
+    reportAdjustments: []
   };
 }
 function defaultUnits(){
@@ -2049,6 +2082,7 @@ function migrateShoppingManualItems(d){
 }
 function migrateExpenses(d){
   if(!d.expenses) d.expenses = [];
+  if(!d.reportAdjustments) d.reportAdjustments = [];
 }
 function migrateQuickSales(d){
   if(!d.quickSales) d.quickSales = [];
@@ -2201,6 +2235,10 @@ function goTab(name){
 }
 
 function render(){
+  if(state.stack[state.stack.length-1]==='quicksell' && isDesktopLayout()){
+    // "Vender" no está disponible en la versión web/desktop.
+    state.stack = ['home'];
+  }
   const cur = state.stack[state.stack.length-1];
   const isSplash = cur === 'splash';
   const isCook = cur === 'cook';
@@ -4313,6 +4351,8 @@ function computeRecipeCost(r, scale){
   return { groups:groups, breakdown:breakdown, total:total, costPerUnit:costPerUnit, yieldQty:yieldQty, yieldUnit:r.yieldUnit||'unidades', energyCost:energyCost };
 }
 function fmtMoney(n){ if(n==null || isNaN(n)) return '-'; return '$'+ (Math.round(n*100)/100).toLocaleString('es-AR'); }
+function roundQty(n){ if(n==null || isNaN(n)) return 0; return Math.round(n*10000)/10000; }
+function fmtQty(n){ const r = roundQty(n); return Number.isInteger(r) ? String(r) : String(Math.round(r*100)/100); }
 function stripMdMarkers(s){ return (s||'').replace(/\*\*(.+?)\*\*/g, '$1'); }
 function capitalizeFirst(s){ s = (s||'').toString(); return s.charAt(0).toUpperCase()+s.slice(1); }
 function buildRecipeIngredientsTextLines(r){
@@ -5486,7 +5526,7 @@ function renderPriceRows(wrapId, list, emptyMsg, icon){
   if(!wrap) return;
   if(list.length===0){ wrap.innerHTML = '<p style="font-size:calc(11.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);">'+emptyMsg+'</p>'; return; }
   wrap.innerHTML = list.map(function(p){
-    const stock = p.stock||0;
+    const stock = roundQty(p.stock||0);
     const low = stock <= 1;
     const color = low ? 'var(--k-danger)' : 'var(--k-success)';
     const ref = p.qty>0 ? p.qty : 1;
@@ -5495,11 +5535,11 @@ function renderPriceRows(wrapId, list, emptyMsg, icon){
     const trendHtml = trend ? '<p class="price-trend" style="color:'+(trend.up?'var(--k-danger)':'var(--k-success)')+';"><span class="icon-slot" data-icon="'+(trend.up?'trending-up':'trending-down')+'"></span>'+(trend.up?'+':'')+Math.round(trend.pct)+'% · '+trend.periodLabel+'</p>' : '';
     const pkgCount = ref>0 ? stock/ref : 0;
     const pkgText = ref>0 ? (Number.isInteger(pkgCount)?pkgCount:pkgCount.toFixed(1))+' paquete'+(pkgCount===1?'':'s') : '';
-    return '<div class="stock-row" onclick="openStockEditModal(\''+p.id+'\')">'+
+    return '<div class="stock-row" onclick="handleStockRowClick(\''+p.id+'\')">'+
       '<div class="sr-top">'+
         '<span class="sr-ic"><span class="icon-slot" data-icon="'+icon+'"></span></span>'+
         '<div class="sr-info"><p class="nm">'+escapeHtml(p.name)+'</p><p class="sub">'+p.qty+' '+escapeHtml(p.unit)+' el envase</p></div>'+
-        '<div class="sr-stats"><p class="price"'+(p.price==null?' style="color:var(--k-muted);"':'')+'>'+(p.price==null?'precio pendiente':'$'+p.price)+'</p>'+trendHtml+'<p class="stock" style="color:'+color+';">'+stock+' '+escapeHtml(p.unit)+'</p>'+(pkgText?'<p class="stock-pkg">'+pkgText+'</p>':'')+'</div>'+
+        '<div class="sr-stats"><p class="price"'+(p.price==null?' style="color:var(--k-muted);"':'')+'>'+(p.price==null?'precio pendiente':'$'+p.price)+'</p>'+trendHtml+'<p class="stock" style="color:'+color+';">'+fmtQty(stock)+' '+escapeHtml(p.unit)+'</p>'+(pkgText?'<p class="stock-pkg">'+pkgText+'</p>':'')+'</div>'+
         '<div class="sr-stepper">'+
           '<button type="button" class="sr-step-btn" onclick="adjustStock(\''+p.id+'\',1,event)"><span class="icon-slot" data-icon="chevron-up"></span></button>'+
           '<button type="button" class="sr-step-btn" onclick="adjustStock(\''+p.id+'\',-1,event)"><span class="icon-slot" data-icon="chevron-down"></span></button>'+
@@ -5514,12 +5554,55 @@ function renderIngredientPrices(){
   renderPriceRows('supplyPriceList', suppliesSorted(), 'todavía no cargaste insumos.', 'package');
   mountIcons();
 }
+let stockRowClickTimer = null;
+let stockRowClickId = null;
+function handleStockRowClick(id){
+  if(stockRowClickTimer && stockRowClickId===id){
+    clearTimeout(stockRowClickTimer);
+    stockRowClickTimer = null;
+    stockRowClickId = null;
+    openStockCorrectModal(id);
+    return;
+  }
+  stockRowClickId = id;
+  stockRowClickTimer = setTimeout(function(){
+    stockRowClickTimer = null;
+    stockRowClickId = null;
+    openStockEditModal(id);
+  }, 280);
+}
+let stockCorrectId = null;
+function openStockCorrectModal(id){
+  const p = DATA.ingredientPrices.find(function(x){ return x.id===id; });
+  if(!p) return;
+  stockCorrectId = id;
+  document.getElementById('sc-name').textContent = p.name+' · stock en '+(p.unit||'');
+  document.getElementById('sc-qty').value = fmtQty(roundQty(p.stock||0));
+  document.getElementById('stockCorrectModal').classList.add('active');
+  setTimeout(function(){ const el=document.getElementById('sc-qty'); if(el){ el.focus(); el.select(); } }, 30);
+}
+function closeStockCorrectModal(){
+  document.getElementById('stockCorrectModal').classList.remove('active');
+  stockCorrectId = null;
+}
+function saveStockCorrect(){
+  const p = DATA.ingredientPrices.find(function(x){ return x.id===stockCorrectId; });
+  if(!p) return;
+  const val = parseFloat((document.getElementById('sc-qty').value||'').toString().replace(',','.'));
+  if(isNaN(val) || val<0){ showToast('Poné una cantidad válida'); return; }
+  p.stock = roundQty(val);
+  saveData(DATA);
+  closeStockCorrectModal();
+  renderIngredientPrices();
+  refreshIngredientPickers();
+  showToast('Stock corregido');
+}
 function adjustStock(id, dir, ev){
   if(ev) ev.stopPropagation();
   const p = DATA.ingredientPrices.find(function(x){ return x.id===id; });
   if(!p) return;
   const step = p.qty>0 ? p.qty : 1;
-  p.stock = Math.max(0, (p.stock||0) + dir*step);
+  p.stock = roundQty(Math.max(0, (p.stock||0) + dir*step));
   if(dir>0 && p.price && DATA.settings.addStockAsExpense!==false){
     DATA.expenses.push({ id:'exp-'+Date.now(), date: todayStr(), amount: p.price, note: 'Stock: '+p.name });
   }
@@ -5575,11 +5658,11 @@ function openStockEditModal(id){
   document.getElementById('stockEditModalTitle').textContent = stockEditType==='insumo' ? 'Editar insumo' : 'Editar ingrediente';
   document.getElementById('se-delete-row').style.display = '';
   const stockInfoEl = document.getElementById('se-stock-info');
-  const curStock = p.stock||0;
+  const curStock = roundQty(p.stock||0);
   const pkgRef = p.qty>0 ? p.qty : 1;
   const pkgN = curStock/pkgRef;
   const pkgTxt = Number.isInteger(pkgN) ? pkgN : pkgN.toFixed(1);
-  stockInfoEl.textContent = 'Stock actual: '+curStock+' '+(p.unit||'')+' ('+pkgTxt+' paquete'+(pkgN===1?'':'s')+')';
+  stockInfoEl.textContent = 'Stock actual: '+fmtQty(curStock)+' '+(p.unit||'')+' ('+pkgTxt+' paquete'+(pkgN===1?'':'s')+')';
   stockInfoEl.style.display = '';
   const trendEl = document.getElementById('se-price-trend');
   const trend = ingredientPriceTrend(p);
@@ -6026,7 +6109,7 @@ function adjustStockForOrder(order, direction){
       const totalQty = perUnitQty * it.qty;
       const converted = convertQty(totalQty, ing.unit, cat.unit);
       if(converted==null) return;
-      cat.stock = (cat.stock||0) + direction*converted;
+      cat.stock = roundQty((cat.stock||0) + direction*converted);
     });
   });
 }
@@ -6981,7 +7064,30 @@ function renderReportsPeriodChips(){
     return '<button class="chip '+(reportsPeriod===p.v?'active':'')+'" onclick="setReportsPeriod(\''+p.v+'\')">'+p.l+'</button>';
   }).join('');
 }
+function getReportAdjustment(period){
+  return (DATA.reportAdjustments||[]).find(function(a){ return a.period===period; }) || null;
+}
+function upsertReportAdjustment(period, revenueDelta, expenseDelta){
+  if(!DATA.reportAdjustments) DATA.reportAdjustments = [];
+  let a = DATA.reportAdjustments.find(function(x){ return x.period===period; });
+  if(!revenueDelta && !expenseDelta){
+    if(a) DATA.reportAdjustments.splice(DATA.reportAdjustments.indexOf(a), 1);
+    return;
+  }
+  if(!a){ a = { id:'radj-'+Date.now(), period:period }; DATA.reportAdjustments.push(a); }
+  a.revenueDelta = revenueDelta;
+  a.expenseDelta = expenseDelta;
+  a.updatedAt = new Date().toISOString();
+}
 function computeReports(period){
+  const raw = computeReportsRaw(period);
+  const adj = getReportAdjustment(period);
+  const totalRevenue = raw.totalRevenue + (adj ? (adj.revenueDelta||0) : 0);
+  const totalExpenses = raw.totalExpenses + (adj ? (adj.expenseDelta||0) : 0);
+  const netProfit = totalRevenue - totalExpenses;
+  return Object.assign({}, raw, { totalRevenue:totalRevenue, totalExpenses:totalExpenses, netProfit:netProfit, hasAdjustment: !!adj });
+}
+function computeReportsRaw(period){
   const range = getPeriodRange(period);
   const inRange = function(dateStr){
     if(!range || !dateStr) return !range;
@@ -7044,8 +7150,60 @@ function renderReportsScreen(){
   const netEl = document.getElementById('bal-net');
   netEl.textContent = fmtMoney(rep.netProfit);
   netEl.style.color = rep.netProfit < 0 ? 'var(--k-danger)' : 'var(--k-accent)';
+  const adjNoteEl = document.getElementById('bal-adjust-note');
+  if(adjNoteEl){
+    adjNoteEl.textContent = rep.hasAdjustment ? 'Incluye una corrección manual para este período. No incluye gastos fijos como luz o gas.' : 'No incluye gastos fijos como luz o gas.';
+  }
   renderRepBars(reportsPeriod);
   renderTrendsCard(reportsPeriod);
+}
+let balanceTapCount = 0;
+let balanceTapTimer = null;
+function handleBalanceTripleTap(){
+  balanceTapCount++;
+  clearTimeout(balanceTapTimer);
+  if(balanceTapCount>=3){
+    balanceTapCount = 0;
+    openBalanceAdjustModal();
+    return;
+  }
+  balanceTapTimer = setTimeout(function(){ balanceTapCount = 0; }, 600);
+}
+function openBalanceAdjustModal(){
+  const rep = computeReports(reportsPeriod);
+  const periodInfo = REPORTS_PERIODS.find(function(p){ return p.v===reportsPeriod; });
+  document.getElementById('ba-period').textContent = 'Período: '+(periodInfo?periodInfo.l:'Total');
+  document.getElementById('ba-revenue').value = Math.round(rep.totalRevenue*100)/100;
+  document.getElementById('ba-expenses').value = Math.round(rep.totalExpenses*100)/100;
+  document.getElementById('ba-clear-btn').style.display = rep.hasAdjustment ? '' : 'none';
+  updateBalanceAdjustPreview();
+  document.getElementById('balanceAdjustModal').classList.add('active');
+}
+function closeBalanceAdjustModal(){
+  document.getElementById('balanceAdjustModal').classList.remove('active');
+}
+function updateBalanceAdjustPreview(){
+  const rev = parseFloat(document.getElementById('ba-revenue').value) || 0;
+  const exp = parseFloat(document.getElementById('ba-expenses').value) || 0;
+  document.getElementById('ba-net').textContent = fmtMoney(rev-exp);
+}
+function saveBalanceAdjust(){
+  const rev = parseFloat(document.getElementById('ba-revenue').value);
+  const exp = parseFloat(document.getElementById('ba-expenses').value);
+  if(isNaN(rev) || isNaN(exp)){ showToast('Completá los dos montos'); return; }
+  const raw = computeReportsRaw(reportsPeriod);
+  upsertReportAdjustment(reportsPeriod, rev-raw.totalRevenue, exp-raw.totalExpenses);
+  saveData(DATA);
+  closeBalanceAdjustModal();
+  renderReportsScreen();
+  showToast('Balance corregido');
+}
+function clearBalanceAdjust(){
+  upsertReportAdjustment(reportsPeriod, 0, 0);
+  saveData(DATA);
+  closeBalanceAdjustModal();
+  renderReportsScreen();
+  showToast('Corrección eliminada');
 }
 
 /* =========================================================
@@ -7510,7 +7668,7 @@ async function addShopHistoryToStock(){
       }
     }
     if(!cat){ skipped++; continue; }
-    cat.stock = (cat.stock||0) + it.qty;
+    cat.stock = roundQty((cat.stock||0) + it.qty);
     if(cat.price && cat.qty>0){
       const cost = (it.qty/cat.qty)*cat.price;
       DATA.expenses.push({ id:'exp-'+Date.now()+'-'+i, date: todayStr(), amount: cost, note: 'Compra: '+cat.name });

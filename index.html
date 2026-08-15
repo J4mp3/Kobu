@@ -8719,6 +8719,52 @@ function fuzzyMatchIngredient(rawName){
   });
   return (best && bestScore>=0.55) ? { cat:best, score:bestScore } : null;
 }
+function fuzzyMatchIngredientCandidates(rawName){
+  const norm = normalizeMatchText(rawName);
+  if(!norm) return [];
+  return DATA.ingredientPrices.map(function(cat){
+    const catNorm = normalizeMatchText(cat.name);
+    if(!catNorm) return null;
+    let score;
+    if(catNorm===norm) score = 1;
+    else if(catNorm.indexOf(norm)>-1 || norm.indexOf(catNorm)>-1){
+      score = Math.max(0.75, Math.min(norm.length,catNorm.length)/Math.max(norm.length,catNorm.length));
+    } else {
+      const dist = levenshteinDist(norm, catNorm);
+      const maxLen = Math.max(norm.length, catNorm.length);
+      score = maxLen ? 1-(dist/maxLen) : 0;
+    }
+    return { cat:cat, score:score };
+  }).filter(function(x){ return x && x.score>=0.45; }).sort(function(a,b){ return b.score-a.score; });
+}
+function applyIngredientPurchase(priceId, qty, unit, price, provider){
+  const p = DATA.ingredientPrices.find(function(x){ return x.id===priceId; });
+  if(!p) return null;
+  const pkgRef = p.qty>0 ? p.qty : 1;
+  let addedStock = null;
+  if(unit && normalizeUnit(p.unit)!=='u'){
+    const converted = convertQty(qty, unit, p.unit);
+    if(converted!=null) addedStock = roundQty(converted);
+  }
+  if(addedStock==null) addedStock = roundQty(qty*pkgRef);
+  if(addedStock<=0) addedStock = pkgRef;
+  p.stock = roundQty((p.stock||0)+addedStock);
+  const scaledPrice = Math.round((price*(pkgRef/addedStock))*100)/100;
+  const priceChanged = p.price !== scaledPrice;
+  p.price = scaledPrice;
+  if(priceChanged){
+    p.priceHistory = p.priceHistory || [];
+    p.priceHistory.push({ price:scaledPrice, date: todayStr() });
+  }
+  if(provider) p.provider = provider;
+  if(DATA.settings.addStockAsExpense!==false){
+    DATA.expenses.push({ id:'exp-'+Date.now(), date: todayStr(), amount: price, note:'Stock: '+p.name });
+  }
+  saveData(DATA);
+  renderIngredientPrices();
+  refreshIngredientPickers();
+  return { name:p.name, addedStock:addedStock, unit:p.unit||'', totalPaid: price, provider: p.provider||null };
+}
 async function aiMatchIngredient(rawName){
   const url = localStorage.getItem('kobuSyncUrl');
   const key = localStorage.getItem('kobuSyncKey');
@@ -9031,6 +9077,78 @@ function fuzzyMatchRecipeInText(text){
   });
   return best;
 }
+const PURCHASE_UNIT_ALT = 'kg|kgs|kilos?|kilogramos?|g|gr|grs|gramos?|mg|l|lt|lts|litros?|ml';
+function normalizePurchaseUnitWord(w){
+  const u = (w||'').toLowerCase().trim();
+  const map = {
+    'kg':'kg','kgs':'kg','kilo':'kg','kilos':'kg','kilogramo':'kg','kilogramos':'kg',
+    'g':'g','gr':'g','grs':'g','gramo':'g','gramos':'g',
+    'mg':'mg',
+    'l':'l','lt':'l','lts':'l','litro':'l','litros':'l',
+    'ml':'ml','cc':'ml'
+  };
+  return map[u] || null;
+}
+function detectPurchaseIntent(text){
+  const t = text||'';
+  const reA2 = new RegExp('compr[eé]\\w*\\s+(\\d+(?:[.,]\\d+)?)\\s*('+PURCHASE_UNIT_ALT+')\\s+(?:de\\s+)?(.+?)\\s+a\\s+\\$?\\s*(\\d+(?:[.,]\\d+)?)(?:\\s+en\\s+(.+))?$', 'i');
+  const mA2 = t.match(reA2);
+  if(mA2){
+    const qty = parseFloat(mA2[1].replace(',','.'));
+    const unit = normalizePurchaseUnitWord(mA2[2]);
+    const rawName = (mA2[3]||'').trim();
+    const price = parseFloat(mA2[4].replace(',','.'));
+    const provider = mA2[5] ? mA2[5].trim() : null;
+    if(rawName && unit && !isNaN(qty) && qty>0 && !isNaN(price) && price>0){
+      return { rawName:rawName, qty:qty, unit:unit, price:price, provider:provider };
+    }
+  }
+  const reA = new RegExp('compr[eé]\\w*\\s+(?:un[oa]\\s+)?(.+?)\\s+(\\d+(?:[.,]\\d+)?)\\s*('+PURCHASE_UNIT_ALT+')\\s+a\\s+\\$?\\s*(\\d+(?:[.,]\\d+)?)(?:\\s+en\\s+(.+))?$', 'i');
+  const mA = t.match(reA);
+  if(mA){
+    const qty = parseFloat(mA[2].replace(',','.'));
+    const unit = normalizePurchaseUnitWord(mA[3]);
+    const rawName = (mA[1]||'').trim();
+    const price = parseFloat(mA[4].replace(',','.'));
+    const provider = mA[5] ? mA[5].trim() : null;
+    if(rawName && unit && !isNaN(qty) && qty>0 && !isNaN(price) && price>0){
+      return { rawName:rawName, qty:qty, unit:unit, price:price, provider:provider };
+    }
+  }
+  const reB = /compr[eé]\w*\s+(\d+(?:[.,]\d+)?)?\s*(?:de\s+)?([a-záéíóúñ0-9°\s]+?)\s+a\s+\$?\s*(\d+(?:[.,]\d+)?)(?:\s+en\s+(.+))?$/i;
+  const mB = t.match(reB);
+  if(mB){
+    const qty = mB[1] ? parseFloat(mB[1].replace(',','.')) : 1;
+    const rawName = (mB[2]||'').trim();
+    const price = parseFloat(mB[3].replace(',','.'));
+    const provider = mB[4] ? mB[4].trim() : null;
+    if(rawName && !isNaN(price) && price>0 && !isNaN(qty) && qty>0){
+      return { rawName:rawName, qty:qty, unit:null, price:price, provider:provider };
+    }
+  }
+  return null;
+}
+function buildPurchaseChatReply(intent){
+  const id = 'm-'+Date.now()+'-'+Math.random().toString(36).slice(2,6);
+  const candidates = fuzzyMatchIngredientCandidates(intent.rawName);
+  if(candidates.length===0){
+    return { id:id, role:'model', text:'No encontré "'+intent.rawName+'" en tu Stock. Cargalo primero en Ajustes → Stock, o probá escribiendo el nombre tal cual está guardado ahí.' };
+  }
+  const top = candidates[0];
+  const second = candidates[1];
+  const ambiguous = !!second && (top.score - second.score) < 0.12;
+  if(!ambiguous){
+    const r = applyIngredientPurchase(top.cat.id, intent.qty, intent.unit, intent.price, intent.provider);
+    if(!r) return { id:id, role:'model', text:'Hubo un problema al actualizar el stock, probá de nuevo.' };
+    const provTxt = r.provider ? ' · proveedor: '+r.provider : '';
+    return { id:id, role:'model', text:'Listo — sumé '+fmtQty(r.addedStock)+' '+r.unit+' de '+r.name+' al stock (pagaste '+fmtMoney(r.totalPaid)+provTxt+'). Si no era este ingrediente, corregilo con doble toque en Ajustes → Stock.' };
+  }
+  const close = candidates.filter(function(c){ return (top.score - c.score) < 0.2; }).slice(0,5);
+  const msg = { id:id, role:'model', text:'Encontré varios parecidos a "'+intent.rawName+'". ¿Cuál es?' };
+  msg.pendingPurchase = { qty:intent.qty, unit:intent.unit, price:intent.price, provider:intent.provider };
+  msg.actions = close.map(function(c){ return { id:'purchase-pick:'+c.cat.id, label:c.cat.name, kind:'ghost' }; });
+  return msg;
+}
 function detectProductionIntent(text){
   const t = (text||'').toLowerCase();
   const numMatch = t.match(/(\d+(?:[.,]\d+)?)/);
@@ -9240,6 +9358,17 @@ function handleChatAction(msgId, actionIdx){
     }
   } else if(action.id==='dismiss'){
     msg.actions = null;
+  } else if(action.id.indexOf('purchase-pick:')===0){
+    const priceId = action.id.slice('purchase-pick:'.length);
+    const pending = msg.pendingPurchase || { qty:1, unit:null, price:0, provider:null };
+    msg.actions = null;
+    const r = applyIngredientPurchase(priceId, pending.qty, pending.unit, pending.price, pending.provider);
+    if(r){
+      const provTxt = r.provider ? ' · proveedor: '+r.provider : '';
+      msg.text += '\n\n✅ Sumé '+fmtQty(r.addedStock)+' '+r.unit+' de '+r.name+' al stock (pagaste '+fmtMoney(r.totalPaid)+provTxt+').';
+    } else {
+      msg.text += '\n\nNo encontré ese ingrediente — puede que se haya eliminado.';
+    }
   } else if(action.id.indexOf('select-order:')===0){
     const orderId = action.id.slice('select-order:'.length);
     const order = DATA.orders.find(function(o){ return o.id===orderId; });
@@ -9681,6 +9810,14 @@ function sendChatMessage(){
   input.value = '';
   renderChatScreen();
   if(!session.recipeId){
+    const purchaseIntent = detectPurchaseIntent(text);
+    if(purchaseIntent){
+      session.messages.push(buildPurchaseChatReply(purchaseIntent));
+      session.updatedAt = new Date().toISOString();
+      saveData(DATA);
+      renderChatScreen();
+      return;
+    }
     const intent = detectProductionIntent(text);
     if(intent){
       session.messages.push(buildProductionChatReply(intent));

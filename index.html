@@ -246,7 +246,7 @@
   .ready-mark.active .icon-slot{ font-size:calc(10px + var(--kobu-font-boost, 0px)); color:var(--k-success-bg); }
   .thumb{ width:46px; height:46px; border-radius:10px; flex-shrink:0; background-size:cover; background-position:center; position:relative; overflow:hidden; }
   .thumb-icon{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:var(--k-accent); font-size:calc(20px + var(--kobu-font-boost, 0px)); }
-  .thumb-stock-badge{ position:absolute; top:2px; right:2px; z-index:1; width:18px; height:18px; border-radius:50%; border:1.5px solid rgba(255,255,255,.9); color:#fff; font-size:9px; font-weight:700; display:flex; align-items:center; justify-content:center; padding:0; pointer-events:none; }
+  .thumb-stock-badge{ position:absolute; top:2px; right:2px; z-index:1; width:18px; height:18px; border-radius:50%; border:1.5px solid rgba(255,255,255,.9); color:#fff; font-size:9px; font-weight:700; display:flex; align-items:center; justify-content:center; padding:0; pointer-events:auto; cursor:pointer; }
   .stockpick{ margin:4px 0 8px; padding:8px 10px; border-radius:10px; background:var(--k-warning-bg,rgba(230,160,60,.12)); }
   .stockpick-warn{ font-size:calc(11px + var(--kobu-font-boost, 0px)); color:var(--k-warning); font-weight:600; margin-bottom:6px; display:flex; align-items:center; gap:5px; }
   .stockpick-note{ font-size:calc(10.5px + var(--kobu-font-boost, 0px)); color:var(--k-muted); margin:6px 0 0; }
@@ -943,6 +943,24 @@
       <div class="btn-row">
         <button class="btn btn-ghost" onclick="closeStockCorrectModal()">Cancelar</button>
         <button class="btn btn-primary" onclick="saveStockCorrect()">Guardar</button>
+      </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECIPE STOCK CORRECT MODAL (triple toque en el círculo de stock de la tarjeta) -->
+  <div class="modal-overlay" id="recipeStockCorrectModal">
+    <div class="modal-box" style="max-width:300px;padding:0;gap:0;">
+      <div class="sc-headtint">
+        <p class="modal-msg" style="font-weight:600;margin:0;">Corregir stock</p>
+        <p class="shop-receipt-title" id="rsc-name" style="margin:6px 0 0;"></p>
+      </div>
+      <div class="sc-headbody">
+      <div class="field"><label>Cantidad disponible</label><input class="input" id="rsc-qty" type="number" step="any" min="0" placeholder="0"></div>
+      <p style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;">Esto solo corrige el número guardado — no genera ni modifica gastos ni afecta la economía de la receta.</p>
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="closeRecipeStockCorrectModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveRecipeStockCorrect()">Guardar corrección</button>
       </div>
       </div>
     </div>
@@ -3098,7 +3116,7 @@ function renderRecipes(){
     const readyMark = r.readyToSell ? '<span class="ready-mark active"><span class="icon-slot" data-icon="check"></span></span>' : '<span class="ready-mark"></span>';
     const readyBtn = '<button type="button" class="iconbtn card-ready" onclick="event.stopPropagation();toggleReadyToSell(\''+r.id+'\')" title="lista para vender">'+readyMark+'</button>';
     const dragBtn = unfiltered ? '<button type="button" class="iconbtn card-drag" onclick="event.stopPropagation();" onpointerdown="event.stopPropagation();recipeDragStart(event,\''+r.id+'\')" title="mover"><span class="icon-slot" data-icon="grip"></span></button>' : '';
-    const stockBadge = '<span class="thumb-stock-badge" style="background:'+stockColor(r.stock||0)+';" title="stock: '+(r.stock||0)+'">'+(r.stock||0)+'</span>';
+    const stockBadge = '<span class="thumb-stock-badge" style="background:'+stockColor(r.stock||0)+';" title="stock: '+(r.stock||0)+'" onclick="event.stopPropagation();handleRecipeStockBadgeTap(\''+r.id+'\')">'+(r.stock||0)+'</span>';
     return '<div class="card" data-id="'+r.id+'" data-fav="'+(r.favorite?1:0)+'" onclick="openDetail(\''+r.id+'\')">'+
       dragBtn + favBtn + readyBtn +
       '<div class="thumb" style="'+bg+'">'+mediaIconHtml(r,'thumb-icon')+stockBadge+'</div>'+
@@ -8205,6 +8223,47 @@ function renderReportsScreen(){
   }
   renderRepBars(reportsPeriod);
   renderTrendsCard(reportsPeriod);
+}
+let recipeStockTapCount = 0;
+let recipeStockTapTimer = null;
+let recipeStockTapId = null;
+function handleRecipeStockBadgeTap(id){
+  if(recipeStockTapId !== id){ recipeStockTapCount = 0; }
+  recipeStockTapId = id;
+  recipeStockTapCount++;
+  clearTimeout(recipeStockTapTimer);
+  if(recipeStockTapCount>=3){
+    recipeStockTapCount = 0;
+    recipeStockTapId = null;
+    openRecipeStockCorrectModal(id);
+    return;
+  }
+  recipeStockTapTimer = setTimeout(function(){ recipeStockTapCount = 0; recipeStockTapId = null; }, 600);
+}
+let recipeStockCorrectId = null;
+function openRecipeStockCorrectModal(id){
+  const r = DATA.recipes.find(function(x){ return x.id===id; });
+  if(!r) return;
+  recipeStockCorrectId = id;
+  document.getElementById('rsc-name').textContent = '— '+r.title+' · stock —';
+  document.getElementById('rsc-qty').value = fmtQty(roundQty(r.stock||0));
+  document.getElementById('recipeStockCorrectModal').classList.add('active');
+  setTimeout(function(){ const el=document.getElementById('rsc-qty'); if(el){ el.focus(); el.select(); } }, 30);
+}
+function closeRecipeStockCorrectModal(){
+  document.getElementById('recipeStockCorrectModal').classList.remove('active');
+  recipeStockCorrectId = null;
+}
+function saveRecipeStockCorrect(){
+  const r = DATA.recipes.find(function(x){ return x.id===recipeStockCorrectId; });
+  if(!r) return;
+  const val = parseFloat((document.getElementById('rsc-qty').value||'').toString().replace(',','.'));
+  if(isNaN(val) || val<0){ showToast('Poné una cantidad válida'); return; }
+  r.stock = roundQty(val);
+  saveData(DATA);
+  closeRecipeStockCorrectModal();
+  renderRecipes();
+  showToast('Stock corregido');
 }
 let balanceTapCount = 0;
 let balanceTapTimer = null;

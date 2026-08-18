@@ -1503,6 +1503,15 @@
         <div class="field"><label>Precio</label><input class="input" id="f-salePrice" type="number" min="0" placeholder="precio de venta por porción" oninput="updateFormCostPreview()"></div>
         <div class="rowline"><span class="l">Ganancia por porción</span><span id="f-profitPreview" style="font-weight:600;color:var(--k-accent);font-size:calc(12.5px + var(--kobu-font-boost, 0px));">$0</span></div>
       </div>
+      <div class="grp-card" id="formPackCard">
+        <p class="section-title"><span class="badge-ic"><span class="icon-slot" data-icon="package"></span></span>Vender por paquete (opcional)</p>
+        <p style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;">Solo completá esto si además vendés de a varias unidades juntas (ej. bolsa de 8 porciones). Si vendés unidad por unidad, dejalo vacío.</p>
+        <div class="btn-row">
+          <div class="field" style="flex:1;"><label>Unidades por paquete</label><input class="input" id="f-packSize" type="number" min="0" placeholder="ej. 8" oninput="updateFormCostPreview()"></div>
+          <div class="field" style="flex:1;"><label>Precio del paquete</label><input class="input" id="f-packPrice" type="number" min="0" placeholder="precio de la bolsa" oninput="updateFormCostPreview()"></div>
+        </div>
+        <div class="rowline" id="f-packProfitRow" style="display:none;"><span class="l">Ganancia por paquete</span><span id="f-packProfitPreview" style="font-weight:600;color:var(--k-accent);font-size:calc(12.5px + var(--kobu-font-boost, 0px));">$0</span></div>
+      </div>
     </div>
     <div class="btn-row formfoot">
       <button class="btn btn-ghost" onclick="cancelForm()">Cancelar</button>
@@ -1748,11 +1757,13 @@
     </div>
     <div class="grp-card" id="qs-form-card" style="display:none;">
       <p class="section-title" id="qs-form-title"></p>
+      <div class="btn-row" id="qs-mode-row" style="display:none;"></div>
       <div class="btn-row" style="align-items:center;justify-content:center;gap:16px;">
         <button type="button" class="iconbtn" onclick="changeQuickSaleQty(-1)" style="background:var(--k-card2);border-radius:50%;">−</button>
         <span id="qs-qty-value" style="font-size:calc(16px + var(--kobu-font-boost, 0px));font-weight:600;min-width:24px;text-align:center;">1</span>
         <button type="button" class="iconbtn" onclick="changeQuickSaleQty(1)" style="background:var(--k-card2);border-radius:50%;">+</button>
       </div>
+      <p id="qs-qty-label" style="text-align:center;font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:-6px 0 0;"></p>
       <div class="btn-row" id="qs-paymethod-row"></div>
       <button class="btn btn-primary" onclick="registerQuickSale()">Registrar venta</button>
     </div>
@@ -1978,6 +1989,9 @@
           <span id="cook-timer-val">00:00</span>
           <button type="button" id="cook-timer-stopbtn" onclick="stopCookTimer(event)"><span class="icon-slot" data-icon="x"></span></button>
         </div>
+        <button type="button" class="cook-finish-btn" id="cook-bake-finish-btn" style="background:var(--k-card2);color:var(--k-bg);margin-bottom:8px;" onclick="finishCookAndBake(event)">
+          <span class="icon-slot" data-icon="package"></span> Registrar horneada y finalizar
+        </button>
         <button type="button" class="cook-finish-btn" id="cook-finish-btn" onclick="finishCook(event)">
           <span class="icon-slot" data-icon="chef-hat"></span> Finalizar
         </button>
@@ -3526,6 +3540,8 @@ function fillFormFromDraft(){
   document.getElementById('f-yieldUnit').value = d.yieldUnit || 'porciones';
   document.getElementById('f-notes').value = d.notes || '';
   document.getElementById('f-salePrice').value = d.salePrice || '';
+  document.getElementById('f-packSize').value = d.packSize || '';
+  document.getElementById('f-packPrice').value = d.packPrice || '';
   updatePhotoPreview();
   applyMediaMode();
   renderChipField('tags','f-tags');
@@ -3839,6 +3855,22 @@ function updateFormCostPreview(){
     const profit = price - c.costPerUnit;
     profitEl.textContent = fmtMoney(profit);
     profitEl.style.color = profit<0 ? 'var(--k-danger)' : 'var(--k-accent)';
+  }
+  const packSizeEl = document.getElementById('f-packSize');
+  const packPriceEl = document.getElementById('f-packPrice');
+  const packRowEl = document.getElementById('f-packProfitRow');
+  const packProfitEl = document.getElementById('f-packProfitPreview');
+  if(packSizeEl && packPriceEl && packRowEl && packProfitEl){
+    const packSize = parseFloat(packSizeEl.value);
+    const packPrice = parseFloat(packPriceEl.value);
+    if(!isNaN(packSize) && packSize>0 && !isNaN(packPrice) && c.costPerUnit!=null){
+      packRowEl.style.display = '';
+      const packProfit = (isNaN(packPrice)?0:packPrice) - (c.costPerUnit*packSize);
+      packProfitEl.textContent = fmtMoney(packProfit);
+      packProfitEl.style.color = packProfit<0 ? 'var(--k-danger)' : 'var(--k-accent)';
+    } else {
+      packRowEl.style.display = 'none';
+    }
   }
 }
 function renderInlineNewIngredientForm(i){
@@ -4374,6 +4406,10 @@ function saveRecipe(){
   d.notes = document.getElementById('f-notes').value;
   const sp = parseFloat(document.getElementById('f-salePrice').value);
   d.salePrice = isNaN(sp) ? null : sp;
+  const pkS = parseFloat(document.getElementById('f-packSize').value);
+  const pkP = parseFloat(document.getElementById('f-packPrice').value);
+  d.packSize = (!isNaN(pkS) && pkS>0) ? pkS : null;
+  d.packPrice = (!isNaN(pkP) && pkP>0) ? pkP : null;
   d.quickNotes = d.quickNotes || [];
   if(d.mediaMode === 'icono'){ d.photo = null; } else { d.icon = null; }
   d.colorIdx = randomWarmColorIdx();
@@ -6720,6 +6756,7 @@ function closeBakeModal(){
   document.getElementById('bakeModal').classList.remove('active');
   bakeModalRecipeId = null;
   state._bakeFromOrderId = null;
+  state._bakeFromCook = false;
 }
 function bakeModalCheckStock(){
   const r = DATA.recipes.find(function(x){ return x.id===bakeModalRecipeId; });
@@ -6760,6 +6797,7 @@ function confirmBakeModal(){
   }
   const porciones = r.yieldQty ? roundQty(val*r.yieldQty) : val;
   const bakedOrderId = state._bakeFromOrderId;
+  const fromCook = state._bakeFromCook;
   registrarHorneada(r.id, porciones);
   saveData(DATA);
   closeBakeModal();
@@ -6773,6 +6811,15 @@ function confirmBakeModal(){
     }
     renderOrderList();
   }
+  if(fromCook && document.getElementById('screen-cook').classList.contains('active')){
+    exitCook();
+  }
+}
+function finishCookAndBake(e){
+  if(e) e.stopPropagation();
+  if(!state.cookRecipeId) return;
+  state._bakeFromCook = true;
+  openBakeModal(state.cookRecipeId);
 }
 function recipeStockShortfall(it){
   if(!it || !it.recipeId) return null;
@@ -8162,37 +8209,39 @@ function computeReportsRaw(period){
     return d >= range.start && d <= range.end;
   };
   const delivered = DATA.orders.filter(function(o){ return o.status==='entregado' && inRange(o.deliveredAt||o.createdAt); });
+  const inPrep = DATA.orders.filter(function(o){ return o.status==='preparacion' && inRange(o.deliveryDate||o.createdAt); });
   const ordersRevenue = delivered.reduce(function(s,o){ return s+(o.total||0); }, 0);
   const quickSalesInRange = (DATA.quickSales||[]).filter(function(s){ return inRange(s.ts); });
   const quickSalesRevenue = quickSalesInRange.reduce(function(s,x){ return s+x.unitPrice*x.qty; }, 0);
   const totalRevenue = ordersRevenue + quickSalesRevenue;
   const recipeQty = {};
   const ingredientCost = {};
+  const addIngredientCostForRecipe = function(recipeId, qty){
+    if(!qty) return;
+    const r = DATA.recipes.find(function(x){ return x.id===recipeId; });
+    if(!r) return;
+    const c = computeRecipeCost(r);
+    c.breakdown.forEach(function(b){
+      if(b.lineCost!=null){
+        ingredientCost[b.name] = (ingredientCost[b.name]||0) + b.lineCost*qty;
+      }
+    });
+  };
+  // Recetas más pedidas: solo pedidos ya entregados
   delivered.forEach(function(o){
     (o.items||[]).forEach(function(it){
       recipeQty[it.recipeName] = (recipeQty[it.recipeName]||0) + it.qty;
-      const r = DATA.recipes.find(function(x){ return x.id===it.recipeId; });
-      if(r){
-        const c = computeRecipeCost(r);
-        c.breakdown.forEach(function(b){
-          if(b.lineCost!=null){
-            ingredientCost[b.name] = (ingredientCost[b.name]||0) + b.lineCost*it.qty;
-          }
-        });
-      }
     });
   });
-  quickSalesInRange.forEach(function(s){
-    recipeQty[s.recipeName] = (recipeQty[s.recipeName]||0) + s.qty;
-    const r = DATA.recipes.find(function(x){ return x.id===s.recipeId; });
-    if(r){
-      const c = computeRecipeCost(r);
-      c.breakdown.forEach(function(b){
-        if(b.lineCost!=null){
-          ingredientCost[b.name] = (ingredientCost[b.name]||0) + b.lineCost*s.qty;
-        }
-      });
-    }
+  // Ingredientes con mayor gasto: pedidos en preparación + entregados + stock ya horneado
+  delivered.forEach(function(o){
+    (o.items||[]).forEach(function(it){ addIngredientCostForRecipe(it.recipeId, it.qty); });
+  });
+  inPrep.forEach(function(o){
+    (o.items||[]).forEach(function(it){ addIngredientCostForRecipe(it.recipeId, it.qty); });
+  });
+  (DATA.recipes||[]).forEach(function(r){
+    if((r.stock||0)>0) addIngredientCostForRecipe(r.id, r.stock);
   });
   const topRecipes = Object.keys(recipeQty).map(function(k){ return {name:k, qty:recipeQty[k]}; }).sort(function(a,b){ return b.qty-a.qty; }).slice(0,5);
   const topIngredients = Object.keys(ingredientCost).map(function(k){ return {name:k, cost:ingredientCost[k]}; }).sort(function(a,b){ return b.cost-a.cost; }).slice(0,5);
@@ -8359,14 +8408,32 @@ function selectQuickSellRecipe(id){
   const r = DATA.recipes.find(function(x){ return x.id===id; });
   if(!r) return;
   if((r.stock||0)<=0){ showToast('No queda stock de '+r.title); return; }
-  if(!r.salePrice){ showToast(r.title+' no tiene precio cargado — poneselo en la receta antes de vender'); return; }
-  state.quickSale = { recipeId:id, qty:1, payMethod:'efectivo' };
+  if(!r.salePrice && !(r.packSize>0 && r.packPrice>0)){ showToast(r.title+' no tiene precio cargado — poneselo en la receta antes de vender'); return; }
+  state.quickSale = { recipeId:id, qty:1, payMethod:'efectivo', mode:'unit' };
+  renderQuickSellScreen();
+}
+function setQuickSaleMode(m){
+  if(!state.quickSale) return;
+  const r = DATA.recipes.find(function(x){ return x.id===state.quickSale.recipeId; });
+  if(!r) return;
+  if(m==='pack'){
+    if(!(r.packSize>0 && r.packPrice>0)) return;
+    const maxPacks = Math.floor((r.stock||0)/r.packSize);
+    if(maxPacks<=0){ showToast('No alcanza el stock para un paquete completo'); return; }
+    state.quickSale.mode = 'pack';
+  } else {
+    state.quickSale.mode = 'unit';
+  }
+  state.quickSale.qty = 1;
   renderQuickSellScreen();
 }
 function changeQuickSaleQty(delta){
   if(!state.quickSale) return;
   const r = DATA.recipes.find(function(x){ return x.id===state.quickSale.recipeId; });
-  const max = r ? (r.stock||0) : 999999;
+  const mode = state.quickSale.mode||'unit';
+  let max = r ? (r.stock||0) : 999999;
+  if(mode==='pack' && r && r.packSize>0) max = Math.floor((r.stock||0)/r.packSize);
+  if(max<1) max = 1;
   state.quickSale.qty = Math.max(1, Math.min(max, (state.quickSale.qty||1) + delta));
   renderQuickSellScreen();
 }
@@ -8381,22 +8448,27 @@ function registerQuickSale(){
   const r = DATA.recipes.find(function(x){ return x.id===qs.recipeId; });
   if(!r) return;
   const c = computeRecipeCost(r);
-  const unitPrice = r.salePrice || 0;
+  const mode = qs.mode==='pack' && r.packSize>0 && r.packPrice>0 ? 'pack' : 'unit';
+  const unitsPerSale = mode==='pack' ? r.packSize : 1;
+  const totalUnits = qs.qty * unitsPerSale;
+  const unitPrice = mode==='pack' ? r.packPrice : (r.salePrice || 0);
   const willDeduct = DATA.settings.discountStockOnSale!==false;
   const entry = {
     id: 'qs-'+Date.now()+'-'+Math.random().toString(36).slice(2,7),
     recipeId: r.id,
     recipeName: r.title,
     qty: qs.qty,
+    mode: mode,
+    unitsDeducted: totalUnits,
     unitPrice: unitPrice,
-    unitCost: c.costPerUnit || 0,
+    unitCost: (c.costPerUnit || 0) * unitsPerSale,
     payMethod: qs.payMethod,
     ts: new Date().toISOString(),
     stockDeducted: willDeduct
   };
   DATA.quickSales.push(entry);
   if(willDeduct){
-    r.stock = Math.max(0, (r.stock||0) - qs.qty);
+    r.stock = Math.max(0, (r.stock||0) - totalUnits);
   }
   state.quickSale = null;
   saveData(DATA);
@@ -8412,7 +8484,7 @@ async function undoLastQuickSale(){
   const last = DATA.quickSales.pop();
   if(last.stockDeducted!==false){
     const r = DATA.recipes.find(function(x){ return x.id===last.recipeId; });
-    if(r) r.stock = (r.stock||0) + last.qty;
+    if(r) r.stock = (r.stock||0) + (last.unitsDeducted!=null ? last.unitsDeducted : last.qty);
   }
   saveData(DATA);
   showToast('Venta deshecha');
@@ -8478,6 +8550,32 @@ function renderQuickSellScreen(){
       formCard.style.display = '';
       document.getElementById('qs-form-title').textContent = r.title;
       document.getElementById('qs-qty-value').textContent = state.quickSale.qty;
+      const mode = state.quickSale.mode||'unit';
+      const modeRow = document.getElementById('qs-mode-row');
+      const qtyLabel = document.getElementById('qs-qty-label');
+      const hasPack = r.packSize>0 && r.packPrice>0;
+      if(hasPack){
+        const unitOn = mode==='unit';
+        modeRow.style.display = '';
+        modeRow.innerHTML =
+          '<div class="qs-pmswitch" style="background:'+(unitOn?'var(--k-info-bg)':'var(--k-success-bg)')+';" onclick="setQuickSaleMode(\''+(unitOn?'pack':'unit')+'\')">'+
+            '<div class="qs-pmswitch-thumb" style="left:'+(unitOn?'2px':'calc(50% + 0px)')+';"></div>'+
+            '<div class="qs-pmswitch-labels">'+
+              '<span style="color:'+(unitOn?'var(--k-info)':'var(--k-text)')+';">Unidad</span>'+
+              '<span style="color:'+(unitOn?'var(--k-text)':'var(--k-success)')+';">Paquete</span>'+
+            '</div>'+
+          '</div>';
+      } else {
+        modeRow.style.display = 'none';
+        modeRow.innerHTML = '';
+      }
+      if(mode==='pack' && hasPack){
+        qtyLabel.textContent = '= '+(state.quickSale.qty*r.packSize)+' '+(r.yieldUnit||'unidades')+' · '+fmtMoney(r.packPrice)+' c/paquete';
+      } else if(hasPack){
+        qtyLabel.textContent = 'Paquete: '+r.packSize+' '+(r.yieldUnit||'unidades')+' a '+fmtMoney(r.packPrice);
+      } else {
+        qtyLabel.textContent = '';
+      }
       const pm = state.quickSale.payMethod;
       const efectivoOn = pm==='efectivo';
       document.getElementById('qs-paymethod-row').innerHTML =
@@ -10109,6 +10207,8 @@ function renderCookStep(){
   const isLast = idx === steps.length-1;
   const trulyDone = isCookTrulyDone();
   document.getElementById('cook-finish-btn').style.display = (isLast && trulyDone) ? 'flex' : 'none';
+  const bakeFinishBtn = document.getElementById('cook-bake-finish-btn');
+  if(bakeFinishBtn) bakeFinishBtn.style.display = (isLast && trulyDone) ? 'flex' : 'none';
   document.getElementById('cook-tapzone-right').style.display = (isLast && trulyDone) ? 'none' : '';
   const nextLabel = document.getElementById('cook-next-label');
   const nextText = document.getElementById('cook-next-text');
@@ -10323,40 +10423,50 @@ function armBackTrap(){
 let lastRootBackAt = 0;
 let rootBackRearmHandle = null;
 window.addEventListener('popstate', function(){
-  const cur = state.stack[state.stack.length-1];
-  if(cur==='cook'){
-    const inPicker = document.getElementById('cook-picker').style.display === 'flex';
-    if(!inPicker && state.cookStep>0){ prevCookStep(); }
-    else { exitCook(); }
-    armBackTrap();
-    return;
+  // Todo esto va en try/finally: si algo llegara a tirar un error al renderizar
+  // la pantalla anterior, igual queremos re-armar la trampa de "atrás" — si no,
+  // el próximo toque de atrás no tiene qué interceptar y cierra la app de golpe.
+  let shouldRearm = true;
+  try{
+    const cur = state.stack[state.stack.length-1];
+    if(cur==='cook'){
+      const pickerEl = document.getElementById('cook-picker');
+      const inPicker = !!pickerEl && pickerEl.style.display === 'flex';
+      if(!inPicker && state.cookStep>0){ prevCookStep(); }
+      else { exitCook(); }
+      return;
+    }
+    if(state.stack.length>1){
+      handleBack();
+      return;
+    }
+    if(cur!=='home'){
+      // estamos en una pestaña (Pedidos, Vender, Compras, Ajustes, etc.) sin pantallas
+      // apiladas encima — un solo "atrás" tiene que llevar a Inicio, no cerrar la app.
+      goTab('home');
+      return;
+    }
+    // ya en inicio: pedir un segundo toque de "atrás" para cerrar la app
+    const now = Date.now();
+    clearTimeout(rootBackRearmHandle);
+    if(now - lastRootBackAt < 2000){
+      // segundo toque seguido: no volvemos a armar la trampa, así el próximo
+      // "atrás" del sistema cierra la app de verdad
+      shouldRearm = false;
+      return;
+    }
+    lastRootBackAt = now;
+    showToast('Tocá atrás de nuevo para salir');
+    rootBackRearmHandle = setTimeout(function(){
+      const c = state.stack[state.stack.length-1];
+      if(c!=='cook' && state.stack.length<=1) armBackTrap();
+    }, 2000);
+    shouldRearm = false; // el setTimeout de arriba se encarga de rearmar si corresponde
+  } catch(e){
+    // no-op: cae al finally, que re-arma la trampa igual
+  } finally {
+    if(shouldRearm) armBackTrap();
   }
-  if(state.stack.length>1){
-    handleBack();
-    armBackTrap();
-    return;
-  }
-  if(cur!=='home'){
-    // estamos en una pestaña (Pedidos, Vender, Compras, Ajustes, etc.) sin pantallas
-    // apiladas encima — un solo "atrás" tiene que llevar a Inicio, no cerrar la app.
-    goTab('home');
-    armBackTrap();
-    return;
-  }
-  // ya en inicio: pedir un segundo toque de "atrás" para cerrar la app
-  const now = Date.now();
-  clearTimeout(rootBackRearmHandle);
-  if(now - lastRootBackAt < 2000){
-    // segundo toque seguido: no volvemos a armar la trampa, así el próximo
-    // "atrás" del sistema cierra la app de verdad
-    return;
-  }
-  lastRootBackAt = now;
-  showToast('Tocá atrás de nuevo para salir');
-  rootBackRearmHandle = setTimeout(function(){
-    const c = state.stack[state.stack.length-1];
-    if(c!=='cook' && state.stack.length<=1) armBackTrap();
-  }, 2000);
 });
 armBackTrap();
 

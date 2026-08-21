@@ -2947,8 +2947,8 @@ function renderHomeSummary(){
   if(!card) return;
   if(homeTickerTimer){ clearInterval(homeTickerTimer); homeTickerTimer = null; }
   const today = todayStr(), tomorrow = tomorrowStr();
-  const ordersToday = DATA.orders.filter(function(o){ return o.deliveryDate===today && o.status!=='cancelado'; }).length;
-  const ordersTomorrow = DATA.orders.filter(function(o){ return o.deliveryDate===tomorrow && o.status!=='cancelado'; }).length;
+  const ordersToday = DATA.orders.filter(function(o){ return o.deliveryDate===today && o.status!=='cancelado' && o.status!=='entregado'; }).length;
+  const ordersTomorrow = DATA.orders.filter(function(o){ return o.deliveryDate===tomorrow && o.status!=='cancelado' && o.status!=='entregado'; }).length;
   const lowStock = DATA.ingredientPrices.filter(function(p){ return (p.stock||0)<=1; }).length;
   const msgs = [];
   if(ordersToday>0 && ordersTomorrow>0){

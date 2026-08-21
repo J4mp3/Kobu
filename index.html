@@ -1507,8 +1507,8 @@
         <p class="section-title"><span class="badge-ic"><span class="icon-slot" data-icon="package"></span></span>Vender por paquete (opcional)</p>
         <p style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;">Solo completá esto si además vendés de a varias unidades juntas (ej. bolsa de 8 porciones). Si vendés unidad por unidad, dejalo vacío.</p>
         <div class="btn-row">
-          <div class="field" style="flex:1;"><label>Unidades por paquete</label><input class="input" id="f-packSize" type="number" min="0" placeholder="ej. 8" oninput="updateFormCostPreview()"></div>
-          <div class="field" style="flex:1;"><label>Precio del paquete</label><input class="input" id="f-packPrice" type="number" min="0" placeholder="precio de la bolsa" oninput="updateFormCostPreview()"></div>
+          <div class="field" style="flex:1;"><label>Unidades por paquete</label><input class="input" id="f-packSize" type="number" min="0" placeholder="ej. 8" oninput="syncSalePriceFromPack();updateFormCostPreview()"></div>
+          <div class="field" style="flex:1;"><label>Precio del paquete</label><input class="input" id="f-packPrice" type="number" min="0" placeholder="precio de la bolsa" oninput="syncSalePriceFromPack();updateFormCostPreview()"></div>
         </div>
         <div class="rowline" id="f-packProfitRow" style="display:none;"><span class="l">Ganancia por paquete</span><span id="f-packProfitPreview" style="font-weight:600;color:var(--k-accent);font-size:calc(12.5px + var(--kobu-font-boost, 0px));">$0</span></div>
       </div>
@@ -1836,15 +1836,6 @@
         <div id="rep-recipes" style="display:flex;flex-direction:column;margin-top:9px;"></div>
       </div>
     </div>
-    <div class="grp-card" id="rep-acc-ingredientes">
-      <div class="rep-acc-head" onclick="toggleRepAcc('ingredientes')">
-        <p class="section-title" style="margin:0;"><span class="badge-ic"><span class="icon-slot" data-icon="list"></span></span>Ingredientes con mayor gasto</p>
-        <span class="icon-slot rep-acc-chevron" data-icon="chevron-right" id="rep-acc-chev-ingredientes"></span>
-      </div>
-      <div class="rep-acc-body" id="rep-acc-body-ingredientes">
-        <div id="rep-ingredients" style="display:flex;flex-direction:column;margin-top:9px;"></div>
-      </div>
-    </div>
     <div class="grp-card grp-card--action">
       <button type="button" class="btn btn-ghost" style="font-size:calc(11.5px + var(--kobu-font-boost, 0px));padding:9px;" onclick="exportDataToExcel()"><span class="icon-slot" data-icon="download" style="vertical-align:-2px;"></span> Exportar datos a Excel</button>
     </div>
@@ -1916,10 +1907,10 @@
           <div id="shopSubIngredientePanel" style="display:none;">
             <div class="btn-row">
               <select class="input" id="shop-ing-select" style="flex:2;" onchange="onShopIngredientPick(this.value)"></select>
-              <input class="input" id="shop-ing-qty" type="number" step="any" min="0" placeholder="cant." style="flex:0 0 64px;">
-              <select class="input" id="shop-ing-unit" style="flex:0 0 64px;"></select>
+              <input class="input" id="shop-ing-qty" type="number" step="1" min="1" placeholder="envases" style="flex:0 0 70px;">
               <button class="btn btn-primary" style="flex:0 0 auto;" onclick="addShopIngredientItem()">Agregar</button>
             </div>
+            <p id="shop-ing-pkg-note" style="font-size:calc(10px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:4px 0 0;"></p>
             <div id="shop-ing-items" style="display:flex;flex-direction:column;gap:6px;margin-top:6px;"></div>
           </div>
           </div>
@@ -2031,7 +2022,7 @@
           <input id="orderSearchInput" placeholder="Buscar cliente..." oninput="setOrderSearchQuery(this.value)">
         </div>
         <button type="button" class="ord-toolbtn" id="orderCalToggleBtn" onclick="toggleOrderCalendar()" title="calendario"><span class="icon-slot" data-icon="calendar"></span></button>
-        <button type="button" class="ord-toolbtn" onclick="exportDeliveriesIcs()" title="exportar entregas"><span class="icon-slot" data-icon="download"></span></button>
+        <button type="button" class="ord-toolbtn" id="orderSortToggleBtn" onclick="toggleOrderSortDir()" title="orden por fecha de entrega"><span class="icon-slot" data-icon="chevron-down" id="orderSortIcon" style="transition:transform .15s;"></span></button>
       </div>
       <div class="grp-card" id="orderCalendarWrap" style="display:none;"></div>
       <div id="orderList" style="display:flex;flex-direction:column;gap:8px;"></div>
@@ -3829,6 +3820,17 @@ function renderIngredientRows(){
   mountIcons();
   updateFormCostPreview();
 }
+function syncSalePriceFromPack(){
+  const packSizeEl = document.getElementById('f-packSize');
+  const packPriceEl = document.getElementById('f-packPrice');
+  const priceEl = document.getElementById('f-salePrice');
+  if(!packSizeEl || !packPriceEl || !priceEl) return;
+  const packSize = parseFloat(packSizeEl.value);
+  const packPrice = parseFloat(packPriceEl.value);
+  if(!isNaN(packSize) && packSize>0 && !isNaN(packPrice) && packPrice>=0){
+    priceEl.value = Math.round((packPrice/packSize)*100)/100;
+  }
+}
 function updateFormCostPreview(){
   const costEl = document.getElementById('f-costPreview');
   const profitEl = document.getElementById('f-profitPreview');
@@ -5148,6 +5150,8 @@ function renderAdvDetail(){
   } else if(s==='danger'){
     body.innerHTML =
       '<p style="font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0 0 8px;">Borra datos de la app de forma permanente, por partes. Ideal para sacar datos de prueba.</p>'+
+      '<button class="btn btn-ghost" onclick="resetPriceHistory()"><span class="icon-slot" data-icon="trending-up" style="vertical-align:-2px;"></span> Borrar histórico de aumentos de precio</button>'+
+      '<p style="font-size:calc(10px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:2px 0 8px;">Deja el precio actual de cada ingrediente/insumo como único registro, así "cuánto aumentó" arranca de cero. No toca el stock ni los precios en sí.</p>'+
       '<button class="btn btn-danger" onclick="openWipeDataModal()">Eliminar todos los datos</button>';
   }
   mountIcons();
@@ -5987,6 +5991,16 @@ function stockUnitOptionsHtml(type, selected){
   }
   return unitOptionsHtml(selected);
 }
+async function resetPriceHistory(){
+  const ok = await showConfirm('¿Borrar el histórico de aumentos de precio de todos los ingredientes e insumos? El precio actual de cada uno queda igual, solo se resetea desde cuándo se mide el aumento.');
+  if(!ok) return;
+  (DATA.ingredientPrices||[]).forEach(function(p){
+    p.priceHistory = (p.price!=null && !isNaN(p.price)) ? [{ price:p.price, date: todayStr() }] : [];
+  });
+  saveData(DATA);
+  showToast('Histórico de precios borrado');
+  renderTrendsCard(reportsPeriod);
+}
 function ingredientPriceTrend(p){
   const hist = p.priceHistory||[];
   if(hist.length<2) return null;
@@ -6647,9 +6661,13 @@ async function removeClient(id){
 function recipesSorted(){
   return DATA.recipes.slice().sort(function(a,b){ return (a.title||'').localeCompare(b.title||'','es',{sensitivity:'base'}); });
 }
+function recipeSellsByPack(r){
+  return !!(r && r.packSize>0 && r.packPrice!=null);
+}
 function unitPriceForRecipe(recipeId){
   const r = DATA.recipes.find(function(x){ return x.id===recipeId; });
   if(!r) return null;
+  if(recipeSellsByPack(r)) return r.packPrice;
   return r.salePrice!=null ? r.salePrice : null;
 }
 function adjustStockForOrder(order, direction){
@@ -6662,7 +6680,8 @@ function adjustPortionStockForOrder(order, direction){
     if(!it.recipeId) return;
     const r = DATA.recipes.find(function(x){ return x.id===it.recipeId; });
     if(!r) return;
-    const qty = parseFloat(it.qty)||0;
+    const rawQty = parseFloat(it.qty)||0;
+    const qty = recipeSellsByPack(r) ? rawQty*r.packSize : rawQty;
     if(direction<0){
       it.shortfall = roundQty(Math.max(0, qty - (r.stock||0)));
     } else {
@@ -6709,7 +6728,7 @@ function registrarHorneada(recipeId, porciones){
       const totalQty = perUnitQty * scale;
       const converted = convertQty(totalQty, ing.unit, cat.unit);
       if(converted==null) return;
-      cat.stock = roundQty((cat.stock||0) - converted);
+      cat.stock = roundQty(Math.max(0, (cat.stock||0) - converted));
     });
   }
   r.stock = roundQty((r.stock||0) + porciones);
@@ -6825,7 +6844,8 @@ function recipeStockShortfall(it){
   if(!it || !it.recipeId) return null;
   const r = DATA.recipes.find(function(x){ return x.id===it.recipeId; });
   if(!r) return null;
-  const qty = parseFloat(it.qty)||0;
+  const rawQty = parseFloat(it.qty)||0;
+  const qty = recipeSellsByPack(r) ? rawQty*r.packSize : rawQty;
   const stock = r.stock||0;
   const short = qty - stock;
   if(short<=0) return null;
@@ -6951,9 +6971,15 @@ function orderInitials(name){
   return (parts[0][0]+parts[1][0]).toUpperCase();
 }
 function isDesktopLayout(){ return window.matchMedia('(min-width:900px) and (pointer:fine)').matches; }
+var orderSortDesc = true; // true (default) = fecha de entrega más cercana arriba de todo
+function toggleOrderSortDir(){
+  orderSortDesc = !orderSortDesc;
+  renderOrderList();
+}
 function orderSortFn(a,b){
+  const dir = orderSortDesc ? 1 : -1;
   if(a.deliveryDate && b.deliveryDate){
-    if(a.deliveryDate !== b.deliveryDate) return a.deliveryDate < b.deliveryDate ? -1 : 1;
+    if(a.deliveryDate !== b.deliveryDate) return (a.deliveryDate < b.deliveryDate ? -1 : 1) * dir;
     return new Date(b.createdAt) - new Date(a.createdAt);
   }
   if(a.deliveryDate && !b.deliveryDate) return -1;
@@ -6980,6 +7006,10 @@ function orderGroupDateLabel(dateStr){
 }
 function renderOrderList(){
   const wrap = document.getElementById('orderList');
+  const sortIcon = document.getElementById('orderSortIcon');
+  const sortBtn = document.getElementById('orderSortToggleBtn');
+  if(sortIcon) sortIcon.style.transform = orderSortDesc ? 'rotate(0deg)' : 'rotate(180deg)';
+  if(sortBtn) sortBtn.title = orderSortDesc ? 'Fecha de entrega: más cercana arriba' : 'Fecha de entrega: más lejana arriba';
   let sortedAll = DATA.orders.slice().sort(orderSortFn);
   if(calendarDayFilter) sortedAll = sortedAll.filter(function(o){ return o.deliveryDate===calendarDayFilter; });
   if(orderSearchQuery) sortedAll = sortedAll.filter(function(o){ return (o.customerName||'').toLowerCase().includes(orderSearchQuery); });
@@ -7270,44 +7300,6 @@ function openKobuEasterModal(){
 }
 function closeKobuEasterModal(){
   document.getElementById('kobuEasterModal').classList.remove('active');
-}
-function dateToIcsDate(dateStr){ return dateStr.replace(/-/g,''); }
-function addDaysToDateStr(dateStr, days){
-  const d = new Date(dateStr+'T00:00:00');
-  d.setDate(d.getDate()+days);
-  return d.toISOString().slice(0,10);
-}
-function icsEscape(s){ return (s||'').toString().replace(/\\/g,'\\\\').replace(/\n/g,'\\n').replace(/,/g,'\\,').replace(/;/g,'\\;'); }
-function exportDeliveriesIcs(){
-  const orders = DATA.orders.filter(function(o){ return o.deliveryDate && o.status!=='cancelado' && o.status!=='entregado'; });
-  if(orders.length===0){ showToast('No hay entregas pendientes para exportar'); return; }
-  const now = new Date();
-  const stamp = now.toISOString().replace(/[-:]/g,'').split('.')[0]+'Z';
-  let ics = 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Kobu//Entregas//ES\r\nCALSCALE:GREGORIAN\r\n';
-  orders.forEach(function(o){
-    const itemsTxt = (o.items||[]).map(function(it){ return it.qty+' x '+it.recipeName; }).join(', ') || 'sin items';
-    const start = dateToIcsDate(o.deliveryDate);
-    const end = dateToIcsDate(addDaysToDateStr(o.deliveryDate,1));
-    ics += 'BEGIN:VEVENT\r\n';
-    ics += 'UID:'+o.id+'@kobu\r\n';
-    ics += 'DTSTAMP:'+stamp+'\r\n';
-    ics += 'DTSTART;VALUE=DATE:'+start+'\r\n';
-    ics += 'DTEND;VALUE=DATE:'+end+'\r\n';
-    ics += 'SUMMARY:Entrega Kobu - '+icsEscape(o.customerName)+'\r\n';
-    ics += 'DESCRIPTION:'+icsEscape(itemsTxt+(o.note?(' | Nota: '+o.note):''))+'\r\n';
-    ics += 'END:VEVENT\r\n';
-  });
-  ics += 'END:VCALENDAR\r\n';
-  const blob = new Blob([ics], {type:'text/calendar;charset=utf-8'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'kobu-entregas.ics';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  showToast('Archivo .ics descargado — abrilo con tu calendario para importarlo');
 }
 function toggleOrderStatus(id){
   const o = DATA.orders.find(function(x){ return x.id===id; });
@@ -7630,7 +7622,7 @@ function renderOrderItemRows(){
   const recipes = recipesSorted();
   wrap.innerHTML = state.orderDraft.items.map(function(it,i){
     const opts = '<option value="">elegí una receta...</option>' +
-      recipes.map(function(r){ return '<option value="'+r.id+'" '+(it.recipeId===r.id?'selected':'')+'>'+escapeHtml(r.title)+'</option>'; }).join('');
+      recipes.map(function(r){ return '<option value="'+r.id+'" '+(it.recipeId===r.id?'selected':'')+'>'+escapeHtml(r.title)+(recipeSellsByPack(r)?' (paquete)':'')+'</option>'; }).join('');
     const hasCustom = it.customPrice!=null;
     const priceOpen = hasCustom || it._priceOpen;
     const catalogPrice = it.recipeId ? unitPriceForRecipe(it.recipeId) : null;
@@ -7831,9 +7823,10 @@ function npRenderItems(){
   wrap.innerHTML = state.newOrderDraft.items.map(function(it,i){
     const r = DATA.recipes.find(function(x){ return x.id===it.recipeId; });
     const name = r ? r.title : '(receta borrada)';
+    const packSuffix = recipeSellsByPack(r) ? ' paquete'+((it.qty||1)==1?'':'s') : '';
     return '<div class="no-item-row">'+
       '<span class="no-item-name">'+escapeHtml(name)+'</span>'+
-      '<span class="no-qty-val">x'+(it.qty||1)+'</span>'+
+      '<span class="no-qty-val">x'+(it.qty||1)+packSuffix+'</span>'+
       '<span class="no-remove" onclick="npRemoveItem('+i+')"><span class="icon-slot" data-icon="x"></span></span>'+
     '</div>';
   }).join('');
@@ -7842,7 +7835,7 @@ function npRenderItems(){
 }
 function npStartAdd(){
   const recipes = recipesSorted();
-  const opts = '<option value="">elegí un producto...</option>'+recipes.map(function(r){ return '<option value="'+r.id+'">'+escapeHtml(r.title)+'</option>'; }).join('');
+  const opts = '<option value="">elegí un producto...</option>'+recipes.map(function(r){ return '<option value="'+r.id+'">'+escapeHtml(r.title)+(recipeSellsByPack(r)?' (paquete)':'')+'</option>'; }).join('');
   document.getElementById('no-addform').innerHTML =
     '<div class="btn-row" style="margin-top:6px;">'+
       '<select class="input" id="no-newrecipe" style="flex:1;min-width:0;">'+opts+'</select>'+
@@ -8209,45 +8202,21 @@ function computeReportsRaw(period){
     return d >= range.start && d <= range.end;
   };
   const delivered = DATA.orders.filter(function(o){ return o.status==='entregado' && inRange(o.deliveredAt||o.createdAt); });
-  const inPrep = DATA.orders.filter(function(o){ return o.status==='preparacion' && inRange(o.deliveryDate||o.createdAt); });
   const ordersRevenue = delivered.reduce(function(s,o){ return s+(o.total||0); }, 0);
   const quickSalesInRange = (DATA.quickSales||[]).filter(function(s){ return inRange(s.ts); });
   const quickSalesRevenue = quickSalesInRange.reduce(function(s,x){ return s+x.unitPrice*x.qty; }, 0);
   const totalRevenue = ordersRevenue + quickSalesRevenue;
   const recipeQty = {};
-  const ingredientCost = {};
-  const addIngredientCostForRecipe = function(recipeId, qty){
-    if(!qty) return;
-    const r = DATA.recipes.find(function(x){ return x.id===recipeId; });
-    if(!r) return;
-    const c = computeRecipeCost(r);
-    c.breakdown.forEach(function(b){
-      if(b.lineCost!=null){
-        ingredientCost[b.name] = (ingredientCost[b.name]||0) + b.lineCost*qty;
-      }
-    });
-  };
   // Recetas más pedidas: solo pedidos ya entregados
   delivered.forEach(function(o){
     (o.items||[]).forEach(function(it){
       recipeQty[it.recipeName] = (recipeQty[it.recipeName]||0) + it.qty;
     });
   });
-  // Ingredientes con mayor gasto: pedidos en preparación + entregados + stock ya horneado
-  delivered.forEach(function(o){
-    (o.items||[]).forEach(function(it){ addIngredientCostForRecipe(it.recipeId, it.qty); });
-  });
-  inPrep.forEach(function(o){
-    (o.items||[]).forEach(function(it){ addIngredientCostForRecipe(it.recipeId, it.qty); });
-  });
-  (DATA.recipes||[]).forEach(function(r){
-    if((r.stock||0)>0) addIngredientCostForRecipe(r.id, r.stock);
-  });
   const topRecipes = Object.keys(recipeQty).map(function(k){ return {name:k, qty:recipeQty[k]}; }).sort(function(a,b){ return b.qty-a.qty; }).slice(0,5);
-  const topIngredients = Object.keys(ingredientCost).map(function(k){ return {name:k, cost:ingredientCost[k]}; }).sort(function(a,b){ return b.cost-a.cost; }).slice(0,5);
   const totalExpenses = (DATA.expenses||[]).filter(function(e){ return inRange(e.date); }).reduce(function(s,e){ return s+(e.amount||0); }, 0);
   const netProfit = totalRevenue - totalExpenses;
-  return { totalRevenue:totalRevenue, deliveredCount:delivered.length, topRecipes:topRecipes, topIngredients:topIngredients, totalExpenses:totalExpenses, netProfit:netProfit };
+  return { totalRevenue:totalRevenue, deliveredCount:delivered.length, topRecipes:topRecipes, totalExpenses:totalExpenses, netProfit:netProfit };
 }
 function renderReportsScreen(){
   renderReportsPeriodChips();
@@ -8256,10 +8225,6 @@ function renderReportsScreen(){
   const recWrap = document.getElementById('rep-recipes');
   recWrap.innerHTML = rep.topRecipes.length ? rep.topRecipes.map(function(r,i){
     return '<div class="report-row"><span><span class="rk">'+(i+1)+'.</span>'+escapeHtml(r.name)+'</span><span>'+r.qty+'</span></div>';
-  }).join('') : '<p style="font-size:calc(11.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);">no hay pedidos entregados en este período.</p>';
-  const ingWrap = document.getElementById('rep-ingredients');
-  ingWrap.innerHTML = rep.topIngredients.length ? rep.topIngredients.map(function(r,i){
-    return '<div class="report-row"><span><span class="rk">'+(i+1)+'.</span>'+escapeHtml(r.name)+'</span><span>'+fmtMoney(r.cost)+'</span></div>';
   }).join('') : '<p style="font-size:calc(11.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);">no hay pedidos entregados en este período.</p>';
   document.getElementById('bal-revenue').textContent = fmtMoney(rep.totalRevenue);
   document.getElementById('bal-expenses').textContent = fmtMoney(rep.totalExpenses);
@@ -8409,22 +8374,9 @@ function selectQuickSellRecipe(id){
   if(!r) return;
   if((r.stock||0)<=0){ showToast('No queda stock de '+r.title); return; }
   if(!r.salePrice && !(r.packSize>0 && r.packPrice>0)){ showToast(r.title+' no tiene precio cargado — poneselo en la receta antes de vender'); return; }
-  state.quickSale = { recipeId:id, qty:1, payMethod:'efectivo', mode:'unit' };
-  renderQuickSellScreen();
-}
-function setQuickSaleMode(m){
-  if(!state.quickSale) return;
-  const r = DATA.recipes.find(function(x){ return x.id===state.quickSale.recipeId; });
-  if(!r) return;
-  if(m==='pack'){
-    if(!(r.packSize>0 && r.packPrice>0)) return;
-    const maxPacks = Math.floor((r.stock||0)/r.packSize);
-    if(maxPacks<=0){ showToast('No alcanza el stock para un paquete completo'); return; }
-    state.quickSale.mode = 'pack';
-  } else {
-    state.quickSale.mode = 'unit';
-  }
-  state.quickSale.qty = 1;
+  const packMode = recipeSellsByPack(r);
+  if(packMode && Math.floor((r.stock||0)/r.packSize)<=0){ showToast('No alcanza el stock para un paquete completo de '+r.title); return; }
+  state.quickSale = { recipeId:id, qty:1, payMethod:'efectivo', mode: packMode ? 'pack' : 'unit' };
   renderQuickSellScreen();
 }
 function changeQuickSaleQty(delta){
@@ -8530,8 +8482,9 @@ function renderQuickSellScreen(){
       const active = state.quickSale && state.quickSale.recipeId===r.id;
       const color = stockColor(stock);
       const pct = Math.max(stock>0?6:0, Math.min(100, stock*10));
-      const priceLabel = r.salePrice ? fmtMoney(r.salePrice) : 'sin precio';
-      const priceStyle = r.salePrice ? '' : 'color:var(--k-danger);';
+      const tilePrice = recipeSellsByPack(r) ? r.packPrice : r.salePrice;
+      const priceLabel = tilePrice ? (fmtMoney(tilePrice)+(recipeSellsByPack(r)?'/paquete':'')) : 'sin precio';
+      const priceStyle = tilePrice ? '' : 'color:var(--k-danger);';
       return '<div class="qs-tile '+(active?'active':'')+(stock<=0?' out':'')+'" onclick="selectQuickSellRecipe(\''+r.id+'\')">'+
         '<p class="qs-tile-name">'+escapeHtml(r.title)+'</p>'+
         '<p class="qs-tile-price" style="'+priceStyle+'">'+priceLabel+'</p>'+
@@ -8553,26 +8506,11 @@ function renderQuickSellScreen(){
       const mode = state.quickSale.mode||'unit';
       const modeRow = document.getElementById('qs-mode-row');
       const qtyLabel = document.getElementById('qs-qty-label');
-      const hasPack = r.packSize>0 && r.packPrice>0;
+      const hasPack = mode==='pack' && recipeSellsByPack(r);
+      modeRow.style.display = 'none';
+      modeRow.innerHTML = '';
       if(hasPack){
-        const unitOn = mode==='unit';
-        modeRow.style.display = '';
-        modeRow.innerHTML =
-          '<div class="qs-pmswitch" style="background:'+(unitOn?'var(--k-info-bg)':'var(--k-success-bg)')+';" onclick="setQuickSaleMode(\''+(unitOn?'pack':'unit')+'\')">'+
-            '<div class="qs-pmswitch-thumb" style="left:'+(unitOn?'2px':'calc(50% + 0px)')+';"></div>'+
-            '<div class="qs-pmswitch-labels">'+
-              '<span style="color:'+(unitOn?'var(--k-info)':'var(--k-text)')+';">Unidad</span>'+
-              '<span style="color:'+(unitOn?'var(--k-text)':'var(--k-success)')+';">Paquete</span>'+
-            '</div>'+
-          '</div>';
-      } else {
-        modeRow.style.display = 'none';
-        modeRow.innerHTML = '';
-      }
-      if(mode==='pack' && hasPack){
-        qtyLabel.textContent = '= '+(state.quickSale.qty*r.packSize)+' '+(r.yieldUnit||'unidades')+' · '+fmtMoney(r.packPrice)+' c/paquete';
-      } else if(hasPack){
-        qtyLabel.textContent = 'Paquete: '+r.packSize+' '+(r.yieldUnit||'unidades')+' a '+fmtMoney(r.packPrice);
+        qtyLabel.textContent = 'Vendés por paquete de '+r.packSize+' '+(r.yieldUnit||'unidades')+' a '+fmtMoney(r.packPrice)+' — total: '+(state.quickSale.qty*r.packSize)+' '+(r.yieldUnit||'unidades');
       } else {
         qtyLabel.textContent = '';
       }
@@ -8927,13 +8865,18 @@ function populateShopRecipeSelect(){
 function populateShopIngredientSelect(){
   const sel = document.getElementById('shop-ing-select');
   const cats = ingredientCatalogSorted();
-  if(cats.length===0){ sel.innerHTML = '<option value="">no hay ingredientes cargados</option>'; document.getElementById('shop-ing-unit').innerHTML=''; return; }
+  if(cats.length===0){ sel.innerHTML = '<option value="">no hay ingredientes cargados</option>'; document.getElementById('shop-ing-pkg-note').textContent = ''; return; }
   sel.innerHTML = cats.map(function(p){ return '<option value="'+p.id+'">'+escapeHtml(p.name)+'</option>'; }).join('');
   onShopIngredientPick(sel.value);
 }
 function onShopIngredientPick(val){
   const cat = DATA.ingredientPrices.find(function(p){ return p.id===val; });
-  document.getElementById('shop-ing-unit').innerHTML = unitOptionsHtml(cat ? cat.unit : 'g');
+  const note = document.getElementById('shop-ing-pkg-note');
+  if(!note) return;
+  if(!cat){ note.textContent = ''; return; }
+  note.textContent = (cat.qty>0)
+    ? ('Cada envase de '+escapeHtml(cat.name)+' tiene '+fmtQty(cat.qty)+' '+cat.unit+'. Poné cuántos envases compraste.')
+    : ('Poné la cantidad en '+cat.unit+'.');
 }
 function addShopRecipeItem(){
   const rid = document.getElementById('shop-recipe-select').value;
@@ -8947,11 +8890,20 @@ function addShopRecipeItem(){
 }
 function addShopIngredientItem(){
   const pid = document.getElementById('shop-ing-select').value;
-  const qty = parseFloat(document.getElementById('shop-ing-qty').value);
-  const unit = document.getElementById('shop-ing-unit').value;
+  const packages = parseFloat(document.getElementById('shop-ing-qty').value);
   if(!pid){ showToast('Elegí un ingrediente'); return; }
-  if(isNaN(qty) || qty<=0){ showToast('Poné una cantidad'); return; }
-  DATA.shopping.manualItems.push({type:'ingredient', priceId:pid, qty:qty, unit:unit});
+  if(isNaN(packages) || packages<=0){ showToast('Poné cuántos envases vas a comprar'); return; }
+  const cat = DATA.ingredientPrices.find(function(p){ return p.id===pid; });
+  if(!cat){ showToast('No encontré ese ingrediente'); return; }
+  const unit = cat.unit || 'u';
+  const qty = (cat.qty>0) ? roundQty(packages*cat.qty) : packages;
+  const existing = DATA.shopping.manualItems.find(function(it){ return it.type==='ingredient' && it.priceId===pid; });
+  if(existing){
+    existing.qty = roundQty((existing.qty||0)+qty);
+    existing.packages = (existing.packages||0)+packages;
+  } else {
+    DATA.shopping.manualItems.push({type:'ingredient', priceId:pid, qty:qty, unit:unit, packages:packages});
+  }
   saveData(DATA);
   document.getElementById('shop-ing-qty').value = '';
   renderShoppingScreen();
@@ -8975,7 +8927,8 @@ function renderShopIngredientItems(){
   wrap.innerHTML = items.map(function(it){
     const idx = DATA.shopping.manualItems.indexOf(it);
     const cat = DATA.ingredientPrices.find(function(p){ return p.id===it.priceId; });
-    return '<div class="shop-recipe" style="cursor:default;"><span class="t">'+escapeHtml(cat?cat.name:'(ingrediente borrado)')+' — '+it.qty+' '+escapeHtml(it.unit)+'</span>'+
+    const label = it.packages ? (fmtQty(it.packages)+' envase'+(it.packages===1?'':'s')+' ('+fmtQty(it.qty)+' '+escapeHtml(it.unit)+')') : (fmtQty(it.qty)+' '+escapeHtml(it.unit));
+    return '<div class="shop-recipe" style="cursor:default;"><span class="t">'+escapeHtml(cat?cat.name:'(ingrediente borrado)')+' — '+label+'</span>'+
       '<button class="iconbtn" onclick="removeShopManualItem('+idx+')" style="color:var(--k-danger);"><span class="icon-slot" data-icon="x"></span></button></div>';
   }).join('');
   mountIcons();
@@ -9797,7 +9750,8 @@ function buildFullAppContext(){
     const c = computeRecipeCost(r,1);
     const precio = r.salePrice ? fmtMoney(r.salePrice) : 'sin precio';
     const costo = (c && c.costPerUnit) ? fmtMoney(c.costPerUnit) : 'sin costo calculado';
-    return r.title+' (precio '+precio+', costo '+costo+(r.readyToSell?', lista para vender, stock actual '+(r.stock||0):'')+')';
+    const packTxt = recipeSellsByPack(r) ? (', se vende por paquete de '+r.packSize+' a '+fmtMoney(r.packPrice)) : '';
+    return r.title+' (precio '+precio+', costo '+costo+packTxt+(r.readyToSell?', lista para vender, stock actual '+(r.stock||0):'')+')';
   }).join(' | ');
   parts.push('Recetas: '+(recetasTxt || 'todavía no hay recetas cargadas')+'.');
   const fmtStockItem = function(p){

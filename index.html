@@ -462,10 +462,12 @@
   .oven-tile-add .icon-slot{ font-size:calc(20px + var(--kobu-font-boost, 0px)); }
   .ut-row{ display:flex; align-items:center; gap:8px; background:var(--k-card); border-radius:10px; padding:7px 9px; }
   .ut-row.dragging{ opacity:.5; }
+  .ut-drag{ cursor:grab; touch-action:none; color:var(--k-border); flex-shrink:0; background:none; border:0; padding:2px; display:flex; align-items:center; }
   .ut-row .ut-ic{ width:32px; height:32px; border-radius:50%; background:var(--k-card2); display:flex; align-items:center; justify-content:center; color:var(--k-accent); font-size:calc(15px + var(--kobu-font-boost, 0px)); flex-shrink:0; }
   .ut-row .ut-info{ flex:1; min-width:0; }
   .ut-row .ut-info .nm{ margin:0; font-size:calc(12px + var(--kobu-font-boost, 0px)); color:var(--k-text); font-weight:500; }
   .ut-row .ut-info .sub{ margin:0; font-size:calc(10px + var(--kobu-font-boost, 0px)); color:var(--k-muted); }
+  #moldList.drop-target-active, #utensilList.drop-target-active{ outline:2px dashed var(--k-accent); outline-offset:4px; border-radius:12px; }
   .ut-add-row{ display:flex; align-items:center; justify-content:center; gap:6px; width:100%; background:none; border:1.5px dashed var(--k-border); border-radius:10px; padding:10px; cursor:pointer; color:var(--k-accent); font-size:calc(12px + var(--kobu-font-boost, 0px)); font-family:inherit; }
   .ut-add-row .icon-slot{ font-size:calc(16px + var(--kobu-font-boost, 0px)); }
   .stock-row{ background:var(--k-card); border-radius:12px; padding:9px 10px; cursor:pointer; }
@@ -912,12 +914,17 @@
       </div>
       <div class="se-headbody">
       <div class="field"><label>Nombre</label><input class="input" id="se-name" placeholder="ej. Harina Flor"></div>
+      <div class="field" id="se-parent-row" style="display:none;"><label>Sale de (ingrediente base)</label><select class="input" id="se-parent"></select></div>
       <div class="btn-row">
-        <div class="field" style="flex:1;"><label>Cantidad del envase</label><input class="input" id="se-qty" type="number" placeholder="1000"></div>
-        <div class="field" style="flex:1;"><label>Unidad</label><select class="input" id="se-unit"></select></div>
+        <div class="field" id="se-qty-row" style="flex:1;"><label>Cantidad del envase</label><input class="input" id="se-qty" type="number" placeholder="1000"></div>
+        <div class="field" style="flex:1;"><label id="se-unit-label">Unidad</label><select class="input" id="se-unit"></select></div>
       </div>
-      <div class="field"><label>Precio del envase ($)</label><input class="input" id="se-price" type="text" inputmode="decimal" placeholder="800 (o '-' si no lo sabés)"><p id="se-price-trend" style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));margin:4px 0 0;display:none;"></p></div>
-      <div class="field"><label>Proveedor</label><input class="input" id="se-provider" placeholder="ej. Distribuidora Sur"></div>
+      <div class="btn-row" id="se-yield-row" style="display:none;">
+        <div class="field" style="flex:1;"><label>Rinde mínimo</label><input class="input" id="se-yield-min" type="number" placeholder="30"></div>
+        <div class="field" style="flex:1;"><label>Rinde máximo</label><input class="input" id="se-yield-max" type="number" placeholder="50"></div>
+      </div>
+      <div class="field" id="se-price-row"><label>Precio del envase ($)</label><input class="input" id="se-price" type="text" inputmode="decimal" placeholder="800 (o '-' si no lo sabés)"><p id="se-price-trend" style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));margin:4px 0 0;display:none;"></p></div>
+      <div class="field" id="se-provider-row"><label>Proveedor</label><input class="input" id="se-provider" placeholder="ej. Distribuidora Sur"></div>
       <div class="btn-row" id="se-delete-row" style="display:none;">
         <button class="btn btn-ghost" style="flex:1;color:var(--k-danger);" onclick="deleteStockEntry()"><span class="icon-slot" data-icon="trash" style="vertical-align:-2px;"></span> Eliminar</button>
       </div>
@@ -1019,9 +1026,28 @@
         <button type="button" class="btn btn-ghost" onclick="openIconPickerModal('utensil')" style="flex:1;">Elegir ícono</button>
       </div>
       <div class="field"><label>Nombre</label><input class="input" id="ue-name" placeholder="ej. Molde redondo"></div>
+      <div class="btn-row" style="gap:8px;">
+        <button type="button" class="chip active" id="ue-type-utensilio" onclick="setUtensilType('utensilio')" style="flex:1;text-align:center;">Utensilio</button>
+        <button type="button" class="chip" id="ue-type-molde" onclick="setUtensilType('molde')" style="flex:1;text-align:center;">Molde</button>
+      </div>
       <div class="btn-row">
-        <div class="field" style="flex:1;"><label>Tamaño</label><input class="input" id="ue-tamano" placeholder="ej. 20cm"></div>
-        <div class="field" style="flex:1;"><label>Material</label><input class="input" id="ue-material" placeholder="ej. Aluminio"></div>
+        <div class="field" style="flex:1;"><label>Largo (cm)</label><input class="input" id="ue-mold-dim1" type="number" min="0" step="0.5" oninput="updateMoldCapacityPreview()"></div>
+        <div class="field" style="flex:1;"><label>Ancho (cm)</label><input class="input" id="ue-mold-dim2" type="number" min="0" step="0.5" oninput="updateMoldCapacityPreview()"></div>
+        <div class="field" style="flex:1;"><label>Altura (cm)</label><input class="input" id="ue-mold-dim3" type="number" min="0" step="0.5" oninput="updateMoldCapacityPreview()"></div>
+      </div>
+      <div class="field"><label>Material</label><input class="input" id="ue-material" placeholder="ej. Aluminio"></div>
+      <div id="ue-mold-fields" style="display:none;flex-direction:column;gap:10px;">
+        <div class="field"><label>Forma</label>
+          <select class="input" id="ue-mold-shape" onchange="onMoldShapeChange()">
+            <option value="redondo">Redondo</option>
+            <option value="rectangular">Rectangular</option>
+            <option value="budinera">Budinera</option>
+            <option value="tubo">Tubo / savarín</option>
+            <option value="otro">Otro (cargo la capacidad a mano)</option>
+          </select>
+        </div>
+        <div class="field" id="ue-mold-manual-field" style="display:none;"><label>Capacidad (ml)</label><input class="input" id="ue-mold-capacity-manual" type="number" min="0" step="10" placeholder="ej. 1500" oninput="updateMoldCapacityPreview()"></div>
+        <p id="ue-mold-capacity-preview" style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;"></p>
       </div>
       <div class="field"><label>Cantidad</label><input class="input" id="ue-cantidad" type="number" min="0" placeholder="1"></div>
       <div class="btn-row">
@@ -1454,6 +1480,26 @@
           <p style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;">Tocá para marcar qué utensilios (Ajustes) usa esta receta.</p>
         </div>
       </div>
+      <div class="grp-card" id="formMoldCard">
+        <p class="section-title"><span class="badge-ic"><span class="icon-slot" data-icon="loaf-pan"></span></span>Molde (opcional)</p>
+        <p style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;">Cargá esto para que Kobu pueda avisarte si un molde no es apto y estimar cuánto rinde con otro molde.</p>
+        <div class="field"><label>¿Cómo se porciona esta receta?</label>
+          <div class="btn-row" style="gap:8px;">
+            <button type="button" class="chip active" id="f-moldMode-molde" onclick="setMoldYieldMode('molde')" style="flex:1;text-align:center;">Por molde individual</button>
+            <button type="button" class="chip" id="f-moldMode-corte" onclick="setMoldYieldMode('corte')" style="flex:1;text-align:center;">Por corte de bandeja</button>
+          </div>
+          <p style="font-size:calc(10px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;" id="f-moldMode-hint">"Por molde individual": cada unidad sale de su propio molde (budines, tartaletas, cupcakes) — si cambiás de molde, el tamaño de cada unidad cambia. "Por corte de bandeja": horneás 1 bandeja y la cortás en porciones (brownies, barras) — si cambiás de bandeja, lo que cambia es cuántas porciones salen, no el tamaño de cada una.</p>
+        </div>
+        <div class="field"><label>Formas de molde aptas para esta receta</label>
+          <div class="chiprow" id="f-moldShapes"></div>
+          <p style="font-size:calc(10px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;">Elegí una o más. Si usás un molde de otra forma, Kobu te va a avisar.</p>
+        </div>
+        <div class="field"><label>Moldes de referencia (para estimar rendimiento)</label>
+          <p style="font-size:calc(10px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;">Cargá uno por cada molde con el que ya probaste esta receta. Si en la ficha elegís uno de estos moldes, Kobu usa el dato real; si elegís otro, lo estima por tamaño.</p>
+          <div id="f-moldCalibList" style="display:flex;flex-direction:column;gap:10px;"></div>
+          <button type="button" class="btn btn-ghost" onclick="addMoldCalibrationRow()"><span class="icon-slot" data-icon="plus" style="vertical-align:-2px;"></span> Agregar molde de referencia</button>
+        </div>
+      </div>
     </div>
     <div class="formtab-panel" data-panel="ingr">
       <div class="homeaction-row" id="addComponentRow">
@@ -1513,6 +1559,9 @@
         <div class="rowline" id="f-packProfitRow" style="display:none;"><span class="l">Ganancia por paquete</span><span id="f-packProfitPreview" style="font-weight:600;color:var(--k-accent);font-size:calc(12.5px + var(--kobu-font-boost, 0px));">$0</span></div>
       </div>
     </div>
+    <div class="btn-row formfoot" id="formDeleteRow" style="display:none;">
+      <button class="btn btn-ghost" style="color:var(--k-danger);" onclick="confirmDeleteCurrentLibraryPrep()"><span class="icon-slot" data-icon="trash" style="vertical-align:-2px;"></span> Borrar preparación</button>
+    </div>
     <div class="btn-row formfoot">
       <button class="btn btn-ghost" onclick="cancelForm()">Cancelar</button>
       <button class="btn btn-primary" id="formSaveBtn" onclick="saveRecipe()">Guardar receta</button>
@@ -1544,6 +1593,23 @@
     <div>
       <p class="section-title">Anotaciones</p>
       <div class="notes-box" id="d-notes"></div>
+    </div>
+    <div id="d-mold-wrap" style="display:none;">
+      <p class="section-title">Molde</p>
+      <div class="field"><label>Elegí el molde</label>
+        <select class="input" id="d-mold-select" onchange="onDetailMoldChange(this.value)"></select>
+      </div>
+      <div id="d-mold-warning" style="display:none;align-items:flex-start;gap:8px;background:var(--k-danger-bg);color:var(--k-danger);border-radius:12px;padding:10px 12px;font-size:calc(11.5px + var(--kobu-font-boost, 0px));margin:6px 0;">
+        <span class="icon-slot" data-icon="alert-triangle" style="flex-shrink:0;margin-top:1px;"></span>
+        <span id="d-mold-warning-text" style="flex:1;"></span>
+        <button type="button" class="iconbtn" style="flex:0 0 auto;color:var(--k-danger);" onclick="dismissMoldWarning('detail')"><span class="icon-slot" data-icon="x"></span></button>
+      </div>
+      <p id="d-mold-estimate" style="font-size:calc(11.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:6px 0;"></p>
+      <p style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0 0 6px;">Cantidad de unidades por tanda:</p>
+      <div class="btn-row" id="d-mold-chips" style="flex-wrap:wrap;"></div>
+      <div class="field" id="d-mold-custom-field" style="display:none;margin-top:6px;">
+        <input class="input" id="d-mold-custom-input" type="number" min="1" step="1" placeholder="cantidad" oninput="applyMoldTargetCount(this.value)">
+      </div>
     </div>
     <div>
       <p class="section-title">
@@ -1699,10 +1765,16 @@
   <!-- UTENSILIOS -->
   <div class="screen" id="screen-utensils">
     <div class="grp-card">
+      <p class="section-title"><span class="badge-ic"><span class="icon-slot" data-icon="loaf-pan"></span></span>Moldes</p>
+      <p style="font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:-4px 0 0;">Cargá forma y medidas para que Kobu pueda estimar cuánto rinde una receta con cada molde.</p>
+      <div id="moldList" style="display:flex;flex-direction:column;gap:6px;"></div>
+      <button type="button" class="ut-add-row" onclick="openUtensilCreateModal('molde')"><span class="icon-slot" data-icon="plus"></span>Añadir molde</button>
+    </div>
+    <div class="grp-card">
       <p class="section-title"><span class="badge-ic"><span class="icon-slot" data-icon="package"></span></span>Utensilios</p>
-      <p style="font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:-4px 0 0;">Moldes, mangas, lo que uses para armar tus productos.</p>
+      <p style="font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:-4px 0 0;">Mangas, bandejas, lo que uses para armar tus productos.</p>
       <div id="utensilList" style="display:flex;flex-direction:column;gap:6px;"></div>
-      <button type="button" class="ut-add-row" onclick="openUtensilCreateModal()"><span class="icon-slot" data-icon="plus"></span>Añadir utensilio</button>
+      <button type="button" class="ut-add-row" onclick="openUtensilCreateModal('utensilio')"><span class="icon-slot" data-icon="plus"></span>Añadir utensilio</button>
     </div>
   </div>
 
@@ -1722,6 +1794,10 @@
     <div class="grp-card" id="ingredientesCard">
       <button type="button" class="ut-add-row" onclick="openIngredientCreateModal()"><span class="icon-slot" data-icon="plus"></span>Añadir ingrediente</button>
       <div id="ingredientPriceList" style="display:flex;flex-direction:column;gap:7px;"></div>
+      <p class="section-title" style="margin-top:8px;"><span class="badge-ic"><span class="icon-slot" data-icon="flask"></span></span>Subproductos</p>
+      <p style="font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:-4px 0 0;">Ingredientes que salen de otro (ej. "Jugo de limón" sale de "Limón"). No tienen precio ni stock propio: se calculan del ingrediente base.</p>
+      <button type="button" class="ut-add-row" onclick="openSubproductCreateModal()"><span class="icon-slot" data-icon="plus"></span>Añadir subproducto</button>
+      <div id="subproductPriceList" style="display:flex;flex-direction:column;gap:7px;"></div>
     </div>
     <div class="grp-card" id="insumosCard" style="display:none;">
       <button type="button" class="ut-add-row" onclick="openSupplyCreateModal()"><span class="icon-slot" data-icon="plus"></span>Añadir insumo</button>
@@ -1966,6 +2042,11 @@
       <button id="cookExitBtn" onclick="exitCook()"><span class="icon-slot" data-icon="arrow-left"></span></button>
     </div>
     <button class="btn btn-ghost" id="cook-switchPrepBtn" style="display:none;color:var(--k-bg);border-color:var(--k-muted);" onclick="renderCookPicker()">Cambiar de preparación</button>
+    <div id="cook-mold-warning" style="display:none;align-items:flex-start;gap:8px;background:rgba(198,90,79,0.22);border:1px solid rgba(198,90,79,0.6);color:#f3c9c2;border-radius:12px;padding:10px 12px;font-size:calc(11.5px + var(--kobu-font-boost, 0px));margin:0 0 8px;">
+      <span class="icon-slot" data-icon="alert-triangle" style="flex-shrink:0;margin-top:1px;"></span>
+      <span id="cook-mold-warning-text" style="flex:1;"></span>
+      <button type="button" class="iconbtn" style="flex:0 0 auto;color:#f3c9c2;" onclick="dismissMoldWarning('cook')"><span class="icon-slot" data-icon="x"></span></button>
+    </div>
     <div id="cook-picker" style="display:none;flex-direction:column;gap:10px;flex:1;justify-content:center;">
       <p style="color:var(--k-bg);text-align:center;font-size:calc(14px + var(--kobu-font-boost, 0px));margin:0;">¿Por cuál preparación arrancamos?</p>
       <div id="cook-picker-buttons" style="display:flex;flex-direction:column;gap:8px;"></div>
@@ -2288,6 +2369,20 @@ function ovenParamsFor(ovenId){
   ];
 }
 const PLACEHOLDER_COLORS = ['#E8A87C','#D9895A','#E6B98F','#CC7A4D','#EDC08A','#D98C6B','#E2A45F','#C97B52','#F0C89A','#DB9868','#D67F4E','#E9B77A','#CE8862','#F2CEA3','#D48A5A','#E5A66D','#C8724A','#EEBE8D','#DA9970','#D2905F'];
+// Contraparte para el tema "oscuro" (azulado): misma saturación/luminosidad, matiz rotado hacia azul-violeta.
+const PLACEHOLDER_COLORS_OSCURO = ['#524BA5','#48458A','#6153A9','#44437B','#634DB0','#4B4C90','#544495','#46457A','#6955B5','#504991','#444283','#5F4AA6','#4B4A83','#6E59B8','#4A4686','#54479D','#424277','#604EB2','#514C92','#4E4886'];
+// Contraparte para los temas "hoja"/"hoja-oscuro" (verde): misma saturación/luminosidad, matiz rotado hacia verde.
+const PLACEHOLDER_COLORS_HOJA = ['#73A54B','#668A45','#73A953','#5F7B43','#6BB04D','#71904B','#5E9544','#607A45','#73B555','#689149','#628342','#65A64A','#66834A','#76B859','#638646','#679D47','#5E7742','#70B24E','#6D924C','#628648'];
+function getPlaceholderColors(){
+  const t = document.documentElement.getAttribute('data-theme') || (DATA.settings && DATA.settings.theme) || 'light';
+  if(t==='oscuro') return PLACEHOLDER_COLORS_OSCURO;
+  if(t==='hoja' || t==='hoja-oscuro') return PLACEHOLDER_COLORS_HOJA;
+  return PLACEHOLDER_COLORS;
+}
+function placeholderBg(idx){
+  const pal = getPlaceholderColors();
+  return pal[(idx||0) % pal.length];
+}
 function randomWarmColorIdx(){ return Math.floor(Math.random()*PLACEHOLDER_COLORS.length); }
 
 function defaultData(){
@@ -2473,6 +2568,16 @@ function migratePriceHistory(d){
     }
   });
 }
+function migrateMoldCalibrations(d){
+  (d.recipes||[]).forEach(function(r){
+    if(!r.moldCalibrations){
+      r.moldCalibrations = [];
+      if(r.refMoldId && r.refYieldQty>0 && r.refUnitWeight>0){
+        r.moldCalibrations.push({ id:'mc-'+Date.now()+'-'+Math.random().toString(36).slice(2,6), moldId:r.refMoldId, yieldQty:r.refYieldQty, unitWeight:r.refUnitWeight });
+      }
+    }
+  });
+}
 function migrateOrderStatus(d){
   (d.orders||[]).forEach(function(o){
     if(o.status==='preparado') o.status = 'listo';
@@ -2532,6 +2637,7 @@ function loadData(){
     migrateOvens(parsed);
     migrateUtensils(parsed);
     migrateOrderStatus(parsed);
+    migrateMoldCalibrations(parsed);
     migrateTheme(parsed);
     migrateQuickSales(parsed);
     migratePriceHistory(parsed);
@@ -2566,6 +2672,150 @@ function unitOptionsHtml(selected){
   const opts = DATA.units.map(function(u){ return u.name; }).concat(['u']);
   const sel = selected && opts.indexOf(selected)!==-1 ? selected : (selected || '');
   return opts.map(function(u){ return '<option value="'+escapeHtml(u)+'" '+(u===sel?'selected':'')+'>'+escapeHtml(u)+'</option>'; }).join('');
+}
+/* =========================================================
+   MOLDES (capacidad)
+   ========================================================= */
+function moldShapeLabel(shape){
+  return { redondo:'Redondo', rectangular:'Rectangular', budinera:'Budinera', tubo:'Tubo/savarín', otro:'Otro' }[shape] || '';
+}
+function moldCapacityCm3(u){
+  if(!u || u.moldShape==null) return null;
+  const shape = u.moldShape;
+  if(shape==='otro'){
+    const c = parseFloat(u.moldCapacityManual);
+    return (c>0) ? c : null;
+  }
+  const L = parseFloat(u.moldDim1), A = parseFloat(u.moldDim2), H = parseFloat(u.moldDim3);
+  if(!(L>0) || !(A>0) || !(H>0)) return null;
+  if(shape==='rectangular' || shape==='budinera') return L*A*H;
+  // redondo y tubo: se aproxima como elipse/círculo (Largo=Ancho => círculo perfecto). El tubo no resta el agujero central.
+  return Math.PI*(L/2)*(A/2)*H;
+}
+function moldHeightCm(u){
+  if(!u || u.moldShape==null) return null;
+  const h = parseFloat(u.moldDim3);
+  return (h>0) ? h : null;
+}
+function fmtMoldNum(n){
+  const r = Math.round(n*100)/100;
+  const s = Number.isInteger(r) ? String(r) : String(r).replace('.', ',');
+  return s;
+}
+function moldDimsLabel(u){
+  const d1 = parseFloat(u && u.moldDim1), d2 = parseFloat(u && u.moldDim2), d3 = parseFloat(u && u.moldDim3);
+  const parts = [];
+  if(d1>0) parts.push(fmtMoldNum(d1));
+  if(d2>0) parts.push(fmtMoldNum(d2));
+  if(d3>0) parts.push(fmtMoldNum(d3));
+  if(parts.length) return parts.join(' x ')+' cm';
+  const legacy = parseSizeToDims(u && u.tamano);
+  if(legacy.length) return legacy.map(fmtMoldNum).join(' x ')+' cm';
+  return '';
+}
+function parseSizeToDims(str){
+  if(!str) return [];
+  const parts = str.toString().toLowerCase().replace(/×/g, 'x').split('x');
+  const nums = [];
+  parts.forEach(function(p){
+    const m = p.replace(',', '.').match(/[0-9]+(\.[0-9]+)?/);
+    if(m) nums.push(parseFloat(m[0]));
+  });
+  return nums.filter(function(n){ return !isNaN(n) && n>0; });
+}
+function moldFootprintAreaCm2(u){
+  if(!u || u.moldShape==null) return null;
+  const shape = u.moldShape;
+  const L = parseFloat(u.moldDim1), A = parseFloat(u.moldDim2);
+  if(!(L>0) || !(A>0)) return null;
+  if(shape==='rectangular' || shape==='budinera') return L*A;
+  return Math.PI*(L/2)*(A/2);
+}
+function recipeMoldCalibrationEntries(r){
+  return ((r && r.moldCalibrations) || []).map(function(c){
+    if(!c || !c.moldId || !(c.yieldQty>0) || !(c.unitWeight>0)) return null;
+    const mold = DATA.utensils.find(function(u){ return u.id===c.moldId; });
+    if(!mold) return null;
+    return { id:c.id, moldId:c.moldId, mold:mold, yieldQty:c.yieldQty, unitWeight:c.unitWeight };
+  }).filter(Boolean);
+}
+function pickMoldCalibrationRef(r, selMold, mode){
+  const entries = recipeMoldCalibrationEntries(r);
+  if(!entries.length || !selMold) return null;
+  const exact = entries.find(function(e){ return e.moldId===selMold.id; });
+  if(exact) return { entry:exact, isExact:true };
+  function metricOf(mold){ return mode==='corte' ? moldFootprintAreaCm2(mold) : moldCapacityCm3(mold); }
+  const selMetric = metricOf(selMold);
+  if(!(selMetric>0)) return null;
+  const usable = entries.filter(function(e){ return metricOf(e.mold)>0; });
+  if(!usable.length) return null;
+  const best = usable.find(function(e){ return e.mold.moldShape && e.mold.moldShape===selMold.moldShape; }) || usable[0];
+  return { entry:best, isExact:false, selMetric:selMetric, refMetric:metricOf(best.mold) };
+}
+function estimateMoldOutcome(r, moldeId){
+  const selMold = DATA.utensils.find(function(u){ return u.id===moldeId; });
+  if(!selMold) return null;
+  const mode = (r.moldYieldMode==='corte') ? 'corte' : 'molde';
+  const pick = pickMoldCalibrationRef(r, selMold, mode);
+  if(!pick) return null;
+  const shapeMismatch = !pick.isExact && !!(r.moldShapesApt && r.moldShapesApt.length && selMold.moldShape && r.moldShapesApt.indexOf(selMold.moldShape)===-1);
+  let weightPerUnit, rawCount;
+  if(pick.isExact){
+    weightPerUnit = pick.entry.unitWeight;
+    rawCount = pick.entry.yieldQty;
+  } else if(mode==='corte'){
+    const areaRatio = pick.selMetric/pick.refMetric;
+    weightPerUnit = pick.entry.unitWeight;
+    rawCount = pick.entry.yieldQty*areaRatio;
+  } else {
+    const ratio = pick.selMetric/pick.refMetric;
+    weightPerUnit = pick.entry.unitWeight*ratio;
+    rawCount = (pick.entry.yieldQty*pick.refMetric)/pick.selMetric;
+  }
+  const countAtCurrentScale = Math.floor(rawCount);
+  const leftoverFrac = rawCount - countAtCurrentScale;
+  let heightRisk = null, heightRatio = null, timeHintPct = null;
+  if(!pick.isExact){
+    const refH = moldHeightCm(pick.entry.mold), selH = moldHeightCm(selMold);
+    if(refH>0 && selH>0){
+      heightRatio = selH/refH;
+      if(heightRatio>=1.4){
+        heightRisk = 'deep';
+        timeHintPct = Math.round((Math.pow(heightRatio,1.5)-1)*100);
+      } else if(heightRatio<=0.65){
+        heightRisk = 'shallow';
+      }
+    }
+  }
+  return {
+    selMold:selMold, refMold:pick.entry.mold, mode:mode,
+    weightPerUnit:weightPerUnit, countAtCurrentScale:countAtCurrentScale, leftoverFrac:leftoverFrac,
+    shapeMismatch:shapeMismatch, heightRisk:heightRisk, heightRatio:heightRatio, timeHintPct:timeHintPct, isExact:pick.isExact
+  };
+}
+function scaleFactorForMoldTarget(r, moldeId, targetCount){
+  if(!(targetCount>0)) return null;
+  const selMold = DATA.utensils.find(function(u){ return u.id===moldeId; });
+  const mode = (r.moldYieldMode==='corte') ? 'corte' : 'molde';
+  const entries = recipeMoldCalibrationEntries(r);
+  if(!entries.length) return null;
+  const exact = selMold && entries.find(function(e){ return e.moldId===selMold.id; });
+  if(mode==='corte'){
+    const base = exact || entries[0];
+    if(!(base.yieldQty>0)) return null;
+    return targetCount/base.yieldQty;
+  }
+  if(!selMold) return null;
+  const selCap = moldCapacityCm3(selMold);
+  if(!(selCap>0)) return null;
+  if(exact){
+    if(!(exact.yieldQty>0)) return null;
+    return targetCount/exact.yieldQty;
+  }
+  const withCap = entries.map(function(e){ return { e:e, cap:moldCapacityCm3(e.mold) }; }).filter(function(x){ return x.cap>0; });
+  if(!withCap.length) return null;
+  const bestX = withCap.find(function(x){ return x.e.mold.moldShape && x.e.mold.moldShape===selMold.moldShape; }) || withCap[0];
+  return (targetCount*selCap)/(bestX.e.yieldQty*bestX.cap);
 }
 
 /* =========================================================
@@ -2888,13 +3138,12 @@ function computeStockPredictions(){
     const r = DATA.recipes.find(function(x){ return x.id===recipeId; });
     if(!r || !qtySold) return;
     flatRecipeIngredients(r).forEach(function(ing){
-      const price = matchIngredientPrice(ing.priceId);
-      if(!price) return;
+      if(!ing.priceId) return;
       const q = parseFloat((ing.qty||'').toString().replace(',','.'));
       if(isNaN(q)) return;
-      const converted = convertQty(q*qtySold, ing.unit, price.unit);
-      if(converted==null) return;
-      consumed[price.id] = (consumed[price.id]||0) + converted;
+      const resolved = resolvePurchaseTarget(ing, q*qtySold);
+      if(!resolved.cat || resolved.qty==null) return;
+      consumed[resolved.cat.id] = (consumed[resolved.cat.id]||0) + resolved.qty;
     });
   }
   (DATA.quickSales||[]).forEach(function(s){
@@ -3105,10 +3354,13 @@ function renderRecipes(){
   renderPrepLibraryCards();
   applyHomeTabUI();
   const unfiltered = !activeTag;
-  const list = DATA.recipes.filter(function(r){
+  const filtered = DATA.recipes.filter(function(r){
     if(activeTag && !(r.tags||[]).includes(activeTag)) return false;
     return true;
-  }).sort(function(a,b){ return (b.favorite?1:0)-(a.favorite?1:0); });
+  });
+  const favs = filtered.filter(function(r){ return r.favorite; });
+  const rest = filtered.filter(function(r){ return !r.favorite; }).sort(function(a,b){ return (a.title||'').localeCompare(b.title||'', 'es', {sensitivity:'base'}); });
+  const list = favs.concat(rest);
   const el = document.getElementById('recipeList');
   if(list.length===0){
     el.innerHTML = '<div class="empty"><span class="icon-slot" data-icon="cookie"></span>Todavía no hay recetas por acá.<br>Tocá "Añadir receta" para cargar la primera.</div>';
@@ -3116,11 +3368,11 @@ function renderRecipes(){
     return;
   }
   el.innerHTML = list.map(function(r){
-    const bg = r.photo ? ('background-image:url('+r.photo+')') : ('background:'+(PLACEHOLDER_COLORS[r.colorIdx % PLACEHOLDER_COLORS.length]));
+    const bg = r.photo ? ('background-image:url('+r.photo+')') : ('background:'+(placeholderBg(r.colorIdx)));
     const favBtn = '<button type="button" class="iconbtn card-fav" onclick="event.stopPropagation();toggleFavorite(\''+r.id+'\')" title="favorita"><span class="icon-slot" data-icon="star" style="color:'+(r.favorite?'var(--k-accent)':'var(--k-border)')+';"></span></button>';
     const readyMark = r.readyToSell ? '<span class="ready-mark active"><span class="icon-slot" data-icon="check"></span></span>' : '<span class="ready-mark"></span>';
     const readyBtn = '<button type="button" class="iconbtn card-ready" onclick="event.stopPropagation();toggleReadyToSell(\''+r.id+'\')" title="lista para vender">'+readyMark+'</button>';
-    const dragBtn = unfiltered ? '<button type="button" class="iconbtn card-drag" onclick="event.stopPropagation();" onpointerdown="event.stopPropagation();recipeDragStart(event,\''+r.id+'\')" title="mover"><span class="icon-slot" data-icon="grip"></span></button>' : '';
+    const dragBtn = (unfiltered && r.favorite) ? '<button type="button" class="iconbtn card-drag" onclick="event.stopPropagation();" onpointerdown="event.stopPropagation();recipeDragStart(event,\''+r.id+'\')" title="mover"><span class="icon-slot" data-icon="grip"></span></button>' : '';
     const stockBadge = '<span class="thumb-stock-badge" style="background:'+stockColor(r.stock||0)+';" title="stock: '+(r.stock||0)+'" onclick="event.stopPropagation();handleRecipeStockBadgeTap(\''+r.id+'\')">'+(r.stock||0)+'</span>';
     return '<div class="card" data-id="'+r.id+'" data-fav="'+(r.favorite?1:0)+'" onclick="openDetail(\''+r.id+'\')">'+
       dragBtn + favBtn + readyBtn +
@@ -3200,9 +3452,12 @@ function renderPrepLibraryCards(){
   const el = document.getElementById('prepCardList');
   if(!el) return;
   const unfiltered = !activePrepTag;
-  const list = (DATA.preparationLibrary||[]).filter(function(p){
+  const filteredPreps = (DATA.preparationLibrary||[]).filter(function(p){
     return !activePrepTag || (p.tags||[]).includes(activePrepTag);
-  }).sort(function(a,b){ return (b.favorite?1:0)-(a.favorite?1:0); });
+  });
+  const favPreps = filteredPreps.filter(function(p){ return p.favorite; });
+  const restPreps = filteredPreps.filter(function(p){ return !p.favorite; }).sort(function(a,b){ return (a.name||'').localeCompare(b.name||'', 'es', {sensitivity:'base'}); });
+  const list = favPreps.concat(restPreps);
   if(list.length===0){
     el.innerHTML = '<div class="empty"><span class="icon-slot" data-icon="flask"></span>Todavía no hay preparaciones guardadas.<br>Tocá "Añadir preparación" para cargar la primera.</div>';
     mountIcons();
@@ -3212,10 +3467,10 @@ function renderPrepLibraryCards(){
     const favBtn = '<button type="button" class="iconbtn card-fav" onclick="event.stopPropagation();toggleLibraryPrepFavorite(\''+p.id+'\')" title="favorita"><span class="icon-slot" data-icon="star" style="color:'+(p.favorite?'var(--k-accent)':'var(--k-border)')+';"></span></button>';
     const readyMark = p.readyToSell ? '<span class="ready-mark active"><span class="icon-slot" data-icon="check"></span></span>' : '<span class="ready-mark"></span>';
     const readyBtn = '<button type="button" class="iconbtn card-ready" onclick="event.stopPropagation();toggleLibraryPrepReady(\''+p.id+'\')" title="lista para vender">'+readyMark+'</button>';
-    const dragBtn = unfiltered ? '<button type="button" class="iconbtn card-drag" onclick="event.stopPropagation();" onpointerdown="event.stopPropagation();libPrepDragStart(event,\''+p.id+'\')" title="mover"><span class="icon-slot" data-icon="grip"></span></button>' : '';
+    const dragBtn = (unfiltered && p.favorite) ? '<button type="button" class="iconbtn card-drag" onclick="event.stopPropagation();" onpointerdown="event.stopPropagation();libPrepDragStart(event,\''+p.id+'\')" title="mover"><span class="icon-slot" data-icon="grip"></span></button>' : '';
     const sub = (p.ingredients||[]).length+' ing. · '+(p.steps||[]).length+' pasos';
     const prepIcon = '<span class="thumb-icon">'+((p.icon && ICONS[p.icon]) ? ICONS[p.icon] : '<span class="icon-slot" data-icon="flask"></span>')+'</span>';
-    const prepBg = PLACEHOLDER_COLORS[(p.colorIdx||0) % PLACEHOLDER_COLORS.length];
+    const prepBg = placeholderBg(p.colorIdx);
     return '<div class="card" data-id="'+p.id+'" data-fav="'+(p.favorite?1:0)+'" onclick="openLibraryPrepEditor(\''+p.id+'\')">'+
       dragBtn + favBtn + readyBtn +
       '<div class="thumb" style="background:'+prepBg+';display:flex;align-items:center;justify-content:center;color:var(--k-accent);">'+prepIcon+'</div>'+
@@ -3392,7 +3647,7 @@ function emptyDraft(){
     id:null, title:'', photo:null, icon:null, mediaMode:'icono', colorIdx: DATA.recipes.length % PLACEHOLDER_COLORS.length,
     timeMinutes:'', difficulty:'fácil', yieldQty:'', yieldUnit:'porciones', tags:[], ovenIds:[], utensilIds:[],
     ingredients:[], steps:[], notes:'', salePrice:null, parentId:null, quickNotes:[], ovenSettings:{},
-    components:[], finalSteps:[]
+    components:[], finalSteps:[], moldShapesApt:[], moldCalibrations:[], moldYieldMode:'molde'
   };
 }
 const ICON_PICKER_GROUPS = [
@@ -3504,6 +3759,8 @@ function openForm(recipeId){
     if(!state.draft.ovenIds) state.draft.ovenIds = [];
     if(!state.draft.components) state.draft.components = [];
     if(!state.draft.finalSteps) state.draft.finalSteps = [];
+    if(!state.draft.moldShapesApt) state.draft.moldShapesApt = [];
+    if(!state.draft.moldCalibrations) state.draft.moldCalibrations = [];
     if(state.draft.icon===undefined) state.draft.icon = null;
     if(!state.draft.mediaMode) state.draft.mediaMode = state.draft.icon ? 'icono' : 'foto';
   } else {
@@ -3533,6 +3790,10 @@ function fillFormFromDraft(){
   document.getElementById('f-salePrice').value = d.salePrice || '';
   document.getElementById('f-packSize').value = d.packSize || '';
   document.getElementById('f-packPrice').value = d.packPrice || '';
+  state.draft.moldCalibrations = (d.moldCalibrations || []).map(function(c){ return Object.assign({}, c); });
+  setMoldYieldMode(d.moldYieldMode || 'molde');
+  renderMoldCalibRows();
+  renderMoldShapeChips();
   updatePhotoPreview();
   applyMediaMode();
   renderChipField('tags','f-tags');
@@ -3543,6 +3804,108 @@ function fillFormFromDraft(){
   renderStepRows();
   renderComponentTabs();
   renderFinalStepRows();
+}
+const MOLD_SHAPES = [
+  {key:'redondo', label:'Redondo'},
+  {key:'rectangular', label:'Rectangular'},
+  {key:'budinera', label:'Budinera'},
+  {key:'tubo', label:'Tubo/savarín'},
+  {key:'otro', label:'Otro'}
+];
+function renderMoldShapeChips(){
+  const wrap = document.getElementById('f-moldShapes');
+  if(!wrap) return;
+  const sel = state.draft.moldShapesApt || [];
+  wrap.innerHTML = MOLD_SHAPES.map(function(s){
+    const active = sel.indexOf(s.key)!==-1;
+    return '<button type="button" class="chip '+(active?'active':'')+'" onclick="toggleMoldShapeApt(\''+s.key+'\')">'+s.label+'</button>';
+  }).join('');
+}
+function toggleMoldShapeApt(key){
+  state.draft.moldShapesApt = state.draft.moldShapesApt || [];
+  const idx = state.draft.moldShapesApt.indexOf(key);
+  if(idx===-1) state.draft.moldShapesApt.push(key); else state.draft.moldShapesApt.splice(idx,1);
+  renderMoldShapeChips();
+}
+function renderMoldCalibRows(){
+  const wrap = document.getElementById('f-moldCalibList');
+  if(!wrap) return;
+  const list = state.draft.moldCalibrations || [];
+  const molds = utensilsSorted('molde');
+  const yieldLabel = (state.draft.moldYieldMode==='corte') ? 'Porciones que salen' : 'Rinde con ese molde';
+  if(!list.length){
+    wrap.innerHTML = '<p style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;">Todavía no cargaste ningún molde de referencia.</p>';
+    return;
+  }
+  wrap.innerHTML = list.map(function(c, idx){
+    const moldOptions = '<option value="">elegí un molde...</option>' + molds.map(function(u){
+      return '<option value="'+u.id+'"'+(u.id===c.moldId?' selected':'')+'>'+escapeHtml(u.nombre)+'</option>';
+    }).join('');
+    return '<div class="grp-card" style="gap:8px;">'+
+      '<div class="btn-row" style="align-items:center;">'+
+        '<select class="input" style="flex:1;" onchange="updateMoldCalibField('+idx+',\'moldId\',this.value)">'+moldOptions+'</select>'+
+        '<button type="button" class="iconbtn" style="color:var(--k-danger);flex:0 0 auto;" onclick="removeMoldCalibrationRow('+idx+')"><span class="icon-slot" data-icon="trash"></span></button>'+
+      '</div>'+
+      '<div class="btn-row">'+
+        '<div class="field" style="flex:1;"><label>'+yieldLabel+'</label><input class="input" type="number" min="0" value="'+(c.yieldQty||'')+'" placeholder="ej. 3" oninput="updateMoldCalibField('+idx+',\'yieldQty\',this.value)"></div>'+
+        '<div class="field" style="flex:1;"><label>Peso aprox. por unidad (g)</label><input class="input" type="number" min="0" value="'+(c.unitWeight||'')+'" placeholder="ej. 250" oninput="updateMoldCalibField('+idx+',\'unitWeight\',this.value)"></div>'+
+      '</div>'+
+      '<button type="button" class="btn btn-ghost" onclick="estimateMoldCalibWeight('+idx+')">Estimar peso con mis ingredientes</button>'+
+    '</div>';
+  }).join('');
+}
+function addMoldCalibrationRow(){
+  state.draft.moldCalibrations = state.draft.moldCalibrations || [];
+  state.draft.moldCalibrations.push({ id:'mc-'+Date.now()+'-'+Math.random().toString(36).slice(2,6), moldId:'', yieldQty:'', unitWeight:'' });
+  renderMoldCalibRows();
+}
+function removeMoldCalibrationRow(idx){
+  state.draft.moldCalibrations.splice(idx,1);
+  renderMoldCalibRows();
+}
+function updateMoldCalibField(idx, field, value){
+  const row = state.draft.moldCalibrations && state.draft.moldCalibrations[idx];
+  if(!row) return;
+  if(field==='moldId'){ row.moldId = value || ''; return; }
+  const n = parseFloat(value);
+  row[field] = isNaN(n) ? '' : n;
+}
+function setMoldYieldMode(mode){
+  state.draft.moldYieldMode = (mode==='corte') ? 'corte' : 'molde';
+  const molBtn = document.getElementById('f-moldMode-molde');
+  const corBtn = document.getElementById('f-moldMode-corte');
+  if(molBtn) molBtn.classList.toggle('active', state.draft.moldYieldMode==='molde');
+  if(corBtn) corBtn.classList.toggle('active', state.draft.moldYieldMode==='corte');
+  renderMoldCalibRows();
+}
+const BAKE_LOSS_FACTOR = 0.88;
+function recipeRawWeightGrams(r){
+  let total = 0;
+  let hasData = false;
+  let skippedSome = false;
+  flatRecipeIngredients(r).forEach(function(ing){
+    if(ingredientEntryType(ing)==='insumo') return;
+    const q = parseFloat((ing.qty||'').toString().replace(',','.'));
+    if(isNaN(q)) return;
+    const g = unitToGrams(ing.unit);
+    if(g==null){ skippedSome = true; return; }
+    total += q*g;
+    hasData = true;
+  });
+  return { total:total, hasData:hasData, skippedSome:skippedSome };
+}
+function estimateMoldCalibWeight(idx){
+  flushActiveComponent();
+  const row = state.draft.moldCalibrations && state.draft.moldCalibrations[idx];
+  if(!row) return;
+  const targetQty = parseFloat(row.yieldQty);
+  if(isNaN(targetQty) || targetQty<=0){ showToast('Primero cargá cuánto rinde ese molde'); return; }
+  const raw = recipeRawWeightGrams(state.draft);
+  if(!raw.hasData){ showToast('No pude estimarlo — cargá los ingredientes en una unidad de peso (g, kg) o volumen (ml, l)'); return; }
+  const perUnit = Math.round(raw.total*BAKE_LOSS_FACTOR/targetQty);
+  row.unitWeight = perUnit;
+  renderMoldCalibRows();
+  showToast('Estimado ~'+perUnit+'g por unidad (asumiendo ~12% de pérdida al hornear)'+(raw.skippedSome ? ' — algunos ingredientes en unidades no convertibles (ej. "u") no se contaron' : '')+'. Corregilo cuando peses el resultado real.');
 }
 function updatePhotoPreview(){
   const el = document.getElementById('photoPreview');
@@ -3741,8 +4104,10 @@ function closeUtensilPicker(){
   document.getElementById('utensilPickerModal').classList.remove('active');
   updateUtensilSummary();
 }
-function utensilsSorted(){
-  return DATA.utensils.slice().sort(function(a,b){ return (a.nombre||'').localeCompare(b.nombre||'', 'es', {sensitivity:'base'}); });
+function utensilsSorted(category){
+  let list = DATA.utensils.slice();
+  if(category) list = list.filter(function(u){ return (u.category||'utensilio')===category; });
+  return list.sort(function(a,b){ return (a.nombre||'').localeCompare(b.nombre||'', 'es', {sensitivity:'base'}); });
 }
 function renderUtensilPickerList(){
   const wrap = document.getElementById('utensil-picker-list');
@@ -3750,7 +4115,7 @@ function renderUtensilPickerList(){
   if(DATA.utensils.length===0){ wrap.innerHTML = '<p style="font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;">Todavía no cargaste utensilios (Ajustes).</p>'; return; }
   wrap.innerHTML = utensilsSorted().map(function(u){
     const active = state.draft.utensilIds.indexOf(u.id)!==-1;
-    const sub = [u.tamano, u.cantidad?('x'+u.cantidad):''].filter(Boolean).join(' · ');
+    const sub = [moldDimsLabel(u), u.cantidad?('x'+u.cantidad):''].filter(Boolean).join(' · ');
     return '<button type="button" class="chip '+(active?'active':'')+'" style="width:100%;text-align:left;" onclick="toggleUtensilPick(\''+u.id+'\')">'+escapeHtml(u.nombre)+(sub?' ('+escapeHtml(sub)+')':'')+'</button>';
   }).join('');
 }
@@ -4241,11 +4606,16 @@ async function deleteLibraryPreparation(id){
   const removed = DATA.preparationLibrary[idx];
   DATA.preparationLibrary.splice(idx,1);
   saveData(DATA);
-  renderSettings();
+  state._libraryMode = false;
+  state.stack = ['home'];
+  homeTab = 'preps';
+  render();
+  applyHomeTabUI();
   showUndoToast('Preparación borrada', function(){
     DATA.preparationLibrary.splice(idx,0,removed);
     saveData(DATA);
-    renderSettings();
+    render();
+    applyHomeTabUI();
   });
 }
 function openLibraryPrepEditor(id){
@@ -4293,7 +4663,13 @@ function applyLibraryFormMode(){
   const saveBtn = document.getElementById('formSaveBtn');
   saveBtn.textContent = on ? 'guardar preparación' : 'guardar receta';
   saveBtn.setAttribute('onclick', on ? 'saveLibraryPrep()' : 'saveRecipe()');
+  const deleteRow = document.getElementById('formDeleteRow');
+  if(deleteRow) deleteRow.style.display = (on && state.editingLibId) ? '' : 'none';
   switchFormTab('datos');
+}
+function confirmDeleteCurrentLibraryPrep(){
+  if(!state.editingLibId) return;
+  deleteLibraryPreparation(state.editingLibId);
 }
 function saveLibraryPrep(){
   const d = state.draft;
@@ -4412,6 +4788,13 @@ function saveRecipe(){
   const pkP = parseFloat(document.getElementById('f-packPrice').value);
   d.packSize = (!isNaN(pkS) && pkS>0) ? pkS : null;
   d.packPrice = (!isNaN(pkP) && pkP>0) ? pkP : null;
+  d.moldShapesApt = state.draft.moldShapesApt || [];
+  d.moldCalibrations = (state.draft.moldCalibrations || []).filter(function(c){
+    return c.moldId && parseFloat(c.yieldQty)>0 && parseFloat(c.unitWeight)>0;
+  }).map(function(c){
+    return { id: c.id || ('mc-'+Date.now()+'-'+Math.random().toString(36).slice(2,6)), moldId:c.moldId, yieldQty:parseFloat(c.yieldQty), unitWeight:parseFloat(c.unitWeight) };
+  });
+  d.moldYieldMode = (state.draft.moldYieldMode==='corte') ? 'corte' : 'molde';
   d.quickNotes = d.quickNotes || [];
   if(d.mediaMode === 'icono'){ d.photo = null; } else { d.icon = null; }
   d.colorIdx = randomWarmColorIdx();
@@ -4587,7 +4970,7 @@ function openDetailRender(id){
   if(!r) return;
   scaleFactor = 1;
   document.getElementById('d-scale-field').style.display = 'none';
-  document.getElementById('d-hero').style.background = r.photo ? ('url('+r.photo+') center/cover') : PLACEHOLDER_COLORS[r.colorIdx % PLACEHOLDER_COLORS.length];
+  document.getElementById('d-hero').style.background = r.photo ? ('url('+r.photo+') center/cover') : placeholderBg(r.colorIdx);
   document.getElementById('d-hero').innerHTML = mediaIconHtml(r,'hero-icon');
   document.getElementById('d-title').textContent = r.title;
   document.getElementById('d-badges').innerHTML = buildBadgesHtml(r);
@@ -4599,6 +4982,7 @@ function openDetailRender(id){
     parentEl.textContent = parent ? ('variante de: '+parent.title) : 'variante de una receta borrada';
   } else { parentEl.style.display = 'none'; }
   document.getElementById('d-notes').textContent = r.notes || '(sin anotaciones)';
+  renderDetailMold(r);
   renderDetailIngredients(r);
   renderDetailSteps(r);
   populateOvenSelect('d-ovenSelect');
@@ -4607,6 +4991,141 @@ function openDetailRender(id){
   renderDetailKnobs();
   renderCostSection(r);
   renderQuickNotes(r);
+}
+function renderDetailMold(r){
+  const wrap = document.getElementById('d-mold-wrap');
+  if(!wrap) return;
+  const molds = utensilsSorted('molde');
+  const calibEntries = recipeMoldCalibrationEntries(r);
+  if(!calibEntries.length || molds.length===0){ wrap.style.display = 'none'; return; }
+  wrap.style.display = '';
+  document.getElementById('d-mold-custom-field').style.display = 'none';
+  const sel = document.getElementById('d-mold-select');
+  const calibMoldIds = calibEntries.map(function(e){ return e.moldId; });
+  const calibMolds = calibEntries.map(function(e){ return molds.find(function(u){ return u.id===e.moldId; }); }).filter(Boolean);
+  const restMolds = molds.filter(function(u){ return calibMoldIds.indexOf(u.id)===-1; });
+  let optionsHtml = calibMolds.map(function(u){ return '<option value="'+u.id+'">'+escapeHtml(u.nombre)+'</option>'; }).join('');
+  if(calibMolds.length && restMolds.length) optionsHtml += '<option disabled>──────────</option>';
+  optionsHtml += restMolds.map(function(u){ return '<option value="'+u.id+'">'+escapeHtml(u.nombre)+'</option>'; }).join('');
+  sel.innerHTML = optionsHtml;
+  state._moldSelection = state._moldSelection || {};
+  const prevSelected = state._moldSelection[r.id];
+  const validPrev = prevSelected && molds.some(function(u){ return u.id===prevSelected; });
+  const firstCalibMoldId = calibEntries[0].moldId;
+  const validRef = molds.some(function(u){ return u.id===firstCalibMoldId; });
+  const chosenId = validPrev ? prevSelected : (validRef ? firstCalibMoldId : molds[0].id);
+  sel.value = chosenId;
+  state._moldSelection[r.id] = chosenId;
+  state._moldWarnDismissed = state._moldWarnDismissed || {};
+  state._moldWarnDismissed.detail = false;
+  renderMoldEstimate(r, chosenId);
+}
+function onDetailMoldChange(moldeId){
+  const r = DATA.recipes.find(function(x){ return x.id===state.currentId; });
+  if(!r) return;
+  state._moldSelection = state._moldSelection || {};
+  state._moldSelection[r.id] = moldeId;
+  state._moldWarnDismissed = state._moldWarnDismissed || {};
+  state._moldWarnDismissed.detail = false;
+  document.getElementById('d-mold-custom-field').style.display = 'none';
+  resetScale();
+  renderMoldEstimate(r, moldeId);
+}
+function buildMoldWarningMessages(est){
+  const msgs = [];
+  if(est.shapeMismatch){
+    msgs.push('Este molde no es del tipo que marcaste como apto para esta receta ('+moldShapeLabel(est.selMold.moldShape)+'). El resultado puede no salir bien.');
+  }
+  if(est.heightRisk==='deep'){
+    let m = 'Este molde es bastante más profundo que el de referencia — puede quedar crudo en el centro o dorarse de más por fuera.';
+    if(est.timeHintPct>0) m += ' Probá agregando ~'+est.timeHintPct+'% más de tiempo de horno y controlá con un palillo.';
+    msgs.push(m);
+  } else if(est.heightRisk==='shallow'){
+    msgs.push('Este molde es bastante más bajo que el de referencia — la mezcla puede desbordar al subir, o cocinarse más rápido de lo esperado. Controlá antes de tiempo.');
+  }
+  return msgs;
+}
+function renderMoldEstimate(r, moldeId){
+  const est = estimateMoldOutcome(r, moldeId);
+  const warnBox = document.getElementById('d-mold-warning');
+  const warnText = document.getElementById('d-mold-warning-text');
+  const estText = document.getElementById('d-mold-estimate');
+  const chipsWrap = document.getElementById('d-mold-chips');
+  if(!est){
+    warnBox.style.display = 'none';
+    estText.textContent = '';
+    chipsWrap.innerHTML = '';
+    return;
+  }
+  const msgs = buildMoldWarningMessages(est);
+  if(msgs.length && !(state._moldWarnDismissed && state._moldWarnDismissed.detail)){
+    warnBox.style.display = 'flex';
+    warnText.textContent = msgs.join(' ');
+    mountIcons();
+  } else {
+    warnBox.style.display = 'none';
+  }
+  const baseCount = est.countAtCurrentScale;
+  let txt;
+  if(est.isExact){
+    txt = (baseCount<=0)
+      ? 'Dato real cargado para este molde, pero el rinde calibrado es menor a 1 — revisalo.'
+      : 'Con este molde ya sabés (dato real que cargaste): '+baseCount+' de aprox. '+Math.round(est.weightPerUnit)+'g cada una.';
+    estText.textContent = txt;
+  } else {
+    if(baseCount<=0){
+      txt = (est.mode==='corte') ? 'La receta tal cual está cargada no da ni para una porción de este tamaño en esta bandeja.' : 'La receta tal cual está cargada no llega a llenar un molde de este tamaño.';
+    } else if(est.mode==='corte'){
+      txt = 'De esta bandeja salen ~'+baseCount+' porciones de aprox. '+Math.round(est.weightPerUnit)+'g cada una (mismo tamaño de porción que tenés calibrado).';
+      if(est.leftoverFrac>0.15) txt += ' Sobra bandeja para ~'+Math.round(est.leftoverFrac*100)+'% de otra porción.';
+    } else {
+      txt = 'Con la receta tal cual está cargada, este molde te da ~'+baseCount+' de aprox. '+Math.round(est.weightPerUnit)+'g cada una.';
+      if(est.leftoverFrac>0.15) txt += ' Te sobra masa para completar ~'+Math.round(est.leftoverFrac*100)+'% de otro.';
+    }
+    estText.textContent = txt+' (estimación aproximada a partir de otro molde calibrado, no reemplaza controlar el horno)';
+  }
+  chipsWrap.innerHTML = [1,3,6,12].map(function(n){
+    return '<button type="button" class="chip" onclick="applyMoldTargetCount('+n+')">'+n+'</button>';
+  }).join('') + '<button type="button" class="chip" onclick="toggleMoldCustomCount()">-</button>';
+}
+function toggleMoldCustomCount(){
+  const field = document.getElementById('d-mold-custom-field');
+  const showing = field.style.display !== 'none';
+  field.style.display = showing ? 'none' : '';
+  if(!showing) document.getElementById('d-mold-custom-input').focus();
+}
+function applyMoldTargetCount(n){
+  const r = DATA.recipes.find(function(x){ return x.id===state.currentId; });
+  if(!r) return;
+  const moldeId = document.getElementById('d-mold-select').value;
+  const target = parseFloat(n);
+  if(isNaN(target) || target<=0) return;
+  const factor = scaleFactorForMoldTarget(r, moldeId, target);
+  if(!factor || factor<=0) return;
+  applyScale(factor);
+  const scaleInput = document.getElementById('d-scale-input');
+  if(scaleInput) scaleInput.value = Math.round(factor*100)/100;
+}
+function dismissMoldWarning(scope){
+  state._moldWarnDismissed = state._moldWarnDismissed || {};
+  state._moldWarnDismissed[scope] = true;
+  const el = document.getElementById(scope==='cook' ? 'cook-mold-warning' : 'd-mold-warning');
+  if(el) el.style.display = 'none';
+}
+function renderCookMoldWarning(){
+  const box = document.getElementById('cook-mold-warning');
+  if(!box) return;
+  const r = DATA.recipes.find(function(x){ return x.id===state.cookRecipeId; });
+  const moldeId = r && state._moldSelection && state._moldSelection[r.id];
+  const est = (r && moldeId) ? estimateMoldOutcome(r, moldeId) : null;
+  const msgs = est ? buildMoldWarningMessages(est) : [];
+  if(msgs.length && !(state._moldWarnDismissed && state._moldWarnDismissed.cook)){
+    box.style.display = 'flex';
+    document.getElementById('cook-mold-warning-text').textContent = 'Estás usando '+escapeHtml(est.selMold.nombre)+'. '+msgs.join(' ');
+    mountIcons();
+  } else {
+    box.style.display = 'none';
+  }
 }
 function renderDetailKnobs(){
   const r = DATA.recipes.find(function(x){ return x.id===state.currentId; });
@@ -4754,6 +5273,59 @@ function matchIngredientPrice(priceId){
   if(!priceId) return null;
   return DATA.ingredientPrices.find(function(p){ return p.id===priceId; }) || null;
 }
+function subproductParent(p){
+  return (p && p.type==='subproducto' && p.parentId) ? DATA.ingredientPrices.find(function(x){ return x.id===p.parentId; }) : null;
+}
+function subproductYieldAvg(p){
+  if(!p) return null;
+  const min = parseFloat(p.yieldMin), max = parseFloat(p.yieldMax);
+  const validMin = !isNaN(min) && min>0, validMax = !isNaN(max) && max>0;
+  if(validMin && validMax) return (min+max)/2;
+  if(validMin) return min;
+  if(validMax) return max;
+  return null;
+}
+function subproductYieldLabel(p){
+  if(!p) return '';
+  const min = parseFloat(p.yieldMin), max = parseFloat(p.yieldMax);
+  const validMin = !isNaN(min) && min>0, validMax = !isNaN(max) && max>0;
+  const unit = p.yieldUnit||'';
+  if(validMin && validMax && min!==max) return fmtQty(min)+'–'+fmtQty(max)+' '+unit;
+  const single = validMin ? min : (validMax ? max : null);
+  return single!=null ? fmtQty(single)+' '+unit : '';
+}
+// Versión del catálogo usada SOLO para calcular costo de receta: si es un subproducto
+// (ej. "Jugo de limón"), sintetiza un "paquete equivalente" a partir del ingrediente
+// del que sale (ej. Limón) y el rinde cargado, para que el motor de costo existente
+// (que espera {qty, unit, price} tipo paquete) funcione sin cambios.
+function costMatchIngredientPrice(priceId){
+  const p = matchIngredientPrice(priceId);
+  if(!p || p.type!=='subproducto') return p;
+  const parent = subproductParent(p);
+  const avgYield = subproductYieldAvg(p);
+  if(!parent || !(avgYield>0) || parent.price==null || isNaN(parent.price) || !(parent.qty>0)){
+    return Object.assign({}, p, { qty: avgYield||1, unit: p.yieldUnit||p.unit, price: null });
+  }
+  const parentUnitPrice = parent.price/parent.qty;
+  return Object.assign({}, p, { qty: avgYield, unit: p.yieldUnit, price: parentUnitPrice });
+}
+// Dado un ingrediente de receta y una cantidad ya escalada (en ing.unit), resuelve a qué
+// entrada del catálogo hay que imputar compra/consumo/stock real: si es un subproducto,
+// se redirige al ingrediente del que sale, convirtiendo la cantidad a unidades de ESE
+// ingrediente a través del rinde cargado (ej. 40ml de jugo -> 1 limón).
+function resolvePurchaseTarget(ing, totalQty){
+  const cat = ing.priceId ? DATA.ingredientPrices.find(function(p){ return p.id===ing.priceId; }) : null;
+  if(!cat) return { cat:null, qty:totalQty };
+  if(cat.type==='subproducto'){
+    const parent = subproductParent(cat);
+    const avgYield = subproductYieldAvg(cat);
+    if(!parent || !(avgYield>0)) return { cat:null, qty:totalQty };
+    const qtyInYieldUnit = convertQty(totalQty, ing.unit, cat.yieldUnit);
+    if(qtyInYieldUnit==null) return { cat:parent, qty:null };
+    return { cat:parent, qty: qtyInYieldUnit/avgYield };
+  }
+  return { cat:cat, qty: convertQty(totalQty, ing.unit, cat.unit) };
+}
 function ingredientEntryType(ing){
   if(!ing.priceId) return 'ingrediente';
   const cat = DATA.ingredientPrices.find(function(p){ return p.id===ing.priceId; });
@@ -4785,7 +5357,7 @@ function computeRecipeCost(r, scale){
   let total = 0;
   const groups = recipeComponentsOrFallback(r).map(function(comp){
     const breakdown = (comp.ingredients||[]).map(function(ing){
-      const price = matchIngredientPrice(ing.priceId);
+      const price = costMatchIngredientPrice(ing.priceId);
       const qty = parseFloat((ing.qty||'').toString().replace(',','.')) * scale;
       let lineCost = null, convertible = true;
       const pricePending = !!(price && (price.price==null || isNaN(price.price)));
@@ -4860,7 +5432,8 @@ function buildRecipeExportText(r){
     const u = DATA.utensils.find(function(x){ return x.id===uid; });
     if(!u) return null;
     const qtyPrefix = (u.cantidad && u.cantidad>1) ? (u.cantidad+'x ') : '';
-    return (qtyPrefix+(u.nombre||'')+(u.tamano ? ' '+u.tamano : '')).trim();
+    const dimsTxt = moldDimsLabel(u);
+    return (qtyPrefix+(u.nombre||'')+(dimsTxt ? ' '+dimsTxt : '')).trim();
   }).filter(Boolean).join(', ');
   if(utensilLine) lines.push('('+utensilLine+')');
   lines.push('');
@@ -5044,14 +5617,36 @@ function renderSettings(){
       '<span class="nm">'+escapeHtml(o.name)+'</span>'+
       '</div>';
   }).join('') + '<button class="oven-tile-add" onclick="openOvenCreateModal()"><span class="icon-slot" data-icon="plus"></span></button>';
+  const moldWrap = document.getElementById('moldList');
+  const molds = utensilsSorted('molde');
+  if(molds.length===0){
+    moldWrap.innerHTML = '<p style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;">todavía no cargaste moldes.</p>';
+  } else {
+    moldWrap.innerHTML = molds.map(function(u){
+      const cap = moldCapacityCm3(u);
+      const dimsLabel = moldDimsLabel(u);
+      const parts = [u.material, dimsLabel, moldShapeLabel(u.moldShape), cap>0?('~'+Math.round(cap)+' ml'):null].filter(Boolean);
+      const sub = parts.join(' · ') + (u.cantidad ? (' ||| x'+u.cantidad) : '');
+      const icon = u.icon || 'loaf-pan';
+      return '<div class="ut-row" data-id="'+u.id+'">'+
+        '<button type="button" class="ut-drag" onpointerdown="utensilDragStart(event,\''+u.id+'\')" title="arrastrar"><span class="icon-slot" data-icon="grip"></span></button>'+
+        '<span class="ut-ic"><span class="icon-slot" data-icon="'+icon+'"></span></span>'+
+        '<div class="ut-info"><p class="nm">'+escapeHtml(u.nombre)+'</p>'+(sub?'<p class="sub">'+escapeHtml(sub)+'</p>':'')+'</div>'+
+        '<button class="iconbtn" onclick="openUtensilEditModal(\''+u.id+'\')"><span class="icon-slot" data-icon="pencil"></span></button>'+
+        '<button class="iconbtn" onclick="removeUtensil(\''+u.id+'\')" style="color:var(--k-danger);"><span class="icon-slot" data-icon="trash"></span></button>'+
+        '</div>';
+    }).join('');
+  }
   const utWrap = document.getElementById('utensilList');
-  if(DATA.utensils.length===0){
+  const plainUtensils = utensilsSorted('utensilio');
+  if(plainUtensils.length===0){
     utWrap.innerHTML = '<p style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;">todavía no cargaste utensilios.</p>';
   } else {
-    utWrap.innerHTML = utensilsSorted().map(function(u){
-      const sub = [u.material, u.tamano, u.cantidad?('x'+u.cantidad):''].filter(Boolean).join(' · ');
+    utWrap.innerHTML = plainUtensils.map(function(u){
+      const sub = [u.material, moldDimsLabel(u)].filter(Boolean).join(' · ') + (u.cantidad ? (' ||| x'+u.cantidad) : '');
       const icon = u.icon || 'package';
       return '<div class="ut-row" data-id="'+u.id+'">'+
+        '<button type="button" class="ut-drag" onpointerdown="utensilDragStart(event,\''+u.id+'\')" title="arrastrar"><span class="icon-slot" data-icon="grip"></span></button>'+
         '<span class="ut-ic"><span class="icon-slot" data-icon="'+icon+'"></span></span>'+
         '<div class="ut-info"><p class="nm">'+escapeHtml(u.nombre)+'</p>'+(sub?'<p class="sub">'+escapeHtml(sub)+'</p>':'')+'</div>'+
         '<button class="iconbtn" onclick="openUtensilEditModal(\''+u.id+'\')"><span class="icon-slot" data-icon="pencil"></span></button>'+
@@ -5593,6 +6188,114 @@ function saveOvenEdit(){
 }
 let utensilEditId = null;
 let utensilEditIcon = null;
+let utensilEditCategory = 'utensilio';
+function setUtensilType(type){
+  utensilEditCategory = (type==='molde') ? 'molde' : 'utensilio';
+  document.getElementById('ue-type-utensilio').classList.toggle('active', utensilEditCategory==='utensilio');
+  document.getElementById('ue-type-molde').classList.toggle('active', utensilEditCategory==='molde');
+  document.getElementById('ue-mold-fields').style.display = utensilEditCategory==='molde' ? 'flex' : 'none';
+  if(utensilEditCategory==='molde') onMoldShapeChange();
+}
+function tryAutofillDimsFromLegacyTamano(u){
+  const d1El = document.getElementById('ue-mold-dim1');
+  const d2El = document.getElementById('ue-mold-dim2');
+  const d3El = document.getElementById('ue-mold-dim3');
+  if(!d1El || !d2El || !d3El) return;
+  if(d1El.value || d2El.value || d3El.value) return;
+  const nums = parseSizeToDims(u && u.tamano);
+  if(!nums.length) return;
+  if(nums.length>=3){ d1El.value = nums[0]; d2El.value = nums[1]; d3El.value = nums[2]; }
+  else if(nums.length===2){ d1El.value = nums[0]; d2El.value = nums[1]; }
+  else { d1El.value = nums[0]; }
+  updateMoldCapacityPreview();
+}
+function onMoldShapeChange(){
+  const shape = document.getElementById('ue-mold-shape').value;
+  const manualField = document.getElementById('ue-mold-manual-field');
+  manualField.style.display = (shape==='otro') ? '' : 'none';
+  updateMoldCapacityPreview();
+}
+function updateMoldCapacityPreview(){
+  const el = document.getElementById('ue-mold-capacity-preview');
+  if(!el) return;
+  const tmp = {
+    moldShape: document.getElementById('ue-mold-shape').value,
+    moldDim1: document.getElementById('ue-mold-dim1').value,
+    moldDim2: document.getElementById('ue-mold-dim2').value,
+    moldDim3: document.getElementById('ue-mold-dim3').value,
+    moldCapacityManual: document.getElementById('ue-mold-capacity-manual').value
+  };
+  const cap = moldCapacityCm3(tmp);
+  el.textContent = (cap>0) ? ('Capacidad estimada: ~'+Math.round(cap)+' ml') : 'Cargá largo/ancho/altura para estimar la capacidad.';
+}
+let utensilDrag = null;
+function isPointInsideEl(x, y, el){
+  if(!el) return false;
+  const r = el.getBoundingClientRect();
+  return x>=r.left && x<=r.right && y>=r.top && y<=r.bottom;
+}
+function utensilDragStart(e, id){
+  e.preventDefault();
+  e.stopPropagation();
+  const row = e.currentTarget.closest('.ut-row');
+  utensilDrag = { id:id };
+  if(row) row.classList.add('dragging');
+  document.addEventListener('pointermove', utensilDragMove);
+  document.addEventListener('pointerup', utensilDragEnd);
+  document.addEventListener('pointercancel', utensilDragEnd);
+}
+function utensilDragMove(e){
+  if(!utensilDrag) return;
+  const moldWrap = document.getElementById('moldList');
+  const utWrap = document.getElementById('utensilList');
+  const overMold = isPointInsideEl(e.clientX, e.clientY, moldWrap);
+  const overUtensil = isPointInsideEl(e.clientX, e.clientY, utWrap);
+  if(moldWrap) moldWrap.classList.toggle('drop-target-active', overMold);
+  if(utWrap) utWrap.classList.toggle('drop-target-active', overUtensil);
+}
+function utensilDragEnd(e){
+  if(!utensilDrag) return;
+  const moldWrap = document.getElementById('moldList');
+  const utWrap = document.getElementById('utensilList');
+  const overMold = isPointInsideEl(e.clientX, e.clientY, moldWrap);
+  const overUtensil = isPointInsideEl(e.clientX, e.clientY, utWrap);
+  if(moldWrap) moldWrap.classList.remove('drop-target-active');
+  if(utWrap) utWrap.classList.remove('drop-target-active');
+  const u = DATA.utensils.find(function(x){ return x.id===utensilDrag.id; });
+  if(u){
+    if(overMold && u.category!=='molde'){
+      u.category = 'molde';
+      let tookDims = false;
+      if(u.moldShape==null){
+        const nums = parseSizeToDims(u.tamano);
+        if(nums.length>=3){
+          u.moldShape = 'rectangular';
+          u.moldDim1 = nums[0]; u.moldDim2 = nums[1]; u.moldDim3 = nums[2];
+          tookDims = true;
+        } else if(nums.length===2){
+          u.moldShape = 'redondo';
+          u.moldDim1 = nums[0]; u.moldDim2 = nums[1];
+          tookDims = true;
+        } else {
+          u.moldShape = 'otro';
+        }
+      }
+      saveData(DATA);
+      renderSettings();
+      showToast(tookDims ? 'Movido a Moldes — medidas tomadas de "'+u.tamano+'"' : 'Movido a Moldes — completá forma y medidas para poder estimarlo');
+    } else if(overUtensil && u.category==='molde'){
+      u.category = 'utensilio';
+      saveData(DATA);
+      renderSettings();
+      showToast('Movido a Utensilios');
+    }
+  }
+  utensilDrag = null;
+  document.removeEventListener('pointermove', utensilDragMove);
+  document.removeEventListener('pointerup', utensilDragEnd);
+  document.removeEventListener('pointercancel', utensilDragEnd);
+  document.querySelectorAll('.ut-row.dragging').forEach(function(el){ el.classList.remove('dragging'); });
+}
 async function removeUtensil(id){
   const ok = await showConfirm('¿Borrar este utensilio?');
   if(!ok) return;
@@ -5616,14 +6319,19 @@ function updateUtensilIconPreview(){
   if(!el) return;
   el.innerHTML = (utensilEditIcon && ICONS[utensilEditIcon]) ? ICONS[utensilEditIcon] : '';
 }
-function openUtensilCreateModal(){
+function openUtensilCreateModal(type){
   utensilEditId = null;
   utensilEditIcon = null;
   document.getElementById('ue-name').value = '';
-  document.getElementById('ue-tamano').value = '';
   document.getElementById('ue-material').value = '';
   document.getElementById('ue-cantidad').value = 1;
-  document.getElementById('utensilEditModalTitle').textContent = 'Nuevo utensilio';
+  document.getElementById('ue-mold-shape').value = 'redondo';
+  document.getElementById('ue-mold-dim1').value = '';
+  document.getElementById('ue-mold-dim2').value = '';
+  document.getElementById('ue-mold-dim3').value = '';
+  document.getElementById('ue-mold-capacity-manual').value = '';
+  setUtensilType(type==='molde' ? 'molde' : 'utensilio');
+  document.getElementById('utensilEditModalTitle').textContent = (type==='molde') ? 'Nuevo molde' : 'Nuevo utensilio';
   updateUtensilIconPreview();
   document.getElementById('utensilEditModal').classList.add('active');
 }
@@ -5633,10 +6341,17 @@ function openUtensilEditModal(id){
   utensilEditId = id;
   utensilEditIcon = u.icon || null;
   document.getElementById('ue-name').value = u.nombre || '';
-  document.getElementById('ue-tamano').value = u.tamano || '';
   document.getElementById('ue-material').value = u.material || '';
   document.getElementById('ue-cantidad').value = u.cantidad || 1;
-  document.getElementById('utensilEditModalTitle').textContent = 'Editar utensilio';
+  document.getElementById('ue-mold-shape').value = u.moldShape || 'redondo';
+  document.getElementById('ue-mold-dim1').value = u.moldDim1!=null ? u.moldDim1 : '';
+  document.getElementById('ue-mold-dim2').value = u.moldDim2!=null ? u.moldDim2 : '';
+  document.getElementById('ue-mold-dim3').value = u.moldDim3!=null ? u.moldDim3 : '';
+  document.getElementById('ue-mold-capacity-manual').value = u.moldCapacityManual!=null ? u.moldCapacityManual : '';
+  tryAutofillDimsFromLegacyTamano(u);
+  const cat = (u.category==='molde') ? 'molde' : 'utensilio';
+  setUtensilType(cat);
+  document.getElementById('utensilEditModalTitle').textContent = 'Editar '+(cat==='molde' ? 'molde' : 'utensilio');
   updateUtensilIconPreview();
   document.getElementById('utensilEditModal').classList.add('active');
 }
@@ -5657,14 +6372,27 @@ function saveUtensilEdit(){
   }
   u.nombre = name;
   u.icon = utensilEditIcon;
-  u.tamano = document.getElementById('ue-tamano').value.trim();
   u.material = document.getElementById('ue-material').value.trim();
   u.cantidad = parseFloat(document.getElementById('ue-cantidad').value) || 0;
+  u.category = utensilEditCategory;
+  if(utensilEditCategory==='molde'){
+    u.moldShape = document.getElementById('ue-mold-shape').value;
+    const d1 = parseFloat(document.getElementById('ue-mold-dim1').value);
+    const d2 = parseFloat(document.getElementById('ue-mold-dim2').value);
+    const d3 = parseFloat(document.getElementById('ue-mold-dim3').value);
+    const capManual = parseFloat(document.getElementById('ue-mold-capacity-manual').value);
+    u.moldDim1 = (!isNaN(d1) && d1>0) ? d1 : null;
+    u.moldDim2 = (!isNaN(d2) && d2>0) ? d2 : null;
+    u.moldDim3 = (!isNaN(d3) && d3>0) ? d3 : null;
+    u.moldCapacityManual = (!isNaN(capManual) && capManual>0) ? capManual : null;
+  } else {
+    u.moldShape = null; u.moldDim1 = null; u.moldDim2 = null; u.moldDim3 = null; u.moldCapacityManual = null;
+  }
   if(isNew) DATA.utensils.push(u);
   saveData(DATA);
   closeUtensilEditModal();
   renderSettings();
-  showToast(isNew ? 'Añadido a Utensilios' : 'Guardado');
+  showToast(isNew ? ('Añadido a '+(utensilEditCategory==='molde'?'Moldes':'Utensilios')) : 'Guardado');
 }
 function saveAiModel(val){
   const model = (val||'').trim() || KOBU_DEFAULT_AI_MODEL;
@@ -5957,7 +6685,7 @@ function ingredientCatalogSorted(){
   return DATA.ingredientPrices.slice().sort(function(a,b){ return a.name.localeCompare(b.name,'es',{sensitivity:'base'}); });
 }
 function foodIngredientsSorted(){
-  return ingredientCatalogSorted().filter(function(p){ return (p.type||'ingrediente')==='ingrediente'; });
+  return ingredientCatalogSorted().filter(function(p){ return (p.type||'ingrediente')!=='insumo'; });
 }
 function suppliesSorted(){
   return ingredientCatalogSorted().filter(function(p){ return p.type==='insumo'; });
@@ -6043,9 +6771,35 @@ function renderPriceRows(wrapId, list, emptyMsg, icon){
   }).join('');
 }
 function renderIngredientPrices(){
-  renderPriceRows('ingredientPriceList', foodIngredientsSorted(), 'todavía no cargaste ingredientes.', 'list');
+  renderPriceRows('ingredientPriceList', foodIngredientsSorted().filter(function(p){ return p.type!=='subproducto'; }), 'todavía no cargaste ingredientes.', 'list');
   renderPriceRows('supplyPriceList', suppliesSorted(), 'todavía no cargaste insumos.', 'package');
+  renderSubproductRows();
   mountIcons();
+}
+function subproductsSorted(){
+  return DATA.ingredientPrices.filter(function(p){ return p.type==='subproducto'; }).sort(function(a,b){ return (a.name||'').localeCompare(b.name||''); });
+}
+function subproductParentOptionsHtml(selectedId){
+  const opts = DATA.ingredientPrices.filter(function(p){ return (p.type||'ingrediente')==='ingrediente'; }).sort(function(a,b){ return (a.name||'').localeCompare(b.name||''); });
+  if(!opts.length) return '<option value="">(no hay ingredientes cargados)</option>';
+  return '<option value="">Elegir…</option>'+opts.map(function(p){ return '<option value="'+p.id+'" '+(p.id===selectedId?'selected':'')+'>'+escapeHtml(p.name)+'</option>'; }).join('');
+}
+function renderSubproductRows(){
+  const wrap = document.getElementById('subproductPriceList');
+  if(!wrap) return;
+  const list = subproductsSorted();
+  if(list.length===0){ wrap.innerHTML = '<p style="font-size:calc(11.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);">todavía no cargaste subproductos.</p>'; return; }
+  wrap.innerHTML = list.map(function(p){
+    const parent = subproductParent(p);
+    const parentName = parent ? parent.name : '(ingrediente base eliminado)';
+    const yieldLabel = subproductYieldLabel(p);
+    return '<div class="stock-row" onclick="openStockEditModal(\''+p.id+'\')">'+
+      '<div class="sr-top">'+
+        '<span class="sr-ic"><span class="icon-slot" data-icon="flask"></span></span>'+
+        '<div class="sr-info"><p class="nm">'+escapeHtml(p.name)+'</p><p class="sub">de '+escapeHtml(parentName)+(yieldLabel?' · rinde '+escapeHtml(yieldLabel):'')+'</p></div>'+
+      '</div>'+
+      '</div>';
+  }).join('');
 }
 let stockRowClickTimer = null;
 let stockRowClickId = null;
@@ -6118,6 +6872,16 @@ function adjustStock(id, dir, ev){
 }
 let stockEditId = null;
 let stockEditType = 'ingrediente';
+function applyStockEditTypeVisibility(){
+  const isSub = stockEditType==='subproducto';
+  document.getElementById('se-parent-row').style.display = isSub ? '' : 'none';
+  document.getElementById('se-qty-row').style.display = isSub ? 'none' : '';
+  document.getElementById('se-yield-row').style.display = isSub ? '' : 'none';
+  document.getElementById('se-price-row').style.display = isSub ? 'none' : '';
+  document.getElementById('se-provider-row').style.display = isSub ? 'none' : '';
+  const unitLabel = document.getElementById('se-unit-label');
+  if(unitLabel) unitLabel.textContent = isSub ? 'Unidad del rinde' : 'Unidad';
+}
 function openIngredientCreateModal(){
   stockEditId = null;
   stockEditType = 'ingrediente';
@@ -6131,6 +6895,7 @@ function openIngredientCreateModal(){
   document.getElementById('se-delete-row').style.display = 'none';
   document.getElementById('se-price-trend').style.display = 'none';
   document.getElementById('se-stock-info').style.display = 'none';
+  applyStockEditTypeVisibility();
   document.getElementById('stockEditModal').classList.add('active');
   document.querySelector('#stockEditModal .modal-box').scrollTop = 0;
 }
@@ -6147,6 +6912,24 @@ function openSupplyCreateModal(){
   document.getElementById('se-delete-row').style.display = 'none';
   document.getElementById('se-price-trend').style.display = 'none';
   document.getElementById('se-stock-info').style.display = 'none';
+  applyStockEditTypeVisibility();
+  document.getElementById('stockEditModal').classList.add('active');
+  document.querySelector('#stockEditModal .modal-box').scrollTop = 0;
+}
+function openSubproductCreateModal(){
+  stockEditId = null;
+  stockEditType = 'subproducto';
+  document.getElementById('se-name').value = '';
+  document.getElementById('se-name').placeholder = 'ej. Jugo de limón exprimido';
+  document.getElementById('se-parent').innerHTML = subproductParentOptionsHtml(null);
+  document.getElementById('se-yield-min').value = '';
+  document.getElementById('se-yield-max').value = '';
+  document.getElementById('se-unit').innerHTML = unitOptionsHtml('ml');
+  document.getElementById('stockEditModalTitle').textContent = 'Nuevo subproducto';
+  document.getElementById('se-delete-row').style.display = 'none';
+  document.getElementById('se-price-trend').style.display = 'none';
+  document.getElementById('se-stock-info').style.display = 'none';
+  applyStockEditTypeVisibility();
   document.getElementById('stockEditModal').classList.add('active');
   document.querySelector('#stockEditModal .modal-box').scrollTop = 0;
 }
@@ -6156,29 +6939,41 @@ function openStockEditModal(id){
   stockEditId = id;
   stockEditType = p.type || 'ingrediente';
   document.getElementById('se-name').value = p.name || '';
-  document.getElementById('se-name').placeholder = stockEditType==='insumo' ? 'ej. Bolsa descartable' : 'ej. Harina Flor';
-  document.getElementById('se-qty').value = p.qty || '';
-  document.getElementById('se-price').value = (p.price==null) ? '-' : p.price;
-  document.getElementById('se-provider').value = p.provider || '';
-  document.getElementById('se-unit').innerHTML = stockUnitOptionsHtml(stockEditType, p.unit);
-  document.getElementById('stockEditModalTitle').textContent = stockEditType==='insumo' ? 'Editar insumo' : 'Editar ingrediente';
-  document.getElementById('se-delete-row').style.display = '';
+  document.getElementById('se-name').placeholder = stockEditType==='insumo' ? 'ej. Bolsa descartable' : (stockEditType==='subproducto' ? 'ej. Jugo de limón exprimido' : 'ej. Harina Flor');
   const stockInfoEl = document.getElementById('se-stock-info');
-  const curStock = roundQty(p.stock||0);
-  const pkgRef = p.qty>0 ? p.qty : 1;
-  const pkgN = curStock/pkgRef;
-  const pkgTxt = Number.isInteger(pkgN) ? pkgN : pkgN.toFixed(1);
-  stockInfoEl.textContent = 'Stock actual: '+fmtQty(curStock)+' '+(p.unit||'')+' ('+pkgTxt+' paquete'+(pkgN===1?'':'s')+')';
-  stockInfoEl.style.display = '';
   const trendEl = document.getElementById('se-price-trend');
-  const trend = ingredientPriceTrend(p);
-  if(trend){
-    trendEl.style.display = '';
-    trendEl.style.color = trend.up ? 'var(--k-danger)' : 'var(--k-success)';
-    trendEl.textContent = (trend.up?'▲ subió ':'▼ bajó ')+Math.abs(Math.round(trend.pct))+'% en '+trend.periodLabel+'.';
-  } else {
+  if(stockEditType==='subproducto'){
+    document.getElementById('se-parent').innerHTML = subproductParentOptionsHtml(p.parentId);
+    document.getElementById('se-yield-min').value = p.yieldMin!=null ? p.yieldMin : '';
+    document.getElementById('se-yield-max').value = p.yieldMax!=null ? p.yieldMax : '';
+    document.getElementById('se-unit').innerHTML = unitOptionsHtml(p.yieldUnit);
+    const parent = subproductParent(p);
+    stockInfoEl.textContent = parent ? ('Se calcula del stock de "'+parent.name+'".') : 'Elegí de qué ingrediente sale.';
+    stockInfoEl.style.display = '';
     trendEl.style.display = 'none';
+  } else {
+    document.getElementById('se-qty').value = p.qty || '';
+    document.getElementById('se-price').value = (p.price==null) ? '-' : p.price;
+    document.getElementById('se-provider').value = p.provider || '';
+    document.getElementById('se-unit').innerHTML = stockUnitOptionsHtml(stockEditType, p.unit);
+    const curStock = roundQty(p.stock||0);
+    const pkgRef = p.qty>0 ? p.qty : 1;
+    const pkgN = curStock/pkgRef;
+    const pkgTxt = Number.isInteger(pkgN) ? pkgN : pkgN.toFixed(1);
+    stockInfoEl.textContent = 'Stock actual: '+fmtQty(curStock)+' '+(p.unit||'')+' ('+pkgTxt+' paquete'+(pkgN===1?'':'s')+')';
+    stockInfoEl.style.display = '';
+    const trend = ingredientPriceTrend(p);
+    if(trend){
+      trendEl.style.display = '';
+      trendEl.style.color = trend.up ? 'var(--k-danger)' : 'var(--k-success)';
+      trendEl.textContent = (trend.up?'▲ subió ':'▼ bajó ')+Math.abs(Math.round(trend.pct))+'% en '+trend.periodLabel+'.';
+    } else {
+      trendEl.style.display = 'none';
+    }
   }
+  document.getElementById('stockEditModalTitle').textContent = stockEditType==='insumo' ? 'Editar insumo' : (stockEditType==='subproducto' ? 'Editar subproducto' : 'Editar ingrediente');
+  document.getElementById('se-delete-row').style.display = '';
+  applyStockEditTypeVisibility();
   document.getElementById('stockEditModal').classList.add('active');
   document.querySelector('#stockEditModal .modal-box').scrollTop = 0;
 }
@@ -6199,6 +6994,41 @@ function cascadeIngredientNameRename(priceId, newName){
 }
 function saveStockEdit(){
   const name = document.getElementById('se-name').value.trim();
+  if(stockEditType==='subproducto'){
+    const parentId = document.getElementById('se-parent').value;
+    const yieldUnit = document.getElementById('se-unit').value;
+    const yieldMin = parseFloat((document.getElementById('se-yield-min').value||'').toString().replace(',','.'));
+    const yieldMax = parseFloat((document.getElementById('se-yield-max').value||'').toString().replace(',','.'));
+    const validMin = !isNaN(yieldMin) && yieldMin>0;
+    const validMax = !isNaN(yieldMax) && yieldMax>0;
+    if(!name || !parentId || (!validMin && !validMax)){ showToast('Completá nombre, ingrediente base y el rinde (mínimo y/o máximo)'); return; }
+    const isNew = !stockEditId;
+    let p;
+    if(isNew){
+      p = { id:'ip-'+Date.now(), type:'subproducto', stock:0 };
+    } else {
+      p = DATA.ingredientPrices.find(function(x){ return x.id===stockEditId; });
+      if(!p) return;
+    }
+    const nameChanged = !isNew && p.name !== name;
+    p.name = name;
+    p.type = 'subproducto';
+    p.parentId = parentId;
+    p.yieldUnit = yieldUnit;
+    p.yieldMin = validMin ? yieldMin : null;
+    p.yieldMax = validMax ? yieldMax : null;
+    p.qty = null;
+    p.price = null;
+    p.provider = '';
+    if(nameChanged) cascadeIngredientNameRename(p.id, name);
+    if(isNew) DATA.ingredientPrices.push(p);
+    saveData(DATA);
+    closeStockEditModal();
+    renderIngredientsScreen();
+    refreshIngredientPickers();
+    showToast(isNew ? 'Subproducto agregado' : 'Guardado');
+    return;
+  }
   const qty = parseFloat(document.getElementById('se-qty').value);
   const unit = document.getElementById('se-unit').value;
   const priceParsed = parsePriceInput(document.getElementById('se-price').value);
@@ -6237,7 +7067,13 @@ function saveStockEdit(){
 async function deleteStockEntry(){
   if(!stockEditId) return;
   const isInsumo = stockEditType==='insumo';
-  const ok = await showConfirm('¿Borrar este '+(isInsumo?'insumo':'ingrediente')+' del catálogo?');
+  const isSub = stockEditType==='subproducto';
+  const dependents = isSub ? [] : DATA.ingredientPrices.filter(function(x){ return x.type==='subproducto' && x.parentId===stockEditId; });
+  let msg = '¿Borrar este '+(isSub?'subproducto':(isInsumo?'insumo':'ingrediente'))+' del catálogo?';
+  if(dependents.length){
+    msg = 'Este ingrediente es la base de '+dependents.map(function(d){ return '"'+d.name+'"'; }).join(', ')+'. Si lo borrás, esos subproductos van a quedar sin ingrediente base. ¿Igual querés borrarlo?';
+  }
+  const ok = await showConfirm(msg);
   if(!ok) return;
   const idx = DATA.ingredientPrices.findIndex(function(p){ return p.id===stockEditId; });
   if(idx===-1) return;
@@ -6247,7 +7083,7 @@ async function deleteStockEntry(){
   closeStockEditModal();
   renderIngredientsScreen();
   refreshIngredientPickers();
-  showUndoToast((isInsumo?'Insumo borrado':'Ingrediente borrado'), function(){
+  showUndoToast((isSub?'Subproducto borrado':(isInsumo?'Insumo borrado':'Ingrediente borrado')), function(){
     DATA.ingredientPrices.splice(idx,0,removed);
     saveData(DATA);
     renderIngredientsScreen();
@@ -6699,14 +7535,12 @@ function maxProducibleTandas(r){
   let maxScale = null;
   flatRecipeIngredients(r).forEach(function(ing){
     if(!ing.priceId) return;
-    const cat = DATA.ingredientPrices.find(function(p){ return p.id===ing.priceId; });
-    if(!cat) return;
     const perUnitQty = parseFloat(ing.qty);
     if(isNaN(perUnitQty) || perUnitQty<=0) return;
-    const perTanda = convertQty(perUnitQty, ing.unit, cat.unit);
-    if(perTanda==null || perTanda<=0) return;
-    const avail = cat.stock||0;
-    const possible = avail/perTanda;
+    const resolved = resolvePurchaseTarget(ing, perUnitQty);
+    if(!resolved.cat || resolved.qty==null || resolved.qty<=0) return;
+    const avail = resolved.cat.stock||0;
+    const possible = avail/resolved.qty;
     if(maxScale==null || possible<maxScale) maxScale = possible;
   });
   if(maxScale==null) return null;
@@ -6721,14 +7555,12 @@ function registrarHorneada(recipeId, porciones){
     const scale = porciones / yieldQty;
     flatRecipeIngredients(r).forEach(function(ing){
       if(!ing.priceId) return;
-      const cat = DATA.ingredientPrices.find(function(p){ return p.id===ing.priceId; });
-      if(!cat) return;
       const perUnitQty = parseFloat(ing.qty);
       if(isNaN(perUnitQty)) return;
       const totalQty = perUnitQty * scale;
-      const converted = convertQty(totalQty, ing.unit, cat.unit);
-      if(converted==null) return;
-      cat.stock = roundQty(Math.max(0, (cat.stock||0) - converted));
+      const resolved = resolvePurchaseTarget(ing, totalQty);
+      if(!resolved.cat || resolved.qty==null) return;
+      resolved.cat.stock = roundQty(Math.max(0, (resolved.cat.stock||0) - resolved.qty));
     });
   }
   r.stock = roundQty((r.stock||0) + porciones);
@@ -7112,7 +7944,7 @@ function toggleOrderCardMenu(id){
 function closeOrderCardMenu(){ orderCardMenuOpenId = null; }
 function orderBoardCardHtml(o){
   const itemsLine = (o.items||[]).map(function(it){ return escapeHtml(it.recipeName)+' x'+it.qty; }).join(' | ') || 'sin items';
-  const bg = PLACEHOLDER_COLORS[(o.colorIdx||0) % PLACEHOLDER_COLORS.length];
+  const bg = placeholderBg(o.colorIdx);
   const dp = orderCardDateParts(o);
   const pay = o.payMethod==='transferencia' ? 'transferencia' : 'efectivo';
   const payIcon = pay==='efectivo' ? 'cash' : 'credit-card';
@@ -7252,6 +8084,7 @@ function toggleTheme(){
   DATA.settings.theme = map[cur];
   saveData(DATA);
   applyTheme(DATA.settings.theme, true);
+  render();
 }
 let themeTapCount = 0;
 let themeTapTimer = null;
@@ -7273,6 +8106,7 @@ function activateHojaTheme(){
   DATA.settings.theme = 'hoja';
   saveData(DATA);
   applyTheme(DATA.settings.theme, true);
+  render();
   showToast('Modo hoja activado');
 }
 function bounceKobuIcon(){
@@ -8946,23 +9780,28 @@ function computeShoppingListManual(){
       if(!r) return;
       flatRecipeIngredients(r).forEach(function(ing){
         if(!ing.name) return;
-        const cat = ing.priceId ? DATA.ingredientPrices.find(function(p){ return p.id===ing.priceId; }) : null;
-        const key = ing.priceId || (ing.name.trim().toLowerCase()+'|'+(ing.unit||'').trim().toLowerCase());
+        const q = parseFloat((ing.qty||'').toString().replace(',','.'));
+        const fallbackKey = ing.priceId || (ing.name.trim().toLowerCase()+'|'+(ing.unit||'').trim().toLowerCase());
+        if(isNaN(q)){
+          if(ing.qty){
+            if(!map[fallbackKey]) map[fallbackKey] = { key:fallbackKey, name:ing.name, unit:ing.unit||'', qty:0, hasNumeric:false, extra:[] };
+            map[fallbackKey].extra.push(ing.qty);
+          }
+          return;
+        }
+        const totalQty = q * (it.mult||1);
+        const resolved = resolvePurchaseTarget(ing, totalQty);
+        const cat = resolved.cat;
+        const key = cat ? cat.id : fallbackKey;
         const displayName = cat ? cat.name : ing.name;
         const displayUnit = cat ? cat.unit : (ing.unit||'');
         if(!map[key]) map[key] = { key:key, name:displayName, unit:displayUnit, qty:0, hasNumeric:false, extra:[] };
-        const q = parseFloat((ing.qty||'').toString().replace(',','.'));
-        if(!isNaN(q)){
-          const totalQty = q * (it.mult||1);
-          if(cat){
-            const converted = convertQty(totalQty, ing.unit, cat.unit);
-            if(converted==null){ map[key].extra.push(totalQty+' '+(ing.unit||'')+' (revisar unidad)'); return; }
-            map[key].qty += converted; map[key].hasNumeric = true;
-          } else {
-            map[key].qty += totalQty; map[key].hasNumeric = true;
-          }
+        if(cat){
+          if(resolved.qty==null){ map[key].extra.push(totalQty+' '+(ing.unit||'')+' (revisar unidad)'); return; }
+          map[key].qty += resolved.qty; map[key].hasNumeric = true;
+        } else {
+          map[key].qty += totalQty; map[key].hasNumeric = true;
         }
-        else if(ing.qty){ map[key].extra.push(ing.qty); }
       });
     } else if(it.type==='ingredient'){
       const cat = DATA.ingredientPrices.find(function(p){ return p.id===it.priceId; });
@@ -9004,23 +9843,28 @@ function computeShoppingListFromOrders(){
       if(!r) return;
       flatRecipeIngredients(r).forEach(function(ing){
         if(!ing.name) return;
-        const cat = ing.priceId ? DATA.ingredientPrices.find(function(p){ return p.id===ing.priceId; }) : null;
-        const key = ing.priceId || (ing.name.trim().toLowerCase()+'|'+(ing.unit||'').trim().toLowerCase());
+        const q = parseFloat((ing.qty||'').toString().replace(',','.'));
+        const fallbackKey = ing.priceId || (ing.name.trim().toLowerCase()+'|'+(ing.unit||'').trim().toLowerCase());
+        if(isNaN(q)){
+          if(ing.qty){
+            if(!map[fallbackKey]) map[fallbackKey] = { key:fallbackKey, name:ing.name, unit:ing.unit||'', qty:0, hasNumeric:false, extra:[] };
+            map[fallbackKey].extra.push(ing.qty);
+          }
+          return;
+        }
+        const totalQty = q * (oit.qty||1);
+        const resolved = resolvePurchaseTarget(ing, totalQty);
+        const cat = resolved.cat;
+        const key = cat ? cat.id : fallbackKey;
         const displayName = cat ? cat.name : ing.name;
         const displayUnit = cat ? cat.unit : (ing.unit||'');
         if(!map[key]) map[key] = { key:key, name:displayName, unit:displayUnit, qty:0, hasNumeric:false, extra:[] };
-        const q = parseFloat((ing.qty||'').toString().replace(',','.'));
-        if(!isNaN(q)){
-          const totalQty = q * (oit.qty||1);
-          if(cat){
-            const converted = convertQty(totalQty, ing.unit, cat.unit);
-            if(converted==null){ map[key].extra.push(totalQty+' '+(ing.unit||'')+' (revisar unidad)'); return; }
-            map[key].qty += converted; map[key].hasNumeric = true;
-          } else {
-            map[key].qty += totalQty; map[key].hasNumeric = true;
-          }
+        if(cat){
+          if(resolved.qty==null){ map[key].extra.push(totalQty+' '+(ing.unit||'')+' (revisar unidad)'); return; }
+          map[key].qty += resolved.qty; map[key].hasNumeric = true;
+        } else {
+          map[key].qty += totalQty; map[key].hasNumeric = true;
         }
-        else if(ing.qty){ map[key].extra.push(ing.qty); }
       });
     });
   });
@@ -9062,18 +9906,18 @@ function aggregateIngredientNeeds(orders){
       if(!r) return;
       flatRecipeIngredients(r).forEach(function(ing){
         if(!ing.name) return;
-        const cat = ing.priceId ? DATA.ingredientPrices.find(function(p){ return p.id===ing.priceId; }) : null;
-        const key = ing.priceId || (ing.name.trim().toLowerCase()+'|'+(ing.unit||'').trim().toLowerCase());
-        const displayName = cat ? cat.name : ing.name;
-        const displayUnit = cat ? cat.unit : (ing.unit||'');
-        if(!map[key]) map[key] = { key:key, name:displayName, unit:displayUnit, qty:0, hasNumeric:false };
         const q = parseFloat((ing.qty||'').toString().replace(',','.'));
         if(isNaN(q)) return;
         const totalQty = q * (parseFloat(oit.qty)||1);
+        const resolved = resolvePurchaseTarget(ing, totalQty);
+        const cat = resolved.cat;
+        const key = cat ? cat.id : (ing.priceId || (ing.name.trim().toLowerCase()+'|'+(ing.unit||'').trim().toLowerCase()));
+        const displayName = cat ? cat.name : ing.name;
+        const displayUnit = cat ? cat.unit : (ing.unit||'');
+        if(!map[key]) map[key] = { key:key, name:displayName, unit:displayUnit, qty:0, hasNumeric:false };
         if(cat){
-          const converted = convertQty(totalQty, ing.unit, cat.unit);
-          if(converted==null) return;
-          map[key].qty += converted; map[key].hasNumeric = true;
+          if(resolved.qty==null) return;
+          map[key].qty += resolved.qty; map[key].hasNumeric = true;
         } else {
           map[key].qty += totalQty; map[key].hasNumeric = true;
         }
@@ -9230,9 +10074,10 @@ function computeMaxBatchesForRecipe(recipe){
       ingredientLines.push({ name:ing.name, qty:fmtNum(q), unit:ing.unit||'' });
     }
     if(isNaN(q) || q<=0) return;
-    const cat = ing.priceId ? DATA.ingredientPrices.find(function(p){ return p.id===ing.priceId; }) : null;
+    const resolved = resolvePurchaseTarget(ing, q);
+    const cat = resolved.cat;
     if(!cat){ unresolvable = true; return; }
-    const converted = convertQty(q, ing.unit, cat.unit);
+    const converted = resolved.qty;
     if(converted==null || converted<=0){ unresolvable = true; return; }
     const stock = cat.stock||0;
     const possible = Math.floor((stock/converted) + 1e-9);
@@ -9681,7 +10526,7 @@ function renderChatScreen(){
   const pillEl = document.getElementById('chat-recipe-pill');
   const r = session.recipeId ? DATA.recipes.find(function(x){ return x.id===session.recipeId; }) : null;
   if(r){
-    const bg = r.photo ? ('background-image:url('+r.photo+')') : ('background:'+(PLACEHOLDER_COLORS[r.colorIdx % PLACEHOLDER_COLORS.length]));
+    const bg = r.photo ? ('background-image:url('+r.photo+')') : ('background:'+(placeholderBg(r.colorIdx)));
     const thumbIcon = (!r.photo && r.icon && ICONS[r.icon]) ? ICONS[r.icon] : '';
     pillEl.style.display = 'flex';
     pillEl.innerHTML = '<span class="chat-recipe-pill-thumb" style="'+bg+'">'+thumbIcon+'</span>'+
@@ -9763,7 +10608,7 @@ function buildFullAppContext(){
   parts.push('Ingredientes en stock: '+(ingredientes.length ? ingredientes.map(fmtStockItem).join(', ') : 'no hay ingredientes cargados')+'.');
   parts.push('Insumos/packaging en stock: '+(insumos.length ? insumos.map(fmtStockItem).join(', ') : 'no hay insumos cargados')+'.');
   const utensilios = utensilsSorted();
-  parts.push('Utensilios: '+(utensilios.length ? utensilios.map(function(u){ return u.nombre+(u.tamano?' ('+u.tamano+')':''); }).join(', ') : 'no hay utensilios cargados')+'.');
+  parts.push('Utensilios: '+(utensilios.length ? utensilios.map(function(u){ const d=moldDimsLabel(u); return u.nombre+(d?' ('+d+')':''); }).join(', ') : 'no hay utensilios cargados')+'.');
   const cocina = (DATA.ovens||[]).map(function(o){ return o.name+(o.fuente?' ('+o.fuente+')':''); }).join(', ');
   parts.push('Equipos de cocina: '+(cocina || 'no hay equipos cargados')+'.');
   const pendientes = (DATA.orders||[]).filter(function(o){ return o.status!=='entregado' && o.status!=='cancelado'; });
@@ -10087,6 +10932,8 @@ function startCook(id){
   if(!r) return;
   state.cookRecipeId = id;
   state.cookComponentKey = null;
+  state._moldWarnDismissed = state._moldWarnDismissed || {};
+  state._moldWarnDismissed.cook = false;
   if(r.components && r.components.length>1){
     showScreen('cook');
     renderCookPicker();
@@ -10109,6 +10956,7 @@ function renderCookPicker(){
   document.getElementById('cook-picker').style.display = 'flex';
   document.getElementById('cook-stepflow').style.display = 'none';
   document.getElementById('cook-switchPrepBtn').style.display = 'none';
+  renderCookMoldWarning();
   const buttons = (r.components||[]).map(function(c,i){
     const n = (c.steps||[]).filter(Boolean).length;
     return '<button type="button" class="btn btn-primary" onclick="chooseCookComponent('+i+')">'+escapeHtml(c.name||('Preparación '+(i+1)))+' ('+n+' pasos)</button>';
@@ -10149,6 +10997,7 @@ function renderCookStep(){
   document.getElementById('cook-stepflow').style.display = 'contents';
   const r = DATA.recipes.find(function(x){ return x.id===state.cookRecipeId; });
   document.getElementById('cook-switchPrepBtn').style.display = (r && r.components && r.components.length>1) ? '' : 'none';
+  renderCookMoldWarning();
   const steps = currentCookSteps();
   const idx = state.cookStep;
   const rawStep = steps[idx] || '';

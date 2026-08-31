@@ -7647,21 +7647,18 @@ function confirmBakeModal(){
     return;
   }
   const porciones = r.yieldQty ? roundQty(val*r.yieldQty) : val;
-  const bakedOrderId = state._bakeFromOrderId;
   const fromCook = state._bakeFromCook;
   registrarHorneada(r.id, porciones);
   saveData(DATA);
   closeBakeModal();
   showToast('Horneada registrada — stock actual: '+(r.stock||0));
+  reconcileRecipeOrderShortfalls(r.id);
   renderRecipes();
   if(document.getElementById('screen-quicksell')) renderQuickSellScreen();
-  if(bakedOrderId){
-    refreshOrderShortfalls(bakedOrderId);
-    if(state.editingOrderId===bakedOrderId && document.getElementById('editOrderModal').classList.contains('active')){
-      renderEopView();
-    }
-    renderOrderList();
+  if(state.editingOrderId && document.getElementById('editOrderModal').classList.contains('active')){
+    renderEopView();
   }
+  renderOrderList();
   if(fromCook && document.getElementById('screen-cook').classList.contains('active')){
     exitCook();
   }
@@ -8165,12 +8162,26 @@ async function cancelOrder(id){
   const ok = await showConfirm('¿Cancelar este pedido?'+((o.stockDeducted||o.portionsDeducted)?' Se repone el stock ya descontado.':''));
   if(!ok) return false;
   if(o.stockDeducted){ adjustStockForOrder(o, 1); o.stockDeducted = false; }
-  if(o.portionsDeducted){ adjustPortionStockForOrder(o, 1); o.portionsDeducted = false; }
+  if(o.portionsDeducted){
+    adjustPortionStockForOrder(o, 1);
+    o.portionsDeducted = false;
+    reconcileRecipeIdsFromOrder(o);
+  }
   o.status = 'cancelado';
   saveData(DATA);
   renderOrderList();
   showToast('Pedido cancelado');
   return true;
+}
+function reconcileRecipeIdsFromOrder(o){
+  // Al reponer stock de porciones (cancelar/borrar un pedido), ese stock recién liberado
+  // puede alcanzar para cubrir el faltante de OTROS pedidos pendientes de la misma receta.
+  const seen = {};
+  (o.items||[]).forEach(function(it){
+    if(!it.recipeId || seen[it.recipeId]) return;
+    seen[it.recipeId] = true;
+    reconcileRecipeOrderShortfalls(it.recipeId);
+  });
 }
 function cancelOrderFromForm(){
   if(!state.editingOrderId) return;
@@ -8184,7 +8195,7 @@ async function deleteOrder(id){
   if(idx===-1) return;
   const removed = DATA.orders[idx];
   if(removed.stockDeducted) adjustStockForOrder(removed, 1);
-  if(removed.portionsDeducted) adjustPortionStockForOrder(removed, 1);
+  if(removed.portionsDeducted){ adjustPortionStockForOrder(removed, 1); reconcileRecipeIdsFromOrder(removed); }
   DATA.orders.splice(idx,1);
   saveData(DATA);
   renderOrderList();
@@ -8330,19 +8341,26 @@ function eopChangeStatus(){
   toggleOrderStatus(state.editingOrderId);
   renderEopView();
 }
-function refreshOrderShortfalls(orderId){
-  const o = DATA.orders.find(function(x){ return x.id===orderId; });
-  if(!o) return;
-  (o.items||[]).forEach(function(it){
-    if(!it.recipeId || !(it.shortfall>0)) return;
-    const r = DATA.recipes.find(function(x){ return x.id===it.recipeId; });
-    if(!r) return;
-    const avail = r.stock||0;
-    const cover = Math.min(avail, it.shortfall);
-    if(cover>0){
-      r.stock = roundQty(avail-cover);
-      it.shortfall = roundQty(it.shortfall-cover);
-    }
+function reconcileRecipeOrderShortfalls(recipeId){
+  // Cuando el stock de una receta aumenta (horneada, sea desde un pedido puntual o
+  // genérica desde la ficha de receta, o una corrección manual de stock), hay que
+  // repasar TODOS los pedidos pendientes que tengan faltante de esa receta y cubrirlos
+  // con el stock disponible, en el orden en que fueron cargados. Antes esto solo pasaba
+  // cuando se horneaba desde el botón "Hornear" de un pedido puntual, así que un pedido
+  // podía seguir marcado "faltan X porciones" para siempre aunque después se repusiera
+  // stock por otra vía (bug reportado: "hay stock de sobra pero igual figura faltante").
+  const r = DATA.recipes.find(function(x){ return x.id===recipeId; });
+  if(!r) return;
+  DATA.orders.forEach(function(o){
+    (o.items||[]).forEach(function(it){
+      if(it.recipeId!==recipeId || !(it.shortfall>0)) return;
+      const avail = r.stock||0;
+      const cover = Math.min(avail, it.shortfall);
+      if(cover>0){
+        r.stock = roundQty(avail-cover);
+        it.shortfall = roundQty(it.shortfall-cover);
+      }
+    });
   });
   saveData(DATA);
 }
@@ -9110,7 +9128,12 @@ function saveRecipeStockCorrect(){
   r.stock = roundQty(val);
   saveData(DATA);
   closeRecipeStockCorrectModal();
+  reconcileRecipeOrderShortfalls(r.id);
   renderRecipes();
+  if(state.editingOrderId && document.getElementById('editOrderModal').classList.contains('active')){
+    renderEopView();
+  }
+  renderOrderList();
   showToast('Stock corregido');
 }
 let balanceTapCount = 0;

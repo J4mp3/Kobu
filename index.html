@@ -7546,6 +7546,38 @@ function maxProducibleTandas(r){
   if(maxScale==null) return null;
   return Math.max(0, Math.floor(maxScale + 1e-9));
 }
+function joinListEs(names){
+  if(names.length===0) return '';
+  if(names.length===1) return names[0];
+  if(names.length===2) return names[0]+' y '+names[1];
+  return names.slice(0,-1).join(', ')+' y '+names[names.length-1];
+}
+function recipeIngredientStockGaps(r, scale){
+  // Para la cantidad de tandas/porciones que se está por hornear, devuelve qué
+  // ingrediente(s) (nombre del ingrediente base, ya resuelto si es un subproducto)
+  // no tienen stock suficiente, para poder decir "no alcanza el stock de X, Y".
+  if(!r || !(scale>0)) return [];
+  const merged = {};
+  flatRecipeIngredients(r).forEach(function(ing){
+    if(!ing.priceId) return;
+    const perUnitQty = parseFloat(ing.qty);
+    if(isNaN(perUnitQty) || perUnitQty<=0) return;
+    const totalQty = perUnitQty * scale;
+    const resolved = resolvePurchaseTarget(ing, totalQty);
+    if(!resolved.cat || resolved.qty==null) return;
+    const avail = resolved.cat.stock||0;
+    if(avail < resolved.qty - 1e-9){
+      const key = resolved.cat.id;
+      if(!merged[key]) merged[key] = { name: resolved.cat.name, need:0, avail: roundQty(avail), unit: resolved.cat.unit };
+      merged[key].need = roundQty(merged[key].need + resolved.qty);
+    }
+  });
+  return Object.keys(merged).map(function(k){
+    const m = merged[k];
+    m.missing = roundQty(Math.max(0, m.need - m.avail));
+    return m;
+  });
+}
 function registrarHorneada(recipeId, porciones){
   const r = DATA.recipes.find(function(x){ return x.id===recipeId; });
   if(!r || !porciones || porciones<=0) return;
@@ -7617,9 +7649,11 @@ function bakeModalCheckStock(){
   const max = maxProducibleTandas(r);
   if(max!=null && !isNaN(val) && val>max){
     const unitLabel = r.yieldQty ? ('tanda'+(max===1?'':'s')) : (r.yieldUnit||'porciones');
-    document.getElementById('bakeModalStockWarnText').textContent = max>0
-      ? ('Solo alcanza para '+max+' '+unitLabel+'.')
-      : 'No alcanza el stock.';
+    const gaps = recipeIngredientStockGaps(r, val);
+    const gapNames = gaps.map(function(g){ return g.name; });
+    const baseMsg = max>0 ? ('Solo alcanza para '+max+' '+unitLabel+'.') : 'No alcanza el stock.';
+    const gapText = gapNames.length ? (' Falta stock de '+joinListEs(gapNames)+'.') : '';
+    document.getElementById('bakeModalStockWarnText').textContent = baseMsg + gapText;
     document.getElementById('bakeModalUseMaxBtn').style.display = max>0 ? '' : 'none';
     warn.style.display = 'block';
     mountIcons();
@@ -7643,7 +7677,9 @@ function confirmBakeModal(){
   const max = maxProducibleTandas(r);
   if(max!=null && val>max){
     const unitLabel = r.yieldQty ? ('tanda'+(max===1?'':'s')) : (r.yieldUnit||'porciones');
-    showToast(max>0 ? ('Solo alcanza para '+max+' '+unitLabel+'.') : 'No alcanza el stock.');
+    const gapNames = recipeIngredientStockGaps(r, val).map(function(g){ return g.name; });
+    const baseMsg = max>0 ? ('Solo alcanza para '+max+' '+unitLabel+'.') : 'No alcanza el stock.';
+    showToast(baseMsg + (gapNames.length ? (' Falta stock de '+joinListEs(gapNames)+'.') : ''));
     return;
   }
   const porciones = r.yieldQty ? roundQty(val*r.yieldQty) : val;
@@ -8550,7 +8586,7 @@ function saveOrder(){
   const client = DATA.clients.find(function(c){ return c.id===state.orderDraft.clientId; });
   const name = client ? client.name : state.orderDraft.customerName;
   if(!name){ showToast('Elegí o creá un cliente'); return; }
-  const deliveryDate = document.getElementById('of-deliverydate').value || '';
+  const deliveryDate = document.getElementById('of-deliverydate').value || todayStr();
   const deposit = parseFloat(document.getElementById('of-deposit').value)||0;
   const note = document.getElementById('of-note').value || '';
   const items = (state.orderDraft.items||[]).filter(function(it){ return it.recipeId && parseFloat(it.qty)>0; });
@@ -8764,7 +8800,7 @@ function saveNewOrder(){
     if(willDeductPortions) resolveOrderBakeChoices(items);
     o.clientId = client.id;
     o.customerName = client.name;
-    o.deliveryDate = state.newOrderDraft.deliveryDate || '';
+    o.deliveryDate = state.newOrderDraft.deliveryDate || todayStr();
     o.deposit = state.newOrderDraft.deposit || 0;
     o.note = state.newOrderDraft.note || '';
     o.items = snapItems;
@@ -8785,7 +8821,7 @@ function saveNewOrder(){
     id: 'ord-'+Date.now(),
     clientId: client.id,
     customerName: client.name,
-    deliveryDate: state.newOrderDraft.deliveryDate || '',
+    deliveryDate: state.newOrderDraft.deliveryDate || todayStr(),
     deposit: state.newOrderDraft.deposit || 0,
     note: state.newOrderDraft.note || '',
     createdAt: new Date().toISOString(),

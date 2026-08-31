@@ -814,9 +814,12 @@
           <input class="input" id="bakeModalInput" type="number" min="0" step="any" oninput="bakeModalCheckStock()" style="width:64px;text-align:center;border:none;border-bottom:1px solid var(--k-border);border-radius:0;background:none;padding:2px 4px;">
         </div>
         <div id="bakeModalStockWarn" style="display:none;margin-top:10px;padding-top:8px;border-top:0.5px solid var(--k-border);">
-          <div style="display:flex;align-items:center;gap:6px;color:var(--k-warning);font-size:calc(11px + var(--kobu-font-boost, 0px));line-height:1.4;position:relative;top:1px;">
-            <span class="icon-slot" data-icon="alert-triangle" style="font-size:13px;flex-shrink:0;"></span>
-            <span id="bakeModalStockWarnText" style="white-space:nowrap;"></span>
+          <div style="display:flex;align-items:flex-start;gap:6px;color:var(--k-warning);font-size:calc(11px + var(--kobu-font-boost, 0px));line-height:1.4;">
+            <span class="icon-slot" data-icon="alert-triangle" style="font-size:13px;flex-shrink:0;position:relative;top:2px;"></span>
+            <div style="flex:1;min-width:0;">
+              <span id="bakeModalStockWarnText"></span>
+              <ul id="bakeModalStockWarnList" style="display:none;margin:4px 0 0;padding-left:18px;"></ul>
+            </div>
           </div>
           <button type="button" id="bakeModalUseMaxBtn" onclick="bakeModalUseMax()" style="display:block;width:100%;text-align:center;margin-top:6px;background:none;border:none;padding:0;color:var(--k-accent);font-size:calc(11px + var(--kobu-font-boost, 0px));font-weight:600;cursor:pointer;">Usar el máximo posible</button>
         </div>
@@ -7652,8 +7655,15 @@ function bakeModalCheckStock(){
     const gaps = recipeIngredientStockGaps(r, val);
     const gapNames = gaps.map(function(g){ return g.name; });
     const baseMsg = max>0 ? ('Solo alcanza para '+max+' '+unitLabel+'.') : 'No alcanza el stock.';
-    const gapText = gapNames.length ? (' Falta stock de '+joinListEs(gapNames)+'.') : '';
-    document.getElementById('bakeModalStockWarnText').textContent = baseMsg + gapText;
+    document.getElementById('bakeModalStockWarnText').textContent = baseMsg;
+    const listEl = document.getElementById('bakeModalStockWarnList');
+    if(gapNames.length){
+      listEl.innerHTML = gapNames.map(function(n){ return '<li>'+escapeHtml(n)+'</li>'; }).join('');
+      listEl.style.display = '';
+    } else {
+      listEl.innerHTML = '';
+      listEl.style.display = 'none';
+    }
     document.getElementById('bakeModalUseMaxBtn').style.display = max>0 ? '' : 'none';
     warn.style.display = 'block';
     mountIcons();

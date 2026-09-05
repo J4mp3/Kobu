@@ -490,7 +490,7 @@
   .stock-row .sr-step-btn:first-child{ border-radius:5px 5px 0 0; }
   .stock-row .sr-step-btn:last-child{ border-radius:0 0 5px 5px; margin-top:1px; }
   /* ---- action grid ---- */
-  .action-grid{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
+  .action-grid{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; }
   .action-btn{ display:flex; flex-direction:column; align-items:center; gap:3px; background:var(--k-card2); border:none; border-radius:10px; padding:9px 4px; cursor:pointer; color:var(--k-accent); }
   .action-btn .icon-slot{ font-size:calc(16px + var(--kobu-font-boost, 0px)); }
   .action-btn span.lbl{ font-size:calc(9.5px + var(--kobu-font-boost, 0px)); color:var(--k-accent); text-align:center; line-height:1.2; }
@@ -972,6 +972,24 @@
         <button class="btn btn-ghost" onclick="closeRecipeStockCorrectModal()">Cancelar</button>
         <button class="btn btn-primary" onclick="saveRecipeStockCorrect()">Guardar corrección</button>
       </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LABEL EXPORT MODAL (Exportar etiquetas) -->
+  <div class="modal-overlay" id="labelExportModal">
+    <div class="modal-box" style="max-width:320px;padding:0;gap:0;">
+      <div class="sc-headtint">
+        <p class="modal-msg" style="font-weight:600;margin:0;">Exportar etiqueta</p>
+        <p id="le-recipe-name" style="font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:2px 0 0;"></p>
+      </div>
+      <div class="sc-headbody">
+      <div class="field"><label>Fecha de elaboración</label><input class="input" id="le-date" type="date"></div>
+      <p style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;">Cambiala si querés exportar algo de otro día o dejar la etiqueta preparada de antemano.</p>
+      <div class="btn-row">
+        <button class="btn btn-primary" style="flex:1;" onclick="confirmExportLabels('excel')"><span class="icon-slot" data-icon="download" style="vertical-align:-2px;"></span> Impresión</button>
+      </div>
+      <button class="btn btn-ghost" style="width:100%;" onclick="closeLabelExportModal()">Cancelar</button>
       </div>
     </div>
   </div>
@@ -1548,6 +1566,7 @@
       <div class="grp-card" id="formNotesCard">
         <p class="section-title"><span class="badge-ic"><span class="icon-slot" data-icon="pencil"></span></span>Notas y precio</p>
         <div class="field"><label>Anotaciones</label><textarea class="input" id="f-notes" placeholder="notas generales de la receta..."></textarea></div>
+        <div class="field"><label>Dura (días) — para etiquetas</label><input class="input" id="f-shelfDays" type="number" min="0" placeholder="ej. 5 (opcional)"><p style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:4px 0 0;">Se usa para calcular la fecha de vencimiento al tocar "Exportar" en la ficha de esta receta.</p></div>
         <div class="rowline"><span class="l">Costo</span><span id="f-costPreview" style="font-weight:600;font-size:calc(12.5px + var(--kobu-font-boost, 0px));">$0</span></div>
         <div class="field"><label>Precio</label><input class="input" id="f-salePrice" type="number" min="0" placeholder="precio de venta por porción" oninput="updateFormCostPreview()"></div>
         <div class="rowline"><span class="l">Ganancia por porción</span><span id="f-profitPreview" style="font-weight:600;color:var(--k-accent);font-size:calc(12.5px + var(--kobu-font-boost, 0px));">$0</span></div>
@@ -1590,8 +1609,9 @@
     </div>
     <div class="action-grid">
       <button class="action-btn" onclick="openChat()"><span class="icon-slot" data-icon="message-circle"></span><span class="lbl">Preguntar a la IA</span></button>
-      <button class="action-btn" onclick="exportRecipeAsText(state.currentId)"><span class="icon-slot" data-icon="share"></span><span class="lbl">Exportar</span></button>
+      <button class="action-btn" onclick="openLabelExportModal(state.currentId)"><span class="icon-slot" data-icon="tag"></span><span class="lbl">Exportar</span></button>
       <button class="action-btn" onclick="generateVariant(state.currentId)"><span class="icon-slot" data-icon="copy"></span><span class="lbl">Generar variante</span></button>
+      <button class="action-btn" onclick="exportRecipeAsText(state.currentId)"><span class="icon-slot" data-icon="share"></span><span class="lbl">Extraer texto</span></button>
     </div>
     <div>
       <p class="section-title">Anotaciones</p>
@@ -3650,7 +3670,7 @@ function emptyDraft(){
     id:null, title:'', photo:null, icon:null, mediaMode:'icono', colorIdx: DATA.recipes.length % PLACEHOLDER_COLORS.length,
     timeMinutes:'', difficulty:'fácil', yieldQty:'', yieldUnit:'porciones', tags:[], ovenIds:[], utensilIds:[],
     ingredients:[], steps:[], notes:'', salePrice:null, parentId:null, quickNotes:[], ovenSettings:{},
-    components:[], finalSteps:[], moldShapesApt:[], moldCalibrations:[], moldYieldMode:'molde'
+    components:[], finalSteps:[], moldShapesApt:[], moldCalibrations:[], moldYieldMode:'molde', shelfLifeDays:''
   };
 }
 const ICON_PICKER_GROUPS = [
@@ -3790,6 +3810,7 @@ function fillFormFromDraft(){
   document.getElementById('f-yieldQty').value = d.yieldQty || '';
   document.getElementById('f-yieldUnit').value = d.yieldUnit || 'porciones';
   document.getElementById('f-notes').value = d.notes || '';
+  document.getElementById('f-shelfDays').value = d.shelfLifeDays || '';
   document.getElementById('f-salePrice').value = d.salePrice || '';
   document.getElementById('f-packSize').value = d.packSize || '';
   document.getElementById('f-packPrice').value = d.packPrice || '';
@@ -4785,6 +4806,8 @@ function saveRecipe(){
   d.yieldQty = parseFloat(document.getElementById('f-yieldQty').value) || 0;
   d.yieldUnit = document.getElementById('f-yieldUnit').value.trim() || 'porciones';
   d.notes = document.getElementById('f-notes').value;
+  const shelfDays = parseFloat(document.getElementById('f-shelfDays').value);
+  d.shelfLifeDays = (!isNaN(shelfDays) && shelfDays>0) ? shelfDays : null;
   const sp = parseFloat(document.getElementById('f-salePrice').value);
   d.salePrice = isNaN(sp) ? null : sp;
   const pkS = parseFloat(document.getElementById('f-packSize').value);
@@ -9057,6 +9080,61 @@ function exportDataToExcel(){
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(pedidosRows), 'Pedidos');
     XLSX.writeFile(wb, 'kobu-datos-'+todayStr()+'.xlsx');
     showToast('Excel exportado');
+  }).catch(function(){
+    showToast('No se pudo generar el Excel — revisá tu conexión.');
+  });
+}
+let labelExportRecipeId = null;
+function openLabelExportModal(recipeId){
+  const r = DATA.recipes.find(function(x){ return x.id===recipeId; });
+  if(!r) return;
+  labelExportRecipeId = recipeId;
+  const inp = document.getElementById('le-date');
+  if(inp) inp.value = todayStr();
+  const nameEl = document.getElementById('le-recipe-name');
+  if(nameEl) nameEl.textContent = r.title;
+  document.getElementById('labelExportModal').classList.add('active');
+}
+function closeLabelExportModal(){
+  document.getElementById('labelExportModal').classList.remove('active');
+}
+function confirmExportLabels(format){
+  const elabDate = (document.getElementById('le-date').value || todayStr());
+  const recipeId = labelExportRecipeId;
+  closeLabelExportModal();
+  exportLabelToExcel(recipeId, elabDate);
+}
+function recipeLabelIngredientNames(r){
+  const seen = {}; const names = [];
+  flatRecipeIngredients(r).forEach(function(ing){
+    if(!ing.name) return;
+    if(ingredientEntryType(ing)==='insumo') return;
+    const key = ing.name.trim().toLowerCase();
+    if(!key || seen[key]) return;
+    seen[key] = true;
+    names.push(ing.name);
+  });
+  return names;
+}
+function recipeLabelFVto(r, elabDateStr){
+  const days = parseFloat(r.shelfLifeDays);
+  if(isNaN(days) || days<=0) return '';
+  const d = new Date(elabDateStr+'T00:00:00');
+  if(isNaN(d.getTime())) return '';
+  d.setDate(d.getDate()+Math.round(days));
+  return d.toISOString().slice(0,10);
+}
+function exportLabelToExcel(recipeId, elabDateStr){
+  const r = DATA.recipes.find(function(x){ return x.id===recipeId; });
+  if(!r) return;
+  showToast('Generando Excel de etiqueta...');
+  loadXLSXLib().then(function(){
+    const rows = [['Nombre','Ingredientes','Fecha de elaboración','Fecha de vencimiento']];
+    rows.push([ r.title, recipeLabelIngredientNames(r).join(', '), elabDateStr, recipeLabelFVto(r, elabDateStr) ]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), 'Etiqueta');
+    XLSX.writeFile(wb, 'etiqueta-'+r.id+'-'+elabDateStr+'.xlsx');
+    showToast('Excel de etiqueta exportado');
   }).catch(function(){
     showToast('No se pudo generar el Excel — revisá tu conexión.');
   });

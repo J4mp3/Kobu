@@ -22,6 +22,7 @@
     --k-bg:#FBF3E7; --k-card:#ffffff; --k-card2:#F5EAD6; --k-text:#3E2723; --k-muted:#A8896A;
     --k-accent:#86644A; --k-border:#E6D9C4; --k-danger:#C0392B; --k-danger-bg:#FCEBEB; --k-success:#3B6D11; --k-success-bg:#EAF3DE;
     --k-warning:#B8730E; --k-warning-bg:#FBEBD3; --k-info:#185FA5; --k-info-bg:#E6F1FB;
+    --k-diet-azucar:#2C7BB0; --k-diet-tacc:#B5502A; --k-diet-lactosa:#7A5FA8; --k-diet-vegano:#3F8F4F;
     --k-status-pend:#B33A2E; --k-status-pend-bg:#F6E1DE;
     --k-status-conf:#5B4FA8; --k-status-conf-bg:#E7E3F5;
     --k-status-prep:#B9791E; --k-status-prep-bg:#F7ECD3;
@@ -35,6 +36,7 @@
     --k-bg:#2B2420; --k-card:#362E28; --k-card2:#3F352C; --k-text:#F5EDE3; --k-muted:#B49E88;
     --k-accent:#C7A88E; --k-border:#4A3F34; --k-danger:#ED8172; --k-danger-bg:#3A211D; --k-success:#8FBF5A; --k-success-bg:#26331A;
     --k-warning:#E0A85C; --k-warning-bg:#3A2E1A; --k-info:#6FA8DC; --k-info-bg:#1E2E3D;
+    --k-diet-azucar:#7FB8E0; --k-diet-tacc:#E8916B; --k-diet-lactosa:#C3A8E8; --k-diet-vegano:#8ED17A;
     --k-status-pend:#E8897C; --k-status-pend-bg:#3A211D;
     --k-status-conf:#B3A8E8; --k-status-conf-bg:#2A2540;
     --k-status-prep:#E8B86B; --k-status-prep-bg:#3A2E18;
@@ -47,6 +49,7 @@
     --k-bg:#0C0C22; --k-card:#13142A; --k-card2:#1A1A33; --k-text:#EDEBF5; --k-muted:#858297;
     --k-accent:#8F8BB1; --k-border:#32314E; --k-danger:#C2455C; --k-danger-bg:#2B1720; --k-success:#7EA587; --k-success-bg:#1A241E;
     --k-warning:#AB9A7C; --k-warning-bg:#292318; --k-info:#7F93AD; --k-info-bg:#1E2635;
+    --k-diet-azucar:#7FA8D9; --k-diet-tacc:#D97B65; --k-diet-lactosa:#B98FD9; --k-diet-vegano:#7FCB8A;
     --k-status-pend:#AB827C; --k-status-pend-bg:#261A20;
     --k-status-conf:#938EB4; --k-status-conf-bg:#272539;
     --k-status-prep:#AB997C; --k-status-prep-bg:#292318;
@@ -59,6 +62,7 @@
     --k-bg:#F1F4E9; --k-card:#FFFFFF; --k-card2:#E3E9D6; --k-text:#3A5A40; --k-muted:#7C8F72;
     --k-accent:#4E5E41; --k-border:#D8E0CB; --k-danger:#B3574A; --k-danger-bg:#F5E6E2; --k-success:#3F7D5C; --k-success-bg:#E1EEE4;
     --k-warning:#B98A3E; --k-warning-bg:#F5EAD3; --k-info:#4C7A9E; --k-info-bg:#E3EDF2;
+    --k-diet-azucar:#3E7FA6; --k-diet-tacc:#B5502A; --k-diet-lactosa:#8A6FAE; --k-diet-vegano:#2F9E44;
     --k-status-pend:#B3574A; --k-status-pend-bg:#F5E6E2;
     --k-status-conf:#8B7FA8; --k-status-conf-bg:#ECE8F2;
     --k-status-prep:#B98A3E; --k-status-prep-bg:#F5EAD3;
@@ -71,6 +75,7 @@
     --k-bg:#0E1410; --k-card:#161D15; --k-card2:#1D251B; --k-text:#E7ECDD; --k-muted:#838F7C;
     --k-accent:#8FA382; --k-border:#2A332A; --k-danger:#B06A5C; --k-danger-bg:#241715; --k-success:#7EA587; --k-success-bg:#1A241E;
     --k-warning:#AB9A7C; --k-warning-bg:#211D14; --k-info:#7F93AD; --k-info-bg:#191F27;
+    --k-diet-azucar:#7FB8CC; --k-diet-tacc:#D98A66; --k-diet-lactosa:#B39BD9; --k-diet-vegano:#7FD858;
     --k-status-pend:#B06A5C; --k-status-pend-bg:#241715;
     --k-status-conf:#938EB4; --k-status-conf-bg:#1E1D29;
     --k-status-prep:#AB9A7C; --k-status-prep-bg:#211D14;
@@ -147,6 +152,9 @@
   .chiprow{ display:flex; gap:6px; flex-wrap:wrap; }
   .chip{ background:var(--k-card2); color:var(--k-accent); font-size:calc(10px + var(--kobu-font-boost, 0px)); padding:4px 10px; border-radius:20px; border:none; cursor:pointer; }
   .chip.active{ background:var(--k-accent); color:var(--k-bg); }
+  .diet-filter-circle{ width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:none; cursor:pointer; flex-shrink:0; background:var(--k-card2); transition:transform .15s ease; }
+  .diet-filter-circle:active{ transform:scale(.9); }
+  .diet-filter-circle .icon-slot{ font-size:calc(15px + var(--kobu-font-boost, 0px)); }
   .chip.removable{ display:flex; align-items:center; gap:4px; }
   .chip.removable .icon-slot{ font-size:calc(11px + var(--kobu-font-boost, 0px)); cursor:pointer; }
   .mediaTabs{ display:flex; gap:8px; margin-bottom:9px; }
@@ -257,10 +265,10 @@
   .stockpick .btn:disabled{ opacity:.4; cursor:not-allowed; }
   .thumb-icon svg, .hero-icon svg{ width:1em; height:1em; flex-shrink:0; }
   .card .meta p{ margin:0; }
-  .card .meta .t{ font-size:calc(13px + var(--kobu-font-boost, 0px)); font-weight:500; color:var(--k-text); }
+  .card .meta .t{ font-size:calc(13px + var(--kobu-font-boost, 0px)); font-weight:500; color:var(--k-text); display:flex; align-items:center; gap:4px; flex-wrap:wrap; }
   .card .meta .s{ font-size:calc(11px + var(--kobu-font-boost, 0px)); color:var(--k-muted); margin-top:2px; }
-  .card .meta .diet{ display:flex; gap:4px; margin-top:4px; }
-  .card .meta .diet .icon-slot{ font-size:11px; color:var(--k-accent); }
+  .diet-icon-badge{ width:16px; height:16px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .diet-icon-badge .icon-slot{ font-size:10px; }
   .empty{ display:flex; flex-direction:column; align-items:center; text-align:center; width:100%; padding:40px 10px; color:var(--k-muted); font-size:calc(12.5px + var(--kobu-font-boost, 0px)); }
   #recipeList.home-list-hidden, #prepCardList.home-list-hidden{ display:none !important; }
   .empty .icon-slot{ font-size:calc(30px + var(--kobu-font-boost, 0px)); margin-bottom:8px; color:var(--k-border); }
@@ -270,12 +278,13 @@
   .badges{ display:flex; gap:6px; flex-wrap:wrap; }
   .badge{ background:var(--k-card2); color:var(--k-accent); font-size:calc(11px + var(--kobu-font-boost, 0px)); padding:3px 9px; border-radius:20px; }
   .d-hero-wrap{ position:relative; }
-  .d-diet-float{ position:absolute; left:12px; bottom:-14px; display:flex; gap:6px; flex-wrap:wrap; z-index:2; }
-  .d-diet-circle{ width:32px; height:32px; border-radius:50%; background:var(--k-card); border:1.5px solid var(--k-border); display:flex; align-items:center; justify-content:center; color:var(--k-accent); font-size:14px; cursor:pointer; flex-shrink:0; transition:transform .15s ease; }
+  .d-diet-float{ position:absolute; left:12px; bottom:-18px; display:flex; gap:7px; flex-wrap:wrap; z-index:2; }
+  .d-diet-circle{ position:relative; width:42px; height:42px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; transition:transform .15s ease; border-width:1.5px; }
   .d-diet-circle:active{ transform:scale(.9); }
-  .d-diet-circle.active{ background:var(--k-accent); color:var(--k-bg); border-color:var(--k-accent); }
-  .d-diet-circle.ghost{ border-style:dashed; opacity:.65; }
-  .d-diet-circle.plus{ font-size:16px; font-weight:700; }
+  .d-diet-circle .icon-slot{ font-size:19px; }
+  .d-diet-circle.plus{ background:var(--k-card); border:1.5px dashed var(--k-border); color:var(--k-muted); font-size:17px; font-weight:700; }
+  .d-diet-dot{ position:absolute; bottom:-1px; right:-1px; width:12px; height:12px; border-radius:50%; border:1.5px solid var(--k-bg); display:flex; align-items:center; justify-content:center; }
+  .d-diet-dot .icon-slot{ font-size:7px; color:#fff; }
   .d-spec-row{ display:flex; align-items:center; gap:9px; flex-wrap:wrap; }
   .d-spec-item{ display:flex; align-items:center; gap:5px; font-size:calc(11.5px + var(--kobu-font-boost, 0px)); color:var(--k-muted); white-space:nowrap; }
   .d-spec-item .icon-slot{ font-size:calc(13px + var(--kobu-font-boost, 0px)); color:var(--k-accent); }
@@ -1372,6 +1381,23 @@
     </div>
   </div>
 
+  <!-- ELIMINAR RECETA (versiones sueltas o receta completa) -->
+  <div class="modal-overlay" id="deleteRecipeModal">
+    <div class="modal-box" style="padding:0;gap:0;">
+      <div class="wd-headtint">
+        <p class="modal-msg" style="text-align:left;font-weight:600;margin:0;">¿Qué necesitás borrar?</p>
+        <p class="modal-msg" style="text-align:left;font-size:calc(11.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:4px 0 0;">Marcá una o más versiones, o elegí borrar todo.</p>
+      </div>
+      <div class="wd-headbody">
+        <div id="drm-list" style="display:flex;flex-direction:column;"></div>
+        <div class="btn-row" style="margin-top:14px;">
+          <button class="btn btn-ghost" onclick="closeDeleteRecipeModal()">Cancelar</button>
+          <button class="btn btn-primary" onclick="confirmDeleteRecipeSelection()">Confirmar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- STOCK COMBINADO RECETA + VARIANTES -->
   <div class="modal-overlay" id="recipeStockSummaryModal">
     <div class="modal-box" style="max-width:300px;">
@@ -1534,7 +1560,10 @@
           </button>
         </div>
       </div>
-      <div class="chiprow" id="tagChips" style="justify-content:center;margin-top:10px;max-height:0px;opacity:0;overflow:hidden;transition:opacity .25s ease,max-height .3s ease;"></div>
+      <div id="tagChipsWrap" style="max-height:0px;opacity:0;overflow:hidden;transition:opacity .25s ease,max-height .3s ease;margin-top:10px;">
+        <div class="chiprow" id="dietFilterChips" style="justify-content:center;margin-bottom:6px;"></div>
+        <div class="chiprow" id="tagChips" style="justify-content:center;"></div>
+      </div>
     </div>
     <div id="recipeList" style="display:flex;flex-direction:column;gap:8px;"></div>
     <div id="prepCardList" class="home-list-hidden" style="display:flex;flex-direction:column;gap:8px;"></div>
@@ -1588,6 +1617,11 @@
           <div class="field" style="flex:1;"><label>Rinde (cantidad)</label><input class="input" id="f-yieldQty" type="number" min="0" placeholder="12" oninput="updateFormCostPreview()"></div>
           <div class="field" style="flex:1;"><label>Unidad de venta</label><input class="input" id="f-yieldUnit" placeholder="brownies, porciones..."></div>
         </div>
+      </div>
+      <div class="grp-card" id="formDietBaseCard">
+        <p class="section-title"><span class="badge-ic"><span class="icon-slot" data-icon="leaf"></span></span>Tipo de receta</p>
+        <p style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;">Si esta receta ya es de por sí sin TACC, vegana, etc., marcalo acá — así no te va a aparecer arriba el ícono para crear esa versión de nuevo.</p>
+        <div class="btn-row" id="f-dietBaseChips" style="flex-wrap:wrap;gap:8px;"></div>
       </div>
       <div class="grp-card" id="formTagsCard">
         <p class="section-title"><span class="badge-ic"><span class="icon-slot" data-icon="list"></span></span>Etiquetas y equipo</p>
@@ -1710,7 +1744,7 @@
       </div>
       <div class="d-spec-row" id="d-badges"></div>
       <div class="badges" id="d-tags"></div>
-      <div id="d-dietBanner" style="display:none;align-items:center;gap:6px;background:var(--k-card2);color:var(--k-accent);border-radius:10px;padding:7px 10px;font-size:calc(11.5px + var(--kobu-font-boost, 0px));"></div>
+      <div id="d-dietBanner" style="display:none;align-items:center;justify-content:center;gap:8px;padding:4px 0;"></div>
       <div id="d-parent" style="display:none;font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);"></div>
     </div>
     <div class="grp-card">
@@ -3394,19 +3428,40 @@ function renderTagChips(){
 }
 function setTagFilter(t){ activeTag = t; renderRecipes(); }
 function setPrepTagFilter(t){ activePrepTag = t; renderRecipes(); }
+let activeDietFilter = null;
+function renderDietFilterChips(){
+  const wrap = document.getElementById('dietFilterChips');
+  if(!wrap) return;
+  const isPrep = homeTab==='preps';
+  if(isPrep){ wrap.style.display = 'none'; wrap.innerHTML=''; return; }
+  wrap.style.display = 'flex';
+  wrap.style.gap = '8px';
+  const options = [{ type:'original', label:'Original', icon:'chef-hat', color:'var(--k-muted)' }].concat(DIET_VARIANT_TYPES);
+  wrap.innerHTML = options.map(function(m){
+    const active = activeDietFilter===m.type;
+    return '<button type="button" class="diet-filter-circle" style="'+(active?('background:'+m.color+';color:var(--k-bg);'):('color:'+m.color+';'))+'" onclick="toggleDietFilterChip(\''+m.type+'\')" title="'+escapeHtml(m.label)+'"><span class="icon-slot" data-icon="'+m.icon+'"></span></button>';
+  }).join('');
+  mountIcons();
+}
+function toggleDietFilterChip(type){
+  activeDietFilter = (activeDietFilter===type) ? null : type;
+  renderDietFilterChips();
+  renderRecipes();
+}
 function toggleTagSearch(){
   tagSearchOpen = !tagSearchOpen;
   const card = document.getElementById('tagSearchCard');
-  const chips = document.getElementById('tagChips');
+  const chips = document.getElementById('tagChipsWrap');
   if(card) card.style.transform = tagSearchOpen ? 'rotateY(0deg)' : 'rotateY(180deg)';
   if(chips){
-    chips.style.maxHeight = tagSearchOpen ? '200px' : '0px';
+    chips.style.maxHeight = tagSearchOpen ? '260px' : '0px';
     chips.style.opacity = tagSearchOpen ? '1' : '0';
   }
   if(tagSearchOpen){
     tagSearchQuery = '';
     const input = document.getElementById('tagSearchInput');
     if(input){ input.value = ''; setTimeout(function(){ input.focus(); }, 350); }
+    renderDietFilterChips();
     renderTagChips();
   }
 }
@@ -3659,18 +3714,22 @@ function applyHomeTabUI(){
   if(tagSearchWrap) tagSearchWrap.style.display = (isRecetas || isPreps) ? 'flex' : 'none';
   if(!isRecetas && !isPreps && tagSearchOpen){ toggleTagSearch(); }
   renderTagChips();
+  renderDietFilterChips();
   document.getElementById('recipeList').classList.toggle('home-list-hidden', !isRecetas);
   document.getElementById('prepCardList').classList.toggle('home-list-hidden', !isPreps);
 }
 function renderRecipes(){
   renderTagChips();
+  renderDietFilterChips();
   renderHomeSummary();
   renderPrepLibraryCards();
   applyHomeTabUI();
-  const unfiltered = !activeTag;
+  const unfiltered = !activeTag && !activeDietFilter;
   const filtered = DATA.recipes.filter(function(r){
     if(r.isDietVariant) return false;
     if(activeTag && !(r.tags||[]).includes(activeTag)) return false;
+    if(activeDietFilter==='original' && r.dietBaseType) return false;
+    if(activeDietFilter && activeDietFilter!=='original' && !recipeHasDietType(r, activeDietFilter)) return false;
     return true;
   });
   const favs = filtered.filter(function(r){ return r.favorite; });
@@ -3689,15 +3748,15 @@ function renderRecipes(){
     const readyBtn = '<button type="button" class="iconbtn card-ready" onclick="event.stopPropagation();toggleReadyToSell(\''+r.id+'\')" title="lista para vender">'+readyMark+'</button>';
     const dragBtn = (unfiltered && r.favorite) ? '<button type="button" class="iconbtn card-drag" onclick="event.stopPropagation();" onpointerdown="event.stopPropagation();recipeDragStart(event,\''+r.id+'\')" title="mover"><span class="icon-slot" data-icon="grip"></span></button>' : '';
     const stockBadge = '<span class="thumb-stock-badge" style="background:'+stockColor(r.stock||0)+';" title="stock: '+(r.stock||0)+'" onclick="event.stopPropagation();handleRecipeStockBadgeTap(\''+r.id+'\')">'+(r.stock||0)+'</span>';
-    const dietVariants = dietVariantsOf(r.id);
-    const dietBadges = dietVariants.length ? ('<div class="diet">'+dietVariants.map(function(v){
-      return '<span class="icon-slot" data-icon="'+dietVariantIcon(v.variantType)+'" title="'+escapeHtml(v.variantLabel)+'"></span>';
-    }).join('')+'</div>') : '';
+    const dietTypes = recipeDisplayDietTypes(r);
+    const dietIcons = dietTypes.map(function(t){
+      return '<span class="diet-icon-badge" style="background:color-mix(in srgb, '+t.meta.color+' 18%, transparent);" title="'+escapeHtml(t.meta.label)+'"><span class="icon-slot" data-icon="'+t.meta.icon+'" style="color:'+t.meta.color+';"></span></span>';
+    }).join('');
     return '<div class="card" data-id="'+r.id+'" data-fav="'+(r.favorite?1:0)+'" onclick="openDetail(\''+r.id+'\')">'+
       dragBtn + favBtn + readyBtn +
       '<div class="thumb" style="'+bg+'">'+mediaIconHtml(r,'thumb-icon')+stockBadge+'</div>'+
-      '<div class="meta"><p class="t">'+escapeHtml(r.title)+'</p>'+
-      '<p class="s">'+(r.timeMinutes||'-')+' min · '+escapeHtml(r.difficulty||'')+'</p>'+dietBadges+'</div>'+
+      '<div class="meta"><p class="t">'+escapeHtml(r.title)+dietIcons+'</p>'+
+      '<p class="s">'+(r.timeMinutes||'-')+' min · '+escapeHtml(r.difficulty||'')+'</p></div>'+
       '</div>';
   }).join('');
   mountIcons();
@@ -3967,7 +4026,8 @@ function emptyDraft(){
     id:null, title:'', photo:null, icon:null, mediaMode:'icono', colorIdx: DATA.recipes.length % PLACEHOLDER_COLORS.length,
     timeMinutes:'', difficulty:'fácil', yieldQty:'', yieldUnit:'porciones', tags:[], ovenIds:[], utensilIds:[],
     ingredients:[], steps:[], notes:'', salePrice:null, parentId:null, quickNotes:[], ovenSettings:{},
-    components:[], finalSteps:[], moldShapesApt:[], moldCalibrations:[], moldYieldMode:'molde', shelfLifeDays:''
+    components:[], finalSteps:[], moldShapesApt:[], moldCalibrations:[], moldYieldMode:'molde', shelfLifeDays:'',
+    dietBaseType:null
   };
 }
 const ICON_PICKER_GROUPS = [
@@ -4125,12 +4185,15 @@ function fillFormFromDraft(){
   renderStepRows();
   renderComponentTabs();
   renderFinalStepRows();
+  renderDietBaseTypeChips();
   applyDietVariantFormMode();
 }
 function applyDietVariantFormMode(){
   const d = state.draft;
   const banner = document.getElementById('formDietBanner');
   const textEl = document.getElementById('formDietBannerText');
+  const baseCard = document.getElementById('formDietBaseCard');
+  if(baseCard) baseCard.style.display = (d && d.isDietVariant) ? 'none' : '';
   if(!banner || !textEl) return;
   if(d && d.isDietVariant){
     const parent = DATA.recipes.find(function(x){ return x.id===d.parentId; });
@@ -4139,6 +4202,27 @@ function applyDietVariantFormMode(){
   } else {
     banner.style.display = 'none';
   }
+}
+function renderDietBaseTypeChips(){
+  const wrap = document.getElementById('f-dietBaseChips');
+  if(!wrap) return;
+  const d = state.draft;
+  const current = d.dietBaseType || null;
+  const options = [{ type:null, label:'Original', icon:'chef-hat' }].concat(DIET_VARIANT_TYPES.map(function(m){ return { type:m.type, label:m.label, icon:m.icon }; }));
+  wrap.innerHTML = options.map(function(o){
+    const active = current===o.type;
+    return '<button type="button" class="chip '+(active?'active':'')+'" onclick="setDietBaseType('+(o.type?"'"+o.type+"'":'null')+')"><span class="icon-slot" data-icon="'+o.icon+'" style="margin-right:4px;"></span>'+escapeHtml(o.label)+'</button>';
+  }).join('');
+  mountIcons();
+}
+function setDietBaseType(type){
+  const d = state.draft;
+  if(type && d.id){
+    const existing = dietVariantsOf(d.id).find(function(v){ return v.variantType===type; });
+    if(existing){ showToast('Ya existe una versión '+dietVariantTypeMeta(type).label+' de esta receta'); return; }
+  }
+  d.dietBaseType = type;
+  renderDietBaseTypeChips();
 }
 const MOLD_SHAPES = [
   {key:'redondo', label:'Redondo'},
@@ -5165,6 +5249,7 @@ function saveRecipe(){
     return { id: c.id || ('mc-'+Date.now()+'-'+Math.random().toString(36).slice(2,6)), moldId:c.moldId, yieldQty:parseFloat(c.yieldQty), unitWeight:parseFloat(c.unitWeight) };
   });
   d.moldYieldMode = (state.draft.moldYieldMode==='corte') ? 'corte' : 'molde';
+  d.dietBaseType = d.isDietVariant ? null : (d.dietBaseType || null);
   d.quickNotes = d.quickNotes || [];
   if(d.mediaMode === 'icono'){ d.photo = null; } else { d.icon = null; }
   d.colorIdx = randomWarmColorIdx();
@@ -5578,18 +5663,95 @@ function saveOvenFromDetail(){
   renderDetailKnobs();
 }
 function editCurrent(){ openForm(state.currentId); }
-async function deleteCurrent(){
-  const ok = await showConfirm('¿Borrar esta receta?');
-  if(!ok) return;
-  const idx = DATA.recipes.findIndex(function(x){ return x.id===state.currentId; });
-  if(idx===-1) return;
-  const removed = DATA.recipes[idx];
-  DATA.recipes.splice(idx,1);
+function deleteCurrent(){
+  const r = DATA.recipes.find(function(x){ return x.id===state.currentId; });
+  if(!r) return;
+  openDeleteRecipeModal(dietVariantFamilyBaseId(r));
+}
+let deleteRecipeBaseId = null;
+let deleteRecipeSelection = {};
+function openDeleteRecipeModal(baseId){
+  const base = DATA.recipes.find(function(x){ return x.id===baseId; });
+  if(!base) return;
+  deleteRecipeBaseId = baseId;
+  deleteRecipeSelection = {};
+  renderDeleteRecipeList();
+  document.getElementById('deleteRecipeModal').classList.add('active');
+}
+function closeDeleteRecipeModal(){
+  document.getElementById('deleteRecipeModal').classList.remove('active');
+}
+function toggleDeleteRecipeOption(id){
+  deleteRecipeSelection[id] = !deleteRecipeSelection[id];
+  renderDeleteRecipeList();
+}
+function renderDeleteRecipeList(){
+  const base = DATA.recipes.find(function(x){ return x.id===deleteRecipeBaseId; });
+  if(!base) return;
+  const variants = dietVariantsOf(deleteRecipeBaseId);
+  const baseMeta = base.dietBaseType ? dietVariantTypeMeta(base.dietBaseType) : null;
+  const rows = [{ id:base.id, label:(baseMeta?baseMeta.label:'Original'), icon:(baseMeta?baseMeta.icon:'chef-hat') }].concat(
+    variants.map(function(v){ return { id:v.id, label:v.variantLabel, icon:dietVariantIcon(v.variantType) }; })
+  );
+  let html = rows.map(function(row){
+    const on = !!deleteRecipeSelection[row.id];
+    return '<div class="rowline">'+
+      '<span class="l" style="display:flex;align-items:center;gap:8px;"><span class="icon-slot" data-icon="'+row.icon+'" style="color:var(--k-accent);"></span>'+escapeHtml(row.label)+'</span>'+
+      '<div class="switch '+(on?'on':'')+'" onclick="toggleDeleteRecipeOption(\''+row.id+'\')"><div class="knob-sw"></div></div>'+
+    '</div>';
+  }).join('');
+  html += '<div onclick="confirmDeleteEntireRecipe()" style="display:flex;align-items:center;gap:8px;margin-top:10px;padding:11px 12px;border-radius:10px;background:var(--k-danger-bg);cursor:pointer;">'+
+    '<span class="icon-slot" data-icon="flame" style="color:var(--k-danger);"></span>'+
+    '<span style="flex:1;font-size:calc(13px + var(--kobu-font-boost, 0px));font-weight:600;color:var(--k-danger);">Todo (receta completa)</span>'+
+    '<span class="icon-slot" data-icon="chevron-right" style="color:var(--k-danger);"></span>'+
+  '</div>';
+  document.getElementById('drm-list').innerHTML = html;
+  mountIcons();
+}
+function confirmDeleteRecipeSelection(){
+  const ids = Object.keys(deleteRecipeSelection).filter(function(id){ return deleteRecipeSelection[id]; });
+  if(!ids.length){ showToast('Marcá al menos una versión'); return; }
+  const baseId = deleteRecipeBaseId;
+  closeDeleteRecipeModal();
+  const removedList = ids.map(function(id){ return DATA.recipes.findIndex(function(x){ return x.id===id; }); })
+    .filter(function(idx){ return idx!==-1; })
+    .map(function(idx){ return { idx:idx, item:DATA.recipes[idx] }; })
+    .sort(function(a,b){ return b.idx-a.idx; });
+  removedList.forEach(function(r){ DATA.recipes.splice(r.idx,1); });
+  if(ids.indexOf(baseId)!==-1){
+    DATA.recipes.forEach(function(x){
+      if(x.parentId===baseId){ x.parentId=null; x.isDietVariant=false; x.variantType=null; x.variantLabel=null; }
+    });
+  }
+  saveData(DATA);
+  const stillBase = DATA.recipes.find(function(x){ return x.id===baseId; });
+  if(ids.indexOf(state.currentId)!==-1){
+    if(stillBase){ state.currentId = stillBase.id; state.stack = ['home','detail']; render(); openDetailRender(stillBase.id); }
+    else { state.stack = ['home']; render(); }
+  } else if(state.stack[state.stack.length-1]==='detail'){
+    openDetailRender(state.currentId);
+  }
+  renderRecipes();
+  showUndoToast(ids.length>1 ? 'Versiones borradas' : 'Versión borrada', function(){
+    removedList.sort(function(a,b){ return a.idx-b.idx; }).forEach(function(r){ DATA.recipes.splice(r.idx,0,r.item); });
+    saveData(DATA);
+    if(state.stack[state.stack.length-1]==='detail') openDetailRender(state.currentId);
+    renderRecipes();
+  });
+}
+function confirmDeleteEntireRecipe(){
+  const baseId = deleteRecipeBaseId;
+  closeDeleteRecipeModal();
+  const removedList = DATA.recipes
+    .map(function(item,idx){ return { idx:idx, item:item }; })
+    .filter(function(o){ return o.item.id===baseId || o.item.parentId===baseId; })
+    .sort(function(a,b){ return b.idx-a.idx; });
+  removedList.forEach(function(r){ DATA.recipes.splice(r.idx,1); });
   saveData(DATA);
   state.stack = ['home'];
   render();
   showUndoToast('Receta borrada', function(){
-    DATA.recipes.splice(idx,0,removed);
+    removedList.sort(function(a,b){ return a.idx-b.idx; }).forEach(function(r){ DATA.recipes.splice(r.idx,0,r.item); });
     saveData(DATA);
     render();
   });
@@ -5602,6 +5764,7 @@ function generateVariant(id){
   clone.title = r.title+' (variante)';
   clone.parentId = r.id;
   clone.quickNotes = [];
+  clone.dietBaseType = null;
   state.editingId = null;
   state._libraryMode = false;
   state.draft = clone;
@@ -5615,15 +5778,29 @@ function generateVariant(id){
    VARIANTES DIETARIAS (sin azúcar, sin TACC, sin lactosa, vegano...)
    ========================================================= */
 const DIET_VARIANT_TYPES = [
-  { type:'azucar', label:'Sin azúcar', icon:'candy-off' },
-  { type:'tacc', label:'Sin TACC', icon:'bread-off' },
-  { type:'lactosa', label:'Sin lactosa', icon:'milk-off' },
-  { type:'vegano', label:'Vegano', icon:'leaf' }
+  { type:'azucar', label:'Sin azúcar', icon:'candy-off', color:'var(--k-diet-azucar)' },
+  { type:'tacc', label:'Sin TACC', icon:'bread-off', color:'var(--k-diet-tacc)' },
+  { type:'lactosa', label:'Sin lactosa', icon:'milk-off', color:'var(--k-diet-lactosa)' },
+  { type:'vegano', label:'Vegano', icon:'leaf', color:'var(--k-diet-vegano)' }
 ];
 function dietVariantTypeMeta(type){
-  return DIET_VARIANT_TYPES.find(function(x){ return x.type===type; }) || { type:'custom', label:'Personalizada', icon:'gift-card' };
+  return DIET_VARIANT_TYPES.find(function(x){ return x.type===type; }) || { type:'custom', label:'Personalizada', icon:'gift-card', color:'var(--k-accent)' };
 }
 function dietVariantIcon(type){ return dietVariantTypeMeta(type).icon; }
+function dietVariantColor(type){ return dietVariantTypeMeta(type).color || 'var(--k-accent)'; }
+function recipeDisplayDietTypes(r){
+  const variants = dietVariantsOf(r.id);
+  const list = variants.map(function(v){ return { type:v.variantType, meta:dietVariantTypeMeta(v.variantType) }; });
+  if(r.dietBaseType && !variants.some(function(v){ return v.variantType===r.dietBaseType; })){
+    list.unshift({ type:r.dietBaseType, meta:dietVariantTypeMeta(r.dietBaseType) });
+  } else if(!r.dietBaseType && variants.length){
+    list.unshift({ type:'original', meta:{ type:'original', label:'Original', icon:'chef-hat', color:'var(--k-muted)' } });
+  }
+  return list;
+}
+function recipeHasDietType(r, type){
+  return recipeDisplayDietTypes(r).some(function(t){ return t.type===type; });
+}
 function dietVariantsOf(recipeId){
   return DATA.recipes.filter(function(x){ return x.isDietVariant && x.parentId===recipeId; });
 }
@@ -5634,6 +5811,7 @@ function createDietVariant(baseId, type, customLabel){
   const r = DATA.recipes.find(function(x){ return x.id===baseId; });
   if(!r) return null;
   const meta = type==='custom' ? { type:'custom', label:(customLabel||'').trim()||'Personalizada', icon:'gift-card' } : dietVariantTypeMeta(type);
+  if(!r.isDietVariant && r.dietBaseType===meta.type) return null;
   const already = dietVariantsOf(baseId).some(function(v){ return v.variantType===meta.type && (meta.type!=='custom' || v.variantLabel===meta.label); });
   if(already){ showToast('Ya existe una variante de ese tipo'); return null; }
   const clone = JSON.parse(JSON.stringify(r));
@@ -5646,16 +5824,130 @@ function createDietVariant(baseId, type, customLabel){
   clone.quickNotes = [];
   clone.stock = 0;
   clone.favorite = false;
+  clone.dietBaseType = null;
   DATA.recipes.push(clone);
   saveData(DATA);
   return clone;
 }
 function createDietVariantFromDetail(baseId, type, customLabel){
-  const clone = createDietVariant(baseId, type, customLabel);
-  if(!clone) return;
-  showToast('Variante creada — cargale los ingredientes');
-  openForm(clone.id);
+  const r = DATA.recipes.find(function(x){ return x.id===baseId; });
+  if(!r) return;
+  const meta = type==='custom' ? { type:'custom', label:(customLabel||'').trim()||'Personalizada', icon:'gift-card' } : dietVariantTypeMeta(type);
+  if(!r.isDietVariant && r.dietBaseType===meta.type){ showToast('Esta receta ya es '+meta.label); return; }
+  const already = dietVariantsOf(baseId).some(function(v){ return v.variantType===meta.type && (meta.type!=='custom' || v.variantLabel===meta.label); });
+  if(already){ showToast('Ya existe una variante de ese tipo'); return; }
+  const clone = JSON.parse(JSON.stringify(r));
+  clone.id = null;
+  clone.title = r.title+' — '+meta.label;
+  clone.parentId = r.id;
+  clone.isDietVariant = true;
+  clone.variantType = meta.type;
+  clone.variantLabel = meta.label;
+  clone.quickNotes = [];
+  clone.stock = 0;
+  clone.favorite = false;
+  clone.dietBaseType = null;
+  state.editingId = null;
+  state._libraryMode = false;
+  state.draft = clone;
+  showScreen('form');
+  fillFormFromDraft();
+  applyLibraryFormMode();
   switchFormTab('ingr');
+  showToast('Editá y guardá para crear la variante');
+}
+function generateDietVariantWithAi(baseId, type){
+  const url = localStorage.getItem('kobuSyncUrl');
+  const key = localStorage.getItem('kobuSyncKey');
+  if(!url || !key){
+    return Promise.reject(new Error('configurá "Sincronización (nube)" en Ajustes primero, la IA se conecta por ahí'));
+  }
+  const r = DATA.recipes.find(function(x){ return x.id===baseId; });
+  if(!r) return Promise.reject(new Error('no encontré la receta base'));
+  const meta = dietVariantTypeMeta(type);
+  const model = localStorage.getItem('kobuAiModel') || KOBU_DEFAULT_AI_MODEL;
+  const unitList = DATA.units.map(function(u){ return u.name; }).concat(['u']).join(', ');
+  const comps = recipeComponentsOrFallback(r);
+  const recipeDump = comps.map(function(c,i){
+    const ingTxt = (c.ingredients||[]).map(function(x){ return '- '+x.name+': '+x.qty+' '+x.unit; }).join('\n');
+    const stepsTxt = (c.steps||[]).map(function(s,si){ return (si+1)+'. '+s; }).join('\n');
+    return (comps.length>1 ? ('Preparación "'+(c.name||('#'+(i+1)))+'":\n') : '')+'Ingredientes:\n'+ingTxt+'\nPasos:\n'+stepsTxt;
+  }).join('\n\n');
+  const finalStepsTxt = (r.finalSteps||[]).length ? '\n\nPasos de armado final:\n'+r.finalSteps.map(function(s,si){ return (si+1)+'. '+s; }).join('\n') : '';
+  const substitutionRules = {
+    azucar: 'Reemplazá el azúcar y derivados (azúcar común, azúcar impalpable, dulce de leche azucarado, etc.) por edulcorante u otra alternativa sin azúcar apta para hornear, ajustando cantidades si la alternativa endulza distinto, y ajustá los pasos si el cambio lo requiere (por ejemplo tiempos o texturas).',
+    tacc: 'Reemplazá la harina de trigo y cualquier ingrediente con gluten (harina 0000, harina leudante, avena común, etc.) por harinas o premezclas sin TACC (harina de arroz, premezcla sin TACC, fécula de maíz, goma xántica si hace falta), ajustando cantidades y pasos si la textura lo requiere.',
+    lactosa: 'Reemplazá la leche, manteca, crema y demás lácteos con lactosa por sus versiones sin lactosa o vegetales equivalentes, ajustando cantidades y pasos si hace falta.',
+    vegano: 'Reemplazá todo ingrediente de origen animal (huevo, manteca, leche, crema, miel, gelatina, etc.) por alternativas veganas equivalentes, ajustando cantidades y pasos si hace falta.'
+  };
+  const sys = 'Sos un asistente experto en repostería/panadería. Te paso una receta y tenés que convertirla a su versión "'+meta.label+'". '+(substitutionRules[type]||'')+' '+
+    'Mantené la receta lo más parecida posible en todo lo demás (mismos pasos y cantidades salvo lo que tengas que cambiar por la restricción). '+
+    'Devolvé SOLO un objeto JSON válido, sin texto extra ni markdown, con esta forma exacta: '+
+    '{"ingredients":[{"name":"","qty":0,"unit":""}],"steps":[""],"components":[{"name":"","ingredients":[{"name":"","qty":0,"unit":""}],"steps":[""]}],"finalSteps":[""],"changesSummary":""}. '+
+    'Si la receta original no tiene varias preparaciones, dejá "components" vacío y usá "ingredients"/"steps". Si tiene varias preparaciones (te las paso separadas abajo), usá "components" con un objeto por cada una manteniendo sus nombres, y dejá "ingredients"/"steps" de arriba vacíos. Si había pasos de armado final, ponelos en "finalSteps". '+
+    'Para "unit" de cada ingrediente usá preferentemente una de estas: '+unitList+'. '+
+    '"changesSummary" es un resumen breve en español (2-4 líneas) de qué ingredientes sustituiste y por qué, para que la persona lo revise antes de guardar. Respondé en español.';
+  const userMsg = 'Receta original: "'+r.title+'"\n\n'+recipeDump+finalStepsTxt;
+  return groqChatWithFallback(url, key, model, [{role:'system',content:sys},{role:'user',content:userMsg}])
+    .then(function(j){
+      const raw = (j.reply||'').trim();
+      const cleaned = raw.replace(/^```json/i,'').replace(/^```/,'').replace(/```$/,'').trim();
+      let parsed = null;
+      try{ parsed = JSON.parse(cleaned); }
+      catch(e){
+        const m = cleaned.match(/\{[\s\S]*\}/);
+        if(m){ try{ parsed = JSON.parse(m[0]); }catch(e2){} }
+      }
+      if(!parsed) throw new Error('la IA no devolvió un formato entendible, probá de nuevo');
+      return parsed;
+    });
+}
+function openAiDietVariantDraft(baseId, type, data){
+  const r = DATA.recipes.find(function(x){ return x.id===baseId; });
+  if(!r){ showToast('No encontré la receta base'); return; }
+  const meta = dietVariantTypeMeta(type);
+  if(!r.isDietVariant && r.dietBaseType===meta.type){ showToast('Esta receta ya es '+meta.label); return; }
+  const already = dietVariantsOf(baseId).some(function(v){ return v.variantType===meta.type; });
+  if(already){ showToast('Ya existe una variante '+meta.label+' — abrila desde los círculos debajo de la foto'); return; }
+  const clone = JSON.parse(JSON.stringify(r));
+  clone.id = null;
+  clone.title = r.title+' — '+meta.label;
+  clone.parentId = r.id;
+  clone.isDietVariant = true;
+  clone.variantType = meta.type;
+  clone.variantLabel = meta.label;
+  clone.quickNotes = [];
+  clone.stock = 0;
+  clone.favorite = false;
+  clone.dietBaseType = null;
+  const mapIngredients = function(list){
+    return (Array.isArray(list) ? list : []).map(function(ing){
+      const unit = normalizeUnit(ing.unit) || 'g';
+      return { priceId: matchIngredientPriceId(ing.name), name: ing.name||'', qty: (ing.qty!=null && ing.qty!=='') ? ing.qty : '', unit: unit, kind:'ingrediente' };
+    });
+  };
+  const parsedComponents = Array.isArray(data.components) ? data.components.filter(function(c){ return c && (c.name || (c.ingredients||[]).length || (c.steps||[]).length); }) : [];
+  if(parsedComponents.length){
+    clone.components = parsedComponents.map(function(c,i){
+      return { id:'prep-'+Date.now()+'-'+i, name: c.name || ('Preparación '+(i+1)), ingredients: mapIngredients(c.ingredients), steps: (Array.isArray(c.steps)?c.steps:[]).filter(Boolean) };
+    });
+    clone.finalSteps = (Array.isArray(data.finalSteps) ? data.finalSteps : []).filter(Boolean);
+    clone.ingredients = [];
+    clone.steps = [];
+  } else if(Array.isArray(data.ingredients) && data.ingredients.length){
+    clone.components = [];
+    clone.finalSteps = [];
+    clone.ingredients = mapIngredients(data.ingredients);
+    clone.steps = (Array.isArray(data.steps) ? data.steps : []).filter(Boolean);
+  }
+  state.editingId = null;
+  state._libraryMode = false;
+  state.draft = clone;
+  showScreen('form');
+  fillFormFromDraft();
+  applyLibraryFormMode();
+  switchFormTab('ingr');
+  showToast('Revisá los cambios que hizo la IA y guardá para crear la variante');
 }
 async function removeDietVariant(id){
   const r = DATA.recipes.find(function(x){ return x.id===id; });
@@ -5680,6 +5972,7 @@ async function removeDietVariant(id){
 function switchDetailVariant(id){
   const r = DATA.recipes.find(function(x){ return x.id===id; });
   if(!r) return;
+  state.currentId = id;
   const scr = document.getElementById('screen-detail');
   if(scr){
     scr.style.transition = 'opacity .12s ease';
@@ -5706,6 +5999,14 @@ function confirmCustomDietVariant(){
   closeCustomDietVariantModal();
   createDietVariantFromDetail(baseId, 'custom', label);
 }
+function dietCircleHtml(onclick, icon, title, color, state){
+  const isGhost = state==='ghost';
+  const isActive = state==='active';
+  const borderStyle = isGhost ? 'dashed' : 'solid';
+  const opacity = isGhost ? '.7' : '1';
+  const dot = '<span class="d-diet-dot" style="background:'+color+';">'+(isActive ? '<span class="icon-slot" data-icon="check"></span>' : '')+'</span>';
+  return '<span class="d-diet-circle" style="border-style:'+borderStyle+';border-color:'+color+';background:color-mix(in srgb, '+color+' 15%, var(--k-card));opacity:'+opacity+';" onclick="'+onclick+'" title="'+escapeHtml(title)+'"><span class="icon-slot" data-icon="'+icon+'" style="color:'+color+';"></span>'+dot+'</span>';
+}
 function renderDietVariantRow(r){
   const wrap = document.getElementById('d-dietFloat');
   const banner = document.getElementById('d-dietBanner');
@@ -5715,26 +6016,32 @@ function renderDietVariantRow(r){
   if(!base){ wrap.innerHTML=''; banner.style.display='none'; return; }
   const variants = dietVariantsOf(baseId);
   const originalActive = !r.isDietVariant;
-  let html = '<span class="d-diet-circle '+(originalActive?'active':'')+'" onclick="switchDetailVariant(\''+baseId+'\')" title="Original"><span class="icon-slot" data-icon="chef-hat"></span></span>';
+  const baseTypeMeta = (base.dietBaseType && !variants.some(function(x){ return x.variantType===base.dietBaseType; })) ? dietVariantTypeMeta(base.dietBaseType) : null;
+  const originalIcon = baseTypeMeta ? baseTypeMeta.icon : 'chef-hat';
+  const originalTitle = baseTypeMeta ? baseTypeMeta.label : 'Original';
+  const originalColor = baseTypeMeta ? baseTypeMeta.color : 'var(--k-accent)';
+  let html = dietCircleHtml('switchDetailVariant(\''+baseId+'\')', originalIcon, originalTitle, originalColor, originalActive?'active':'created');
   DIET_VARIANT_TYPES.forEach(function(meta){
+    if(baseTypeMeta && meta.type===baseTypeMeta.type) return;
     const v = variants.find(function(x){ return x.variantType===meta.type; });
     if(v){
       const isActive = r.id===v.id;
-      html += '<span class="d-diet-circle '+(isActive?'active':'')+'" onclick="switchDetailVariant(\''+v.id+'\')" title="'+escapeHtml(meta.label)+'"><span class="icon-slot" data-icon="'+meta.icon+'"></span></span>';
+      html += dietCircleHtml('switchDetailVariant(\''+v.id+'\')', meta.icon, meta.label, meta.color, isActive?'active':'created');
     } else {
-      html += '<span class="d-diet-circle ghost" onclick="createDietVariantFromDetail(\''+baseId+'\',\''+meta.type+'\')" title="Crear '+escapeHtml(meta.label)+'"><span class="icon-slot" data-icon="'+meta.icon+'"></span></span>';
+      html += dietCircleHtml('createDietVariantFromDetail(\''+baseId+'\',\''+meta.type+'\')', meta.icon, 'Crear '+meta.label, meta.color, 'ghost');
     }
   });
   variants.filter(function(v){ return v.variantType==='custom'; }).forEach(function(v){
     const isActive = r.id===v.id;
-    html += '<span class="d-diet-circle '+(isActive?'active':'')+'" onclick="switchDetailVariant(\''+v.id+'\')" title="'+escapeHtml(v.variantLabel)+'"><span class="icon-slot" data-icon="gift-card"></span></span>';
+    html += dietCircleHtml('switchDetailVariant(\''+v.id+'\')', 'gift-card', v.variantLabel, 'var(--k-accent)', isActive?'active':'created');
   });
-  html += '<span class="d-diet-circle ghost plus" onclick="openCustomDietVariantModal(\''+baseId+'\')" title="Agregar otra variante">+</span>';
+  html += '<span class="d-diet-circle plus" onclick="openCustomDietVariantModal(\''+baseId+'\')" title="Agregar otra variante"><span style="line-height:1;">+</span></span>';
   wrap.innerHTML = html;
   if(r.isDietVariant){
     banner.style.display = 'flex';
-    banner.innerHTML = '<span class="icon-slot" data-icon="'+dietVariantIcon(r.variantType)+'" style="font-size:12px;"></span><span style="flex:1;">Viendo: '+escapeHtml(r.variantLabel)+'</span>'+
-      '<button type="button" class="iconbtn" style="color:var(--k-danger);" onclick="removeDietVariant(\''+r.id+'\')"><span class="icon-slot" data-icon="trash"></span></button>';
+    banner.innerHTML = '<span style="flex:1;max-width:36px;height:1px;background:var(--k-border);"></span>'+
+      '<span style="font-size:calc(14px + var(--kobu-font-boost, 0px));color:var(--k-text);font-weight:500;white-space:nowrap;">'+escapeHtml(r.variantLabel)+'</span>'+
+      '<span style="flex:1;max-width:36px;height:1px;background:var(--k-border);"></span>';
   } else {
     banner.style.display = 'none';
   }
@@ -11012,6 +11319,16 @@ function buildPurchaseChatReply(intent){
   msg.actions = close.map(function(c){ return { id:'purchase-pick:'+c.cat.id, label:c.cat.name, kind:'ghost' }; });
   return msg;
 }
+function detectDietVariantIntent(text){
+  const t = (text||'').toLowerCase();
+  const wantsCreate = /(hac[eéiaí]\w*|hazme|cre[aá]\w*|gener[aá]\w*|arm[aá]\w*|pas[aá]\w*|convert[ií]\w*|dame|quiero|necesito|pod[eé]s?\s+(hacer|crear|armar))/.test(t);
+  if(!wantsCreate) return null;
+  if(/vegan[oa]/.test(t)) return 'vegano';
+  if(/sin\s*tacc|sin\s*gluten/.test(t)) return 'tacc';
+  if(/sin\s*az[uú]car/.test(t)) return 'azucar';
+  if(/sin\s*lactosa/.test(t)) return 'lactosa';
+  return null;
+}
 function detectProductionIntent(text){
   const t = (text||'').toLowerCase();
   const numMatch = t.match(/(\d+(?:[.,]\d+)?)/);
@@ -11222,6 +11539,12 @@ function handleChatAction(msgId, actionIdx){
     }
   } else if(action.id==='dismiss'){
     msg.actions = null;
+  } else if(action.id==='view-ai-diet-variant'){
+    const payload = msg.aiDietVariant;
+    msg.actions = null;
+    saveData(DATA);
+    if(payload) openAiDietVariantDraft(payload.baseId, payload.type, payload.data);
+    return;
   } else if(action.id.indexOf('purchase-pick:')===0){
     const priceId = action.id.slice('purchase-pick:'.length);
     const pending = msg.pendingPurchase || { qty:1, unit:null, price:0, provider:null };
@@ -11690,6 +12013,53 @@ function sendChatMessage(){
       saveData(DATA);
       renderChatScreen();
       return;
+    }
+  } else {
+    const dietType = detectDietVariantIntent(text);
+    if(dietType){
+      const meta = dietVariantTypeMeta(dietType);
+      const openRecipe = DATA.recipes.find(function(x){ return x.id===session.recipeId; });
+      const baseId = dietVariantFamilyBaseId(openRecipe);
+      const base = baseId ? DATA.recipes.find(function(x){ return x.id===baseId; }) : null;
+      if(base){
+        if(!base.isDietVariant && base.dietBaseType===dietType){
+          session.messages.push({role:'model', text:'"'+base.title+'" ya es '+meta.label+', no hace falta crear otra variante.'});
+          session.updatedAt = new Date().toISOString();
+          saveData(DATA);
+          renderChatScreen();
+          return;
+        }
+        const already = dietVariantsOf(baseId).some(function(v){ return v.variantType===dietType; });
+        if(already){
+          session.messages.push({role:'model', text:'Ya existe una variante '+meta.label+' de "'+base.title+'" — abrila tocando el círculo correspondiente debajo de la foto en la ficha.'});
+          session.updatedAt = new Date().toISOString();
+          saveData(DATA);
+          renderChatScreen();
+          return;
+        }
+        session.messages.push({role:'model', text:'Generando la versión '+meta.label+' con IA...'});
+        renderChatScreen();
+        generateDietVariantWithAi(baseId, dietType).then(function(parsed){
+          session.messages.pop();
+          const msg = { id:'m-'+Date.now()+'-'+Math.random().toString(36).slice(2,6), role:'model', text: parsed.changesSummary || ('Generé la versión '+meta.label+'.') };
+          msg.aiDietVariant = { baseId:baseId, type:dietType, data:parsed };
+          msg.actions = [
+            { id:'view-ai-diet-variant', label:'Ver, editar y guardar', kind:'primary' },
+            { id:'dismiss', label:'Descartar', kind:'ghost' }
+          ];
+          session.messages.push(msg);
+          session.updatedAt = new Date().toISOString();
+          saveData(DATA);
+          renderChatScreen();
+        }).catch(function(err){
+          session.messages.pop();
+          session.messages.push({role:'error', text:'No se pudo generar la variante: '+err.message});
+          session.updatedAt = new Date().toISOString();
+          saveData(DATA);
+          renderChatScreen();
+        });
+        return;
+      }
     }
   }
   session.messages.push({role:'model', text:'escribiendo...'});

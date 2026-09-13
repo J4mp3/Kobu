@@ -259,6 +259,8 @@
   .card .meta p{ margin:0; }
   .card .meta .t{ font-size:calc(13px + var(--kobu-font-boost, 0px)); font-weight:500; color:var(--k-text); }
   .card .meta .s{ font-size:calc(11px + var(--kobu-font-boost, 0px)); color:var(--k-muted); margin-top:2px; }
+  .card .meta .diet{ display:flex; gap:4px; margin-top:4px; }
+  .card .meta .diet .icon-slot{ font-size:11px; color:var(--k-accent); }
   .empty{ display:flex; flex-direction:column; align-items:center; text-align:center; width:100%; padding:40px 10px; color:var(--k-muted); font-size:calc(12.5px + var(--kobu-font-boost, 0px)); }
   #recipeList.home-list-hidden, #prepCardList.home-list-hidden{ display:none !important; }
   .empty .icon-slot{ font-size:calc(30px + var(--kobu-font-boost, 0px)); margin-bottom:8px; color:var(--k-border); }
@@ -267,6 +269,32 @@
   .hero-icon{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:var(--k-accent); font-size:calc(64px + var(--kobu-font-boost, 0px)); }
   .badges{ display:flex; gap:6px; flex-wrap:wrap; }
   .badge{ background:var(--k-card2); color:var(--k-accent); font-size:calc(11px + var(--kobu-font-boost, 0px)); padding:3px 9px; border-radius:20px; }
+  .d-hero-wrap{ position:relative; }
+  .d-diet-float{ position:absolute; left:12px; bottom:-14px; display:flex; gap:6px; flex-wrap:wrap; z-index:2; }
+  .d-diet-circle{ width:32px; height:32px; border-radius:50%; background:var(--k-card); border:1.5px solid var(--k-border); display:flex; align-items:center; justify-content:center; color:var(--k-accent); font-size:14px; cursor:pointer; flex-shrink:0; transition:transform .15s ease; }
+  .d-diet-circle:active{ transform:scale(.9); }
+  .d-diet-circle.active{ background:var(--k-accent); color:var(--k-bg); border-color:var(--k-accent); }
+  .d-diet-circle.ghost{ border-style:dashed; opacity:.65; }
+  .d-diet-circle.plus{ font-size:16px; font-weight:700; }
+  .d-spec-row{ display:flex; align-items:center; gap:9px; flex-wrap:wrap; }
+  .d-spec-item{ display:flex; align-items:center; gap:5px; font-size:calc(11.5px + var(--kobu-font-boost, 0px)); color:var(--k-muted); white-space:nowrap; }
+  .d-spec-item .icon-slot{ font-size:calc(13px + var(--kobu-font-boost, 0px)); color:var(--k-accent); }
+  .d-spec-div{ width:1px; height:12px; background:var(--k-border); flex-shrink:0; }
+  .cook-btn-sm{ display:flex; align-items:center; justify-content:center; gap:5px; background:var(--k-accent); color:var(--k-bg); border:none; border-radius:999px; padding:9px 14px; font-size:calc(11.5px + var(--kobu-font-boost, 0px)); font-weight:600; cursor:pointer; }
+  .cook-btn-sm.ghost{ background:var(--k-card2); color:var(--k-accent); }
+  .d-actions-bare{ display:flex; justify-content:space-around; align-items:center; }
+  .d-actions-bare .iconbtn{ font-size:calc(19px + var(--kobu-font-boost, 0px)); padding:6px 12px; }
+  .d-acc{ display:flex; flex-direction:column; gap:8px; }
+  .d-acc-item{ background:var(--k-card); border:0.5px solid var(--k-border); border-radius:14px; overflow:hidden; }
+  .d-acc-head{ display:flex; align-items:center; gap:8px; padding:13px 14px; cursor:pointer; }
+  .d-acc-head .badge-ic{ width:26px; height:26px; border-radius:8px; background:var(--k-card2); color:var(--k-accent); display:flex; align-items:center; justify-content:center; font-size:calc(14px + var(--kobu-font-boost, 0px)); flex-shrink:0; }
+  .d-acc-title{ flex:1; font-size:calc(12.5px + var(--kobu-font-boost, 0px)); font-weight:600; color:var(--k-text); }
+  .d-acc-count{ background:var(--k-card2); color:var(--k-accent); font-size:calc(10px + var(--kobu-font-boost, 0px)); border-radius:10px; padding:2px 7px; flex-shrink:0; }
+  .d-acc-chev{ color:var(--k-muted); font-size:calc(14px + var(--kobu-font-boost, 0px)); flex-shrink:0; transition:transform .2s ease; }
+  .d-acc-item.open .d-acc-chev{ transform:rotate(180deg); }
+  .d-acc-body{ display:none; padding:0 14px 14px; }
+  .d-acc-item.open .d-acc-body{ display:block; animation:dAccIn .18s ease; }
+  @keyframes dAccIn{ from{ opacity:0; transform:translateY(-4px); } to{ opacity:1; transform:translateY(0); } }
   .section-title{ font-size:calc(12px + var(--kobu-font-boost, 0px)); font-weight:600; color:var(--k-text); margin:4px 0 8px; display:flex; align-items:center; justify-content:space-between; }
   /* ---- grouped cards (ingredientes, ajustes) ---- */
   .grp-card{ background:var(--k-card); border-radius:14px; border:0.5px solid var(--k-border); padding:14px; display:flex; flex-direction:column; gap:10px; }
@@ -1332,6 +1360,27 @@
     </div>
   </div>
 
+  <!-- NUEVA VARIANTE DIETARIA PERSONALIZADA -->
+  <div class="modal-overlay" id="customDietVariantModal">
+    <div class="modal-box" style="max-width:300px;">
+      <p class="modal-msg" style="font-weight:600;">Nueva variante</p>
+      <div class="field"><label>Nombre</label><input class="input" id="cdv-label" placeholder="ej. Sin nueces, Keto"></div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" style="flex:1;" onclick="closeCustomDietVariantModal()">Cancelar</button>
+        <button class="btn btn-primary" style="flex:1;" onclick="confirmCustomDietVariant()">Crear</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STOCK COMBINADO RECETA + VARIANTES -->
+  <div class="modal-overlay" id="recipeStockSummaryModal">
+    <div class="modal-box" style="max-width:300px;">
+      <p class="modal-msg" style="font-weight:600;" id="rss-title">Stock</p>
+      <div id="rss-list" style="display:flex;flex-direction:column;gap:6px;"></div>
+      <button class="btn btn-ghost" style="width:100%;margin-top:8px;" onclick="closeRecipeStockSummaryModal()">Cerrar</button>
+    </div>
+  </div>
+
   <!-- NEW ORDER POPUP -->
   <div class="modal-overlay" id="newOrderModal">
     <div class="modal-box" style="text-align:left;padding:0;gap:0;">
@@ -1493,6 +1542,10 @@
 
   <!-- FORM (add/edit) -->
   <div class="screen" id="screen-form">
+    <div id="formDietBanner" style="display:none;align-items:center;gap:8px;background:var(--k-card2);color:var(--k-accent);border-radius:10px;padding:9px 12px;font-size:calc(11.5px + var(--kobu-font-boost, 0px));">
+      <span class="icon-slot" data-icon="gift-card"></span>
+      <span style="flex:1;" id="formDietBannerText"></span>
+    </div>
     <div class="formtabs-bar" id="formTabsBar">
       <div class="formtabs-indicator" id="formTabsIndicator"></div>
       <button type="button" class="formtab active" data-tab="datos" onclick="switchFormTab('datos')">Datos</button>
@@ -1643,95 +1696,198 @@
 
   <!-- DETAIL -->
   <div class="screen" id="screen-detail">
-    <div class="hero" id="d-hero"></div>
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-      <p style="font-size:calc(16px + var(--kobu-font-boost, 0px));font-weight:600;margin:0;" id="d-title"></p>
-      <div style="display:flex;gap:4px;">
-        <button class="iconbtn" onclick="editCurrent()"><span class="icon-slot" data-icon="pencil"></span></button>
-        <button class="iconbtn" onclick="deleteCurrent()" style="color:var(--k-danger);"><span class="icon-slot" data-icon="trash"></span></button>
-      </div>
+    <div class="d-hero-wrap">
+      <div class="hero" id="d-hero"></div>
+      <div class="d-diet-float" id="d-dietFloat"></div>
     </div>
-    <div class="badges" id="d-badges"></div>
-    <div class="badges" id="d-tags"></div>
-    <div id="d-parent" style="display:none;font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);"></div>
-    <div style="display:flex;gap:6px;">
-      <button class="cook-btn" style="flex:1;font-size:calc(11.5px + var(--kobu-font-boost, 0px));padding:11px 6px;" onclick="startCook(state.currentId)"><span class="icon-slot" data-icon="flame"></span> Empezar a cocinar</button>
-      <button class="cook-btn" style="flex:1;font-size:calc(11.5px + var(--kobu-font-boost, 0px));padding:11px 6px;background:var(--k-card2);color:var(--k-accent);" onclick="openBakeModal(state.currentId)"><span class="icon-slot" data-icon="flame"></span> Registrar horneada</button>
-    </div>
-    <div class="action-grid">
-      <button class="action-btn" onclick="openChat()"><span class="icon-slot" data-icon="message-circle"></span><span class="lbl">Preguntar a la IA</span></button>
-      <button class="action-btn" onclick="openLabelExportModal(state.currentId)"><span class="icon-slot" data-icon="tag"></span><span class="lbl">Exportar</span></button>
-      <button class="action-btn" onclick="generateVariant(state.currentId)"><span class="icon-slot" data-icon="copy"></span><span class="lbl">Generar variante</span></button>
-      <button class="action-btn" onclick="exportRecipeAsText(state.currentId)"><span class="icon-slot" data-icon="share"></span><span class="lbl">Extraer texto</span></button>
-    </div>
-    <div>
-      <p class="section-title">Anotaciones</p>
-      <div class="notes-box" id="d-notes"></div>
-    </div>
-    <div id="d-mold-wrap" style="display:none;">
-      <p class="section-title">Molde</p>
-      <div class="field"><label>Elegí el molde</label>
-        <select class="input" id="d-mold-select" onchange="onDetailMoldChange(this.value)"></select>
-      </div>
-      <div id="d-mold-warning" style="display:none;align-items:flex-start;gap:8px;background:var(--k-danger-bg);color:var(--k-danger);border-radius:12px;padding:10px 12px;font-size:calc(11.5px + var(--kobu-font-boost, 0px));margin:6px 0;">
-        <span class="icon-slot" data-icon="alert-triangle" style="flex-shrink:0;margin-top:1px;"></span>
-        <span id="d-mold-warning-text" style="flex:1;"></span>
-        <button type="button" class="iconbtn" style="flex:0 0 auto;color:var(--k-danger);" onclick="dismissMoldWarning('detail')"><span class="icon-slot" data-icon="x"></span></button>
-      </div>
-      <p id="d-mold-estimate" style="font-size:calc(11.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:6px 0;"></p>
-      <p style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0 0 6px;">Cantidad de unidades por tanda:</p>
-      <div class="btn-row" id="d-mold-chips" style="flex-wrap:wrap;"></div>
-      <div class="field" id="d-mold-custom-field" style="display:none;margin-top:6px;">
-        <input class="input" id="d-mold-custom-input" type="number" min="1" step="1" placeholder="cantidad" oninput="applyMoldTargetCount(this.value)">
-      </div>
-    </div>
-    <div>
-      <p class="section-title">
-        <span>Ingredientes</span>
-        <button class="iconbtn" id="d-scale-btn" onclick="toggleScaleInput()" title="multiplicar por"><span class="icon-slot" data-icon="adjustments"></span></button>
-      </p>
-      <div class="field" id="d-scale-field" style="display:none;">
-        <label>Multiplicar por</label>
-        <div class="btn-row">
-          <input class="input" id="d-scale-input" type="number" min="0.1" step="0.1" placeholder="ej. 2" oninput="applyScale(this.value)">
-          <button class="btn btn-ghost" style="flex:0 0 auto;" onclick="resetScale()">Restablecer</button>
+    <div class="grp-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <p style="font-size:calc(16px + var(--kobu-font-boost, 0px));font-weight:600;margin:0;" id="d-title"></p>
+        <div style="display:flex;gap:4px;">
+          <button class="iconbtn" onclick="editCurrent()"><span class="icon-slot" data-icon="pencil"></span></button>
+          <button class="iconbtn" onclick="deleteCurrent()" style="color:var(--k-danger);"><span class="icon-slot" data-icon="trash"></span></button>
         </div>
       </div>
-      <div id="d-ingredients"></div>
+      <div class="d-spec-row" id="d-badges"></div>
+      <div class="badges" id="d-tags"></div>
+      <div id="d-dietBanner" style="display:none;align-items:center;gap:6px;background:var(--k-card2);color:var(--k-accent);border-radius:10px;padding:7px 10px;font-size:calc(11.5px + var(--kobu-font-boost, 0px));"></div>
+      <div id="d-parent" style="display:none;font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);"></div>
     </div>
-    <div id="d-supplies-wrap" style="display:none;">
-      <p class="section-title">Insumos</p>
-      <div id="d-supplies"></div>
-    </div>
-    <div>
-      <p class="section-title" id="d-steps-title">Pasos</p>
-      <div id="d-steps"></div>
-    </div>
-    <div id="d-finalsteps-wrap" style="display:none;">
-      <p class="section-title">Montaje final</p>
-      <div class="steps-list" id="d-finalsteps"></div>
-    </div>
-    <div>
-      <p class="section-title">
-        <span>Parámetros de horno</span>
-        <button class="iconbtn" id="d-editOvenBtn" onclick="toggleOvenEdit()"><span class="icon-slot" data-icon="adjustments"></span></button>
-      </p>
-      <select class="input" id="d-ovenSelect" onchange="renderDetailKnobs()"></select>
-      <div class="knob-grid" id="d-knobs" style="margin-top:12px;"></div>
-      <button class="btn btn-primary" id="d-saveOvenBtn" style="display:none;margin-top:10px;" onclick="saveOvenFromDetail()">Guardar parámetros</button>
-    </div>
-    <div>
-      <p class="section-title">Costo de producción</p>
-      <div id="d-cost"></div>
-    </div>
-    <div>
-      <p class="section-title">Notas rápidas</p>
-      <div class="qn-add-row">
-        <textarea class="input" id="qn-input" placeholder="anotá algo mientras tenés las manos con masa..."></textarea>
-        <button class="mic-btn" id="qn-mic" onclick="toggleVoiceNote()"><span class="icon-slot" data-icon="mic"></span></button>
+    <div class="grp-card">
+      <div style="display:flex;gap:8px;">
+        <button class="cook-btn-sm" style="flex:1;" onclick="startCook(state.currentId)"><span class="icon-slot" data-icon="flame"></span> Cocinar</button>
+        <button class="cook-btn-sm ghost" style="flex:1;" onclick="openBakeModal(state.currentId)"><span class="icon-slot" data-icon="flame"></span> Hornear</button>
       </div>
-      <button class="btn btn-ghost" style="margin-top:6px;" onclick="addQuickNote()"><span class="icon-slot" data-icon="plus" style="vertical-align:-2px;"></span> Guardar nota</button>
-      <div id="d-quicknotes" style="display:flex;flex-direction:column;gap:6px;margin-top:8px;"></div>
+      <div class="d-actions-bare">
+        <button class="iconbtn" onclick="openChat()" aria-label="Preguntar a la IA" title="Preguntar a la IA"><span class="icon-slot" data-icon="message-circle"></span></button>
+        <button class="iconbtn" onclick="openLabelExportModal(state.currentId)" aria-label="Exportar" title="Exportar"><span class="icon-slot" data-icon="tag"></span></button>
+        <button class="iconbtn" onclick="generateVariant(state.currentId)" aria-label="Generar variante" title="Generar variante"><span class="icon-slot" data-icon="copy"></span></button>
+        <button class="iconbtn" onclick="exportRecipeAsText(state.currentId)" aria-label="Extraer texto" title="Extraer texto"><span class="icon-slot" data-icon="share"></span></button>
+      </div>
+    </div>
+    <div class="d-acc">
+      <div class="d-acc-item open">
+        <div class="d-acc-head" onclick="toggleDetailAccordion(this)">
+          <span class="badge-ic"><span class="icon-slot" data-icon="pencil"></span></span>
+          <span class="d-acc-title">Anotaciones</span>
+          <span class="icon-slot d-acc-chev" data-icon="chevron-down"></span>
+        </div>
+        <div class="d-acc-body">
+          <div class="notes-box" id="d-notes"></div>
+        </div>
+      </div>
+      <div class="d-acc-item" id="d-mold-wrap" style="display:none;">
+        <div class="d-acc-head" onclick="toggleDetailAccordion(this)">
+          <span class="badge-ic"><span class="icon-slot" data-icon="cake"></span></span>
+          <span class="d-acc-title">Molde</span>
+          <span class="icon-slot d-acc-chev" data-icon="chevron-down"></span>
+        </div>
+        <div class="d-acc-body">
+          <div class="field"><label>Elegí el molde</label>
+            <select class="input" id="d-mold-select" onchange="onDetailMoldChange(this.value)"></select>
+          </div>
+          <div id="d-mold-warning" style="display:none;align-items:flex-start;gap:8px;background:var(--k-danger-bg);color:var(--k-danger);border-radius:12px;padding:10px 12px;font-size:calc(11.5px + var(--kobu-font-boost, 0px));margin:6px 0;">
+            <span class="icon-slot" data-icon="alert-triangle" style="flex-shrink:0;margin-top:1px;"></span>
+            <span id="d-mold-warning-text" style="flex:1;"></span>
+            <button type="button" class="iconbtn" style="flex:0 0 auto;color:var(--k-danger);" onclick="dismissMoldWarning('detail')"><span class="icon-slot" data-icon="x"></span></button>
+          </div>
+          <p id="d-mold-estimate" style="font-size:calc(11.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:6px 0;"></p>
+          <p style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0 0 6px;">Cantidad de unidades por tanda:</p>
+          <div class="btn-row" id="d-mold-chips" style="flex-wrap:wrap;"></div>
+          <div class="field" id="d-mold-custom-field" style="display:none;margin-top:6px;">
+            <input class="input" id="d-mold-custom-input" type="number" min="1" step="1" placeholder="cantidad" oninput="applyMoldTargetCount(this.value)">
+          </div>
+        </div>
+      </div>
+      <div class="d-acc-item">
+        <div class="d-acc-head" onclick="toggleDetailAccordion(this)">
+          <span class="badge-ic"><span class="icon-slot" data-icon="list"></span></span>
+          <span class="d-acc-title">Ingredientes</span>
+          <span class="d-acc-count" id="d-acc-count-ingr">0</span>
+          <button class="iconbtn" id="d-scale-btn" onclick="event.stopPropagation();toggleScaleInput()" title="multiplicar por"><span class="icon-slot" data-icon="adjustments"></span></button>
+          <span class="icon-slot d-acc-chev" data-icon="chevron-down"></span>
+        </div>
+        <div class="d-acc-body">
+          <div class="field" id="d-scale-field" style="display:none;">
+            <label>Multiplicar por</label>
+            <div class="btn-row">
+              <input class="input" id="d-scale-input" type="number" min="0.1" step="0.1" placeholder="ej. 2" oninput="applyScale(this.value)">
+              <button class="btn btn-ghost" style="flex:0 0 auto;" onclick="resetScale()">Restablecer</button>
+            </div>
+          </div>
+          <div id="d-ingredients"></div>
+        </div>
+      </div>
+      <div class="d-acc-item" id="d-supplies-wrap" style="display:none;">
+        <div class="d-acc-head" onclick="toggleDetailAccordion(this)">
+          <span class="badge-ic"><span class="icon-slot" data-icon="package"></span></span>
+          <span class="d-acc-title">Insumos</span>
+          <span class="icon-slot d-acc-chev" data-icon="chevron-down"></span>
+        </div>
+        <div class="d-acc-body">
+          <div id="d-supplies"></div>
+        </div>
+      </div>
+      <div class="d-acc-item">
+        <div class="d-acc-head" onclick="toggleDetailAccordion(this)">
+          <span class="badge-ic"><span class="icon-slot" data-icon="clipboard"></span></span>
+          <span class="d-acc-title" id="d-steps-title">Pasos</span>
+          <span class="d-acc-count" id="d-acc-count-pasos">0</span>
+          <span class="icon-slot d-acc-chev" data-icon="chevron-down"></span>
+        </div>
+        <div class="d-acc-body">
+          <div id="d-steps"></div>
+        </div>
+      </div>
+      <div class="d-acc-item" id="d-finalsteps-wrap" style="display:none;">
+        <div class="d-acc-head" onclick="toggleDetailAccordion(this)">
+          <span class="badge-ic"><span class="icon-slot" data-icon="clipboard"></span></span>
+          <span class="d-acc-title">Montaje final</span>
+          <span class="icon-slot d-acc-chev" data-icon="chevron-down"></span>
+        </div>
+        <div class="d-acc-body">
+          <div class="steps-list" id="d-finalsteps"></div>
+        </div>
+      </div>
+      <div class="d-acc-item">
+        <div class="d-acc-head" onclick="toggleDetailAccordion(this)">
+          <span class="badge-ic"><span class="icon-slot" data-icon="flame"></span></span>
+          <span class="d-acc-title">Parámetros de horno</span>
+          <button class="iconbtn" id="d-editOvenBtn" onclick="event.stopPropagation();toggleOvenEdit()"><span class="icon-slot" data-icon="adjustments"></span></button>
+          <span class="icon-slot d-acc-chev" data-icon="chevron-down"></span>
+        </div>
+        <div class="d-acc-body">
+          <select class="input" id="d-ovenSelect" onchange="renderDetailKnobs()"></select>
+          <div class="knob-grid" id="d-knobs" style="margin-top:12px;"></div>
+          <button class="btn btn-primary" id="d-saveOvenBtn" style="display:none;margin-top:10px;" onclick="saveOvenFromDetail()">Guardar parámetros</button>
+        </div>
+      </div>
+      <div class="d-acc-item">
+        <div class="d-acc-head" onclick="toggleDetailAccordion(this)">
+          <span class="badge-ic"><span class="icon-slot" data-icon="calculator"></span></span>
+          <span class="d-acc-title">Costo de producción</span>
+          <span class="icon-slot d-acc-chev" data-icon="chevron-down"></span>
+        </div>
+        <div class="d-acc-body">
+          <div id="d-cost"></div>
+        </div>
+      </div>
+      <div class="d-acc-item open">
+        <div class="d-acc-head" onclick="toggleDetailAccordion(this)">
+          <span class="badge-ic"><span class="icon-slot" data-icon="message-circle"></span></span>
+          <span class="d-acc-title">Notas rápidas</span>
+          <span class="icon-slot d-acc-chev" data-icon="chevron-down"></span>
+        </div>
+        <div class="d-acc-body">
+          <div class="qn-add-row">
+            <textarea class="input" id="qn-input" placeholder="anotá algo mientras tenés las manos con masa..."></textarea>
+            <button class="mic-btn" id="qn-mic" onclick="toggleVoiceNote()"><span class="icon-slot" data-icon="mic"></span></button>
+          </div>
+          <button class="btn btn-ghost" style="margin-top:6px;" onclick="addQuickNote()"><span class="icon-slot" data-icon="plus" style="vertical-align:-2px;"></span> Guardar nota</button>
+          <div id="d-quicknotes" style="display:flex;flex-direction:column;gap:6px;margin-top:8px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PREP DETAIL -->
+  <div class="screen" id="screen-prepdetail">
+    <div class="d-hero-wrap">
+      <div class="hero" id="pd-hero"></div>
+    </div>
+    <div class="grp-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <p style="font-size:calc(16px + var(--kobu-font-boost, 0px));font-weight:600;margin:0;" id="pd-title"></p>
+        <div style="display:flex;gap:4px;">
+          <button class="iconbtn" onclick="editCurrentPrep()"><span class="icon-slot" data-icon="pencil"></span></button>
+          <button class="iconbtn" onclick="deleteCurrentPrep()" style="color:var(--k-danger);"><span class="icon-slot" data-icon="trash"></span></button>
+        </div>
+      </div>
+      <div class="badges" id="pd-tags" style="margin-top:6px;"></div>
+    </div>
+    <div class="d-acc">
+      <div class="d-acc-item open">
+        <div class="d-acc-head" onclick="toggleDetailAccordion(this)">
+          <span class="badge-ic"><span class="icon-slot" data-icon="list"></span></span>
+          <span class="d-acc-title">Ingredientes</span>
+          <span class="d-acc-count" id="pd-acc-count-ingr">0</span>
+          <span class="icon-slot d-acc-chev" data-icon="chevron-down"></span>
+        </div>
+        <div class="d-acc-body">
+          <div id="pd-ingredients"></div>
+        </div>
+      </div>
+      <div class="d-acc-item open">
+        <div class="d-acc-head" onclick="toggleDetailAccordion(this)">
+          <span class="badge-ic"><span class="icon-slot" data-icon="clipboard"></span></span>
+          <span class="d-acc-title">Pasos</span>
+          <span class="d-acc-count" id="pd-acc-count-pasos">0</span>
+          <span class="icon-slot d-acc-chev" data-icon="chevron-down"></span>
+        </div>
+        <div class="d-acc-body">
+          <div id="pd-steps"></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -2360,6 +2516,9 @@ const ICONS = {
   'sparkles-2': '<svg '+SVG_ATTRS+'><path stroke="none" d="M0 0h24v24H0z" fill="none" /> <path d="M14 6a9.3 9.3 0 0 0 1.516 -.546c.911 -.438 1.494 -1.015 1.937 -1.932c.207 -.428 .382 -.928 .547 -1.522c.165 .595 .34 1.095 .547 1.521c.443 .918 1.026 1.495 1.937 1.933c.426 .205 .925 .38 1.516 .546a9.3 9.3 0 0 0 -1.516 .547c-.911 .438 -1.494 1.015 -1.937 1.932a9 9 0 0 0 -.547 1.521c-.165 -.594 -.34 -1.095 -.547 -1.521c-.443 -.918 -1.026 -1.494 -1.937 -1.932a9 9 0 0 0 -1.516 -.547" /> <path d="M3 14a21 21 0 0 0 1.652 -.532c2.542 -.953 3.853 -2.238 4.816 -4.806a20 20 0 0 0 .532 -1.662a20 20 0 0 0 .532 1.662c.963 2.567 2.275 3.853 4.816 4.806q .75 .28 1.652 .532a21 21 0 0 0 -1.652 .532c-2.542 .953 -3.854 2.238 -4.816 4.806a20 20 0 0 0 -.532 1.662a20 20 0 0 0 -.532 -1.662c-.963 -2.568 -2.275 -3.853 -4.816 -4.806a21 21 0 0 0 -1.652 -.532" /></svg>',
   'flower': '<svg '+SVG_ATTRS+'><path stroke="none" d="M0 0h24v24H0z" fill="none" /> <path d="M9 12a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /> <path d="M12 2a3 3 0 0 1 3 3c0 .562 -.259 1.442 -.776 2.64l-.724 1.36l1.76 -1.893c.499 -.6 .922 -1 1.27 -1.205a2.968 2.968 0 0 1 4.07 1.099a3.011 3.011 0 0 1 -1.09 4.098c-.374 .217 -.99 .396 -1.846 .535l-2.664 .366l2.4 .326c1 .145 1.698 .337 2.11 .576a3.011 3.011 0 0 1 1.09 4.098a2.968 2.968 0 0 1 -4.07 1.098c-.348 -.202 -.771 -.604 -1.27 -1.205l-1.76 -1.893l.724 1.36c.516 1.199 .776 2.079 .776 2.64a3 3 0 0 1 -6 0c0 -.562 .259 -1.442 .776 -2.64l.724 -1.36l-1.76 1.893c-.499 .601 -.922 1 -1.27 1.205a2.968 2.968 0 0 1 -4.07 -1.098a3.011 3.011 0 0 1 1.09 -4.098c.374 -.218 .99 -.396 1.846 -.536l2.664 -.366l-2.4 -.325c-1 -.145 -1.698 -.337 -2.11 -.576a3.011 3.011 0 0 1 -1.09 -4.099a2.968 2.968 0 0 1 4.07 -1.099c.348 .203 .771 .604 1.27 1.205l1.76 1.894c-1 -2.292 -1.5 -3.625 -1.5 -4a3 3 0 0 1 3 -3" /></svg>',
   'leaf': '<svg '+SVG_ATTRS+'><path stroke="none" d="M0 0h24v24H0z" fill="none" /> <path d="M5 21c.5 -4.5 2.5 -8 7 -10" /> <path d="M9 18c6.218 0 10.5 -3.288 11 -12v-2h-4.014c-9 0 -11.986 4 -12 9c0 1 0 3 2 5h3l.014 0" /></svg>',
+  'candy-off': '<svg '+SVG_ATTRS+'><path stroke="none" d="M0 0h24v24H0z" fill="none" /> <path d="M9 9l-4 -2v10l4 -2" /> <path d="M15 9l4 -2v10l-4 -2" /> <path d="M9 8h6a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-6a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1z" /> <path d="M3 3l18 18" /></svg>',
+  'milk-off': '<svg '+SVG_ATTRS+'><path stroke="none" d="M0 0h24v24H0z" fill="none" /> <path d="M9 3h6v3l1 2v12a1 1 0 0 1 -1 1h-6a1 1 0 0 1 -1 -1v-12l1 -2z" /> <path d="M9 6h6" /> <path d="M3 3l18 18" /></svg>',
+  'bread-off': '<svg '+SVG_ATTRS+'><path stroke="none" d="M0 0h24v24H0z" fill="none" /> <path d="M4 10a4 4 0 0 1 4 -4h8a4 4 0 0 1 4 4v5a3 3 0 0 1 -3 3h-10a3 3 0 0 1 -3 -3z" /> <path d="M8 18v-4" /> <path d="M12 18v-4" /> <path d="M16 18v-4" /> <path d="M3 3l18 18" /></svg>',
   'rosette': '<svg '+SVG_ATTRS+'><path stroke="none" d="M0 0h24v24H0z" fill="none" /> <path d="M5 7.2a2.2 2.2 0 0 1 2.2 -2.2h1a2.2 2.2 0 0 0 1.55 -.64l.7 -.7a2.2 2.2 0 0 1 3.12 0l.7 .7c.412 .41 .97 .64 1.55 .64h1a2.2 2.2 0 0 1 2.2 2.2v1c0 .58 .23 1.138 .64 1.55l.7 .7a2.2 2.2 0 0 1 0 3.12l-.7 .7a2.2 2.2 0 0 0 -.64 1.55v1a2.2 2.2 0 0 1 -2.2 2.2h-1a2.2 2.2 0 0 0 -1.55 .64l-.7 .7a2.2 2.2 0 0 1 -3.12 0l-.7 -.7a2.2 2.2 0 0 0 -1.55 -.64h-1a2.2 2.2 0 0 1 -2.2 -2.2v-1a2.2 2.2 0 0 0 -.64 -1.55l-.7 -.7a2.2 2.2 0 0 1 0 -3.12l.7 -.7a2.2 2.2 0 0 0 .64 -1.55v-1" /></svg>',
   'gift': '<svg '+SVG_ATTRS+'><path stroke="none" d="M0 0h24v24H0z" fill="none" /> <path d="M3 9a1 1 0 0 1 1 -1h16a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1l0 -2" /> <path d="M12 8l0 13" /> <path d="M19 12v7a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-7" /> <path d="M7.5 8a2.5 2.5 0 0 1 0 -5a4.8 8 0 0 1 4.5 5a4.8 8 0 0 1 4.5 -5a2.5 2.5 0 0 1 0 5" /></svg>',
   'gift-card': '<svg '+SVG_ATTRS+'><path stroke="none" d="M0 0h24v24H0z" fill="none" /> <path d="M3 8a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3l0 -8" /> <path d="M7 16l3 -3l3 3" /> <path d="M8 13c-.789 0 -2 -.672 -2 -1.5s.711 -1.5 1.5 -1.5c1.128 -.02 2.077 1.17 2.5 3c.423 -1.83 1.372 -3.02 2.5 -3c.789 0 1.5 .672 1.5 1.5s-1.211 1.5 -2 1.5h-4" /></svg>',
@@ -2703,6 +2862,69 @@ function migrateChatSessions(d){
   }
   d.chatSessions.sort(function(a,b){ return new Date(b.updatedAt) - new Date(a.updatedAt); });
 }
+function seedMoldDemoContent(d){
+  if(d._demoMoldSeeded) return false;
+  d._demoMoldSeeded = true;
+  d.utensils = d.utensils || [];
+  d.recipes = d.recipes || [];
+  d.preparationLibrary = d.preparationLibrary || [];
+  const demoMolds = [
+    {id:'ut-demo-molde-1', nombre:'Molde redondo 20cm (demo)', icon:'cake', material:'aluminio', cantidad:1, category:'molde', moldShape:'redondo', moldDim1:20, moldDim2:20, moldDim3:7, moldCapacityManual:null},
+    {id:'ut-demo-molde-2', nombre:'Molde redondo 26cm (demo)', icon:'cake', material:'aluminio', cantidad:1, category:'molde', moldShape:'redondo', moldDim1:26, moldDim2:26, moldDim3:7, moldCapacityManual:null},
+    {id:'ut-demo-molde-3', nombre:'Molde rectangular 30x20cm (demo)', icon:'cake', material:'aluminio', cantidad:1, category:'molde', moldShape:'rectangular', moldDim1:30, moldDim2:20, moldDim3:5, moldCapacityManual:null}
+  ];
+  demoMolds.forEach(function(m){ if(!d.utensils.some(function(u){ return u.id===m.id; })) d.utensils.push(m); });
+  if(!d.recipes.some(function(r){ return r.id==='demo-molde-1'; })){
+    d.recipes.push({
+      id:'demo-molde-1', title:'Torta de limón (demo molde)', photo:null, colorIdx:2,
+      timeMinutes:50, difficulty:'media', yieldQty:10, yieldUnit:'porciones',
+      tags:['demo'], ovenIds:[], utensilIds:[],
+      ingredients:[
+        {name:'harina', qty:'300', unit:'g', priceId:null},
+        {name:'azúcar', qty:'250', unit:'g', priceId:null},
+        {name:'huevos', qty:'4', unit:'u', priceId:null},
+        {name:'manteca', qty:'200', unit:'g', priceId:null},
+        {name:'jugo de limón', qty:'100', unit:'ml', priceId:null},
+        {name:'ralladura de limón', qty:'1', unit:'u', priceId:null}
+      ],
+      steps:[
+        'Precalentar el horno a 180°C.',
+        'Batir manteca y azúcar hasta cremar.',
+        'Incorporar los huevos de a uno.',
+        'Agregar la ralladura y el jugo de limón.',
+        'Sumar la harina tamizada, mezclar sin batir de más.',
+        'Volcar en el molde enmantecado y hornear 45-50 min.',
+        'Dejar enfriar 15 min antes de desmoldar.'
+      ],
+      notes:'Receta de prueba para ver cómo funciona la herramienta de moldes. Se puede borrar cuando quieras.',
+      salePrice:null, parentId:null, quickNotes:[], ovenSettings:{},
+      components:[], finalSteps:[],
+      moldShapesApt:['redondo'], moldYieldMode:'molde',
+      moldCalibrations:[{id:'mc-demo-1', moldId:'ut-demo-molde-1', yieldQty:10, unitWeight:120}],
+      favorite:false, readyToSell:false, stock:0
+    });
+  }
+  if(!d.preparationLibrary.some(function(p){ return p.id==='demo-prep-1'; })){
+    d.preparationLibrary.push({
+      id:'demo-prep-1', name:'Crema pastelera (demo)', icon:'flask', tags:['demo'], colorIdx:1,
+      ingredients:[
+        {name:'leche', qty:'500', unit:'ml'},
+        {name:'azúcar', qty:'100', unit:'g'},
+        {name:'yemas', qty:'4', unit:'u'},
+        {name:'almidón de maíz', qty:'40', unit:'g'},
+        {name:'esencia de vainilla', qty:'1', unit:'cucharada'}
+      ],
+      steps:[
+        'Entibiar la leche con la mitad del azúcar.',
+        'Batir las yemas con el resto del azúcar y el almidón.',
+        'Templar con la leche caliente de a poco.',
+        'Volver todo a la olla y cocinar revolviendo hasta espesar.',
+        'Retirar, agregar la vainilla y dejar enfriar con film en contacto.'
+      ]
+    });
+  }
+  return true;
+}
 function loadData(){
   try{
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -2729,6 +2951,9 @@ function loadData(){
     migrateTheme(parsed);
     migrateQuickSales(parsed);
     migratePriceHistory(parsed);
+    if(seedMoldDemoContent(parsed)){
+      try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed)); }catch(e){}
+    }
     return parsed;
   }catch(e){ return defaultData(); }
 }
@@ -2910,9 +3135,9 @@ function scaleFactorForMoldTarget(r, moldeId, targetCount){
    NAV / SCREEN STATE
    ========================================================= */
 const state = { stack:['home'], editingId:null, currentId:null, ovenEditMode:false, draft:null, cookRecipeId:null, cookStep:0, cookTimerHandle:null, wakeLock:null, _newIngredientRow:null, orderDraft:null, editingOrderId:null, activeChatId:null, quickSale:null, advSection:null, chatPendingImage:null };
-const TITLES = { home:'Inicio', form:'Receta', detail:'Receta', settings:'Ajustes', shopping:'Lista de compras', chat:'Kobu IA', chatlist:'Chats', ingredients:'Stock', conversion:'Conversión', orders:'Pedidos', orderform:'Nuevo pedido', reports:'Reportes', clients:'Clientes', clientdetail:'Cliente', quicksell:'Vender', ovens:'Cocina', utensils:'Utensilios', advanced:'Avanzado', coupons:'Cuponera' };
-const TITLE_ICONS = { home:'home', form:'cookie', detail:'cookie', settings:'settings', shopping:'cart', chat:'message-circle', chatlist:'message-circle', ingredients:'list', conversion:'arrows-left-right', orders:'clipboard', orderform:'clipboard', reports:'chart-bar', clients:'users', clientdetail:'users', quicksell:'wallet', ovens:'flame', utensils:'package', advanced:'lock', advdetail:'lock', cook:'chef-hat', coupons:'gift-card' };
-const SCREEN_NAMES = ['home','form','detail','settings','shopping','chat','chatlist','cook','ingredients','conversion','orders','orderform','reports','clientdetail','quicksell','ovens','utensils','advanced','advdetail','coupons'];
+const TITLES = { home:'Inicio', form:'Receta', detail:'Receta', prepdetail:'Preparación', settings:'Ajustes', shopping:'Lista de compras', chat:'Kobu IA', chatlist:'Chats', ingredients:'Stock', conversion:'Conversión', orders:'Pedidos', orderform:'Nuevo pedido', reports:'Reportes', clients:'Clientes', clientdetail:'Cliente', quicksell:'Vender', ovens:'Cocina', utensils:'Utensilios', advanced:'Avanzado', coupons:'Cuponera' };
+const TITLE_ICONS = { home:'home', form:'cookie', detail:'cookie', prepdetail:'flask', settings:'settings', shopping:'cart', chat:'message-circle', chatlist:'message-circle', ingredients:'list', conversion:'arrows-left-right', orders:'clipboard', orderform:'clipboard', reports:'chart-bar', clients:'users', clientdetail:'users', quicksell:'wallet', ovens:'flame', utensils:'package', advanced:'lock', advdetail:'lock', cook:'chef-hat', coupons:'gift-card' };
+const SCREEN_NAMES = ['home','form','detail','prepdetail','settings','shopping','chat','chatlist','cook','ingredients','conversion','orders','orderform','reports','clientdetail','quicksell','ovens','utensils','advanced','advdetail','coupons'];
 const ADV_SECTION_TITLES = { sync:'Sincronización', notif:'Notificaciones', ai:'Asistente IA', backup:'Backup', danger:'Zona de peligro' };
 const NAVBAR_SCREENS = ['home','orders','quicksell','shopping','settings'];
 
@@ -3444,6 +3669,7 @@ function renderRecipes(){
   applyHomeTabUI();
   const unfiltered = !activeTag;
   const filtered = DATA.recipes.filter(function(r){
+    if(r.isDietVariant) return false;
     if(activeTag && !(r.tags||[]).includes(activeTag)) return false;
     return true;
   });
@@ -3463,11 +3689,15 @@ function renderRecipes(){
     const readyBtn = '<button type="button" class="iconbtn card-ready" onclick="event.stopPropagation();toggleReadyToSell(\''+r.id+'\')" title="lista para vender">'+readyMark+'</button>';
     const dragBtn = (unfiltered && r.favorite) ? '<button type="button" class="iconbtn card-drag" onclick="event.stopPropagation();" onpointerdown="event.stopPropagation();recipeDragStart(event,\''+r.id+'\')" title="mover"><span class="icon-slot" data-icon="grip"></span></button>' : '';
     const stockBadge = '<span class="thumb-stock-badge" style="background:'+stockColor(r.stock||0)+';" title="stock: '+(r.stock||0)+'" onclick="event.stopPropagation();handleRecipeStockBadgeTap(\''+r.id+'\')">'+(r.stock||0)+'</span>';
+    const dietVariants = dietVariantsOf(r.id);
+    const dietBadges = dietVariants.length ? ('<div class="diet">'+dietVariants.map(function(v){
+      return '<span class="icon-slot" data-icon="'+dietVariantIcon(v.variantType)+'" title="'+escapeHtml(v.variantLabel)+'"></span>';
+    }).join('')+'</div>') : '';
     return '<div class="card" data-id="'+r.id+'" data-fav="'+(r.favorite?1:0)+'" onclick="openDetail(\''+r.id+'\')">'+
       dragBtn + favBtn + readyBtn +
       '<div class="thumb" style="'+bg+'">'+mediaIconHtml(r,'thumb-icon')+stockBadge+'</div>'+
       '<div class="meta"><p class="t">'+escapeHtml(r.title)+'</p>'+
-      '<p class="s">'+(r.timeMinutes||'-')+' min · '+escapeHtml(r.difficulty||'')+'</p></div>'+
+      '<p class="s">'+(r.timeMinutes||'-')+' min · '+escapeHtml(r.difficulty||'')+'</p>'+dietBadges+'</div>'+
       '</div>';
   }).join('');
   mountIcons();
@@ -3560,7 +3790,7 @@ function renderPrepLibraryCards(){
     const sub = (p.ingredients||[]).length+' ing. · '+(p.steps||[]).length+' pasos';
     const prepIcon = '<span class="thumb-icon">'+((p.icon && ICONS[p.icon]) ? ICONS[p.icon] : '<span class="icon-slot" data-icon="flask"></span>')+'</span>';
     const prepBg = placeholderBg(p.colorIdx);
-    return '<div class="card" data-id="'+p.id+'" data-fav="'+(p.favorite?1:0)+'" onclick="openLibraryPrepEditor(\''+p.id+'\')">'+
+    return '<div class="card" data-id="'+p.id+'" data-fav="'+(p.favorite?1:0)+'" onclick="openPrepDetail(\''+p.id+'\')">'+
       dragBtn + favBtn + readyBtn +
       '<div class="thumb" style="background:'+prepBg+';display:flex;align-items:center;justify-content:center;color:var(--k-accent);">'+prepIcon+'</div>'+
       '<div class="meta"><p class="t">'+escapeHtml(p.name)+'</p>'+
@@ -3698,6 +3928,7 @@ function renderGlobalSearch(){
   const wrap = document.getElementById('globalSearchResults');
   if(!q){ wrap.innerHTML = '<p style="font-size:calc(11.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);text-align:center;margin:10px 0;">Escribí para buscar en recetas, clientes y pedidos.</p>'; return; }
   const recipeMatches = DATA.recipes.filter(function(r){
+    if(r.isDietVariant) return false;
     const hay = [r.title, r.notes, (r.tags||[]).join(' ')].join(' ').toLowerCase();
     return hay.includes(q);
   }).slice(0,8);
@@ -3742,7 +3973,7 @@ function emptyDraft(){
 const ICON_PICKER_GROUPS = [
   { label:'Budines', icons:['budin-clasico','budin-glaseado','budin-frutado','budin-marmolado'] },
   { label:'Panadería', icons:['croissant','medialuna','donut','muffin','cupcake','baguette-loaf','rolling-pin','flour-scoop','dough-ball','bread-slice','bread-loaf-sliced','oven','cooling-rack','sifter','measuring-cup','measuring-spoon','bread-basket','proofing-basket','bagel','tart','waffle','pancake-stack','breadsticks','cake-slice','layer-cake','icing-drizzle','bakery-shop','bakery-box','birthday-candle','loaf-pan','cookie-cutter'] },
-  { label:'Postres y cocina', icons:['cookie','cookie-man','cake','cake-roll','bread','chocolate','ice-cream','milkshake','coffee','wheat','chef-hat','cup','bowl','bowl-spoon','candy','milk','baguette','sparkles','sparkles-2','flower','leaf','rosette','gift','package','gift-card','paper-bag','blender','whisk','teapot','mug','microwave','flame','heart','hearts','stars','book','book-2','fridge','grill-fork','grill-spatula','ladle','salad','salt','soup','stopwatch','tag'] },
+  { label:'Postres y cocina', icons:['cookie','cookie-man','cake','cake-roll','bread','chocolate','ice-cream','milkshake','coffee','wheat','chef-hat','cup','bowl','bowl-spoon','candy','milk','baguette','sparkles','sparkles-2','flower','leaf','rosette','gift','package','gift-card','paper-bag','blender','whisk','teapot','mug','microwave','flame','heart','hearts','stars','book','book-2','fridge','grill-fork','grill-spatula','ladle','salad','salt','soup','stopwatch','tag','candy-off','milk-off','bread-off'] },
   { label:'Otros', icons:['cloud','butterfly','muffin-tray','muffin-tray-round','piping-bag','cake-stand','circle'] }
 ];
 let iconPickerQuery = '';
@@ -3894,6 +4125,20 @@ function fillFormFromDraft(){
   renderStepRows();
   renderComponentTabs();
   renderFinalStepRows();
+  applyDietVariantFormMode();
+}
+function applyDietVariantFormMode(){
+  const d = state.draft;
+  const banner = document.getElementById('formDietBanner');
+  const textEl = document.getElementById('formDietBannerText');
+  if(!banner || !textEl) return;
+  if(d && d.isDietVariant){
+    const parent = DATA.recipes.find(function(x){ return x.id===d.parentId; });
+    banner.style.display = 'flex';
+    textEl.innerHTML = 'Estás editando la versión <strong>'+escapeHtml(d.variantLabel||'')+'</strong> de <strong>'+escapeHtml(parent?parent.title:'esta receta')+'</strong>. Ya viene con los mismos datos — ajustá solo lo que cambia.';
+  } else {
+    banner.style.display = 'none';
+  }
 }
 const MOLD_SHAPES = [
   {key:'redondo', label:'Redondo'},
@@ -4775,11 +5020,44 @@ function saveLibraryPrep(){
   saveData(DATA);
   showToast('Preparación guardada');
   state._libraryMode = false;
-  state.stack = ['home'];
   homeTab = 'preps';
+  state.currentPrepId = entry.id;
+  state.stack = ['home','prepdetail'];
   render();
   applyHomeTabUI();
+  openPrepDetailRender(entry.id);
 }
+function openPrepDetail(id){ state.currentPrepId = id; showScreen('prepdetail'); openPrepDetailRender(id); }
+function openPrepDetailRender(id){
+  const p = (DATA.preparationLibrary||[]).find(function(x){ return x.id===id; });
+  if(!p) return;
+  document.getElementById('pd-hero').style.background = placeholderBg(p.colorIdx);
+  document.getElementById('pd-hero').innerHTML = '<span class="hero-icon">'+((p.icon && ICONS[p.icon]) ? ICONS[p.icon] : ICONS['flask'])+'</span>';
+  document.getElementById('pd-title').textContent = p.name;
+  document.getElementById('pd-tags').innerHTML = (p.tags||[]).map(function(t){ return '<span class="chip">'+escapeHtml(t)+'</span>'; }).join('');
+  renderPrepDetailIngredients(p);
+  renderPrepDetailSteps(p);
+  updatePrepAccordionCounts();
+  mountIcons();
+}
+function renderPrepDetailIngredients(p){
+  const wrap = document.getElementById('pd-ingredients');
+  const list = p.ingredients || [];
+  wrap.innerHTML = list.map(function(i){
+    return '<div class="ing-row"><span>'+escapeHtml(i.name)+'</span><span>'+escapeHtml(i.qty||'')+' '+escapeHtml(i.unit||'')+'</span></div>';
+  }).join('') || '<p style="font-size:calc(12px + var(--kobu-font-boost, 0px));color:var(--k-muted);">sin ingredientes cargados</p>';
+}
+function renderPrepDetailSteps(p){
+  document.getElementById('pd-steps').innerHTML = '<div class="steps-list">'+dstepsHtml((p.steps||[]).filter(Boolean))+'</div>';
+}
+function updatePrepAccordionCounts(){
+  const ingEl = document.getElementById('pd-acc-count-ingr');
+  const stepEl = document.getElementById('pd-acc-count-pasos');
+  if(ingEl) ingEl.textContent = document.querySelectorAll('#pd-ingredients .ing-row').length;
+  if(stepEl) stepEl.textContent = document.querySelectorAll('#pd-steps .dstep').length;
+}
+function editCurrentPrep(){ openLibraryPrepEditor(state.currentPrepId); }
+function deleteCurrentPrep(){ deleteLibraryPreparation(state.currentPrepId); }
 let stepDrag = null;
 function stepDragWrapId(ci){
   if(ci==null) return 'f-steps';
@@ -4890,12 +5168,26 @@ function saveRecipe(){
   d.quickNotes = d.quickNotes || [];
   if(d.mediaMode === 'icono'){ d.photo = null; } else { d.icon = null; }
   d.colorIdx = randomWarmColorIdx();
+  const pendingDietVariants = d._pendingDietVariants;
+  delete d._pendingDietVariants;
+  const isNewRecipe = !state.editingId;
   if(state.editingId){
     const idx = DATA.recipes.findIndex(function(x){ return x.id===state.editingId; });
     DATA.recipes[idx] = d;
   } else {
     d.id = 'r-'+Date.now();
     DATA.recipes.push(d);
+  }
+  if(isNewRecipe && pendingDietVariants && pendingDietVariants.length){
+    pendingDietVariants.forEach(function(v){
+      const clone = createDietVariant(d.id, v.type, v.type==='custom' ? v.label : null);
+      if(clone){
+        clone.ingredients = v.ingredients;
+        clone.steps = v.steps;
+        clone.components = [];
+        clone.finalSteps = [];
+      }
+    });
   }
   saveData(DATA);
   showToast('Receta guardada');
@@ -4917,9 +5209,12 @@ function scaledQty(qtyRaw, factor){
   return (Math.round(q*factor*100)/100).toString();
 }
 function buildBadgesHtml(r){
-  return '<span class="badge">'+(r.timeMinutes||'-')+' min</span><span class="badge">'+escapeHtml(r.difficulty)+'</span>'+
-    (r.yieldQty ? '<span class="badge">rinde '+scaledQty(r.yieldQty, scaleFactor)+' '+escapeHtml(r.yieldUnit||'')+'</span>' : '')+
-    (r.ovenIds||[]).map(function(oid){
+  const specs = [];
+  specs.push('<span class="d-spec-item"><span class="icon-slot" data-icon="stopwatch"></span>'+(r.timeMinutes||'-')+' min</span>');
+  specs.push('<span class="d-spec-item"><span class="icon-slot" data-icon="chart-bar"></span>'+escapeHtml(r.difficulty)+'</span>');
+  if(r.yieldQty) specs.push('<span class="d-spec-item"><span class="icon-slot" data-icon="users"></span>rinde '+scaledQty(r.yieldQty, scaleFactor)+' '+escapeHtml(r.yieldUnit||'')+'</span>');
+  let html = specs.map(function(s,i){ return (i>0?'<span class="d-spec-div"></span>':'')+s; }).join('');
+  const extraBadges = (r.ovenIds||[]).map(function(oid){
       const o = DATA.ovens.find(function(x){ return x.id===oid; });
       return o ? '<span class="badge">'+escapeHtml(o.name)+'</span>' : '';
     }).join('') +
@@ -4927,6 +5222,8 @@ function buildBadgesHtml(r){
       const u = DATA.utensils.find(function(x){ return x.id===uid; });
       return u ? '<span class="badge">'+escapeHtml(u.nombre)+'</span>' : '';
     }).join('');
+  if(extraBadges) html += '<div class="badges" style="width:100%;margin-top:2px;">'+extraBadges+'</div>';
+  return html;
 }
 function recipeComponentsOrFallback(r){
   return (r.components && r.components.length) ? r.components : [{ name:'', ingredients:r.ingredients||[], steps:r.steps||[] }];
@@ -5067,8 +5364,9 @@ function openDetailRender(id){
   document.getElementById('d-title').textContent = r.title;
   document.getElementById('d-badges').innerHTML = buildBadgesHtml(r);
   document.getElementById('d-tags').innerHTML = (r.tags||[]).map(function(t){ return '<span class="chip">'+escapeHtml(t)+'</span>'; }).join('');
+  renderDietVariantRow(r);
   const parentEl = document.getElementById('d-parent');
-  if(r.parentId){
+  if(r.parentId && !r.isDietVariant){
     const parent = DATA.recipes.find(function(x){ return x.id===r.parentId; });
     parentEl.style.display = 'block';
     parentEl.textContent = parent ? ('variante de: '+parent.title) : 'variante de una receta borrada';
@@ -5083,6 +5381,17 @@ function openDetailRender(id){
   renderDetailKnobs();
   renderCostSection(r);
   renderQuickNotes(r);
+  updateAccordionCounts();
+}
+function toggleDetailAccordion(headEl){
+  const item = headEl.closest('.d-acc-item');
+  if(item) item.classList.toggle('open');
+}
+function updateAccordionCounts(){
+  const ingEl = document.getElementById('d-acc-count-ingr');
+  const stepEl = document.getElementById('d-acc-count-pasos');
+  if(ingEl) ingEl.textContent = document.querySelectorAll('#d-ingredients .ing-row').length;
+  if(stepEl) stepEl.textContent = document.querySelectorAll('#d-steps .dstep').length;
 }
 function renderDetailMold(r){
   const wrap = document.getElementById('d-mold-wrap');
@@ -5273,6 +5582,136 @@ function generateVariant(id){
   fillFormFromDraft();
   applyLibraryFormMode();
   showToast('Editá y guardá tu variante');
+}
+
+/* =========================================================
+   VARIANTES DIETARIAS (sin azúcar, sin TACC, sin lactosa, vegano...)
+   ========================================================= */
+const DIET_VARIANT_TYPES = [
+  { type:'azucar', label:'Sin azúcar', icon:'candy-off' },
+  { type:'tacc', label:'Sin TACC', icon:'bread-off' },
+  { type:'lactosa', label:'Sin lactosa', icon:'milk-off' },
+  { type:'vegano', label:'Vegano', icon:'leaf' }
+];
+function dietVariantTypeMeta(type){
+  return DIET_VARIANT_TYPES.find(function(x){ return x.type===type; }) || { type:'custom', label:'Personalizada', icon:'gift-card' };
+}
+function dietVariantIcon(type){ return dietVariantTypeMeta(type).icon; }
+function dietVariantsOf(recipeId){
+  return DATA.recipes.filter(function(x){ return x.isDietVariant && x.parentId===recipeId; });
+}
+function dietVariantFamilyBaseId(r){
+  return (r && r.isDietVariant && r.parentId) ? r.parentId : (r ? r.id : null);
+}
+function createDietVariant(baseId, type, customLabel){
+  const r = DATA.recipes.find(function(x){ return x.id===baseId; });
+  if(!r) return null;
+  const meta = type==='custom' ? { type:'custom', label:(customLabel||'').trim()||'Personalizada', icon:'gift-card' } : dietVariantTypeMeta(type);
+  const already = dietVariantsOf(baseId).some(function(v){ return v.variantType===meta.type && (meta.type!=='custom' || v.variantLabel===meta.label); });
+  if(already){ showToast('Ya existe una variante de ese tipo'); return null; }
+  const clone = JSON.parse(JSON.stringify(r));
+  clone.id = 'r-'+Date.now()+'-'+Math.random().toString(36).slice(2,6);
+  clone.title = r.title+' — '+meta.label;
+  clone.parentId = r.id;
+  clone.isDietVariant = true;
+  clone.variantType = meta.type;
+  clone.variantLabel = meta.label;
+  clone.quickNotes = [];
+  clone.stock = 0;
+  clone.favorite = false;
+  DATA.recipes.push(clone);
+  saveData(DATA);
+  return clone;
+}
+function createDietVariantFromDetail(baseId, type, customLabel){
+  const clone = createDietVariant(baseId, type, customLabel);
+  if(!clone) return;
+  showToast('Variante creada — cargale los ingredientes');
+  openForm(clone.id);
+  switchFormTab('ingr');
+}
+async function removeDietVariant(id){
+  const r = DATA.recipes.find(function(x){ return x.id===id; });
+  if(!r) return;
+  const ok = await showConfirm('¿Borrar la variante "'+r.variantLabel+'"? Se pierde su stock, precio e ingredientes propios.');
+  if(!ok) return;
+  const idx = DATA.recipes.findIndex(function(x){ return x.id===id; });
+  if(idx===-1) return;
+  const removed = DATA.recipes[idx];
+  const parentId = removed.parentId;
+  DATA.recipes.splice(idx,1);
+  saveData(DATA);
+  if(state.currentId===id){ state.currentId = parentId; openDetailRender(parentId); }
+  renderRecipes();
+  showUndoToast('Variante borrada', function(){
+    DATA.recipes.splice(idx,0,removed);
+    saveData(DATA);
+    if(state.stack[state.stack.length-1]==='detail') openDetailRender(state.currentId);
+    renderRecipes();
+  });
+}
+function switchDetailVariant(id){
+  const r = DATA.recipes.find(function(x){ return x.id===id; });
+  if(!r) return;
+  const scr = document.getElementById('screen-detail');
+  if(scr){
+    scr.style.transition = 'opacity .12s ease';
+    scr.style.opacity = '0';
+    setTimeout(function(){ openDetailRender(id); scr.style.opacity = '1'; }, 120);
+  } else {
+    openDetailRender(id);
+  }
+}
+function openCustomDietVariantModal(baseId){
+  state._customDietVariantBaseId = baseId;
+  const el = document.getElementById('cdv-label');
+  if(el) el.value = '';
+  document.getElementById('customDietVariantModal').classList.add('active');
+  setTimeout(function(){ const e=document.getElementById('cdv-label'); if(e) e.focus(); }, 30);
+}
+function closeCustomDietVariantModal(){
+  document.getElementById('customDietVariantModal').classList.remove('active');
+}
+function confirmCustomDietVariant(){
+  const label = document.getElementById('cdv-label').value.trim();
+  if(!label){ showToast('Poné un nombre para la variante'); return; }
+  const baseId = state._customDietVariantBaseId;
+  closeCustomDietVariantModal();
+  createDietVariantFromDetail(baseId, 'custom', label);
+}
+function renderDietVariantRow(r){
+  const wrap = document.getElementById('d-dietFloat');
+  const banner = document.getElementById('d-dietBanner');
+  if(!wrap || !banner) return;
+  const baseId = dietVariantFamilyBaseId(r);
+  const base = DATA.recipes.find(function(x){ return x.id===baseId; });
+  if(!base){ wrap.innerHTML=''; banner.style.display='none'; return; }
+  const variants = dietVariantsOf(baseId);
+  const originalActive = !r.isDietVariant;
+  let html = '<span class="d-diet-circle '+(originalActive?'active':'')+'" onclick="switchDetailVariant(\''+baseId+'\')" title="Original"><span class="icon-slot" data-icon="chef-hat"></span></span>';
+  DIET_VARIANT_TYPES.forEach(function(meta){
+    const v = variants.find(function(x){ return x.variantType===meta.type; });
+    if(v){
+      const isActive = r.id===v.id;
+      html += '<span class="d-diet-circle '+(isActive?'active':'')+'" onclick="switchDetailVariant(\''+v.id+'\')" title="'+escapeHtml(meta.label)+'"><span class="icon-slot" data-icon="'+meta.icon+'"></span></span>';
+    } else {
+      html += '<span class="d-diet-circle ghost" onclick="createDietVariantFromDetail(\''+baseId+'\',\''+meta.type+'\')" title="Crear '+escapeHtml(meta.label)+'"><span class="icon-slot" data-icon="'+meta.icon+'"></span></span>';
+    }
+  });
+  variants.filter(function(v){ return v.variantType==='custom'; }).forEach(function(v){
+    const isActive = r.id===v.id;
+    html += '<span class="d-diet-circle '+(isActive?'active':'')+'" onclick="switchDetailVariant(\''+v.id+'\')" title="'+escapeHtml(v.variantLabel)+'"><span class="icon-slot" data-icon="gift-card"></span></span>';
+  });
+  html += '<span class="d-diet-circle ghost plus" onclick="openCustomDietVariantModal(\''+baseId+'\')" title="Agregar otra variante">+</span>';
+  wrap.innerHTML = html;
+  if(r.isDietVariant){
+    banner.style.display = 'flex';
+    banner.innerHTML = '<span class="icon-slot" data-icon="'+dietVariantIcon(r.variantType)+'" style="font-size:12px;"></span><span style="flex:1;">Viendo: '+escapeHtml(r.variantLabel)+'</span>'+
+      '<button type="button" class="iconbtn" style="color:var(--k-danger);" onclick="removeDietVariant(\''+r.id+'\')"><span class="icon-slot" data-icon="trash"></span></button>';
+  } else {
+    banner.style.display = 'none';
+  }
+  mountIcons();
 }
 
 /* =========================================================
@@ -9460,8 +9899,8 @@ function exportLabelToExcel(recipeId, elabDateStr){
   if(!r) return;
   showToast('Generando Excel de etiqueta...');
   loadXLSXLib().then(function(){
-    const rows = [['Nombre','Ingredientes','Fecha de elaboración','Fecha de vencimiento']];
-    rows.push([ r.title, recipeLabelIngredientNames(r).join(', '), elabDateStr, recipeLabelFVto(r, elabDateStr) ]);
+    const rows = [['Nombre','Variante','Ingredientes','Fecha de elaboración','Fecha de vencimiento']];
+    rows.push([ r.title, (r.isDietVariant ? r.variantLabel : ''), recipeLabelIngredientNames(r).join(', '), elabDateStr, recipeLabelFVto(r, elabDateStr) ]);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), 'Etiqueta');
     XLSX.writeFile(wb, 'etiqueta-'+r.id+'-'+elabDateStr+'.xlsx');
@@ -9559,7 +9998,31 @@ function handleRecipeStockBadgeTap(id){
     openRecipeStockCorrectModal(id);
     return;
   }
-  recipeStockTapTimer = setTimeout(function(){ recipeStockTapCount = 0; recipeStockTapId = null; }, 600);
+  recipeStockTapTimer = setTimeout(function(){
+    if(recipeStockTapCount===1 && dietVariantsOf(id).length>0){
+      openRecipeStockSummaryModal(id);
+    }
+    recipeStockTapCount = 0; recipeStockTapId = null;
+  }, 380);
+}
+function openRecipeStockSummaryModal(baseId){
+  const base = DATA.recipes.find(function(x){ return x.id===baseId; });
+  if(!base) return;
+  const variants = dietVariantsOf(baseId);
+  document.getElementById('rss-title').textContent = base.title+' — stock';
+  const rowHtml = function(r, icon){
+    return '<div class="ut-row" style="cursor:pointer;" onclick="closeRecipeStockSummaryModal();openRecipeStockCorrectModal(\''+r.id+'\')">'+
+      (icon ? '<span class="ut-ic"><span class="icon-slot" data-icon="'+icon+'"></span></span>' : '<span class="ut-ic"><span class="icon-slot" data-icon="cookie"></span></span>')+
+      '<div class="ut-info"><p class="nm">'+escapeHtml(icon ? r.variantLabel : 'Original')+'</p></div>'+
+      '<span style="font-weight:600;color:var(--k-text);">'+(r.stock||0)+'</span>'+
+      '</div>';
+  };
+  document.getElementById('rss-list').innerHTML = rowHtml(base, null) + variants.map(function(v){ return rowHtml(v, dietVariantIcon(v.variantType)); }).join('');
+  mountIcons();
+  document.getElementById('recipeStockSummaryModal').classList.add('active');
+}
+function closeRecipeStockSummaryModal(){
+  document.getElementById('recipeStockSummaryModal').classList.remove('active');
 }
 let recipeStockCorrectId = null;
 function openRecipeStockCorrectModal(id){
@@ -11281,12 +11744,14 @@ function callAiExtractRecipe(rawText){
     '{"title":"","timeMinutes":0,"difficulty":"fácil","yieldQty":0,"yieldUnit":"porciones","tags":[],'+
     '"ingredients":[{"name":"","qty":0,"unit":""}],"steps":[""],'+
     '"components":[{"name":"","ingredients":[{"name":"","qty":0,"unit":""}],"steps":[""]}],'+
-    '"finalSteps":[""],"notes":""}. '+
+    '"finalSteps":[""],"notes":"",'+
+    '"dietVariants":[{"type":"azucar","label":"","ingredients":[{"name":"","qty":0,"unit":""}],"steps":[""]}]}. '+
     'El campo difficulty tiene que ser "fácil", "media" o "difícil". '+
     'Si la receta tiene una sola preparación (lo más común), dejá "components" como un array vacío y cargá los ingredientes y pasos en los campos normales "ingredients" y "steps". '+
     'Si el texto trae varias preparaciones separadas con sus propios ingredientes y pasos (por ejemplo "INGREDIENTES PARA LA MASA" + "PREPARACIÓN DE LA MASA", y después otra sección para un relleno, crema o cobertura), usá "components": un objeto por cada preparación con su nombre y sus propios ingredientes y pasos, y en ese caso dejá los campos "ingredients" y "steps" de arriba vacíos. '+
     'Si además hay pasos para combinar las preparaciones al final (armado, relleno final, decoración), ponelos en "finalSteps"; si no hay varias preparaciones, dejá "finalSteps" vacío. '+
     'Para "unit" de cada ingrediente usá preferentemente una de estas: '+unitList+'. Si no entra en ninguna, usá "u" y aclará la cantidad original dentro de "name". '+
+    'Si además el texto trae, aparte de la receta normal, una versión "sin azúcar", "sin TACC"/"sin gluten", "sin lactosa" y/o "vegana" con sus propios ingredientes y/o pasos propios, agregá un objeto por cada una en "dietVariants": "type" tiene que ser exactamente uno de "azucar", "tacc", "lactosa", "vegano" o "custom" (si es otra restricción distinta), "label" es el nombre corto de esa variante (ej. "Sin azúcar"), e "ingredients"/"steps" son SOLO los datos propios de esa variante (si en el texto solo cambia un ingrediente, poné igual la lista completa de ingredientes de esa variante, no solo el que cambia). Si el texto no menciona ninguna variante dietaria, dejá "dietVariants" como un array vacío. '+
     'Si un dato no aparece en el texto, dejalo vacío o en 0, no inventes cantidades ni pasos. Respondé en español.';
   return groqChatWithFallback(url, key, model, [{role:'system',content:sys},{role:'user',content:rawText}])
     .then(function(j){
@@ -11339,9 +11804,14 @@ function importRecipeWithAi(){
       d.steps = (Array.isArray(parsed.steps) ? parsed.steps : []).filter(Boolean);
       unlinkedCount = d.ingredients.filter(function(x){ return !x.priceId; }).length;
     }
+    const parsedDietVariants = Array.isArray(parsed.dietVariants) ? parsed.dietVariants.filter(function(v){ return v && ((v.ingredients||[]).length || (v.steps||[]).length); }) : [];
+    d._pendingDietVariants = parsedDietVariants.map(function(v){
+      return { type: v.type||'custom', label: v.label||'', ingredients: mapIngredients(v.ingredients), steps: (Array.isArray(v.steps)?v.steps:[]).filter(Boolean) };
+    });
     fillFormFromDraft();
     closeImportRecipeModal();
-    showToast(unlinkedCount>0 ? 'Receta importada. Revisá '+unlinkedCount+' ingrediente'+(unlinkedCount>1?'s':'')+' sin vincular.' : 'Receta importada, revisala antes de guardar.');
+    const variantNote = parsedDietVariants.length ? (' Se detectaron '+parsedDietVariants.length+' variante'+(parsedDietVariants.length>1?'s':'')+' dietaria'+(parsedDietVariants.length>1?'s':'')+' — se crean al guardar la receta.') : '';
+    showToast((unlinkedCount>0 ? 'Receta importada. Revisá '+unlinkedCount+' ingrediente'+(unlinkedCount>1?'s':'')+' sin vincular.' : 'Receta importada, revisala antes de guardar.')+variantNote);
   }).catch(function(err){
     showToast(err.message || 'No se pudo importar la receta');
   }).finally(function(){

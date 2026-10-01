@@ -10320,6 +10320,13 @@ function recipeLabelFVto(r, elabDateStr){
   d.setDate(d.getDate()+Math.round(days));
   return d.toISOString().slice(0,10);
 }
+function slugifyLabelName(str){
+  return (str||'').toString()
+    .normalize('NFD').replace(new RegExp('[̀-ͯ]','g'),'')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g,'')
+    .trim();
+}
 function exportLabelToExcel(recipeId, elabDateStr){
   const r = DATA.recipes.find(function(x){ return x.id===recipeId; });
   if(!r) return;
@@ -10329,7 +10336,8 @@ function exportLabelToExcel(recipeId, elabDateStr){
     rows.push([ r.title, (r.isDietVariant ? r.variantLabel : ''), recipeLabelIngredientNames(r).join(', '), elabDateStr, recipeLabelFVto(r, elabDateStr) ]);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), 'Etiqueta');
-    XLSX.writeFile(wb, 'etiqueta-'+r.id+'-'+elabDateStr+'.xlsx');
+    const nameSlug = slugifyLabelName(r.title) + (r.isDietVariant && r.variantLabel ? '-'+slugifyLabelName(r.variantLabel) : '');
+    XLSX.writeFile(wb, 'Kobuetiq-'+nameSlug+'-'+elabDateStr+'.xlsx');
     showToast('Excel de etiqueta exportado');
   }).catch(function(){
     showToast('No se pudo generar el Excel — revisá tu conexión.');

@@ -41,3 +41,61 @@ self.addEventListener('fetch', function(e){
     })
   );
 });
+
+// Notificaciones push (Firebase Cloud Messaging).
+// El Apps Script manda payloads "solo datos" (sin campo notification), así
+// este handler tiene control total sobre cómo se arma y se ve la notificación,
+// y evita el problema de notificaciones duplicadas.
+self.addEventListener('push', function(e){
+  let payload = {};
+  try{ payload = e.data ? e.data.json() : {}; }catch(err){ payload = {}; }
+  const data = payload.data || payload || {};
+  const title = data.title || 'Kobu';
+  const body = data.body || '';
+  const screen = data.screen || 'home';
+  e.waitUntil(
+    self.registration.showNotification(title, {
+      body: body,
+      icon: './icon-192.png',
+      badge: './icon-192.png',
+      data: { screen: screen }
+    })
+  );
+});
+
+self.addEventListener('notificationclick', function(e){
+  const isCookTimer = e.notification.data && e.notification.data.type==='cook-timer';
+  if(isCookTimer && (e.action==='cook-pause' || e.action==='cook-resume' || e.action==='cook-stop')){
+    // Pausar/reanudar mantienen la notificación (se actualiza sola desde la app);
+    // detener sí la cierra ahora mismo.
+    if(e.action==='cook-stop') e.notification.close();
+    e.waitUntil(
+      self.clients.matchAll({ type:'window', includeUncontrolled:true }).then(function(clientsArr){
+        for(let i=0;i<clientsArr.length;i++){
+          const c = clientsArr[i];
+          c.postMessage({ type:'kobu-cook-timer-action', action: e.action });
+        }
+        if(!clientsArr.length && self.clients.openWindow){
+          return self.clients.openWindow('./index.html?goto=home');
+        }
+      })
+    );
+    return;
+  }
+  e.notification.close();
+  const screen = (e.notification.data && e.notification.data.screen) || 'home';
+  e.waitUntil(
+    self.clients.matchAll({ type:'window', includeUncontrolled:true }).then(function(clientsArr){
+      for(let i=0;i<clientsArr.length;i++){
+        const c = clientsArr[i];
+        if('focus' in c){
+          c.postMessage({ type:'kobu-notification-nav', screen: screen });
+          return c.focus();
+        }
+      }
+      if(self.clients.openWindow){
+        return self.clients.openWindow('./index.html?goto='+encodeURIComponent(screen));
+      }
+    })
+  );
+});

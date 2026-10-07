@@ -842,6 +842,46 @@
     .ordb-menu button.danger{ border-color:var(--k-danger); }
     .ordb-menu button .ordb-menu-lbl{ display:none; }
   }
+
+  /* Pedidos web (bandeja de pedidos que llegan desde la página) */
+  .wb-banner{ display:flex; align-items:center; gap:12px; background:var(--k-card); border:1.5px solid var(--k-accent); border-radius:16px; padding:12px 14px; cursor:pointer; }
+  .wb-ic{ width:40px; height:40px; border-radius:12px; background:var(--k-accent); color:var(--k-bg); display:flex; align-items:center; justify-content:center; flex:none; font-size:22px; }
+  .wb-t{ font-weight:700; color:var(--k-text); font-size:calc(15px + var(--kobu-font-boost, 0px)); }
+  .wb-s{ font-size:calc(12px + var(--kobu-font-boost, 0px)); color:var(--k-muted); }
+  .wb-badge{ margin-left:auto; background:var(--k-danger); color:#fff; border-radius:999px; min-width:24px; height:24px; padding:0 8px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:calc(13px + var(--kobu-font-boost, 0px)); flex:none; }
+  .wb-box{ max-width:370px !important; padding:0 !important; gap:0 !important; max-height:90vh; }
+  .wb-chip{ display:inline-block; font-size:calc(10px + var(--kobu-font-boost, 0px)); font-weight:700; letter-spacing:.04em; padding:2px 7px; border-radius:999px; vertical-align:middle; }
+  .wb-chip.web{ background:var(--k-info-bg); color:var(--k-info); }
+  .wb-chip.may{ background:var(--k-warning-bg); color:var(--k-warning); }
+  .wb-chip.ok{ background:var(--k-success-bg); color:var(--k-success); }
+  .wb-chip.new{ background:var(--k-info-bg); color:var(--k-info); }
+  .wb-chip.off{ background:var(--k-danger-bg); color:var(--k-danger); }
+  .wb-card{ border:1px solid var(--k-border); border-radius:14px; padding:12px; margin:0 0 10px; background:var(--k-card); }
+  .wb-row{ display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  .wb-num{ font-size:calc(11px + var(--kobu-font-boost, 0px)); color:var(--k-muted); font-weight:600; }
+  .wb-name{ font-weight:700; color:var(--k-text); font-size:calc(15px + var(--kobu-font-boost, 0px)); min-width:0; overflow:hidden; text-overflow:ellipsis; }
+  .wb-meta{ font-size:calc(12px + var(--kobu-font-boost, 0px)); color:var(--k-muted); margin:4px 0 6px; }
+  .wb-items{ font-size:calc(13px + var(--kobu-font-boost, 0px)); color:var(--k-text); margin:0 0 8px; line-height:1.45; }
+  .wb-tot{ font-weight:700; color:var(--k-accent); font-size:calc(15px + var(--kobu-font-boost, 0px)); white-space:nowrap; }
+  .wb-btns{ display:flex; gap:8px; margin-top:8px; }
+  .wb-btns .btn{ flex:1; padding:9px 0; font-size:calc(13px + var(--kobu-font-boost, 0px)); }
+  .wb-sec{ font-size:calc(11px + var(--kobu-font-boost, 0px)); letter-spacing:.06em; color:var(--k-muted); font-weight:700; text-transform:uppercase; margin:12px 0 6px; }
+  .wb-line{ padding:8px 0; border-bottom:1px dashed var(--k-border); }
+  .wb-line .t{ display:flex; justify-content:space-between; gap:8px; font-size:calc(13px + var(--kobu-font-boost, 0px)); color:var(--k-text); }
+  .wb-line .t small{ color:var(--k-muted); }
+  .wb-linkok{ font-size:calc(12px + var(--kobu-font-boost, 0px)); margin-top:4px; color:var(--k-success); display:flex; align-items:center; gap:4px; background:none; border:none; padding:0; cursor:pointer; font-family:inherit; text-align:left; }
+  .wb-linkok u{ color:var(--k-muted); margin-left:4px; }
+  .wb-sel{ width:100%; margin-top:6px; padding:8px 10px; border-radius:10px; border:1.5px solid var(--k-warning); background:var(--k-warning-bg); color:var(--k-text); font-size:calc(13px + var(--kobu-font-boost, 0px)); font-family:inherit; }
+  .wb-sel.ok{ border-color:var(--k-border); background:var(--k-card2); }
+  .wb-hint{ font-size:calc(11px + var(--kobu-font-boost, 0px)); color:var(--k-muted); margin-top:4px; }
+  .wb-warn{ font-size:calc(12px + var(--kobu-font-boost, 0px)); color:var(--k-warning); background:var(--k-warning-bg); border-radius:8px; padding:6px 8px; margin-top:6px; }
+  .wb-field{ display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:calc(13px + var(--kobu-font-boost, 0px)); padding:5px 0; color:var(--k-muted); }
+  .wb-field b{ color:var(--k-text); font-weight:600; text-align:right; max-width:62%; }
+  .wb-in{ padding:6px 8px; border-radius:8px; border:1px solid var(--k-border); background:var(--k-card2); font-family:inherit; font-size:calc(13px + var(--kobu-font-boost, 0px)); color:var(--k-text); }
+  .wb-notes{ font-size:calc(13px + var(--kobu-font-boost, 0px)); color:var(--k-text); white-space:pre-wrap; }
+  .wb-empty{ font-size:calc(13px + var(--kobu-font-boost, 0px)); color:var(--k-muted); text-align:center; margin:10px 0; }
+  .wb-link-btn{ display:block; width:100%; background:none; border:none; color:var(--k-accent); font-family:inherit; font-size:calc(12px + var(--kobu-font-boost, 0px)); text-decoration:underline; padding:8px 0; cursor:pointer; }
+  .wb-tag{ display:inline-block; font-size:calc(9px + var(--kobu-font-boost, 0px)); font-weight:800; letter-spacing:.05em; padding:1px 6px; border-radius:6px; margin-left:6px; vertical-align:1px; }
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-messaging-compat.js"></script>
@@ -1997,6 +2037,10 @@
         <button class="settings-tile" onclick="showScreen('reports')"><span class="icon-slot" data-icon="chart-bar"></span><span>Reportes</span></button>
         <button class="settings-tile" onclick="openAdvancedScreen()"><span class="icon-slot" data-icon="lock"></span><span>Avanzado</span></button>
       </div>
+      <div class="rowline" style="cursor:pointer;" onclick="openWebInbox()">
+        <span class="l">Pedidos web y productos de la web</span>
+        <span class="icon-slot" data-icon="chevron-right" style="color:var(--k-muted);"></span>
+      </div>
       <div class="rowline">
         <span class="l">Lista de compras automática (desde pedidos)</span>
         <div class="switch" id="autoShopSwitch" onclick="toggleAutoShopping()"><div class="knob-sw"></div></div>
@@ -2417,6 +2461,11 @@
     </div>
     <div id="ordersPedidosPanel" style="display:flex;flex-direction:column;gap:12px;">
       <button class="addbtn" onclick="openNewOrderModal()"><span class="icon-slot" data-icon="plus"></span> Nuevo pedido</button>
+      <div class="wb-banner" id="webInboxBanner" style="display:none;" onclick="openWebInbox()">
+        <div class="wb-ic"><span class="icon-slot" data-icon="paper-bag"></span></div>
+        <div><div class="wb-t">Pedidos web</div><div class="wb-s">Llegaron desde la página · tocá para revisar</div></div>
+        <div class="wb-badge" id="webInboxCount">0</div>
+      </div>
       <div class="orders-toolbar">
         <div class="searchbar" style="flex:1;">
           <span class="icon-slot" data-icon="search"></span>
@@ -3029,11 +3078,15 @@ function normalizeData(parsed){
   if(!parsed.couponCatalog) parsed.couponCatalog = [];
   [ migrateIngredientLinks, normalizeIngredientStock, migrateClientLinks, migrateShoppingManualItems,
     migrateExpenses, migrateChatSessions, migrateOvens, migrateUtensils, migrateOrderStatus,
-    migrateMoldCalibrations, migrateTheme, migrateQuickSales, migratePriceHistory
+    migrateMoldCalibrations, migrateTheme, migrateQuickSales, migratePriceHistory, migrateWebLinks
   ].forEach(function(fn){
     try{ fn(parsed); }catch(e){ console.error('Migración falló: '+(fn&&fn.name), e); }
   });
   return parsed;
+}
+// Vínculos producto de la web -> receta (pedidos web). Objeto { "menu:<id>[.<variante>]": recipeId }.
+function migrateWebLinks(d){
+  if(!d.webLinks || typeof d.webLinks!=='object' || Array.isArray(d.webLinks)) d.webLinks = {};
 }
 function backupUnreadableData(raw){
   try{ localStorage.setItem(STORAGE_KEY+'_ilegible_'+Date.now(), raw); }catch(e){}
@@ -3274,6 +3327,13 @@ function handleBack(){
 }
 function goHome(){ goTab('home'); }
 function goTab(name){
+  if(name==='webinbox'){
+    // Aviso de pedido web nuevo: abre Pedidos con la bandeja.
+    state.stack = ['orders']; render();
+    try{ setOrdersTab('pedidos'); }catch(e){}
+    openWebInbox();
+    return;
+  }
   state.stack = [name]; render();
 }
 
@@ -8954,6 +9014,8 @@ let calendarDayFilter = null;
 function renderOrdersScreen(){
   if(orderCalendarOpen) renderOrderCalendar();
   renderOrderList();
+  updateWebInboxBanner();
+  refreshWebInbox(false);
 }
 const ORDER_STATUS_LABELS = { pendiente:'Pendiente', confirmado:'Confirmado', preparacion:'En preparación', listo:'Listo', entregado:'Entregado', cancelado:'Cancelado' };
 const ORDER_STATUS_ORDER = ['pendiente','confirmado','preparacion','listo','entregado'];
@@ -9183,7 +9245,7 @@ function orderBoardCardHtml(o){
   return '<div class="ordb-card" onclick="openOrderDetailPopup(\''+o.id+'\')">'+
     '<div class="ordb-avatar" style="background:'+bg+';"><span class="ordb-avatar-day">'+dp.day+'</span><span class="ordb-avatar-month">'+dp.month+'</span></div>'+
     '<div style="min-width:0;flex:1;">'+
-      '<div class="ordb-name" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+shortfallMark+escapeHtml(o.customerName)+'</div>'+
+      '<div class="ordb-name" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+shortfallMark+escapeHtml(o.customerName)+(o.web ? '<span class="wb-tag" style="background:var(--k-'+(o.web.origen==='mayorista' ? 'warning-bg);color:var(--k-warning);">MAYORISTA' : 'info-bg);color:var(--k-info);">WEB')+'</span>' : '')+'</div>'+
       '<div class="ordb-items" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">• '+itemsLine+'</div>'+
     '</div>'+
     '<div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">'+
@@ -9538,9 +9600,10 @@ function renderEopView(){
   const clientName = client ? client.name : (o.customerName || 'sin definir');
   document.getElementById('eop-title').textContent = 'Detalle del pedido';
   document.getElementById('eop-sub').textContent = clientName;
+  if(o.web) document.getElementById('eop-sub').insertAdjacentHTML('beforeend', ' <span class="wb-chip '+(o.web.origen==='mayorista' ? 'may">MAYORISTA' : 'web">WEB')+'</span>');
   document.getElementById('eop-view-items').innerHTML = (o.items||[]).map(function(it){
     const lineTotal = (it.unitPrice||0)*(it.qty||0);
-    return '<div class="eop-view-item"><span>'+(it.qty||0)+' x '+escapeHtml(it.recipeName||'(receta borrada)')+'</span><span>'+fmtMoney(lineTotal)+'</span></div>';
+    return '<div class="eop-view-item"><span>'+(it.qty||0)+' x '+escapeHtml(it.recipeName||'(receta borrada)')+(it.detail ? ' <small style="color:var(--k-muted);">('+escapeHtml(it.detail)+')</small>' : '')+'</span><span>'+fmtMoney(lineTotal)+'</span></div>';
   }).join('') || '<p style="font-size:calc(11.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:4px 0;">Sin productos</p>';
   document.getElementById('eop-view-total').innerHTML = '<span>Total</span><span>'+fmtMoney(o.total||0)+'</span>';
   const shortItems = (o.items||[]).filter(function(it){ return (it.shortfall||0)>0; });
@@ -9556,7 +9619,8 @@ function renderEopView(){
   document.getElementById('eop-view-clientinfo').innerHTML =
     '<div class="eop-view-field"><span>Estado</span><span style="font-weight:700;color:var(--k-status-'+statusShort+');">'+(ORDER_STATUS_LABELS[o.status]||'Pendiente')+'</span></div>'+
     '<div class="eop-view-field"><span>Cliente</span><span>'+escapeHtml(clientName)+'</span></div>'+
-    '<div class="eop-view-field"><span>Fecha de entrega</span><span>'+(o.deliveryDate ? new Date(o.deliveryDate+'T00:00:00').toLocaleDateString('es-AR') : 'sin definir')+'</span></div>';
+    '<div class="eop-view-field"><span>Fecha de entrega</span><span>'+(o.deliveryDate ? new Date(o.deliveryDate+'T00:00:00').toLocaleDateString('es-AR') : 'sin definir')+'</span></div>'+
+    (o.web ? webOrderFieldsHtml(o) : '');
   const noteWrap = document.getElementById('eop-view-notewrap');
   if(o.note){
     noteWrap.style.display = 'block';
@@ -9829,8 +9893,9 @@ function saveOrder(){
     o.deliveryDate = deliveryDate;
     o.deposit = deposit;
     o.note = note;
+    const webCarried = webCarryItemInfo(o, snapItems);
     o.items = snapItems;
-    o.total = total;
+    o.total = webCarried ? webRecalcTotal(snapItems, typeof discountPct==='number' ? discountPct : 0) : total;
     if(willDeductPortions){ resolveOrderBakeChoices(state.orderDraft.items); adjustPortionStockForOrder(o, -1); o.portionsDeducted = true; }
     else { o.portionsDeducted = false; }
     if(o.stockDeducted) adjustStockForOrder(o, -1);
@@ -10084,8 +10149,9 @@ function saveNewOrder(){
     o.deliveryDate = state.newOrderDraft.deliveryDate || todayStr();
     o.deposit = state.newOrderDraft.deposit || 0;
     o.note = state.newOrderDraft.note || '';
+    const webCarried = webCarryItemInfo(o, snapItems);
     o.items = snapItems;
-    o.total = total;
+    o.total = webCarried ? webRecalcTotal(snapItems, typeof discountPct==='number' ? discountPct : 0) : total;
     o.discountPct = discountPct;
     o.appliedCoupons = appliedCoupons;
     if(willDeductPortions){ adjustPortionStockForOrder(o, -1); o.portionsDeducted = true; }
@@ -10123,6 +10189,437 @@ function saveNewOrder(){
   closeNewOrderModal();
   renderOrderList();
   showToast('Pedido guardado');
+}
+
+/* =========================================================
+   PEDIDOS WEB (bandeja de pedidos que llegan desde la página)
+   El script de Google los guarda aparte (action=pedidoWeb, público) y la app los lee con la clave
+   de sincronización (action=pedidosWeb). Aceptar crea el pedido (y el cliente si es nuevo);
+   el vínculo producto de la web → receta queda en DATA.webLinks ("menu:<id>[.<variante>]" / "may:<id>…").
+   ========================================================= */
+const webInbox = { pedidos:[], productos:[], cargado:false, error:'', promesa:null, ultimo:0, historial:false, revisando:null, sel:null };
+function webCreds(){
+  const url = (localStorage.getItem('kobuSyncUrl')||'').trim();
+  const key = (localStorage.getItem('kobuSyncKey')||'').trim();
+  return (url && key) ? { url:url, key:key } : null;
+}
+function webLinksMap(){
+  if(!DATA.webLinks || typeof DATA.webLinks!=='object' || Array.isArray(DATA.webLinks)) DATA.webLinks = {};
+  return DATA.webLinks;
+}
+function webNorm(s){ return (s||'').toString().normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9ñ ]+/g,' ').replace(/\s+/g,' ').trim(); }
+function webPrefix(origen){ return origen==='mayorista' ? 'may:' : 'menu:'; }
+function webRecipeExists(id){ return !!id && DATA.recipes.some(function(r){ return r.id===id; }); }
+// Receta vinculada a un producto de la web (mayorista sin vínculo propio usa el del menú).
+function webLinkFor(origen, key){
+  const L = webLinksMap();
+  const cands = [webPrefix(origen)+key];
+  if(origen==='mayorista') cands.push('menu:'+key);
+  for(let i=0;i<cands.length;i++){ if(webRecipeExists(L[cands[i]])) return L[cands[i]]; }
+  return null;
+}
+function webRecipeSuggestions(nombre, detalle){
+  const words = webNorm(nombre+' '+(detalle||'')).split(' ').filter(function(w){ return w.length>2; });
+  if(!words.length) return [];
+  return DATA.recipes.map(function(r){
+    const t = webNorm(r.title);
+    const score = words.filter(function(w){ return t.indexOf(w)!==-1; }).length;
+    return { r:r, score:score };
+  }).filter(function(x){ return x.score>0; }).sort(function(a,b){ return b.score-a.score; }).slice(0,3).map(function(x){ return x.r; });
+}
+function webPedidosNuevos(){ return webInbox.pedidos.filter(function(p){ return p.estado==='nuevo'; }); }
+function webOrderLocal(p){ return DATA.orders.find(function(o){ return (o.web && o.web.id===p.id) || (p.orderId && o.id===p.orderId); }) || null; }
+
+function refreshWebInbox(force){
+  const c = webCreds();
+  if(!c) return Promise.resolve(null);
+  if(webInbox.promesa) return webInbox.promesa;
+  if(!force && webInbox.cargado && Date.now()-webInbox.ultimo < 20000) return Promise.resolve(webInbox);
+  webInbox.promesa = fetch(c.url+'?key='+encodeURIComponent(c.key)+'&action=pedidosWeb', { method:'GET' })
+    .then(function(r){ return r.json(); })
+    .then(function(j){
+      // Un script viejo responde otra cosa (los datos de sincronización): no se toma como bandeja.
+      if(j && j.ok===true && Array.isArray(j.pedidos)){
+        // Solo ids con el formato que genera el script (se usan dentro de botones): nunca texto libre.
+        webInbox.pedidos = j.pedidos.filter(function(p){ return p && typeof p.id==='string' && /^pw-\d{10,16}-\d{1,7}$/.test(p.id) && Array.isArray(p.items); })
+          .map(function(p){ if(p.orderId && !/^ord-\d{10,16}$/.test(String(p.orderId))) p.orderId = ''; return p; });
+        webInbox.productos = Array.isArray(j.productos) ? j.productos : [];
+        webInbox.cargado = true; webInbox.error = '';
+      } else {
+        webInbox.error = (j && j.error==='clave incorrecta') ? 'clave' : 'script';
+      }
+      webInbox.ultimo = Date.now();
+    })
+    .catch(function(){ webInbox.error = webInbox.cargado ? '' : 'red'; })
+    .then(function(){ webInbox.promesa = null; updateWebInboxBanner(); webRerenderOpen(); return webInbox; });
+  return webInbox.promesa;
+}
+function updateWebInboxBanner(){
+  const b = document.getElementById('webInboxBanner');
+  if(!b) return;
+  const n = webPedidosNuevos().length;
+  b.style.display = n ? 'flex' : 'none';
+  const cnt = document.getElementById('webInboxCount');
+  if(cnt) cnt.textContent = n;
+}
+function webRerenderOpen(){
+  const m = document.getElementById('webInboxModal');
+  if(m && m.classList.contains('active')) renderWebInbox();
+  const v = document.getElementById('webLinksModal');
+  if(v && v.classList.contains('active')) renderWebLinks();
+}
+function webModal(id){
+  let m = document.getElementById(id);
+  if(m) return m;
+  m = document.createElement('div');
+  m.className = 'modal-overlay'; m.id = id;
+  m.innerHTML = '<div class="modal-box wb-box"></div>';
+  m.addEventListener('click', function(e){ if(e.target===m) m.classList.remove('active'); });
+  const ref = document.getElementById('editOrderModal');
+  (ref && ref.parentNode ? ref.parentNode : document.body).appendChild(m);
+  return m;
+}
+function webHead(title, sub, extraBtn, closeFn){
+  return '<div class="eop-headtint"><div class="eop-headicons">'+(extraBtn||'')+
+    '<button class="iconbtn" onclick="'+closeFn+'"><span class="icon-slot" data-icon="x"></span></button></div>'+
+    '<p class="eop-title">'+title+'</p><p class="eop-sub">'+sub+'</p></div>';
+}
+function webMoney(p){ return fmtMoney(p.total||0)+(p.aConsultar?' +':''); }
+function webFechaCorta(iso){
+  if(!iso) return '';
+  const d = new Date(iso+'T00:00:00');
+  if(isNaN(d)) return '';
+  const s = d.toLocaleDateString('es-AR', { weekday:'long', day:'numeric', month:'numeric' });
+  return s.charAt(0).toUpperCase()+s.slice(1);
+}
+function webRecibido(iso){
+  const d = new Date(iso); if(isNaN(d)) return '';
+  const hm = d.toLocaleTimeString('es-AR', { hour:'2-digit', minute:'2-digit' });
+  return localDateStr(d)===todayStr() ? 'hoy '+hm : d.toLocaleDateString('es-AR', { day:'numeric', month:'numeric' })+' '+hm;
+}
+function webItemLabel(it){ return escapeHtml(it.nombre)+(it.detalle ? ' · '+escapeHtml(it.detalle) : ''); }
+function webQuien(p){ return p.origen==='mayorista' ? (p.negocio || p.nombre || 'Mayorista') : (p.nombre || 'Sin nombre'); }
+
+/* ---- Bandeja ---- */
+function openWebInbox(){
+  webInbox.historial = false;
+  webModal('webInboxModal').classList.add('active');
+  renderWebInbox();
+  refreshWebInbox(true);
+}
+function closeWebInbox(){ const m = document.getElementById('webInboxModal'); if(m) m.classList.remove('active'); }
+function toggleWebHistory(){ webInbox.historial = !webInbox.historial; renderWebInbox(); }
+function webCardHtml(p){
+  const may = p.origen==='mayorista';
+  const meta = may
+    ? [p.fecha ? webFechaCorta(p.fecha) : 'Fecha a coordinar', p.items.filter(function(i){ return i.precio==null; }).length ? (p.items.filter(function(i){ return i.precio==null; }).length+' a consultar') : ''].filter(Boolean).join(' · ')
+    : [webFechaCorta(p.fecha), p.franja, p.entrega, p.pago].filter(Boolean).join(' · ');
+  const items = p.items.map(function(it){ return it.qty+' × '+webItemLabel(it); }).join('<br>');
+  let btns = '';
+  if(p.estado==='nuevo'){
+    btns = '<div class="wb-btns"><button class="btn btn-ghost" onclick="rejectWebOrder(\''+p.id+'\')">Rechazar</button><button class="btn btn-primary" onclick="openWebReview(\''+p.id+'\')">Revisar y aceptar</button></div>';
+  } else if(p.estado==='rechazado'){
+    btns = '<div class="wb-btns"><button class="btn btn-ghost" onclick="restoreWebOrder(\''+p.id+'\')">Recuperar</button></div>';
+  } else if(p.estado==='aceptado'){
+    const o = webOrderLocal(p);
+    btns = o ? '<div class="wb-btns"><button class="btn btn-ghost" onclick="closeWebInbox();openOrderDetailPopup(\''+o.id+'\')">Ver pedido</button></div>'
+             : '<div class="wb-btns"><button class="btn btn-ghost" onclick="openWebReview(\''+p.id+'\')">Volver a crear el pedido</button></div>';
+  }
+  const chip = may ? '<span class="wb-chip may">MAYORISTA</span>' : '<span class="wb-chip web">MENÚ</span>';
+  const est = p.estado==='aceptado' ? ' <span class="wb-chip ok">ACEPTADO</span>' : p.estado==='rechazado' ? ' <span class="wb-chip off">RECHAZADO</span>' : '';
+  return '<div class="wb-card">'+
+    '<div class="wb-row"><span class="wb-num">'+escapeHtml(p.numero)+' · '+webRecibido(p.recibido)+'</span><span>'+chip+est+'</span></div>'+
+    '<div class="wb-row" style="margin-top:4px;"><span class="wb-name">'+escapeHtml(webQuien(p))+'</span><span class="wb-tot">'+webMoney(p)+'</span></div>'+
+    (meta ? '<div class="wb-meta">'+escapeHtml(meta)+'</div>' : '')+
+    '<div class="wb-items">'+items+'</div>'+btns+'</div>';
+}
+function renderWebInbox(){
+  const m = webModal('webInboxModal');
+  const box = m.querySelector('.modal-box');
+  const nuevos = webPedidosNuevos().slice().sort(function(a,b){ return (b.recibido||'').localeCompare(a.recibido||''); });
+  const otros = webInbox.pedidos.filter(function(p){ return p.estado!=='nuevo'; }).sort(function(a,b){ return (b.recibido||'').localeCompare(a.recibido||''); });
+  let sub, body = '';
+  if(!webCreds()){
+    sub = 'Sin sincronización';
+    body = '<p class="wb-empty">Para recibir los pedidos de la web, configurá la sincronización en Ajustes → Avanzado.</p>';
+  } else if(!webInbox.cargado && webInbox.error==='script'){
+    sub = 'Falta actualizar el script';
+    body = '<p class="wb-empty">Para recibir los pedidos de la web hay que actualizar el script de Google (pegar el código nuevo y hacer una nueva implementación).</p>';
+  } else if(!webInbox.cargado && webInbox.error){
+    sub = 'Sin conexión';
+    body = '<p class="wb-empty">No se pudo consultar los pedidos de la web. Revisá la conexión y volvé a abrir.</p>';
+  } else if(!webInbox.cargado){
+    sub = 'Buscando pedidos…';
+    body = '<p class="wb-empty">Buscando pedidos…</p>';
+  } else {
+    sub = nuevos.length ? (nuevos.length===1 ? '1 nuevo' : nuevos.length+' nuevos')+' · se actualiza solo' : 'No hay pedidos nuevos';
+    body = nuevos.length ? nuevos.map(webCardHtml).join('') : '<p class="wb-empty">No hay pedidos web nuevos. Cuando alguien mande un pedido desde la página, aparece acá.</p>';
+    if(otros.length){
+      body += '<button type="button" class="wb-link-btn" onclick="toggleWebHistory()">'+(webInbox.historial ? 'Ocultar aceptados y rechazados' : 'Ver aceptados y rechazados (últimos 60 días)')+'</button>';
+      if(webInbox.historial) body += otros.map(webCardHtml).join('');
+    }
+    body += '<button type="button" class="wb-link-btn" onclick="openWebLinks()">Productos de la web: elegir qué receta es cada uno</button>';
+  }
+  box.innerHTML = webHead('Pedidos web', sub, '<button class="iconbtn" title="Productos de la web" onclick="openWebLinks()"><span class="icon-slot" data-icon="adjustments"></span></button>', 'closeWebInbox()')+
+    '<div class="eop-headbody">'+body+'</div>';
+  mountIcons();
+}
+function webSetEstado(p, estado, orderId){
+  const c = webCreds();
+  // Solo con un script que ya respondió la bandeja (uno viejo trataría este POST como datos de sincronización).
+  if(!c || !webInbox.cargado) return Promise.reject(new Error('sin conexión'));
+  return fetch(c.url+'?key='+encodeURIComponent(c.key)+'&action=pedidoWebEstado', {
+    method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' },
+    body: JSON.stringify({ id:p.id, estado:estado, orderId:orderId||'' })
+  }).then(function(r){ return r.json(); }).then(function(j){
+    if(j && j.pedido){ const i = webInbox.pedidos.findIndex(function(x){ return x.id===p.id; }); if(i>-1) webInbox.pedidos[i] = j.pedido; }
+    if(!j || !j.ok) throw new Error((j && j.error) || 'sin respuesta');
+    return j.pedido;
+  });
+}
+async function rejectWebOrder(id){
+  const p = webInbox.pedidos.find(function(x){ return x.id===id; });
+  if(!p) return;
+  const ok = await showConfirm('¿Rechazar el pedido '+p.numero+' de '+webQuien(p)+'? Lo podés recuperar después desde "Ver aceptados y rechazados".');
+  if(!ok) return;
+  webSetEstado(p, 'rechazado').then(function(){ showToast('Pedido rechazado'); })
+    .catch(function(e){ showToast(/ya aceptado/.test(e.message) ? 'Ese pedido ya se aceptó' : 'No se pudo conectar. Probá de nuevo.'); })
+    .then(function(){ closeWebReview(); updateWebInboxBanner(); renderWebInbox(); });
+}
+function restoreWebOrder(id){
+  const p = webInbox.pedidos.find(function(x){ return x.id===id; });
+  if(!p) return;
+  webSetEstado(p, 'nuevo').then(function(){ showToast('Pedido recuperado'); })
+    .catch(function(){ showToast('No se pudo conectar. Probá de nuevo.'); })
+    .then(function(){ updateWebInboxBanner(); renderWebInbox(); });
+}
+
+/* ---- Revisar y aceptar ---- */
+function openWebReview(id){
+  const p = webInbox.pedidos.find(function(x){ return x.id===id; });
+  if(!p) return;
+  const matches = webClientMatches(p);
+  webInbox.revisando = p.id;
+  webInbox.sel = {
+    client: matches.length ? matches[0].id : 'nuevo',
+    fecha: p.fecha || '',
+    recipes: p.items.map(function(it){ return webLinkFor(p.origen, it.key) || ''; }),
+    cambiar: p.items.map(function(){ return false; })
+  };
+  webModal('webReviewModal').classList.add('active');
+  renderWebReview();
+}
+function closeWebReview(){ const m = document.getElementById('webReviewModal'); if(m) m.classList.remove('active'); webInbox.revisando = null; }
+function webClientMatches(p){
+  const names = [p.origen==='mayorista' ? p.negocio : '', p.nombre].map(webNorm).filter(Boolean);
+  if(!names.length) return [];
+  return DATA.clients.filter(function(c){ return names.indexOf(webNorm(c.name))!==-1 || (c.company && names.indexOf(webNorm(c.company))!==-1); });
+}
+function webNewClientName(p){ return webQuien(p)==='Sin nombre' ? 'Cliente web '+p.numero : webQuien(p); }
+function webRecipeOptions(sel, it){
+  const sug = webRecipeSuggestions(it.nombre, it.detalle);
+  const all = DATA.recipes.slice().sort(function(a,b){ return (a.title||'').localeCompare(b.title||'', 'es'); });
+  const opt = function(r){ return '<option value="'+r.id+'"'+(r.id===sel?' selected':'')+'>'+escapeHtml(r.title||'(sin nombre)')+'</option>'; };
+  return '<option value="">Elegí la receta…</option>'+
+    (sug.length ? '<optgroup label="Sugeridas">'+sug.map(opt).join('')+'</optgroup><optgroup label="Todas">' : '')+
+    all.filter(function(r){ return sug.indexOf(r)===-1 || !sug.length; }).map(opt).join('')+(sug.length ? '</optgroup>' : '');
+}
+function renderWebReview(){
+  const p = webInbox.pedidos.find(function(x){ return x.id===webInbox.revisando; });
+  const m = webModal('webReviewModal');
+  if(!p){ m.classList.remove('active'); return; }
+  const s = webInbox.sel;
+  const may = p.origen==='mayorista';
+  const matches = webClientMatches(p);
+  const others = DATA.clients.filter(function(c){ return matches.indexOf(c)===-1; }).sort(function(a,b){ return (a.name||'').localeCompare(b.name||'', 'es'); });
+  const cOpt = function(c){ return '<option value="'+c.id+'"'+(s.client===c.id?' selected':'')+'>'+escapeHtml(c.name)+(c.phone ? ' ('+escapeHtml(c.phone)+')' : (c.company && c.company!==c.name ? ' ('+escapeHtml(c.company)+')' : ''))+'</option>'; };
+  const clientSel = '<select class="wb-sel ok" onchange="webInbox.sel.client=this.value;renderWebReview()">'+
+    matches.map(cOpt).join('')+
+    '<option value="nuevo"'+(s.client==='nuevo'?' selected':'')+'>Crear cliente nuevo: '+escapeHtml(webNewClientName(p))+'</option>'+
+    (others.length ? '<optgroup label="Otros clientes">'+others.map(cOpt).join('')+'</optgroup>' : '')+'</select>';
+  const chip = s.client==='nuevo' ? '<span class="wb-chip new">CLIENTE NUEVO</span>' : '<span class="wb-chip ok">YA ESTÁ EN CLIENTES</span>';
+  const lines = p.items.map(function(it, i){
+    const rid = s.recipes[i];
+    const r = rid ? DATA.recipes.find(function(x){ return x.id===rid; }) : null;
+    const price = it.precio==null ? '<span style="color:var(--k-warning);">a consultar</span>' : fmtMoney(it.precio*it.qty);
+    let link;
+    if(r && !s.cambiar[i]){
+      link = '<button type="button" class="wb-linkok" onclick="webInbox.sel.cambiar['+i+']=true;renderWebReview()"><span class="icon-slot" data-icon="check"></span> Receta: '+escapeHtml(r.title)+' <u>cambiar</u></button>';
+    } else {
+      link = '<select class="wb-sel'+(rid?' ok':'')+'" onchange="webInbox.sel.recipes['+i+']=this.value;webInbox.sel.cambiar['+i+']=false;renderWebReview()">'+webRecipeOptions(rid, it)+'</select>'+
+        '<div class="wb-hint">Se recuerda para los próximos pedidos.</div>';
+    }
+    return '<div class="wb-line"><div class="t"><span>'+it.qty+' × '+escapeHtml(it.nombre)+(it.detalle ? ' <small>('+escapeHtml(it.detalle)+')</small>' : '')+'</span><span>'+price+'</span></div>'+link+'</div>';
+  }).join('');
+  const field = function(l, v){ return v ? '<div class="wb-field"><span>'+l+'</span><b>'+escapeHtml(v)+'</b></div>' : ''; };
+  const entrega = p.entrega==='Envío' ? 'Envío'+(p.direccion ? ' · '+p.direccion : '') : (p.entrega || '');
+  const faltan = s.recipes.filter(function(x){ return !x; }).length;
+  m.querySelector('.modal-box').innerHTML = webHead((may ? 'Pedido mayorista ' : 'Pedido web ')+escapeHtml(p.numero), p.estado==='aceptado' ? 'Volver a crear el pedido' : 'Revisá y aceptá', '', 'closeWebReview()')+
+    '<div class="eop-headbody">'+
+      '<div class="wb-sec">Cliente</div>'+
+      '<div class="wb-row"><span class="wb-name">'+escapeHtml(s.client==='nuevo' ? webNewClientName(p) : ((DATA.clients.find(function(c){ return c.id===s.client; })||{}).name||''))+'</span>'+chip+'</div>'+
+      clientSel+'<div class="wb-hint">Si no es la misma persona, elegí otra o "Crear cliente nuevo".'+(may ? ' Queda con la etiqueta Mayorista.' : '')+'</div>'+
+      '<div class="wb-sec">Productos</div>'+lines+
+      '<div class="cost-total" style="margin-top:6px;"><span>Total</span><span>'+webMoney(p)+'</span></div>'+
+      (p.aConsultar ? '<div class="wb-hint">Los productos "a consultar" quedan en $0: cambiá el precio después desde el pedido.</div>' : '')+
+      (p.verificado===false ? '<div class="wb-warn">Los precios no se pudieron comparar con la web: revisalos.</div>' : '')+
+      '<div class="wb-sec">Entrega</div>'+
+      '<div class="wb-field"><span>Fecha</span><input class="wb-in" type="date" value="'+escapeHtml(s.fecha)+'" onchange="webInbox.sel.fecha=this.value"></div>'+
+      (may ? field('Negocio', p.negocio) : '')+field('Franja', p.franja)+field('Entrega', entrega)+field('Pago', p.pago)+
+      (p.notas ? '<div class="wb-sec">'+(may ? 'Mensaje del cliente' : 'Notas del cliente')+'</div><div class="wb-notes">'+escapeHtml(p.notas)+'</div>' : '')+
+      '<div class="btn-row" style="margin-top:14px;">'+
+        (p.estado==='nuevo' ? '<button class="btn btn-ghost" style="flex:1;" onclick="rejectWebOrder(\''+p.id+'\')">Rechazar</button>' : '<button class="btn btn-ghost" style="flex:1;" onclick="closeWebReview()">Cancelar</button>')+
+        '<button class="btn btn-primary" style="flex:1.4;" id="wbAcceptBtn" onclick="acceptWebOrder()"'+(faltan?' disabled':'')+'>'+(faltan ? 'Elegí '+(faltan===1?'la receta':'las recetas') : 'Crear pedido')+'</button>'+
+      '</div>'+
+    '</div>';
+  mountIcons();
+}
+function acceptWebOrder(){
+  const p = webInbox.pedidos.find(function(x){ return x.id===webInbox.revisando; });
+  if(!p) return;
+  const s = webInbox.sel;
+  if(s.recipes.some(function(x){ return !webRecipeExists(x); })){ showToast('Elegí la receta de cada producto'); return; }
+  const ya = webOrderLocal(p);
+  if(ya){ showToast('Ese pedido ya está en tus pedidos'); closeWebReview(); return; }
+  const btn = document.getElementById('wbAcceptBtn'); if(btn){ btn.disabled = true; btn.textContent = 'Creando…'; }
+  const orderId = (p.orderId && /^ord-\d{10,16}$/.test(String(p.orderId))) ? p.orderId : ('ord-'+Date.now());
+  webSetEstado(p, 'aceptado', orderId).then(function(){
+    createOrderFromWeb(p, s, orderId);
+    closeWebReview();
+    updateWebInboxBanner(); renderWebInbox();
+    showToast('Pedido creado');
+  }).catch(function(e){
+    if(/ya aceptado/.test(e.message)){ showToast('Ese pedido ya se aceptó en otro dispositivo'); closeWebReview(); renderWebInbox(); updateWebInboxBanner(); }
+    else { showToast('No se pudo conectar. Probá de nuevo.'); if(btn){ btn.disabled = false; btn.textContent = 'Crear pedido'; } }
+  });
+}
+// Crea el pedido igual que uno cargado a mano (stock, horneadas), con los datos de la web.
+function createOrderFromWeb(p, s, orderId){
+  if(DATA.orders.some(function(o){ return o.id===orderId; })) return null;
+  const may = p.origen==='mayorista';
+  let client = s.client!=='nuevo' ? DATA.clients.find(function(c){ return c.id===s.client; }) : null;
+  if(!client){
+    client = { id:'cli-'+Date.now(), name:webNewClientName(p), phone:'', email:'', company: may ? (p.negocio||'') : '', tags: may ? ['Mayorista'] : [], icon:null };
+    DATA.clients.push(client);
+  } else if(may){
+    client.tags = client.tags || [];
+    if(!client.tags.some(function(t){ return webNorm(t)==='mayorista'; })) client.tags.push('Mayorista');
+  }
+  const L = webLinksMap();
+  p.items.forEach(function(it, i){ if(s.recipes[i] && webLinkFor(p.origen, it.key)!==s.recipes[i]) L[webPrefix(p.origen)+it.key] = s.recipes[i]; });
+  const items = p.items.map(function(it, i){
+    const r = DATA.recipes.find(function(x){ return x.id===s.recipes[i]; });
+    const out = { recipeId:r.id, recipeName:r.title, qty:it.qty, unitPrice: it.precio==null ? 0 : it.precio };
+    if(it.detalle) out.detail = it.detalle;
+    return out;
+  });
+  const willDeductPortions = DATA.settings.discountStockOnSale!==false;
+  if(willDeductPortions) resolveOrderBakeChoices(items.map(function(it){ return { recipeId:it.recipeId, qty:it.qty }; }));
+  const order = {
+    id: orderId,
+    clientId: client.id,
+    customerName: client.name,
+    deliveryDate: s.fecha || todayStr(),
+    deposit: 0,
+    note: p.notas || '',
+    createdAt: new Date().toISOString(),
+    deliveredAt: null,
+    status: 'confirmado',
+    colorIdx: DATA.orders.length % PLACEHOLDER_COLORS.length,
+    items: items,
+    total: items.reduce(function(a, it){ return a + (it.unitPrice||0)*it.qty; }, 0),
+    discountPct: 0,
+    appliedCoupons: [],
+    portionsDeducted: willDeductPortions,
+    web: { id:p.id, numero:p.numero, origen:p.origen, franja:p.franja||'', entrega:p.entrega||'', direccion:p.direccion||'', pago:p.pago||'', negocio:p.negocio||'' }
+  };
+  if(p.pago==='Transferencia') order.payMethod = 'transferencia';
+  else if(p.pago==='Efectivo') order.payMethod = 'efectivo';
+  if(willDeductPortions) adjustPortionStockForOrder(order, -1);
+  DATA.orders.push(order);
+  saveData(DATA);
+  if(typeof renderOrderList==='function' && document.getElementById('orderList')) renderOrderList();
+  return order;
+}
+
+/* ---- Productos de la web ↔ recetas ---- */
+function openWebLinks(){
+  webModal('webLinksModal').classList.add('active');
+  renderWebLinks();
+  if(!webInbox.cargado) refreshWebInbox(true);
+}
+function closeWebLinks(){ const m = document.getElementById('webLinksModal'); if(m) m.classList.remove('active'); }
+function setWebLink(k, rid){
+  const L = webLinksMap();
+  if(rid) L[k] = rid; else delete L[k];
+  saveData(DATA);
+  renderWebLinks();
+}
+function renderWebLinks(){
+  const m = webModal('webLinksModal');
+  const prods = webInbox.productos || [];
+  const L = webLinksMap();
+  const recipes = DATA.recipes.slice().sort(function(a,b){ return (a.title||'').localeCompare(b.title||'', 'es'); });
+  let sin = 0, body = '';
+  ['menu','mayorista'].forEach(function(origen){
+    const list = prods.filter(function(x){ return x.origen===origen; });
+    if(!list.length) return;
+    body += '<div class="wb-sec">'+(origen==='menu' ? 'Menú' : 'Mayorista')+'</div>';
+    body += list.map(function(x){
+      const k = x.key;
+      const own = webRecipeExists(L[k]) ? L[k] : '';
+      const base = k.replace(/^may:/, 'menu:');
+      const inherited = origen==='mayorista' && !own && webRecipeExists(L[base]) ? DATA.recipes.find(function(r){ return r.id===L[base]; }) : null;
+      if(!own && !inherited) sin++;
+      const first = inherited ? 'Igual que en el menú ('+escapeHtml(inherited.title)+')' : 'Sin vincular';
+      const opts = '<option value="">'+first+'</option>'+recipes.map(function(r){ return '<option value="'+r.id+'"'+(r.id===own?' selected':'')+'>'+escapeHtml(r.title||'(sin nombre)')+'</option>'; }).join('');
+      return '<div class="wb-line"><div class="t"><span>'+escapeHtml(x.nombre)+(x.detalle ? ' · '+escapeHtml(x.detalle) : '')+'</span></div>'+
+        '<select class="wb-sel'+(own||inherited?' ok':'')+'" data-k="'+escapeHtml(k)+'" onchange="setWebLink(this.dataset.k, this.value)">'+opts+'</select></div>';
+    }).join('');
+  });
+  let sub;
+  if(!prods.length){
+    sub = 'Productos de la página';
+    body = '<p class="wb-empty">'+(!webCreds() ? 'Configurá la sincronización para ver los productos de la web.' : webInbox.error==='script' ? 'Para ver los productos de la web hay que actualizar el script de Google.' : webInbox.cargado ? 'No se encontraron productos en la web.' : 'Buscando los productos de la web…')+'</p>';
+  } else {
+    sub = 'Elegí qué receta es cada producto'+(sin ? ' · '+sin+' sin vincular' : '');
+    body += '<div class="wb-hint" style="margin-top:10px;">Los pedidos entran igual aunque falte vincular; te lo pregunta al aceptarlos.</div>';
+  }
+  m.querySelector('.modal-box').innerHTML = webHead('Productos de la web', sub, '', 'closeWebLinks()')+'<div class="eop-headbody">'+body+'</div>';
+  mountIcons();
+}
+
+// Consulta automática: al abrir la app, al volver a ella y cada 2 minutos con Pedidos en pantalla.
+setTimeout(function(){ refreshWebInbox(true); }, 2500);
+setInterval(function(){
+  const cur = state.stack[state.stack.length-1];
+  if(cur==='orders' && document.visibilityState!=='hidden') refreshWebInbox(true);
+}, 120000);
+document.addEventListener('visibilitychange', function(){ if(document.visibilityState==='visible') refreshWebInbox(false); });
+
+// Al editar un pedido que vino de la web: conserva el precio que vio el cliente y la opción elegida
+// (por ejemplo "Con glasé cítrico") de cada producto que sigue en el pedido. Devuelve true si cambió algún precio.
+function webCarryItemInfo(o, snapItems){
+  const old = (o.items||[]).slice();
+  let changed = false;
+  snapItems.forEach(function(sn){
+    const k = old.findIndex(function(x){ return x.recipeId===sn.recipeId && (x.detail || o.web); });
+    if(k===-1) return;
+    if(old[k].detail) sn.detail = old[k].detail;
+    if(o.web && !sn.customPrice && old[k].unitPrice!=null && old[k].unitPrice!==sn.unitPrice){ sn.unitPrice = old[k].unitPrice; changed = true; }
+    old.splice(k,1);
+  });
+  return changed;
+}
+function webRecalcTotal(items, discountPct){
+  const raw = items.reduce(function(a, it){ return a + (it.unitPrice||0)*it.qty; }, 0);
+  return discountPct>0 ? Math.round(raw*(1-discountPct/100)) : raw;
+}
+function webOrderFieldsHtml(o){
+  const w = o.web || {};
+  const row = function(l, v){ return v ? '<div class="eop-view-field"><span>'+l+'</span><span>'+escapeHtml(v)+'</span></div>' : ''; };
+  const entrega = w.entrega==='Envío' ? 'Envío'+(w.direccion ? ' · '+w.direccion : '') : (w.entrega||'');
+  return row('Franja', w.franja)+row('Entrega', entrega)+row('Pago', w.pago)+row(w.origen==='mayorista' ? 'Pedido mayorista' : 'Pedido web', w.numero);
 }
 
 /* =========================================================

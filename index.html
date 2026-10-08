@@ -882,6 +882,18 @@
   .wb-empty{ font-size:calc(13px + var(--kobu-font-boost, 0px)); color:var(--k-muted); text-align:center; margin:10px 0; }
   .wb-link-btn{ display:block; width:100%; background:none; border:none; color:var(--k-accent); font-family:inherit; font-size:calc(12px + var(--kobu-font-boost, 0px)); text-decoration:underline; padding:8px 0; cursor:pointer; }
   .wb-tag{ display:inline-block; font-size:calc(9px + var(--kobu-font-boost, 0px)); font-weight:800; letter-spacing:.05em; padding:1px 6px; border-radius:6px; margin-left:6px; vertical-align:1px; }
+
+  /* Pendientes del bot de Telegram (Vender) */
+  .bp-card{ border:1.5px solid var(--k-warning); }
+  .bp-row{ border-top:1px dashed var(--k-border); padding:10px 0 4px; }
+  .bp-t{ display:flex; justify-content:space-between; gap:8px; font-size:calc(13px + var(--kobu-font-boost, 0px)); color:var(--k-text); font-weight:600; }
+  .bp-sub{ font-size:calc(11px + var(--kobu-font-boost, 0px)); color:var(--k-muted); margin:2px 0 6px; }
+  .bp-chips{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:6px; }
+  .bp-chip{ border:1px solid var(--k-border); background:var(--k-card2); border-radius:999px; padding:6px 10px; font-size:calc(12px + var(--kobu-font-boost, 0px)); color:var(--k-text); font-family:inherit; cursor:pointer; }
+  .bp-chip.on{ background:var(--k-accent); color:var(--k-bg); border-color:var(--k-accent); }
+  .bp-chip.off{ opacity:.45; }
+  .bp-pm{ display:flex; gap:6px; margin-bottom:8px; }
+  .bp-pm button{ flex:1; text-align:center; border:none; border-radius:10px; padding:7px; font-size:calc(12px + var(--kobu-font-boost, 0px)); font-family:inherit; cursor:pointer; }
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-messaging-compat.js"></script>
@@ -2041,6 +2053,10 @@
         <span class="l">Pedidos web y productos de la web</span>
         <span class="icon-slot" data-icon="chevron-right" style="color:var(--k-muted);"></span>
       </div>
+      <div class="rowline" style="cursor:pointer;" onclick="connectTelegram()">
+        <span class="l">Conectar Telegram (bot de Kobu)</span>
+        <span id="tgConnectState" style="font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);">Conectar ›</span>
+      </div>
       <div class="rowline">
         <span class="l">Lista de compras automática (desde pedidos)</span>
         <div class="switch" id="autoShopSwitch" onclick="toggleAutoShopping()"><div class="knob-sw"></div></div>
@@ -2185,6 +2201,7 @@
 
   <!-- VENDER (venta a la calle) -->
   <div class="screen" id="screen-quicksell">
+    <div class="grp-card bp-card" id="qs-bot-pending" style="display:none;"></div>
     <div class="grp-card">
       <p class="section-title"><span class="badge-ic"><span class="icon-slot" data-icon="square-check"></span></span>Listas para vender</p>
       <p style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:-4px 0 0;">Tocá el número para cargar stock exacto, +/- para ajustar de a uno, y la tarjeta para vender.</p>
@@ -3078,7 +3095,7 @@ function normalizeData(parsed){
   if(!parsed.couponCatalog) parsed.couponCatalog = [];
   [ migrateIngredientLinks, normalizeIngredientStock, migrateClientLinks, migrateShoppingManualItems,
     migrateExpenses, migrateChatSessions, migrateOvens, migrateUtensils, migrateOrderStatus,
-    migrateMoldCalibrations, migrateTheme, migrateQuickSales, migratePriceHistory, migrateWebLinks
+    migrateMoldCalibrations, migrateTheme, migrateQuickSales, migratePriceHistory, migrateWebLinks, migrateBotDismissed
   ].forEach(function(fn){
     try{ fn(parsed); }catch(e){ console.error('Migración falló: '+(fn&&fn.name), e); }
   });
@@ -3087,6 +3104,10 @@ function normalizeData(parsed){
 // Vínculos producto de la web -> receta (pedidos web). Objeto { "menu:<id>[.<variante>]": recipeId }.
 function migrateWebLinks(d){
   if(!d.webLinks || typeof d.webLinks!=='object' || Array.isArray(d.webLinks)) d.webLinks = {};
+}
+// Ventas con sabor pendiente del bot de Telegram que se descartaron en Vender (ids).
+function migrateBotDismissed(d){
+  if(!Array.isArray(d.botDismissed)) d.botDismissed = [];
 }
 function backupUnreadableData(raw){
   try{ localStorage.setItem(STORAGE_KEY+'_ilegible_'+Date.now(), raw); }catch(e){}
@@ -6674,6 +6695,7 @@ function renderSettings(){
   document.getElementById('addStockExpenseSwitch').classList.toggle('on', DATA.settings.addStockAsExpense!==false);
   document.getElementById('notifEnabledSwitch').classList.toggle('on', notifEnabled());
   updateNotifNote();
+  updateTelegramRow();
   mountIcons();
 }
 
@@ -11323,8 +11345,195 @@ function renderQuickSellScreen(){
   }
 
   document.getElementById('qs-sold').textContent = fmtMoney(qs.totalRevenue);
+  renderBotPending();
+  refreshBotSales(false);
   mountIcons();
 }
+
+/* =========================================================
+   BOT DE TELEGRAM (ventas en la calle desde el reloj / Telegram)
+   El script guarda lo que anota el bot en un archivo aparte (action=ventasBot, con la clave de sincronización).
+   La app lo levanta solo: las ventas con producto entran a DATA.quickSales con el MISMO id (así el bot sabe que
+   ya están y toma el stock de Kobu); las "anular" deshacen una venta ya levantada; las de sabor pendiente
+   ("+1 budín" → Después) se muestran en Vender para elegir el sabor. Descartar un pendiente lo anota en
+   DATA.botDismissed (el bot deja de reservarle stock).
+   ========================================================= */
+const botSales = { pendientes:[], cargado:false, promesa:null, ultimo:0, sel:{} };
+function botDismissedList(){
+  if(!Array.isArray(DATA.botDismissed)) DATA.botDismissed = [];
+  return DATA.botDismissed;
+}
+function refreshBotSales(force){
+  const c = webCreds();
+  if(!c) return Promise.resolve(null);
+  if(botSales.promesa) return botSales.promesa;
+  if(!force && botSales.cargado && Date.now()-botSales.ultimo < 20000) return Promise.resolve(botSales);
+  botSales.promesa = fetch(c.url+'?key='+encodeURIComponent(c.key)+'&action=ventasBot', { method:'GET' })
+    .then(function(r){ return r.json(); })
+    .then(function(j){
+      // Un script viejo responde otra cosa (los datos de sincronización): se ignora.
+      if(j && j.ok===true && Array.isArray(j.ventas)){ applyBotSales(j.ventas); botSales.cargado = true; }
+      botSales.ultimo = Date.now();
+    })
+    .catch(function(){})
+    .then(function(){ botSales.promesa = null; return botSales; });
+  return botSales.promesa;
+}
+function botValidSale(v){
+  return v && typeof v.id==='string' && /^qs-bot-[\d-]{10,40}$/.test(v.id) && v.tipo==='venta' && Number.isInteger(v.qty) && v.qty>=1 && v.qty<=50;
+}
+function applyBotSales(ventas){
+  const ids = {};
+  (DATA.quickSales||[]).forEach(function(q){ if(q && q.id) ids[q.id] = true; });
+  const dismissed = {};
+  botDismissedList().forEach(function(id){ dismissed[id] = true; });
+  const anuladas = {};
+  ventas.forEach(function(v){ if(v && v.tipo==='anular' && typeof v.ref==='string' && /^qs-bot-[\d-]{10,40}$/.test(v.ref)) anuladas[v.ref] = true; });
+  let nuevas = 0, deshechas = 0;
+  const willDeduct = DATA.settings.discountStockOnSale!==false;
+  const pend = [];
+  ventas.forEach(function(v){
+    if(!botValidSale(v) || anuladas[v.id] || dismissed[v.id] || ids[v.id]) return;
+    if(!v.recipeId){
+      if(v.pendiente && Array.isArray(v.candidatos)) pend.push(v);
+      return;
+    }
+    const r = DATA.recipes.find(function(x){ return x.id===v.recipeId; });
+    if(!r) return;
+    if(addBotQuickSale(v, r, v.payMethod, willDeduct)){ ids[v.id] = true; nuevas++; }
+  });
+  // Anulaciones de ventas que ya estaban en Kobu
+  Object.keys(anuladas).forEach(function(ref){
+    const idx = (DATA.quickSales||[]).findIndex(function(q){ return q.id===ref; });
+    if(idx===-1) return;
+    const q = DATA.quickSales[idx];
+    if(q.stockDeducted!==false){
+      const r = DATA.recipes.find(function(x){ return x.id===q.recipeId; });
+      if(r) r.stock = (r.stock||0) + (q.unitsDeducted!=null ? q.unitsDeducted : q.qty);
+    }
+    DATA.quickSales.splice(idx, 1);
+    deshechas++;
+  });
+  botSales.pendientes = pend;
+  if(nuevas || deshechas){
+    saveData(DATA);
+    showToast(nuevas ? ('Se '+(nuevas===1?'cargó 1 venta':'cargaron '+nuevas+' ventas')+' del bot de Telegram') : 'Se deshizo una venta del bot');
+  }
+  if(state.stack[state.stack.length-1]==='quicksell') renderQuickSellScreen();
+  return { nuevas:nuevas, deshechas:deshechas, pendientes:pend.length };
+}
+// Igual que registerQuickSale, pero con los datos del bot (mismo id, misma hora y medio de pago).
+function addBotQuickSale(v, r, payMethod, willDeduct){
+  if(DATA.quickSales.some(function(q){ return q.id===v.id; })) return false;
+  const c = computeRecipeCost(r);
+  const pack = v.mode==='pack' && r.packSize>0 && r.packPrice!=null;
+  const unitsPerSale = pack ? r.packSize : 1;
+  const qty = parseFloat(v.qty)||1;
+  const units = qty*unitsPerSale;
+  const price = v.recipeId===r.id && v.unitPrice>0 ? v.unitPrice : (pack ? r.packPrice : (r.salePrice||0));
+  DATA.quickSales.push({
+    id: v.id, recipeId: r.id, recipeName: r.title, qty: qty, mode: pack ? 'pack' : 'unit', unitsDeducted: units,
+    unitPrice: price, unitCost: (c.costPerUnit||0)*unitsPerSale, payMethod: payMethod==='transferencia' ? 'transferencia' : 'efectivo',
+    ts: v.ts && !isNaN(new Date(v.ts)) ? v.ts : new Date().toISOString(), stockDeducted: willDeduct, origen:'bot'
+  });
+  if(willDeduct) r.stock = Math.max(0, (r.stock||0) - units);
+  return true;
+}
+function botPendSel(v){
+  if(!botSales.sel[v.id]) botSales.sel[v.id] = { recipeId:'', pay: v.payMethod==='transferencia' ? 'transferencia' : 'efectivo' };
+  return botSales.sel[v.id];
+}
+function botPendChoose(id, rid){ const v = botSales.pendientes.find(function(x){ return x.id===id; }); if(!v) return; botPendSel(v).recipeId = rid; renderBotPending(); }
+function botPendPay(id, pay){ const v = botSales.pendientes.find(function(x){ return x.id===id; }); if(!v) return; botPendSel(v).pay = pay; renderBotPending(); }
+function botPendConfirm(id){
+  const v = botSales.pendientes.find(function(x){ return x.id===id; });
+  if(!v) return;
+  const s = botPendSel(v);
+  const r = DATA.recipes.find(function(x){ return x.id===s.recipeId; });
+  if(!r){ showToast('Elegí cuál fue'); return; }
+  addBotQuickSale({ id:v.id, recipeId:null, qty:v.qty||1, mode:'unit', ts:v.ts }, r, s.pay, DATA.settings.discountStockOnSale!==false);
+  botSales.pendientes = botSales.pendientes.filter(function(x){ return x.id!==id; });
+  delete botSales.sel[id];
+  saveData(DATA);
+  showToast('Venta registrada: '+r.title);
+  renderQuickSellScreen();
+}
+async function botPendDismiss(id){
+  const v = botSales.pendientes.find(function(x){ return x.id===id; });
+  if(!v) return;
+  const ok = await showConfirm('¿Descartar esta venta del bot ('+(v.qty||1)+' '+(v.grupo||'producto')+')? No se va a registrar.');
+  if(!ok) return;
+  const l = botDismissedList();
+  l.push(id);
+  if(l.length>500) l.splice(0, l.length-500);
+  botSales.pendientes = botSales.pendientes.filter(function(x){ return x.id!==id; });
+  saveData(DATA);
+  renderQuickSellScreen();
+}
+function renderBotPending(){
+  const wrap = document.getElementById('qs-bot-pending');
+  if(!wrap) return;
+  const list = botSales.pendientes.filter(function(v){ return !DATA.quickSales.some(function(q){ return q.id===v.id; }); });
+  if(!list.length){ wrap.style.display = 'none'; wrap.innerHTML = ''; return; }
+  wrap.style.display = '';
+  wrap.innerHTML = '<p class="section-title"><span class="badge-ic"><span class="icon-slot" data-icon="bell"></span></span>Pendientes del bot · '+list.length+'</p>'+
+    '<p style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:-4px 0 0;">Ventas anotadas desde Telegram sin sabor. Elegí cuál fue y confirmá.</p>'+
+    list.map(function(v){
+      const s = botPendSel(v);
+      const hora = new Date(v.ts); const hm = isNaN(hora) ? '' : ' · '+hora.toLocaleTimeString('es-AR', { hour:'2-digit', minute:'2-digit' });
+      const cands = (v.candidatos||[]).map(function(id){ return DATA.recipes.find(function(r){ return r.id===id; }); }).filter(Boolean);
+      const chips = cands.map(function(r){
+        return '<button type="button" class="bp-chip'+(s.recipeId===r.id?' on':'')+((r.stock||0)<=0?' off':'')+'" data-v="'+escapeHtml(v.id)+'" data-r="'+escapeHtml(r.id)+'" onclick="botPendChoose(this.dataset.v, this.dataset.r)">'+escapeHtml(r.title)+' ('+(r.stock||0)+')</button>';
+      }).join('') || '<span style="font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);">Esos productos ya no están en Kobu.</span>';
+      const precio = s.recipeId ? (function(){ const r = DATA.recipes.find(function(x){ return x.id===s.recipeId; }); return r ? (recipeSellsByPack(r) ? r.packPrice : r.salePrice) : v.unitPrice; })() : v.unitPrice;
+      const efe = s.pay!=='transferencia';
+      return '<div class="bp-row">'+
+        '<div class="bp-t"><span>'+(v.qty||1)+' '+escapeHtml(v.grupo||'Producto')+hm+'</span><span>'+fmtMoney((precio||0)*(v.qty||1))+'</span></div>'+
+        '<div class="bp-sub">¿Cuál fue?</div><div class="bp-chips">'+chips+'</div>'+
+        '<div class="bp-pm">'+
+          '<button type="button" data-v="'+escapeHtml(v.id)+'" onclick="botPendPay(this.dataset.v,\'efectivo\')" style="'+(efe?'background:var(--k-success-bg);color:var(--k-success);font-weight:600;':'background:var(--k-card2);color:var(--k-muted);')+'">Efectivo</button>'+
+          '<button type="button" data-v="'+escapeHtml(v.id)+'" onclick="botPendPay(this.dataset.v,\'transferencia\')" style="'+(!efe?'background:var(--k-info-bg);color:var(--k-info);font-weight:600;':'background:var(--k-card2);color:var(--k-muted);')+'">Transf.</button>'+
+        '</div>'+
+        '<div class="btn-row"><button class="btn btn-ghost" style="flex:1;" data-v="'+escapeHtml(v.id)+'" onclick="botPendDismiss(this.dataset.v)">Descartar</button>'+
+          '<button class="btn btn-primary" style="flex:1.4;" data-v="'+escapeHtml(v.id)+'" onclick="botPendConfirm(this.dataset.v)"'+(s.recipeId?'':' disabled')+'>'+(s.recipeId?'Confirmar venta':'Elegí el sabor')+'</button></div>'+
+      '</div>';
+    }).join('');
+  mountIcons();
+}
+
+/* ---- Conectar Telegram (Ajustes) ---- */
+function updateTelegramRow(){
+  const el = document.getElementById('tgConnectState');
+  if(!el) return;
+  let on = false; try{ on = !!localStorage.getItem('kobuTelegramLinked'); }catch(e){}
+  el.textContent = on ? 'Conectado ✓' : 'Conectar ›';
+  el.style.color = on ? 'var(--k-success)' : 'var(--k-muted)';
+}
+function connectTelegram(){
+  const c = webCreds();
+  if(!c){ showToast('Primero configurá la sincronización (Ajustes → Avanzado)'); return; }
+  showToast('Abriendo Telegram…');
+  fetch(c.url+'?key='+encodeURIComponent(c.key)+'&action=telegramLink', { method:'GET' })
+    .then(function(r){ return r.json(); })
+    .then(function(j){
+      if(j && j.ok && typeof j.url==='string' && /^https:\/\/t\.me\/\w+\?start=[A-Za-z0-9]{16,64}$/.test(j.url)){
+        try{ localStorage.setItem('kobuTelegramLinked', new Date().toISOString()); }catch(e){}
+        updateTelegramRow();
+        location.href = j.url; // Android abre la app de Telegram con el enlace (de un solo uso, vence en 10 minutos)
+        return;
+      }
+      showToast(j && j.error==='telegram sin configurar' ? 'Falta configurar el bot en el script de Google (ver instrucciones)' : 'Hay que actualizar el script de Google para usar el bot');
+    })
+    .catch(function(){ showToast('No se pudo conectar. Probá de nuevo.'); });
+}
+
+// Consulta automática: al abrir la app, al volver a ella, al entrar a Vender y cada 2 minutos con Vender en pantalla.
+setTimeout(function(){ refreshBotSales(true); }, 3000);
+setInterval(function(){
+  const cur = state.stack[state.stack.length-1];
+  if(cur==='quicksell' && document.visibilityState!=='hidden') refreshBotSales(true);
+}, 120000);
+document.addEventListener('visibilitychange', function(){ if(document.visibilityState==='visible') refreshBotSales(false); });
 
 /* =========================================================
    SHOPPING LIST

@@ -3095,7 +3095,7 @@ function normalizeData(parsed){
   if(!parsed.couponCatalog) parsed.couponCatalog = [];
   [ migrateIngredientLinks, normalizeIngredientStock, migrateClientLinks, migrateShoppingManualItems,
     migrateExpenses, migrateChatSessions, migrateOvens, migrateUtensils, migrateOrderStatus,
-    migrateMoldCalibrations, migrateTheme, migrateQuickSales, migratePriceHistory, migrateWebLinks, migrateBotDismissed
+    migrateMoldCalibrations, migrateTheme, migrateQuickSales, migratePriceHistory, migrateWebLinks, migrateBotDismissed, migrateBotProcesadas
   ].forEach(function(fn){
     try{ fn(parsed); }catch(e){ console.error('Migración falló: '+(fn&&fn.name), e); }
   });
@@ -3108,6 +3108,10 @@ function migrateWebLinks(d){
 // Ventas con sabor pendiente del bot de Telegram que se descartaron en Vender (ids).
 function migrateBotDismissed(d){
   if(!Array.isArray(d.botDismissed)) d.botDismissed = [];
+}
+// Horneadas que mandó el bot (/hornee) y ya se aplicaron (ids).
+function migrateBotProcesadas(d){
+  if(!Array.isArray(d.botProcesadas)) d.botProcesadas = [];
 }
 function backupUnreadableData(raw){
   try{ localStorage.setItem(STORAGE_KEY+'_ilegible_'+Date.now(), raw); }catch(e){}
@@ -7512,6 +7516,7 @@ function saveSyncConfig(){
   // este dispositivo pasa a "nunca sincronizado" con la nueva, así no la pisa.
   if(url !== (localStorage.getItem('kobuSyncUrl')||'') || key !== (localStorage.getItem('kobuSyncKey')||'')){
     localStorage.removeItem('kobuLastSyncedHash');
+    localStorage.removeItem('kobuLastCloudHash');
     localStorage.removeItem('kobuLastSync');
   }
   localStorage.setItem('kobuSyncUrl', url);
@@ -7541,7 +7546,25 @@ function updateSyncNote(){
   if(el) el.innerHTML = syncNoteText();
   renderHomeSummary();
 }
+// Lista de compras resumida para el bot (/compras): se guarda con los datos al subir.
+function updateBotResumen(){
+  try{
+    if(!DATA.shopping) return;
+    const items = (DATA.settings && DATA.settings.autoShoppingFromOrders) ? computeShoppingListFromOrders() : computeShoppingListManual();
+    const compras = items.slice(0, 60).map(function(it){
+      let q = '';
+      if(it.hasNumeric) q = (Math.round(it.qty*100)/100)+' '+(it.unit||'')+packageNoteText(it);
+      if(it.extra && it.extra.length) q += (q?' + ':'') + it.extra.join(', ');
+      return { t:String(it.name||''), q:q.trim(), ok: !!(DATA.shopping.checked||{})[it.key] };
+    });
+    const prev = DATA.botResumen && JSON.stringify(DATA.botResumen.compras);
+    if(prev===JSON.stringify(compras)) return;
+    DATA.botResumen = { compras:compras, ts:new Date().toISOString() };
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA)); }catch(e){}
+  }catch(e){}
+}
 function doSyncPush(url, key, silent){
+  updateBotResumen();
   return fetch(url+'?key='+encodeURIComponent(key), {
     method:'POST',
     headers:{ 'Content-Type':'text/plain' },
@@ -7551,6 +7574,7 @@ function doSyncPush(url, key, silent){
     .then(function(){
       localStorage.setItem('kobuLastSync', new Date().toISOString());
       localStorage.setItem('kobuLastSyncedHash', dataHash(DATA));
+      localStorage.setItem('kobuLastCloudHash', dataHash(DATA));
       updateSyncNote();
       if(!silent) showToast('Subido a la nube');
     })
@@ -7575,6 +7599,7 @@ function cloudHasRealData(c){ return cloudDataValid(c) && !isPristineData(c); }
 function deviceHasSynced(){ return !!localStorage.getItem('kobuLastSyncedHash'); }
 // Reemplaza los datos locales por los de la nube (sin tocar la nube).
 function adoptCloudData(parsed){
+  try{ localStorage.setItem('kobuLastCloudHash', dataHash(parsed)); }catch(e){}
   normalizeData(parsed);
   DATA = parsed;
   try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA)); }catch(e){}
@@ -7583,6 +7608,8 @@ function adoptCloudData(parsed){
   try{ applyTheme(DATA.settings && DATA.settings.theme, false); }catch(e){}
   updateSyncNote();
   render();
+  // Lo que mandó el bot mientras tanto se vuelve a aplicar sobre los datos recién bajados.
+  setTimeout(function(){ try{ refreshBotSales(true); }catch(e){} }, 500);
 }
 function syncPush(){
   if(!syncEnabled()){ showToast('Sincronización desactivada en este dispositivo. Activala en Ajustes.'); return; }
@@ -7606,7 +7633,7 @@ function syncPush(){
           return doSyncPush(url, key, false);
         });
       }
-      const conflict = cloud && !cloud.error && knownCloudHash && dataHash(cloud)!==knownCloudHash;
+      const conflict = cloud && !cloud.error && knownCloudHash && !cloudMatchesKnown(cloud);
       if(!conflict) return doSyncPush(url, key, false);
       return showConfirm('Hay cambios en la nube que no tenés en este dispositivo (probablemente los subió el otro). Si subís igual, se pierden. ¿Subir de todas formas?').then(function(ok){
         if(!ok){ showToast('Cancelado. Bajá primero para traer esos cambios.'); return; }
@@ -7657,6 +7684,13 @@ function syncCloneFromMain(){
       .catch(function(){ showToast('No se pudo conectar con la nube'); });
   });
 }
+// ¿Lo que hay en la nube es lo último que este dispositivo subió o bajó? Al bajar, DATA se normaliza
+// (migraciones) y su huella cambia: por eso también se guarda la huella de la nube tal cual vino
+// (kobuLastCloudHash). Si no, la subida automática creía que había cambios de otro dispositivo y se frenaba.
+function cloudMatchesKnown(c){
+  const h = dataHash(c);
+  return h===localStorage.getItem('kobuLastSyncedHash') || h===localStorage.getItem('kobuLastCloudHash');
+}
 function dataHash(d){
   const s = JSON.stringify(d);
   let h = 0;
@@ -7679,7 +7713,14 @@ function autoPushNow(){
   fetch(url+'?key='+encodeURIComponent(key), { method:'GET' })
     .then(function(res){ return res.json(); })
     .then(function(cloud){
-      if(cloud && !cloud.error && knownCloudHash && dataHash(cloud)!==knownCloudHash){
+      if(cloud && !cloud.error && knownCloudHash && !cloudMatchesKnown(cloud)){
+        // Cambios de otro dispositivo en la nube: no se pisan. Se avisa una vez por sesión.
+        try{
+          if(!sessionStorage.getItem('kobuSyncConflictAviso')){
+            sessionStorage.setItem('kobuSyncConflictAviso','1');
+            showToast('Tus cambios no se subieron: la nube tiene cambios de otro dispositivo. Ajustes → Avanzado → Sincronización.');
+          }
+        }catch(e){}
         return;
       }
       // Dispositivo que nunca sincronizó y nube con datos reales: NUNCA se sube (primero se baja).
@@ -7718,7 +7759,7 @@ function autoPullOnOpen(){
     .then(function(res){ return res.json(); })
     .then(function(parsed){
       if(!parsed || parsed.error || !parsed.recipes || !parsed.ovens) return;
-      if(dataHash(parsed) === lastHash) return;
+      if(cloudMatchesKnown(parsed)) return;
       adoptCloudData(parsed);
     })
     .catch(function(){});
@@ -11379,6 +11420,9 @@ function refreshBotSales(force){
     .then(function(){ botSales.promesa = null; return botSales; });
   return botSales.promesa;
 }
+function botValidHorneada(v){
+  return v && v.tipo==='horneada' && typeof v.id==='string' && /^hb-bot-[\d-]{10,40}$/.test(v.id) && typeof v.recipeId==='string' && Number.isInteger(v.porciones) && v.porciones>=1 && v.porciones<=2000;
+}
 function botValidSale(v){
   return v && typeof v.id==='string' && /^qs-bot-[\d-]{10,40}$/.test(v.id) && v.tipo==='venta' && Number.isInteger(v.qty) && v.qty>=1 && v.qty<=50;
 }
@@ -11414,13 +11458,33 @@ function applyBotSales(ventas){
     DATA.quickSales.splice(idx, 1);
     deshechas++;
   });
+  // Horneadas (/hornee): suman stock y descuentan ingredientes una sola vez.
+  if(!Array.isArray(DATA.botProcesadas)) DATA.botProcesadas = [];
+  const procesadas = {};
+  DATA.botProcesadas.forEach(function(id){ procesadas[id] = true; });
+  let horneadas = 0;
+  ventas.forEach(function(v){
+    if(!botValidHorneada(v) || procesadas[v.id]) return;
+    const r = DATA.recipes.find(function(x){ return x.id===v.recipeId; });
+    if(!r) return;
+    registrarHorneada(r.id, v.porciones);
+    DATA.botProcesadas.push(v.id); procesadas[v.id] = true;
+    horneadas++;
+  });
+  // Se conservan mientras el bot pueda tenerlas en su lista (14 días): el id trae la hora en ms.
+  const limiteHb = Date.now() - 30*86400000;
+  DATA.botProcesadas = DATA.botProcesadas.filter(function(id){ const m = /^hb-bot-(\d+)/.exec(String(id)); return !m || Number(m[1]) >= limiteHb; });
   botSales.pendientes = pend;
-  if(nuevas || deshechas){
+  if(nuevas || deshechas || horneadas){
     saveData(DATA);
-    showToast(nuevas ? ('Se '+(nuevas===1?'cargó 1 venta':'cargaron '+nuevas+' ventas')+' del bot de Telegram') : 'Se deshizo una venta del bot');
+    const msgs = [];
+    if(nuevas) msgs.push('Se '+(nuevas===1?'cargó 1 venta':'cargaron '+nuevas+' ventas')+' del bot de Telegram');
+    else if(deshechas) msgs.push('Se deshizo una venta del bot');
+    if(horneadas) msgs.push(horneadas===1 ? 'Se cargó 1 horneada del bot' : 'Se cargaron '+horneadas+' horneadas del bot');
+    showToast(msgs.join(' · '));
   }
   if(state.stack[state.stack.length-1]==='quicksell') renderQuickSellScreen();
-  return { nuevas:nuevas, deshechas:deshechas, pendientes:pend.length };
+  return { nuevas:nuevas, deshechas:deshechas, pendientes:pend.length, horneadas:horneadas };
 }
 // Igual que registerQuickSale, pero con los datos del bot (mismo id, misma hora y medio de pago).
 function addBotQuickSale(v, r, payMethod, willDeduct){

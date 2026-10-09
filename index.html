@@ -2053,6 +2053,14 @@
         <span class="l">Pedidos web y productos de la web</span>
         <span class="icon-slot" data-icon="chevron-right" style="color:var(--k-muted);"></span>
       </div>
+      <div class="rowline" style="cursor:pointer;" onclick="openWebEditor()">
+        <span class="l">Editar la web (menú, precios y lista mayorista)</span>
+        <span class="icon-slot" data-icon="chevron-right" style="color:var(--k-muted);"></span>
+      </div>
+      <div class="rowline">
+        <span class="l">Mostrar en la web lo que hay en stock</span>
+        <div class="switch" id="webStockSwitch" onclick="toggleWebStock()"><div class="knob-sw"></div></div>
+      </div>
       <div class="rowline" style="cursor:pointer;" onclick="connectTelegram()">
         <span class="l">Conectar Telegram (bot de Kobu)</span>
         <span id="tgConnectState" style="font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);">Conectar ›</span>
@@ -6696,6 +6704,7 @@ function renderSettings(){
   mountIcons();
   document.getElementById('autoShopSwitch').classList.toggle('on', !!DATA.settings.autoShoppingFromOrders);
   document.getElementById('discountStockSwitch').classList.toggle('on', DATA.settings.discountStockOnSale!==false);
+  const wss = document.getElementById('webStockSwitch'); if(wss) wss.classList.toggle('on', DATA.settings.webStock!==false);
   document.getElementById('addStockExpenseSwitch').classList.toggle('on', DATA.settings.addStockAsExpense!==false);
   document.getElementById('notifEnabledSwitch').classList.toggle('on', notifEnabled());
   updateNotifNote();
@@ -6890,6 +6899,18 @@ function toggleAutoShopping(){
   DATA.settings.autoShoppingFromOrders = !DATA.settings.autoShoppingFromOrders;
   saveData(DATA);
   renderSettings();
+}
+// "Disponibles ahora" en la web: el aviso de entrada muestra lo que está "Listo para vender" con stock (sin cantidades).
+function toggleWebStock(){
+  DATA.settings.webStock = !(DATA.settings.webStock!==false);
+  saveData(DATA);
+  renderSettings();
+  showToast(DATA.settings.webStock ? 'La web va a mostrar lo que hay en stock' : 'La web ya no muestra lo que hay en stock');
+}
+// Editor de la web (editor.html, en la misma carpeta que la app). Antes de salir se sube lo pendiente.
+function openWebEditor(){
+  try{ if(autoPushTimer){ clearTimeout(autoPushTimer); autoPushTimer = null; autoPushNow(); } }catch(e){}
+  setTimeout(function(){ location.href = 'editor.html'; }, 250);
 }
 function toggleDiscountStockOnSale(){
   DATA.settings.discountStockOnSale = !(DATA.settings.discountStockOnSale!==false);
@@ -7514,6 +7535,8 @@ function saveSyncConfig(){
   const key = document.getElementById('syncKeyInput').value.trim();
   // Cambiar de URL o de clave es cambiar de nube (ej. cuenta principal ↔ cuenta de prueba):
   // este dispositivo pasa a "nunca sincronizado" con la nueva, así no la pisa.
+  const soloClave = url === (localStorage.getItem('kobuSyncUrl')||'') && key !== (localStorage.getItem('kobuSyncKey')||'');
+  const antes = { synced: localStorage.getItem('kobuLastSyncedHash'), cloud: localStorage.getItem('kobuLastCloudHash'), last: localStorage.getItem('kobuLastSync') };
   if(url !== (localStorage.getItem('kobuSyncUrl')||'') || key !== (localStorage.getItem('kobuSyncKey')||'')){
     localStorage.removeItem('kobuLastSyncedHash');
     localStorage.removeItem('kobuLastCloudHash');
@@ -7523,6 +7546,23 @@ function saveSyncConfig(){
   localStorage.setItem('kobuSyncKey', key);
   showToast('Datos de sincronización guardados');
   updateSyncNote();
+  // Cambio de clave de la MISMA cuenta (misma URL y la nube con la nueva clave es exactamente la que ya conocía):
+  // se mantiene sincronizado, así la subida automática sigue andando.
+  if(soloClave && (antes.synced || antes.cloud) && url && key){
+    fetch(url+'?key='+encodeURIComponent(key), { method:'GET' })
+      .then(function(res){ return res.json(); })
+      .then(function(cloud){
+        if(!cloud || cloud.error || localStorage.getItem('kobuSyncKey') !== key || localStorage.getItem('kobuLastSyncedHash')) return;
+        const h = dataHash(cloud);
+        if(h !== antes.synced && h !== antes.cloud) return;
+        if(antes.synced) localStorage.setItem('kobuLastSyncedHash', antes.synced);
+        if(antes.cloud) localStorage.setItem('kobuLastCloudHash', antes.cloud);
+        if(antes.last) localStorage.setItem('kobuLastSync', antes.last);
+        updateSyncNote();
+        showToast('Clave nueva guardada: la sincronización sigue igual');
+      })
+      .catch(function(){});
+  }
   // Dispositivo nuevo: al cargar URL y clave baja solo los datos de la nube (nunca los pisa).
   autoPullOnOpen();
 }

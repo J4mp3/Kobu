@@ -415,6 +415,10 @@
   .step-row{ transition:opacity .15s; }
   .step-row textarea.input{ field-sizing:content; }
   .add-pair{ display:flex; gap:8px; }
+  .no-mode{ display:flex; gap:6px; margin-top:8px; margin-bottom:0; }
+  .no-mode .mediaTab{ padding:7px 0; }
+  .no-maynote{ font-size:calc(10.5px + var(--kobu-font-boost, 0px)); color:var(--k-muted); text-align:right; margin-top:2px; }
+  .no-item-price{ color:var(--k-muted); font-size:calc(11px + var(--kobu-font-boost, 0px)); margin-left:auto; margin-right:6px; white-space:nowrap; }
   .add-pair .btn{ flex:1; }
   .chip, .client-pill, .ordb-kebab, .ordb-paypill, .sr-step-btn, .conv-del{ position:relative; }
   .chip::after, .client-pill::after{ content:''; position:absolute; inset:-7px 0; }
@@ -1532,6 +1536,7 @@
           <button type="button" class="no-iconbtn" id="no-datebtn" onclick="npToggleDate(this)" aria-label="Fecha de entrega"><span class="icon-slot" data-icon="calendar"></span></button>
           <button type="button" class="no-iconbtn" id="no-notebtn" onclick="npToggleNote(this)" aria-label="Nota interna"><span class="icon-slot" data-icon="pencil"></span></button>
         </div>
+        <div class="no-mode" id="no-mode"><button type="button" class="mediaTab" id="no-mode-cli" onclick="npSetMayorista(false)">Cliente</button><button type="button" class="mediaTab" id="no-mode-may" onclick="npSetMayorista(true)">Mayorista</button></div>
         <div class="no-daterow" id="no-daterow"><input class="input" type="date" id="no-date" onchange="npDateChange(this.value)"></div>
         <div class="no-note" id="no-note"><textarea class="input" id="no-noteinput" rows="2" placeholder="Nota interna (opcional) — solo la ves vos" oninput="npNoteInput(this.value)"></textarea></div>
       </div>
@@ -1547,6 +1552,7 @@
             <button type="button" class="no-iconbtn" id="no-señabtn" style="width:28px;height:28px;border-radius:9px;" onclick="npToggleSeña(this)" aria-label="Agregar seña"><span class="icon-slot" data-icon="wallet"></span></button>
           </span>
         </div>
+        <div class="no-maynote" id="no-maynote" style="display:none;"></div>
         <div class="no-señabox" id="no-señabox"><input class="input" id="no-señainput" type="number" min="0" step="any" placeholder="Seña / adelanto recibido" oninput="npSeñaInput(this.value)"></div>
         <div class="no-saldorow" id="no-saldorow"><span>Saldo pendiente</span><span id="no-saldo">$0</span></div>
         <div class="btn-row" style="margin-top:12px;">
@@ -2073,6 +2079,10 @@
         <span class="l">Mostrar en la web lo que hay en stock</span>
         <div class="switch" id="webStockSwitch" onclick="toggleWebStock()"><div class="knob-sw"></div></div>
       </div>
+      <div class="rowline">
+        <span class="l">Descuento mayorista para productos que no están en la lista<br><span style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);">Se usa solo si el producto no tiene precio mayorista publicado</span></span>
+        <span style="display:flex;align-items:center;gap:4px;flex-shrink:0;"><input class="input" id="mayPctInput" type="number" min="0" max="90" step="1" style="width:58px;text-align:center;padding:6px 4px;" onchange="setMayoristaPct(this.value)"> %</span>
+      </div>
       <div class="rowline" style="cursor:pointer;" onclick="connectTelegram()">
         <span class="l">Conectar Telegram (bot de Kobu)</span>
         <span id="tgConnectState" style="font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);">Conectar ›</span>
@@ -2546,9 +2556,11 @@
     </div>
     <div class="grp-card">
       <p class="section-title"><span class="badge-ic"><span class="icon-slot" data-icon="clipboard"></span></span>Items del pedido</p>
+      <div class="mediaTabs no-mode" id="of-mode"><button type="button" class="mediaTab" id="of-mode-cli" onclick="ofSetMayorista(false)">Cliente</button><button type="button" class="mediaTab" id="of-mode-may" onclick="ofSetMayorista(true)">Mayorista</button></div>
       <div id="of-items" style="display:flex;flex-direction:column;gap:6px;"></div>
       <button class="btn btn-ghost" onclick="addOrderItemRow()"><span class="icon-slot" data-icon="plus" style="vertical-align:-2px;"></span> Agregar item</button>
       <div class="cost-total" id="of-total"><span>Total estimado</span><span>$0</span></div>
+      <div class="no-maynote" id="of-maynote" style="display:none;"></div>
       <div class="field"><label>Seña / adelanto recibido (opcional)</label><input class="input" id="of-deposit" type="number" min="0" step="any" placeholder="0" oninput="updateOrderTotalPreview()"></div>
       <div class="cost-total" id="of-balance"><span>Saldo pendiente</span><span>$0</span></div>
     </div>
@@ -5766,6 +5778,7 @@ function buildMoldWarningMessages(est){
   }
   return msgs;
 }
+const MOLD_PRESETS = [3,6,9,12,15]; // Molde: cantidades rápidas de unidades por tanda
 function renderMoldEstimate(r, moldeId){
   const est = estimateMoldOutcome(r, moldeId);
   const warnBox = document.getElementById('d-mold-warning');
@@ -5805,7 +5818,7 @@ function renderMoldEstimate(r, moldeId){
     }
     estText.textContent = txt+' (estimación aproximada a partir de otro molde calibrado, no reemplaza controlar el horno)';
   }
-  chipsWrap.innerHTML = [1,3,6,12].map(function(n){
+  chipsWrap.innerHTML = MOLD_PRESETS.map(function(n){
     return '<button type="button" class="chip" onclick="applyMoldTargetCount('+n+')">'+n+'</button>';
   }).join('') + '<button type="button" class="chip" onclick="toggleMoldCustomCount()">-</button>';
   updateMoldChipHighlight();
@@ -5813,7 +5826,7 @@ function renderMoldEstimate(r, moldeId){
 function updateMoldChipHighlight(){
   const chipsWrap = document.getElementById('d-mold-chips');
   if(!chipsWrap) return;
-  const presets = [1,3,6,12];
+  const presets = MOLD_PRESETS;
   const btns = chipsWrap.querySelectorAll('button.chip');
   btns.forEach(function(b){
     const label = b.textContent.trim();
@@ -5848,6 +5861,11 @@ function applyMoldTargetCount(n){
   updateMoldChipHighlight();
   const scaleInput = document.getElementById('d-scale-input');
   if(scaleInput) scaleInput.value = Math.round(factor*100)/100;
+  // Que se vea el efecto: abre Ingredientes y avisa por cuánto se multiplicó.
+  const ingHead = document.getElementById('d-acc-count-ingr');
+  const ingItem = ingHead && ingHead.closest('.d-acc-item');
+  if(ingItem && !ingItem.classList.contains('open')) ingItem.classList.add('open');
+  showToast('Para '+target+': ingredientes ×'+(Math.round(factor*100)/100).toLocaleString('es-AR'));
 }
 function dismissMoldWarning(scope){
   state._moldWarnDismissed = state._moldWarnDismissed || {};
@@ -6756,6 +6774,7 @@ function renderSettings(){
   document.getElementById('autoShopSwitch').classList.toggle('on', !!DATA.settings.autoShoppingFromOrders);
   document.getElementById('discountStockSwitch').classList.toggle('on', DATA.settings.discountStockOnSale!==false);
   const wss = document.getElementById('webStockSwitch'); if(wss) wss.classList.toggle('on', DATA.settings.webStock!==false);
+  const mpi = document.getElementById('mayPctInput'); if(mpi && document.activeElement!==mpi) mpi.value = mayoristaPct();
   document.getElementById('addStockExpenseSwitch').classList.toggle('on', DATA.settings.addStockAsExpense!==false);
   document.getElementById('notifEnabledSwitch').classList.toggle('on', notifEnabled());
   updateNotifNote();
@@ -7638,19 +7657,27 @@ function updateSyncNote(){
   renderHomeSummary();
 }
 // Lista de compras resumida para el bot (/compras): se guarda con los datos al subir.
+// También las recetas como texto (igual que "Extraer texto") para /recetas.
 function updateBotResumen(){
   try{
-    if(!DATA.shopping) return;
-    const items = (DATA.settings && DATA.settings.autoShoppingFromOrders) ? computeShoppingListFromOrders() : computeShoppingListManual();
-    const compras = items.slice(0, 60).map(function(it){
-      let q = '';
-      if(it.hasNumeric) q = (Math.round(it.qty*100)/100)+' '+(it.unit||'')+packageNoteText(it);
-      if(it.extra && it.extra.length) q += (q?' + ':'') + it.extra.join(', ');
-      return { t:String(it.name||''), q:q.trim(), ok: !!(DATA.shopping.checked||{})[it.key] };
-    });
-    const prev = DATA.botResumen && JSON.stringify(DATA.botResumen.compras);
-    if(prev===JSON.stringify(compras)) return;
-    DATA.botResumen = { compras:compras, ts:new Date().toISOString() };
+    const prevRes = DATA.botResumen || {};
+    let compras = Array.isArray(prevRes.compras) ? prevRes.compras : [];
+    if(DATA.shopping){
+      const items = (DATA.settings && DATA.settings.autoShoppingFromOrders) ? computeShoppingListFromOrders() : computeShoppingListManual();
+      compras = items.slice(0, 60).map(function(it){
+        let q = '';
+        if(it.hasNumeric) q = (Math.round(it.qty*100)/100)+' '+(it.unit||'')+packageNoteText(it);
+        if(it.extra && it.extra.length) q += (q?' + ':'') + it.extra.join(', ');
+        return { t:String(it.name||''), q:q.trim(), ok: !!(DATA.shopping.checked||{})[it.key] };
+      });
+    }
+    const recetas = (DATA.recipes||[]).filter(function(r){ return r && r.id && r.title; }).slice(0, 100).map(function(r){
+      let x = '';
+      try{ x = buildRecipeExportText(r); }catch(e){}
+      return { id:String(r.id), t:String(r.title).slice(0, 80), x:String(x).slice(0, 3800) };
+    }).filter(function(x){ return x.x; });
+    if(JSON.stringify(prevRes.compras)===JSON.stringify(compras) && JSON.stringify(prevRes.recetas)===JSON.stringify(recetas)) return;
+    DATA.botResumen = { compras:compras, recetas:recetas, ts:new Date().toISOString() };
     try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA)); }catch(e){}
   }catch(e){}
 }
@@ -8876,6 +8903,8 @@ function confirmAddClient(){
   if(returnTo==='neworder'){
     state.newOrderDraft.clientId = newClient.id;
     npPopulateClientSelect(newClient.id);
+    npSyncMayFromClient();
+    npRenderItems();
   }
 }
 async function removeClient(id){
@@ -8902,6 +8931,79 @@ function recipesSorted(){
 }
 function recipeSellsByPack(r){
   return !!(r && r.packSize>0 && r.packPrice!=null);
+}
+/* ---- Precios mayoristas ----
+   Fuente: la lista mayorista publicada en la web (mayorista.js), por el vínculo producto de la web <-> receta
+   (DATA.webLinks 'may:<id>[.<variante>]'; si no hay, el del menú con el mismo id). Si la receta no está en la lista
+   (o figura "a consultar"), se usa el precio normal con el % de Ajustes (DATA.settings.mayoristaPct, 17 por defecto),
+   redondeado a $100. La lista se guarda en este dispositivo (localStorage) y se vuelve a pedir cada 30 minutos. */
+const KOBU_WEB_PUBLICA = 'https://j4mp3.github.io/kobudulce/';
+const KOBU_MAY_CACHE = 'kobuMayLista';
+let kobuMayLista = null;
+try{ kobuMayLista = JSON.parse(localStorage.getItem(KOBU_MAY_CACHE) || 'null'); }catch(e){ kobuMayLista = null; }
+function mayoristaPct(){ const v = Number(DATA && DATA.settings && DATA.settings.mayoristaPct); return isFinite(v) && v>=0 && v<=90 ? v : 17; }
+function setMayoristaPct(v){
+  const n = Math.round(parseFloat(String(v).replace(',','.')));
+  DATA.settings.mayoristaPct = (isFinite(n) && n>=0 && n<=90) ? n : 17;
+  saveData(DATA);
+  const el = document.getElementById('mayPctInput'); if(el) el.value = DATA.settings.mayoristaPct;
+  showToast('Descuento mayorista: '+DATA.settings.mayoristaPct+'%');
+}
+// Pasa el texto de mayorista.js (window.KOBU_MAYORISTA = {...}) a { fecha, precios:{ 'id' | 'id.variante': número | null } } sin ejecutarlo.
+function kobuMayParse(txt){
+  if(typeof txt!=='string') return null;
+  const i = txt.indexOf('{', txt.indexOf('window.')), j = txt.lastIndexOf('}');
+  if(i<0 || j<i) return null;
+  let o;
+  try{ o = JSON.parse(txt.slice(i, j+1).replace(/^(\s*)([A-Za-z_][A-Za-z0-9_]*):/gm, '$1"$2":')); }catch(e){ return null; }
+  if(!o || !Array.isArray(o.categorias)) return null;
+  const precios = {};
+  const num = function(v){ const n = typeof v==='number' ? v : parseFloat(String(v==null?'':v).replace(/\./g,'').replace(',','.')); return isFinite(n) && n>0 ? n : null; };
+  o.categorias.forEach(function(c){ (c && Array.isArray(c.productos) ? c.productos : []).forEach(function(pr){
+    if(!pr || typeof pr.id!=='string') return;
+    if(Array.isArray(pr.variantes) && pr.variantes.length) pr.variantes.forEach(function(v){ if(v && typeof v.id==='string') precios[pr.id+'.'+v.id] = num(v.precio); });
+    else precios[pr.id] = num(pr.precio);
+  }); });
+  return { fecha: typeof o.actualizado==='string' ? o.actualizado.slice(0,10) : '', precios: precios, ts: Date.now() };
+}
+function kobuMayCargar(force){
+  if(!force && kobuMayLista && Date.now() - (kobuMayLista.ts||0) < 30*60000) return Promise.resolve(kobuMayLista);
+  if(typeof fetch!=='function') return Promise.resolve(kobuMayLista);
+  return fetch(KOBU_WEB_PUBLICA + 'mayorista.js?v=' + Date.now(), { cache:'no-store' })
+    .then(function(r){ return r && r.ok ? r.text() : null; })
+    .then(function(t){
+      const L = kobuMayParse(t);
+      if(L){ kobuMayLista = L; try{ localStorage.setItem(KOBU_MAY_CACHE, JSON.stringify(L)); }catch(e){} }
+      return kobuMayLista;
+    }).catch(function(){ return kobuMayLista; });
+}
+// Claves de la web vinculadas a una receta: primero las de la lista mayorista, después las del menú (mismo id).
+function webKeysForRecipe(recipeId, prefix){
+  const L = DATA.webLinks || {};
+  return Object.keys(L).filter(function(k){ return L[k]===recipeId && k.indexOf(prefix)===0; }).map(function(k){ return k.slice(prefix.length); });
+}
+// { price, src:'lista'|'pct'|null }
+function wholesaleInfo(recipeId){
+  const precios = kobuMayLista && kobuMayLista.precios || {};
+  const keys = webKeysForRecipe(recipeId, 'may:').concat(webKeysForRecipe(recipeId, 'menu:'));
+  for(let i=0;i<keys.length;i++){
+    if(Object.prototype.hasOwnProperty.call(precios, keys[i]) && precios[keys[i]]!=null) return { price: precios[keys[i]], src:'lista' };
+  }
+  const normal = unitPriceForRecipe(recipeId);
+  if(normal==null) return { price:null, src:null };
+  return { price: Math.max(0, Math.round(normal*(1-mayoristaPct()/100)/100)*100), src:'pct' };
+}
+function priceForOrderRecipe(recipeId, mayorista){ return mayorista ? wholesaleInfo(recipeId).price : unitPriceForRecipe(recipeId); }
+function clientIsMayorista(c){ return !!(c && (c.tags||[]).some(function(t){ return String(t).trim().toLowerCase()==='mayorista'; })); }
+function orderIsMayorista(o){ return !!o && (o.mayorista!=null ? !!o.mayorista : !!(o.web && o.web.origen==='mayorista')); }
+// Texto debajo del total en modo Mayorista.
+function mayoristaNote(items){
+  const srcs = (items||[]).filter(function(it){ return it.recipeId; }).map(function(it){ return wholesaleInfo(it.recipeId).src; });
+  const fecha = kobuMayLista && kobuMayLista.fecha ? parseDateLoose(kobuMayLista.fecha) : null;
+  const vig = fecha ? ' (vigente al '+fecha.toLocaleDateString('es-AR')+')' : '';
+  if(!kobuMayLista) return 'Precios con −'+mayoristaPct()+'% (todavía no se pudo leer la lista mayorista)';
+  if(srcs.length && srcs.every(function(x){ return x==='pct'; })) return 'Precios con −'+mayoristaPct()+'% (no están en la lista mayorista)';
+  return 'Precios de la lista mayorista'+vig+(srcs.some(function(x){ return x==='pct'; }) ? ' · algunos con −'+mayoristaPct()+'%' : '');
 }
 function unitPriceForRecipe(recipeId){
   const r = DATA.recipes.find(function(x){ return x.id===recipeId; });
@@ -9421,7 +9523,7 @@ function orderBoardCardHtml(o){
   return '<div class="ordb-card" onclick="openOrderDetailPopup(\''+o.id+'\')">'+
     '<div class="ordb-avatar" style="background:'+bg+';"><span class="ordb-avatar-day">'+dp.day+'</span><span class="ordb-avatar-month">'+dp.month+'</span></div>'+
     '<div style="min-width:0;flex:1;">'+
-      '<div class="ordb-name" style="display:flex;align-items:center;min-width:0;"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:'+(o.web?'3.2em':'0')+';flex:0 1 auto;">'+shortfallMark+escapeHtml(o.customerName)+'</span>'+(o.web ? '<span class="wb-tag" style="flex:0 1 auto;min-width:2.6em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:var(--k-'+(o.web.origen==='mayorista' ? 'warning-bg);color:var(--k-warning);">MAYORISTA' : 'info-bg);color:var(--k-info);">WEB')+'</span>' : '')+'</div>'+
+      '<div class="ordb-name" style="display:flex;align-items:center;min-width:0;"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:'+((o.web||orderIsMayorista(o))?'3.2em':'0')+';flex:0 1 auto;">'+shortfallMark+escapeHtml(o.customerName)+'</span>'+((o.web || orderIsMayorista(o)) ? '<span class="wb-tag" style="flex:0 1 auto;min-width:2.6em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:var(--k-'+(orderIsMayorista(o) ? 'warning-bg);color:var(--k-warning);">MAYORISTA' : 'info-bg);color:var(--k-info);">WEB')+'</span>' : '')+'</div>'+
       '<div class="ordb-items" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">• '+itemsLine+'</div>'+
     '</div>'+
     '<div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">'+
@@ -9690,7 +9792,7 @@ async function deleteOrder(id){
 }
 function openOrderForm(){
   state.editingOrderId = null;
-  state.orderDraft = { items:[], clientId:null, customerName:'', deliveryDate:'', deposit:0, note:'' };
+  state.orderDraft = { items:[], clientId:null, customerName:'', deliveryDate:'', deposit:0, note:'', mayorista:false, _mayManual:false };
   state._newClientInOrder = false;
   showScreen('orderform');
   populateOrderClientSelect();
@@ -9712,7 +9814,10 @@ function editOrder(id){
     customerName: o.customerName || '',
     deliveryDate: o.deliveryDate || '',
     deposit: o.deposit || 0,
-    note: o.note || ''
+    note: o.note || '',
+    mayorista: orderIsMayorista(o),
+    _mayManual: true,
+    envio: o.envio || 0
   };
   state._newClientInOrder = false;
   showScreen('orderform');
@@ -9749,7 +9854,10 @@ function openEditOrderPopup(id){
     items: (o.items||[]).map(function(it){ return {recipeId:it.recipeId, qty:it.qty}; }),
     deposit: o.deposit || 0,
     note: o.note || '',
-    couponIds: priorCouponIds
+    couponIds: priorCouponIds,
+    mayorista: orderIsMayorista(o),
+    _mayManual: true,
+    envio: o.envio || 0
   };
   npPopulateClientSelect(o.clientId || null);
   npRenderClientCoupons();
@@ -9776,11 +9884,11 @@ function renderEopView(){
   const clientName = client ? client.name : (o.customerName || 'sin definir');
   document.getElementById('eop-title').textContent = 'Detalle del pedido';
   document.getElementById('eop-sub').textContent = clientName;
-  if(o.web) document.getElementById('eop-sub').insertAdjacentHTML('beforeend', ' <span class="wb-chip '+(o.web.origen==='mayorista' ? 'may">MAYORISTA' : 'web">WEB')+'</span>');
+  if(o.web || orderIsMayorista(o)) document.getElementById('eop-sub').insertAdjacentHTML('beforeend', ' <span class="wb-chip '+(orderIsMayorista(o) ? 'may">MAYORISTA' : 'web">WEB')+'</span>');
   document.getElementById('eop-view-items').innerHTML = (o.items||[]).map(function(it){
     const lineTotal = (it.unitPrice||0)*(it.qty||0);
     return '<div class="eop-view-item"><span>'+(it.qty||0)+' x '+escapeHtml(it.recipeName||'(receta borrada)')+(it.detail ? ' <small style="color:var(--k-muted);">('+escapeHtml(it.detail)+')</small>' : '')+'</span><span>'+fmtMoney(lineTotal)+'</span></div>';
-  }).join('') || '<p style="font-size:calc(11.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:4px 0;">Sin productos</p>';
+  }).join('') + (o.envio>0 ? '<div class="eop-view-item"><span>Envío</span><span>'+fmtMoney(o.envio)+'</span></div>' : '') || '<p style="font-size:calc(11.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:4px 0;">Sin productos</p>';
   document.getElementById('eop-view-total').innerHTML = '<span>Total</span><span>'+fmtMoney(o.total||0)+'</span>';
   const shortItems = (o.items||[]).filter(function(it){ return (it.shortfall||0)>0; });
   const shortEl = document.getElementById('eop-shortfall');
@@ -9876,7 +9984,7 @@ function eopSavePrices(){
     const val = parseFloat((el.value||'').toString().replace(',','.'));
     if(!isNaN(val)){ it.unitPrice = val; it.customPrice = true; }
   });
-  o.total = (o.items||[]).reduce(function(s,it){ return s + (it.unitPrice||0)*(it.qty||0); }, 0);
+  o.total = (o.items||[]).reduce(function(s,it){ return s + (it.unitPrice||0)*(it.qty||0); }, 0) + (Number(o.envio)||0);
   saveData(DATA);
   eopTogglePriceEdit();
   renderEopView();
@@ -9899,9 +10007,12 @@ function repeatOrder(id){
     customerName: o.customerName || '',
     deliveryDate: '',
     deposit: 0,
-    note: ''
+    note: '',
+    mayorista: orderIsMayorista(o),
+    _mayManual: true
   };
   state._newClientInOrder = false;
+  kobuMayCargar().then(function(){ if(state.orderDraft) renderOrderItemRows(); });
   showScreen('orderform');
   populateOrderClientSelect();
   document.getElementById('of-deliverydate').value = '';
@@ -9933,6 +10044,7 @@ function onOrderClientPick(val){
   state.orderDraft.clientId = val || null;
   if(val){
     const c = DATA.clients.find(function(x){ return x.id===val; });
+    if(c && !state.orderDraft._mayManual){ state.orderDraft.mayorista = clientIsMayorista(c); renderOrderItemRows(); }
     if(c) state.orderDraft.customerName = c.name;
   }
 }
@@ -9966,7 +10078,7 @@ function renderOrderItemRows(){
       recipes.map(function(r){ return '<option value="'+r.id+'" '+(it.recipeId===r.id?'selected':'')+'>'+escapeHtml(r.title)+(recipeSellsByPack(r)?' (paquete)':'')+'</option>'; }).join('');
     const hasCustom = it.customPrice!=null;
     const priceOpen = hasCustom || it._priceOpen;
-    const catalogPrice = it.recipeId ? unitPriceForRecipe(it.recipeId) : null;
+    const catalogPrice = it.recipeId ? priceForOrderRecipe(it.recipeId, state.orderDraft.mayorista) : null;
     const priceRow = priceOpen ? ('<div class="btn-row" style="padding-left:2px;">'+
       '<input class="input" style="flex:1;" type="number" min="0" placeholder="precio especial'+(catalogPrice!=null?' (catálogo '+fmtMoney(catalogPrice)+')':'')+'" value="'+(hasCustom?it.customPrice:'')+'" oninput="updateOrderItemPrice('+i+',this.value)">'+
       '<input class="input" style="flex:1;" type="text" placeholder="motivo (opcional)" value="'+escapeHtml(it.priceNote||'')+'" oninput="updateOrderItemPriceNote('+i+',this.value)">'+
@@ -9982,6 +10094,7 @@ function renderOrderItemRows(){
   mountIcons();
   updateOrderTotalPreview();
 }
+function ofSetMayorista(on){ state.orderDraft.mayorista = !!on; state.orderDraft._mayManual = true; renderOrderItemRows(); }
 function addOrderItemRow(){ state.orderDraft.items.push({recipeId:'', qty:1, customPrice:null, priceNote:''}); renderOrderItemRows(); }
 function removeOrderItemRow(i){ state.orderDraft.items.splice(i,1); renderOrderItemRows(); }
 function updateOrderItem(i, field, val){
@@ -10019,13 +10132,20 @@ function updateOrderItemPriceNote(i, val){
 function updateOrderTotalPreview(){
   let total = 0, anyMissing = false;
   (state.orderDraft.items||[]).forEach(function(it){
-    const price = it.customPrice!=null ? it.customPrice : (it.recipeId ? unitPriceForRecipe(it.recipeId) : null);
+    const price = it.customPrice!=null ? it.customPrice : (it.recipeId ? priceForOrderRecipe(it.recipeId, state.orderDraft.mayorista) : null);
     const qty = parseFloat(it.qty)||0;
     if(it.recipeId && price==null) anyMissing = true;
     else total += (price||0)*qty;
   });
+  total += Number(state.orderDraft.envio)||0;
   const el = document.getElementById('of-total');
   if(el) el.innerHTML = '<span>Total estimado</span><span>'+fmtMoney(total)+(anyMissing?' *':'')+'</span>';
+  const may = !!state.orderDraft.mayorista;
+  const ma = document.getElementById('of-mode-cli'), mb = document.getElementById('of-mode-may');
+  if(ma) ma.classList.toggle('active', !may);
+  if(mb) mb.classList.toggle('active', may);
+  const mn = document.getElementById('of-maynote');
+  if(mn){ mn.style.display = may ? 'block' : 'none'; mn.textContent = may ? mayoristaNote(state.orderDraft.items) : ''; }
   const depositEl = document.getElementById('of-deposit');
   const deposit = depositEl ? (parseFloat(depositEl.value)||0) : 0;
   const balanceEl = document.getElementById('of-balance');
@@ -10046,7 +10166,7 @@ function saveOrder(){
   if(items.length===0){ showToast('Agregá al menos un item'); return; }
   const snapItems = items.map(function(it){
     const r = DATA.recipes.find(function(x){ return x.id===it.recipeId; });
-    const catalogPrice = unitPriceForRecipe(it.recipeId);
+    const catalogPrice = priceForOrderRecipe(it.recipeId, state.orderDraft.mayorista);
     const unitPrice = it.customPrice!=null ? it.customPrice : catalogPrice;
     const out = { recipeId:it.recipeId, recipeName: r?r.title:'(receta borrada)', qty:parseFloat(it.qty), unitPrice: unitPrice };
     if(it.customPrice!=null){
@@ -10069,9 +10189,10 @@ function saveOrder(){
     o.deliveryDate = deliveryDate;
     o.deposit = deposit;
     o.note = note;
+    o.mayorista = !!state.orderDraft.mayorista;
     const webCarried = webCarryItemInfo(o, snapItems);
     o.items = snapItems;
-    o.total = webCarried ? webRecalcTotal(snapItems, typeof discountPct==='number' ? discountPct : 0) : total;
+    o.total = (webCarried ? webRecalcTotal(snapItems, typeof discountPct==='number' ? discountPct : 0) : total) + (Number(o.envio)||0);
     if(willDeductPortions){ resolveOrderBakeChoices(state.orderDraft.items); adjustPortionStockForOrder(o, -1); o.portionsDeducted = true; }
     else { o.portionsDeducted = false; }
     if(o.stockDeducted) adjustStockForOrder(o, -1);
@@ -10092,7 +10213,8 @@ function saveOrder(){
       colorIdx: DATA.orders.length % PLACEHOLDER_COLORS.length,
       items: snapItems,
       total: total,
-      portionsDeducted: willDeductPortions
+      portionsDeducted: willDeductPortions,
+      mayorista: !!state.orderDraft.mayorista
     };
     if(willDeductPortions) adjustPortionStockForOrder(newOrder, -1);
     DATA.orders.push(newOrder);
@@ -10104,7 +10226,8 @@ function saveOrder(){
 }
 function openNewOrderModal(){
   state.editingOrderId = null;
-  state.newOrderDraft = { clientId:null, deliveryDate:'', items:[], deposit:0, note:'', couponIds:[] };
+  state.newOrderDraft = { clientId:null, deliveryDate:'', items:[], deposit:0, note:'', couponIds:[], mayorista:false, _mayManual:false };
+  kobuMayCargar().then(function(){ if(document.getElementById('newOrderModal').classList.contains('active')) npRenderItems(); });
   document.getElementById('no-title').textContent = 'Nuevo pedido';
   document.getElementById('no-submitBtn').textContent = 'Guardar pedido';
   npPopulateClientSelect();
@@ -10143,8 +10266,20 @@ function npClientChange(val){
   }
   state.newOrderDraft.clientId = val || null;
   state.newOrderDraft.couponIds = [];
+  npSyncMayFromClient();
   npRenderClientCoupons();
-  npRecalcTotal();
+  npRenderItems();
+}
+// Cliente con la etiqueta "Mayorista" => el pedido pasa solo a Mayorista (salvo que se haya elegido a mano).
+function npSyncMayFromClient(){
+  const d = state.newOrderDraft; if(!d || d._mayManual) return;
+  const c = d.clientId ? DATA.clients.find(function(x){ return x.id===d.clientId; }) : null;
+  d.mayorista = clientIsMayorista(c);
+}
+function npSetMayorista(on){
+  state.newOrderDraft.mayorista = !!on;
+  state.newOrderDraft._mayManual = true;
+  npRenderItems();
 }
 function npRenderClientCoupons(){
   const wrap = document.getElementById('no-coupons');
@@ -10216,12 +10351,15 @@ function npNoteInput(val){
 }
 function npRenderItems(){
   const wrap = document.getElementById('no-items');
+  const may = !!state.newOrderDraft.mayorista;
   wrap.innerHTML = state.newOrderDraft.items.map(function(it,i){
     const r = DATA.recipes.find(function(x){ return x.id===it.recipeId; });
     const name = r ? r.title : '(receta borrada)';
     const packSuffix = recipeSellsByPack(r) ? ' paquete'+((it.qty||1)==1?'':'s') : '';
+    const pr = it.recipeId ? priceForOrderRecipe(it.recipeId, may) : null;
     return '<div class="no-item-row">'+
       '<span class="no-item-name">'+escapeHtml(name)+'</span>'+
+      (pr!=null ? '<span class="no-item-price">'+fmtMoney(pr)+' c/u</span>' : '')+
       '<span class="no-qty-val">x'+(it.qty||1)+packSuffix+'</span>'+
       '<span class="no-remove" onclick="npRemoveItem('+i+')"><span class="icon-slot" data-icon="x"></span></span>'+
     '</div>';
@@ -10252,14 +10390,23 @@ function npRemoveItem(i){
   state.newOrderDraft.items.splice(i,1);
   npRenderItems();
 }
+function npRenderMode(){
+  const may = !!(state.newOrderDraft && state.newOrderDraft.mayorista);
+  const a = document.getElementById('no-mode-cli'), b = document.getElementById('no-mode-may');
+  if(a) a.classList.toggle('active', !may);
+  if(b) b.classList.toggle('active', may);
+  const n = document.getElementById('no-maynote');
+  if(n){ n.style.display = may ? 'block' : 'none'; n.textContent = may ? mayoristaNote(state.newOrderDraft.items) : ''; }
+}
 function npRecalcTotal(){
+  npRenderMode();
   let raw = 0;
   (state.newOrderDraft.items||[]).forEach(function(it){
-    const price = it.recipeId ? unitPriceForRecipe(it.recipeId) : null;
+    const price = it.recipeId ? priceForOrderRecipe(it.recipeId, state.newOrderDraft.mayorista) : null;
     raw += (price||0)*(parseFloat(it.qty)||0);
   });
   const coupon = npAppliedPercentCoupon();
-  const total = coupon ? Math.round(raw*(1-(coupon.value||0)/100)) : raw;
+  const total = (coupon ? Math.round(raw*(1-(coupon.value||0)/100)) : raw) + (Number(state.newOrderDraft.envio)||0);
   const totalEl = document.getElementById('no-total');
   if(coupon){
     totalEl.innerHTML = '<span style="text-decoration:line-through;color:var(--k-muted);font-weight:400;font-size:calc(12px + var(--kobu-font-boost, 0px));margin-right:5px;">'+fmtMoney(raw)+'</span>'+fmtMoney(total);
@@ -10301,7 +10448,7 @@ function saveNewOrder(){
   if(items.length===0){ showToast('Agregá al menos un producto'); return; }
   const snapItems = items.map(function(it){
     const r = DATA.recipes.find(function(x){ return x.id===it.recipeId; });
-    const unitPrice = unitPriceForRecipe(it.recipeId);
+    const unitPrice = priceForOrderRecipe(it.recipeId, state.newOrderDraft.mayorista);
     return { recipeId:it.recipeId, recipeName: r?r.title:'(receta borrada)', qty:parseFloat(it.qty), unitPrice: unitPrice };
   });
   const rawTotal = snapItems.reduce(function(s,it){ return s + (it.unitPrice||0)*it.qty; }, 0);
@@ -10325,9 +10472,10 @@ function saveNewOrder(){
     o.deliveryDate = state.newOrderDraft.deliveryDate || todayStr();
     o.deposit = state.newOrderDraft.deposit || 0;
     o.note = state.newOrderDraft.note || '';
+    o.mayorista = !!state.newOrderDraft.mayorista;
     const webCarried = webCarryItemInfo(o, snapItems);
     o.items = snapItems;
-    o.total = webCarried ? webRecalcTotal(snapItems, typeof discountPct==='number' ? discountPct : 0) : total;
+    o.total = (webCarried ? webRecalcTotal(snapItems, typeof discountPct==='number' ? discountPct : 0) : total) + (Number(o.envio)||0);
     o.discountPct = discountPct;
     o.appliedCoupons = appliedCoupons;
     if(willDeductPortions){ adjustPortionStockForOrder(o, -1); o.portionsDeducted = true; }
@@ -10357,7 +10505,8 @@ function saveNewOrder(){
     total: total,
     discountPct: discountPct,
     appliedCoupons: appliedCoupons,
-    portionsDeducted: willDeductPortions
+    portionsDeducted: willDeductPortions,
+    mayorista: !!state.newOrderDraft.mayorista
   };
   if(willDeductPortions) adjustPortionStockForOrder(newOrder, -1);
   DATA.orders.push(newOrder);
@@ -10691,6 +10840,8 @@ function createOrderFromWeb(p, s, orderId){
   });
   const willDeductPortions = DATA.settings.discountStockOnSale!==false;
   if(willDeductPortions) resolveOrderBakeChoices(items.map(function(it){ return { recipeId:it.recipeId, qty:it.qty }; }));
+  // Envío mayorista (lo calcula el script con la lista publicada: $3.000 en pedidos de menos de $45.000).
+  const envio = may && isFinite(p.envio) && p.envio>0 && p.envio<=100000 ? Number(p.envio) : 0;
   const order = {
     id: orderId,
     clientId: client.id,
@@ -10703,12 +10854,14 @@ function createOrderFromWeb(p, s, orderId){
     status: 'confirmado',
     colorIdx: DATA.orders.length % PLACEHOLDER_COLORS.length,
     items: items,
-    total: items.reduce(function(a, it){ return a + (it.unitPrice||0)*it.qty; }, 0),
+    total: items.reduce(function(a, it){ return a + (it.unitPrice||0)*it.qty; }, 0) + envio,
     discountPct: 0,
     appliedCoupons: [],
     portionsDeducted: willDeductPortions,
+    mayorista: p.origen==='mayorista',
     web: { id:p.id, numero:p.numero, origen:p.origen, franja:p.franja||'', entrega:p.entrega||'', direccion:p.direccion||'', pago:p.pago||'', negocio:p.negocio||'' }
   };
+  if(envio) order.envio = envio;
   if(p.pago==='Transferencia') order.payMethod = 'transferencia';
   else if(p.pago==='Efectivo') order.payMethod = 'efectivo';
   if(willDeductPortions) adjustPortionStockForOrder(order, -1);
@@ -11538,6 +11691,38 @@ function refreshBotSales(force){
 function botValidHorneada(v){
   return v && v.tipo==='horneada' && typeof v.id==='string' && /^hb-bot-[\d-]{10,40}$/.test(v.id) && typeof v.recipeId==='string' && Number.isInteger(v.porciones) && v.porciones>=1 && v.porciones<=2000;
 }
+// Compras cargadas desde el bot (/compre): suman stock (y el gasto) una sola vez.
+const BOT_COMPRA_UNID = ['kg','g','mg','l','ml'];
+function botValidCompra(v){
+  return v && v.tipo==='compra' && typeof v.id==='string' && /^cp-bot-[\d-]{10,40}$/.test(v.id) && Array.isArray(v.items) && v.items.length>=1 && v.items.length<=25;
+}
+function botCompraItemOk(it){
+  return !!it && typeof it.nombre==='string' && !!it.nombre.trim() && it.nombre.length<=60 && isFinite(it.cant) && it.cant>0 && it.cant<=1000 &&
+    isFinite(it.total) && it.total>=0 && it.total<=1e9 && (it.q==null || (isFinite(it.q) && it.q>0 && it.q<=100000 && BOT_COMPRA_UNID.indexOf(it.u)!==-1));
+}
+function applyBotCompra(v){
+  let n = 0;
+  const fecha = v.ts && !isNaN(new Date(v.ts)) ? localDateStr(new Date(v.ts)) : todayStr();
+  v.items.forEach(function(it, k){
+    if(!botCompraItemOk(it)) return;
+    let p = typeof it.priceId==='string' ? DATA.ingredientPrices.find(function(x){ return x.id===it.priceId; }) : null;
+    if(!p && it.nuevo){
+      const nn = normalizeMatchText(it.nombre);
+      p = DATA.ingredientPrices.find(function(x){ return normalizeMatchText(x.name)===nn; });
+      if(!p){
+        p = { id:'ip-'+Date.now()+'-'+k, name:it.nombre.trim(), qty: it.q || 1, unit: it.q ? it.u : 'u', price:null, type:'ingrediente', stock:0, priceHistory:[] };
+        DATA.ingredientPrices.push(p);
+      }
+    }
+    if(!p) return;
+    // Con medida (1 kg × 2) suma 2 kg; sin medida (o si no se puede convertir) suma paquetes como los de Stock.
+    const conMedida = it.q && normalizeUnit(p.unit)!=='u' && convertQty(1, it.u, p.unit)!=null;
+    const r = applyIngredientPurchase(p.id, conMedida ? it.q*it.cant : it.cant, conMedida ? it.u : null, Number(it.total)||0, null,
+      { noSave:true, expId:'exp-'+v.id+'-'+k, date:fecha, note:'Compra (bot): '+p.name });
+    if(r) n++;
+  });
+  return n;
+}
 function botValidSale(v){
   return v && typeof v.id==='string' && /^qs-bot-[\d-]{10,40}$/.test(v.id) && v.tipo==='venta' && Number.isInteger(v.qty) && v.qty>=1 && v.qty<=50;
 }
@@ -11586,20 +11771,29 @@ function applyBotSales(ventas){
     DATA.botProcesadas.push(v.id); procesadas[v.id] = true;
     horneadas++;
   });
+  let compras = 0, comprasVistas = 0;
+  ventas.forEach(function(v){
+    if(!botValidCompra(v) || procesadas[v.id]) return;
+    if(applyBotCompra(v)) compras++;
+    DATA.botProcesadas.push(v.id); procesadas[v.id] = true;
+    comprasVistas++;
+  });
   // Se conservan mientras el bot pueda tenerlas en su lista (14 días): el id trae la hora en ms.
   const limiteHb = Date.now() - 30*86400000;
-  DATA.botProcesadas = DATA.botProcesadas.filter(function(id){ const m = /^hb-bot-(\d+)/.exec(String(id)); return !m || Number(m[1]) >= limiteHb; });
+  DATA.botProcesadas = DATA.botProcesadas.filter(function(id){ const m = /^(?:hb|cp)-bot-(\d+)/.exec(String(id)); return !m || Number(m[1]) >= limiteHb; });
   botSales.pendientes = pend;
-  if(nuevas || deshechas || horneadas){
+  if(nuevas || deshechas || horneadas || comprasVistas){
     saveData(DATA);
+    if(comprasVistas){ try{ renderIngredientPrices(); refreshIngredientPickers(); }catch(e){} }
     const msgs = [];
     if(nuevas) msgs.push('Se '+(nuevas===1?'cargó 1 venta':'cargaron '+nuevas+' ventas')+' del bot de Telegram');
     else if(deshechas) msgs.push('Se deshizo una venta del bot');
     if(horneadas) msgs.push(horneadas===1 ? 'Se cargó 1 horneada del bot' : 'Se cargaron '+horneadas+' horneadas del bot');
-    showToast(msgs.join(' · '));
+    if(compras) msgs.push(compras===1 ? 'Se cargó 1 compra del bot al stock' : 'Se cargaron '+compras+' compras del bot al stock');
+    if(msgs.length) showToast(msgs.join(' · '));
   }
   if(state.stack[state.stack.length-1]==='quicksell') renderQuickSellScreen();
-  return { nuevas:nuevas, deshechas:deshechas, pendientes:pend.length, horneadas:horneadas };
+  return { nuevas:nuevas, deshechas:deshechas, pendientes:pend.length, horneadas:horneadas, compras:compras };
 }
 // Igual que registerQuickSale, pero con los datos del bot (mismo id, misma hora y medio de pago).
 function addBotQuickSale(v, r, payMethod, willDeduct){
@@ -11954,7 +12148,8 @@ function fuzzyMatchIngredientCandidates(rawName){
     return { cat:cat, score:score };
   }).filter(function(x){ return x && x.score>=0.45; }).sort(function(a,b){ return b.score-a.score; });
 }
-function applyIngredientPurchase(priceId, qty, unit, price, provider){
+function applyIngredientPurchase(priceId, qty, unit, price, provider, opts){
+  opts = opts || {};
   const p = DATA.ingredientPrices.find(function(x){ return x.id===priceId; });
   if(!p) return null;
   const pkgRef = p.qty>0 ? p.qty : 1;
@@ -11971,15 +12166,17 @@ function applyIngredientPurchase(priceId, qty, unit, price, provider){
   p.price = scaledPrice;
   if(priceChanged){
     p.priceHistory = p.priceHistory || [];
-    p.priceHistory.push({ price:scaledPrice, date: todayStr() });
+    p.priceHistory.push({ price:scaledPrice, date: opts.date || todayStr() });
   }
   if(provider) p.provider = provider;
   if(DATA.settings.addStockAsExpense!==false){
-    DATA.expenses.push({ id:'exp-'+Date.now(), date: todayStr(), amount: price, note:'Stock: '+p.name });
+    DATA.expenses.push({ id: opts.expId || ('exp-'+Date.now()), date: opts.date || todayStr(), amount: price, note: opts.note || ('Stock: '+p.name) });
   }
-  saveData(DATA);
-  renderIngredientPrices();
-  refreshIngredientPickers();
+  if(!opts.noSave){
+    saveData(DATA);
+    renderIngredientPrices();
+    refreshIngredientPickers();
+  }
   return { name:p.name, addedStock:addedStock, unit:p.unit||'', totalPaid: price, provider: p.provider||null };
 }
 async function aiMatchIngredient(rawName){

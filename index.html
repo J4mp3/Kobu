@@ -573,7 +573,7 @@
   .ut-row .ut-info{ flex:1; min-width:0; }
   .ut-row .ut-info .nm{ margin:0; font-size:calc(12px + var(--kobu-font-boost, 0px)); color:var(--k-text); font-weight:500; }
   .ut-row .ut-info .sub{ margin:0; font-size:calc(10px + var(--kobu-font-boost, 0px)); color:var(--k-muted); }
-  #moldList.drop-target-active, #utensilList.drop-target-active{ outline:2px dashed var(--k-accent); outline-offset:4px; border-radius:12px; }
+  #moldList.drop-target-active, #utensilList.drop-target-active, #bowlList.drop-target-active{ outline:2px dashed var(--k-accent); outline-offset:4px; border-radius:12px; }
   .ut-add-row{ display:flex; align-items:center; justify-content:center; gap:6px; width:100%; background:none; border:1.5px dashed var(--k-border); border-radius:10px; padding:10px; cursor:pointer; color:var(--k-accent); font-size:calc(12px + var(--kobu-font-boost, 0px)); font-family:inherit; }
   .ut-add-row .icon-slot{ font-size:calc(16px + var(--kobu-font-boost, 0px)); }
   .stock-row{ background:var(--k-card); border-radius:12px; padding:9px 10px; cursor:pointer; }
@@ -590,6 +590,11 @@
   .stock-row .sr-stats .stock-pkg{ margin:0; font-size:calc(9px + var(--kobu-font-boost, 0px)); color:var(--k-muted); }
   .stock-row .sr-bar{ height:4px; background:var(--k-card2); border-radius:3px; overflow:hidden; margin-top:7px; }
   .stock-row .sr-bar-fill{ height:100%; transition:width .2s ease; }
+  .se-alert-row{ display:flex; align-items:center; gap:10px; margin-top:8px; }
+  .se-alert-btn{ flex-shrink:0; width:34px; height:34px; border-radius:50%; border:1.5px dashed var(--k-border); background:var(--k-card); color:var(--k-muted); display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0; font-size:calc(16px + var(--kobu-font-boost, 0px)); -webkit-tap-highlight-color:transparent; touch-action:manipulation; user-select:none; }
+  .se-alert-btn.on{ border:1.5px solid transparent; background:var(--k-danger-bg); color:var(--k-danger); }
+  .se-alert-txt{ margin:0; font-size:calc(11px + var(--kobu-font-boost, 0px)); color:var(--k-muted); line-height:1.35; }
+  #stockAlertModal{ z-index:91; }
   .stock-row .sr-stepper{ display:flex; flex-direction:column; flex-shrink:0; }
   .stock-row .sr-step-btn{ width:20px; height:15px; border:none; background:var(--k-card2); color:var(--k-accent); cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; }
   .stock-row .sr-step-btn .icon-slot{ font-size:calc(11px + var(--kobu-font-boost, 0px)); }
@@ -687,6 +692,100 @@
   .cook-dots{ display:flex; gap:6px; justify-content:center; padding:16px 0 2px; position:relative; z-index:1; }
   .cook-dots span{ width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.25); }
   .cook-dots span.on{ background:var(--k-bg); }
+  .mm-qty{ display:flex; align-items:center; justify-content:center; gap:14px; }
+  .mm-qty button{ width:40px; height:40px; border-radius:50%; border:1.5px solid var(--k-border); background:var(--k-card); color:var(--k-accent); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:calc(18px + var(--kobu-font-boost, 0px)); padding:0; }
+  .mm-qty input{ width:70px; text-align:center; font-size:calc(20px + var(--kobu-font-boost, 0px)); font-weight:700; }
+  .mm-chips{ display:flex; flex-wrap:wrap; gap:6px; }
+  .mm-cost{ margin:0; font-size:calc(11.5px + var(--kobu-font-boost, 0px)); color:var(--k-muted); text-align:center; }
+  .mm-cost b{ color:var(--k-danger); }
+  .rep-mm-row{ display:flex; justify-content:space-between; gap:8px; font-size:calc(12px + var(--kobu-font-boost, 0px)); padding:6px 0; border-top:1px dashed var(--k-border); color:var(--k-text); }
+  .rep-mm-row span:last-child{ color:var(--k-muted); white-space:nowrap; }
+  .rep-mm-sub{ margin:10px 0 2px; font-size:calc(10.5px + var(--kobu-font-boost, 0px)); font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--k-muted); }
+  .snd-chips{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+  .cook-top{ gap:8px; min-height:40px; }
+  .cook-timers{ flex:1; min-width:0; display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; position:relative; z-index:5; padding:2px 0; }
+  .cook-timers::-webkit-scrollbar{ display:none; }
+  .cook-tchip{ flex-shrink:0; display:flex; align-items:center; gap:5px; border:none; border-radius:999px; padding:6px 11px 6px 8px; background:rgba(255,255,255,.14); color:#FBF3E7; font-family:inherit; font-size:calc(12px + var(--kobu-font-boost, 0px)); cursor:pointer; }
+  .cook-tchip .icon-slot{ font-size:calc(14px + var(--kobu-font-boost, 0px)); }
+  .cook-tchip .dot{ width:6px; height:6px; border-radius:50%; background:#F0C9A8; flex-shrink:0; }
+  .cook-tchip .n{ max-width:96px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity:.85; }
+  .cook-tchip .v{ font-weight:700; font-variant-numeric:tabular-nums; }
+  .cook-tchip.paused .v{ opacity:.6; }
+  .cook-tchip.done{ background:#FBF3E7; color:#3a2a21; animation:cookPulse 1.1s ease-in-out infinite; }
+  .cook-tchip.done .dot{ background:#C0392B; }
+  @keyframes cookPulse{ 50%{ transform:scale(1.06); } }
+  .cook-top #cookVoiceBtn{ width:40px; height:40px; align-items:center; justify-content:center; border-radius:50%; background:rgba(255,255,255,.12); color:#FBF3E7; font-size:calc(19px + var(--kobu-font-boost, 0px)); position:relative; z-index:5; flex-shrink:0; }
+  .cook-top #cookVoiceBtn.on{ background:#FBF3E7; color:#3a2a21; }
+  .cook-top #cookCalcBtn{ flex-shrink:0; }
+  .cook-timer-pill.done{ background:#FBF3E7; }
+  .cook-timer-pill.done span, .cook-timer-pill.done button{ color:#3a2a21; }
+  .cook-nextprep{ position:relative; z-index:4; display:none; flex-direction:column; align-items:center; gap:2px; border:1.5px solid rgba(251,243,231,.5); background:rgba(255,255,255,.08); color:#FBF3E7; border-radius:14px; padding:10px 18px; font-family:inherit; cursor:pointer; }
+  .cook-nextprep b{ display:flex; align-items:center; gap:6px; font-size:calc(13.5px + var(--kobu-font-boost, 0px)); }
+  .cook-nextprep b .icon-slot{ font-size:calc(16px + var(--kobu-font-boost, 0px)); }
+  .cook-nextprep .np-name{ font-size:calc(11.5px + var(--kobu-font-boost, 0px)); opacity:.75; }
+  .cook-preheat{ position:relative; z-index:4; display:none; margin:10px 0 0; background:rgba(255,255,255,.1); border-radius:14px; padding:10px 12px; color:#FBF3E7; flex-direction:column; gap:8px; }
+  .cook-preheat .row{ display:flex; align-items:center; gap:10px; }
+  .cook-preheat .row > .icon-slot{ font-size:calc(20px + var(--kobu-font-boost, 0px)); color:#F0C9A8; }
+  .cook-preheat p{ margin:0; }
+  .cook-preheat .t{ font-weight:700; font-size:calc(14px + var(--kobu-font-boost, 0px)); }
+  .cook-preheat .s{ font-size:calc(11px + var(--kobu-font-boost, 0px)); opacity:.7; }
+  .cook-preheat .chips{ display:flex; gap:6px; flex-wrap:wrap; }
+  .cook-preheat .chips button{ border:none; border-radius:999px; padding:6px 12px; background:rgba(255,255,255,.16); color:#FBF3E7; font-weight:600; font-family:inherit; cursor:pointer; font-size:calc(12px + var(--kobu-font-boost, 0px)); }
+  .cook-preheat .x{ background:none; border:none; color:#FBF3E7; cursor:pointer; display:flex; padding:4px; font-size:calc(16px + var(--kobu-font-boost, 0px)); }
+  .cook-alert{ position:absolute; left:12px; right:12px; top:64px; z-index:35; display:none; background:#FBF3E7; color:#3a2a21; border-radius:16px; padding:14px; box-shadow:0 10px 30px rgba(0,0,0,.35); flex-direction:column; gap:10px; }
+  .cook-alert.on{ display:flex; }
+  .cook-alert .h{ display:flex; align-items:center; gap:8px; font-weight:800; font-size:calc(15px + var(--kobu-font-boost, 0px)); }
+  .cook-alert .h .icon-slot{ font-size:calc(20px + var(--kobu-font-boost, 0px)); color:#856349; }
+  .cook-alert .s{ margin:0; font-size:calc(12px + var(--kobu-font-boost, 0px)); color:#80654A; }
+  .cook-alert .btns{ display:flex; gap:8px; }
+  .cook-alert .btns button{ flex:1; border:none; border-radius:12px; padding:11px; font-weight:700; font-family:inherit; cursor:pointer; font-size:calc(13px + var(--kobu-font-boost, 0px)); }
+  .cook-alert .go{ background:#4a352a; color:#FBF3E7; }
+  .cook-alert .later{ background:#F5EAD6; color:#4a352a; }
+  .step-timer-btn{ color:var(--k-muted); gap:3px; flex-shrink:0; align-self:center; }
+  .step-timer-btn.on{ color:var(--k-accent); background:var(--k-card2); border-radius:999px; padding:5px 8px; font-size:calc(10.5px + var(--kobu-font-boost, 0px)); font-weight:700; white-space:nowrap; }
+  .dstep-timer{ display:inline-flex; align-items:center; gap:3px; margin-left:6px; padding:1px 7px; border-radius:999px; background:var(--k-card2); color:var(--k-accent); font-size:calc(10.5px + var(--kobu-font-boost, 0px)); font-weight:700; vertical-align:1px; white-space:nowrap; }
+  .stm-chips{ display:flex; flex-wrap:wrap; gap:6px; }
+  .cooknotes-title{ margin:10px 0 4px; font-size:calc(10.5px + var(--kobu-font-boost, 0px)); font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--k-muted); }
+  .cooknote{ display:flex; align-items:flex-start; gap:8px; padding:6px 0; border-top:1px dashed var(--k-border); font-size:calc(12px + var(--kobu-font-boost, 0px)); }
+  .cooknote .d{ color:var(--k-muted); font-weight:600; white-space:nowrap; padding-top:2px; }
+  .cooknote .t{ flex:1; white-space:pre-wrap; color:var(--k-text); padding-top:2px; }
+  .cooknote .iconbtn{ padding:2px; color:var(--k-muted); }
+  .cook-top #cookCalcBtn{ margin-left:auto; width:40px; height:40px; align-items:center; justify-content:center; border-radius:50%; background:rgba(255,255,255,.12); color:#FBF3E7; font-size:calc(19px + var(--kobu-font-boost, 0px)); position:relative; z-index:5; }
+  #cookCalc{ position:absolute; inset:0; z-index:30; display:none; flex-direction:column; justify-content:flex-end; background:rgba(30,20,15,.55); }
+  #cookCalc.on{ display:flex; }
+  .cc-panel{ background:#3a2a21; border-radius:20px 20px 0 0; padding:14px 14px 18px; display:flex; flex-direction:column; gap:10px; color:#FBF3E7; max-height:100%; overflow-y:auto; box-shadow:0 -8px 24px rgba(0,0,0,.25); }
+  .cc-head{ display:flex; align-items:center; gap:8px; }
+  .cc-head p{ margin:0; flex:1; font-weight:700; font-size:calc(14px + var(--kobu-font-boost, 0px)); }
+  .cc-head button{ background:rgba(255,255,255,.1); border:none; color:#FBF3E7; width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:calc(17px + var(--kobu-font-boost, 0px)); padding:0; }
+  .cc-head button.on{ background:#FBF3E7; color:#3a2a21; }
+  .cc-disp{ background:rgba(0,0,0,.22); border-radius:14px; padding:10px 14px; text-align:right; }
+  .cc-sub{ margin:0; min-height:17px; font-size:calc(12px + var(--kobu-font-boost, 0px)); color:rgba(251,243,231,.62); overflow-wrap:anywhere; }
+  .cc-val{ margin:2px 0 0; font-size:calc(32px + var(--kobu-font-boost, 0px)); font-weight:700; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; line-height:1.15; }
+  .cc-val small{ font-size:calc(16px + var(--kobu-font-boost, 0px)); font-weight:600; color:rgba(251,243,231,.7); margin-left:4px; }
+  .cc-keys{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .cc-keys button{ border:none; border-radius:14px; padding:0; height:52px; font-size:calc(20px + var(--kobu-font-boost, 0px)); font-weight:600; background:rgba(255,255,255,.09); color:#FBF3E7; cursor:pointer; display:flex; align-items:center; justify-content:center; font-family:inherit; }
+  .cc-keys button.op{ background:rgba(255,255,255,.2); }
+  .cc-keys button.fn{ color:#F0C9A8; }
+  .cc-keys button.eq{ grid-row:span 2; height:auto; background:#FBF3E7; color:#3a2a21; }
+  .cc-keys button.zero{ grid-column:span 2; }
+  .cc-bowlbtn{ display:flex; align-items:center; justify-content:center; gap:8px; border:none; border-radius:14px; padding:13px; background:#F5EAD6; color:#3a2a21; font-weight:700; font-size:calc(14px + var(--kobu-font-boost, 0px)); cursor:pointer; font-family:inherit; }
+  .cc-bowlbtn .icon-slot{ font-size:calc(19px + var(--kobu-font-boost, 0px)); }
+  .cc-label{ margin:0; font-size:calc(12.5px + var(--kobu-font-boost, 0px)); color:rgba(251,243,231,.78); }
+  .cc-list{ display:flex; flex-direction:column; gap:6px; }
+  .cc-item{ display:flex; align-items:center; gap:10px; background:rgba(255,255,255,.08); border:none; border-radius:12px; padding:10px 12px; color:#FBF3E7; text-align:left; cursor:pointer; font-family:inherit; font-size:calc(13px + var(--kobu-font-boost, 0px)); width:100%; }
+  .cc-item .icon-slot{ font-size:calc(18px + var(--kobu-font-boost, 0px)); flex-shrink:0; color:#F0C9A8; }
+  .cc-item .nm{ flex:1; min-width:0; }
+  .cc-item .nm b{ display:block; font-weight:600; }
+  .cc-item .nm span{ display:block; font-size:calc(11px + var(--kobu-font-boost, 0px)); color:rgba(251,243,231,.6); }
+  .cc-item .w{ font-weight:700; white-space:nowrap; }
+  .cc-item:disabled{ opacity:.45; cursor:default; }
+  .cc-note{ margin:0; font-size:calc(12px + var(--kobu-font-boost, 0px)); color:rgba(251,243,231,.62); text-align:center; padding:8px 0; }
+  .cc-divs{ display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+  .cc-divs button{ border:none; border-radius:12px; height:48px; background:rgba(255,255,255,.14); color:#FBF3E7; font-weight:700; font-size:calc(16px + var(--kobu-font-boost, 0px)); cursor:pointer; font-family:inherit; }
+  .cc-divs button.on{ background:#FBF3E7; color:#3a2a21; }
+  .cc-divs button.otro{ font-size:calc(12.5px + var(--kobu-font-boost, 0px)); }
+  .cc-back{ background:none; border:none; color:rgba(251,243,231,.78); font-size:calc(12.5px + var(--kobu-font-boost, 0px)); text-decoration:underline; cursor:pointer; padding:4px; align-self:center; font-family:inherit; }
+  .ing-sep{ margin:10px 0 2px; padding-top:8px; border-top:1px dashed var(--k-border); font-size:calc(10.5px + var(--kobu-font-boost, 0px)); font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--k-muted); }
   /* ---- catalog ---- */
   /* ---- confirm modal ---- */
   .modal-overlay{ position:absolute; inset:0; background:rgba(0,0,0,.45); display:none; align-items:center; justify-content:center; z-index:80; padding:24px; }
@@ -1074,13 +1173,17 @@
       <div class="se-headtint">
         <p class="modal-msg" id="stockEditModalTitle" style="text-align:left;font-weight:600;margin:0;">Editar ingrediente</p>
         <p id="se-stock-info" style="font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:4px 0 0;display:none;"></p>
+        <div class="se-alert-row" id="se-alert-row">
+          <button type="button" class="se-alert-btn on" id="se-alert-btn" onclick="stockAlertTap(event)" aria-label="Avisar si queda poco" title="Avisar si queda poco"></button>
+          <p class="se-alert-txt" id="se-alert-txt"></p>
+        </div>
       </div>
       <div class="se-headbody">
       <div class="field"><label>Nombre</label><input class="input" id="se-name" placeholder="ej. Harina Flor"></div>
       <div class="field" id="se-parent-row" style="display:none;"><label>Sale de (ingrediente base)</label><select class="input" id="se-parent"></select></div>
       <div class="btn-row">
         <div class="field" id="se-qty-row" style="flex:1;"><label>Cantidad del envase</label><input class="input" id="se-qty" type="number" placeholder="1000"></div>
-        <div class="field" style="flex:1;"><label id="se-unit-label">Unidad</label><select class="input" id="se-unit"></select></div>
+        <div class="field" style="flex:1;"><label id="se-unit-label">Unidad</label><select class="input" id="se-unit" onchange="seAlertRender()"></select></div>
       </div>
       <div class="btn-row" id="se-yield-row" style="display:none;">
         <div class="field" style="flex:1;"><label>Rinde mínimo</label><input class="input" id="se-yield-min" type="number" placeholder="30"></div>
@@ -1196,6 +1299,62 @@
   </div>
 
   <!-- UTENSIL EDIT MODAL -->
+  <div class="modal-overlay" id="mermaModal">
+    <div class="modal-box">
+      <p class="modal-msg" style="font-weight:600;margin:0;">Anotar merma</p>
+      <p id="mm-name" style="font-size:calc(12.5px + var(--kobu-font-boost, 0px));color:var(--k-accent);font-weight:600;margin:0;text-align:center;"></p>
+      <p id="mm-stock" style="font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;text-align:center;"></p>
+      <div class="mm-qty">
+        <button type="button" onclick="mermaStep(-1)" aria-label="Menos"><span class="icon-slot" data-icon="chevron-down"></span></button>
+        <input class="input" id="mm-qty" type="number" min="1" step="1" inputmode="numeric" value="1" oninput="mermaRenderCost()">
+        <button type="button" onclick="mermaStep(1)" aria-label="Más"><span class="icon-slot" data-icon="chevron-up"></span></button>
+      </div>
+      <div class="mm-chips" id="mm-chips"></div>
+      <p class="mm-cost" id="mm-cost"></p>
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="closeMermaModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveMerma()">Anotar</button>
+      </div>
+    </div>
+  </div>
+  <div class="modal-overlay" id="stockAlertModal">
+    <div class="modal-box">
+      <p class="modal-msg" style="font-weight:600;margin:0;display:flex;align-items:center;gap:6px;"><span class="icon-slot" data-icon="bell"></span>Aviso de poco stock</p>
+      <p id="sa-name" style="font-size:calc(12px + var(--kobu-font-boost, 0px));color:var(--k-accent);font-weight:600;margin:0;"></p>
+      <div class="field"><label>Avisarme cuando queden (<span id="sa-unit"></span>) o menos</label><input class="input" id="sa-min" type="number" min="0" step="any" inputmode="decimal" placeholder="ej. 500"></div>
+      <p id="sa-now" style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;"></p>
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="closeStockAlertModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveStockAlertModal()">Listo</button>
+      </div>
+    </div>
+  </div>
+  <div class="modal-overlay" id="stepTimerModal">
+    <div class="modal-box">
+      <p class="modal-msg" style="font-weight:600;margin:0;display:flex;align-items:center;gap:6px;"><span class="icon-slot" data-icon="stopwatch"></span>Timer del paso</p>
+      <p id="stm-step" style="font-size:calc(11.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;"></p>
+      <div class="stm-chips" id="stm-chips"></div>
+      <div class="field"><label>Minutos</label><input class="input" id="stm-min" type="number" min="0.5" max="600" step="0.5" inputmode="decimal" placeholder="ej. 15" oninput="renderStepTimerChips()"></div>
+      <p style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;">En el modo cocina, este paso va a tener el timer listo para arrancar.</p>
+      <button type="button" class="btn btn-ghost" id="stm-remove" onclick="saveStepTimer(true)" style="color:var(--k-danger);">Sacar timer</button>
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="closeStepTimerModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveStepTimer()">Guardar</button>
+      </div>
+    </div>
+  </div>
+  <div class="modal-overlay" id="cookNoteModal">
+    <div class="modal-box">
+      <p class="modal-msg" style="font-weight:600;margin:0;">¿Cómo salió?</p>
+      <p id="cn-title" style="font-size:calc(11.5px + var(--kobu-font-boost, 0px));color:var(--k-accent);font-weight:600;margin:0;"></p>
+      <p style="font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;">Anotá algo para la próxima vez (opcional). Queda guardado en la receta con la fecha.</p>
+      <textarea class="input" id="cn-text" rows="3" maxlength="500" placeholder="ej. Bajar 10° el horno, quedó un poco seca"></textarea>
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="closeCookNoteModal()">Saltar</button>
+        <button class="btn btn-primary" onclick="saveCookNote()">Guardar nota</button>
+      </div>
+    </div>
+  </div>
   <div class="modal-overlay" id="utensilEditModal">
     <div class="modal-box" style="padding:0;gap:0;">
       <div class="oe-headtint">
@@ -1210,8 +1369,20 @@
       <div class="btn-row" style="gap:8px;">
         <button type="button" class="chip active" id="ue-type-utensilio" onclick="setUtensilType('utensilio')" style="flex:1;text-align:center;">Utensilio</button>
         <button type="button" class="chip" id="ue-type-molde" onclick="setUtensilType('molde')" style="flex:1;text-align:center;">Molde</button>
+        <button type="button" class="chip" id="ue-type-bowl" onclick="setUtensilType('bowl')" style="flex:1;text-align:center;">Bowl</button>
       </div>
-      <div class="btn-row">
+      <div id="ue-bowl-fields" style="display:none;flex-direction:column;gap:10px;">
+        <div class="btn-row">
+          <div class="field" style="flex:1;"><label>Diámetro (cm)</label><input class="input" id="ue-bowl-diam" type="number" min="0" step="0.5" inputmode="decimal"></div>
+          <div class="field" style="flex:1;"><label>Altura (cm)</label><input class="input" id="ue-bowl-alto" type="number" min="0" step="0.5" inputmode="decimal"></div>
+        </div>
+        <div class="btn-row">
+          <div class="field" style="flex:1;"><label>Capacidad (ml)</label><input class="input" id="ue-bowl-cap" type="number" min="0" step="50" inputmode="decimal" placeholder="ej. 3000"></div>
+          <div class="field" style="flex:1;"><label>Peso (g)</label><input class="input" id="ue-bowl-peso" type="number" min="0" step="1" inputmode="decimal" placeholder="ej. 450"></div>
+        </div>
+        <p style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;">El peso del bowl vacío es el que se resta en la calculadora del modo cocina.</p>
+      </div>
+      <div class="btn-row" id="ue-dims-row">
         <div class="field" style="flex:1;"><label>Largo (cm)</label><input class="input" id="ue-mold-dim1" type="number" min="0" step="0.5" oninput="updateMoldCapacityPreview()"></div>
         <div class="field" style="flex:1;"><label>Ancho (cm)</label><input class="input" id="ue-mold-dim2" type="number" min="0" step="0.5" oninput="updateMoldCapacityPreview()"></div>
         <div class="field" style="flex:1;"><label>Altura (cm)</label><input class="input" id="ue-mold-dim3" type="number" min="0" step="0.5" oninput="updateMoldCapacityPreview()"></div>
@@ -1872,6 +2043,7 @@
       <div style="display:flex;gap:8px;">
         <button class="cook-btn-sm" style="flex:1;" onclick="startCook(state.currentId)"><span class="icon-slot" data-icon="flame"></span> Cocinar</button>
         <button class="cook-btn-sm ghost" style="flex:1;" onclick="openBakeModal(state.currentId)"><span class="icon-slot" data-icon="flame"></span> Hornear</button>
+        <button class="cook-btn-sm ghost" style="flex:1;" onclick="openMermaModal(state.currentId)"><span class="icon-slot" data-icon="trash"></span> Merma</button>
       </div>
       <div class="d-actions-bare">
         <button class="iconbtn" onclick="openChat()" aria-label="Preguntar a la IA" title="Preguntar a la IA"><span class="icon-slot" data-icon="message-circle"></span></button>
@@ -1889,6 +2061,7 @@
         </div>
         <div class="d-acc-body">
           <div class="notes-box" id="d-notes"></div>
+          <div id="d-cooknotes"></div>
         </div>
       </div>
       <div class="d-acc-item" id="d-mold-wrap" style="display:none;">
@@ -2109,6 +2282,18 @@
       </div>
       <p id="notifStatusNote" style="font-size:calc(10px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:2px 0 0;"></p>
     </div>
+    <div class="grp-card" style="padding:10px 14px;">
+      <div class="rowline" style="padding:0;">
+        <span class="l"><span class="icon-slot" data-icon="stopwatch" style="vertical-align:-3px;margin-right:5px;color:var(--k-accent);"></span>Sonido del timer</span>
+        <button type="button" class="btn btn-ghost" style="flex:0 0 auto;padding:6px 12px;font-size:calc(11.5px + var(--kobu-font-boost, 0px));" onclick="testTimerSound()"><span class="icon-slot" data-icon="player-play" style="vertical-align:-2px;"></span> Probar</button>
+      </div>
+      <div class="snd-chips" id="timerSoundChips"></div>
+      <div class="rowline" style="padding:8px 0 0;">
+        <span class="l">Repetir hasta que lo toque</span>
+        <div class="switch" id="timerRepeatSwitch" onclick="toggleTimerRepeat()"><div class="knob-sw"></div></div>
+      </div>
+      <p style="font-size:calc(10px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:2px 0 0;">Suena cuando termina un timer del modo cocina. Si repite, para al tocar el aviso o a los 20 segundos.</p>
+    </div>
     <div class="grp-card">
       <p class="section-title"><span class="badge-ic"><span class="icon-slot" data-icon="thermometer"></span></span>Conversor de temperatura</p>
       <div class="btn-row">
@@ -2181,6 +2366,12 @@
       <p style="font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:-4px 0 0;">Mangas, bandejas, lo que uses para armar tus productos.</p>
       <div id="utensilList" style="display:flex;flex-direction:column;gap:6px;"></div>
       <button type="button" class="ut-add-row" onclick="openUtensilCreateModal('utensilio')"><span class="icon-slot" data-icon="plus"></span>Añadir utensilio</button>
+    </div>
+    <div class="grp-card">
+      <p class="section-title"><span class="badge-ic"><span class="icon-slot" data-icon="bowl"></span></span>Bowls</p>
+      <p style="font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:-4px 0 0;">Cargá cuánto pesa cada bowl vacío: en el modo cocina la calculadora lo resta para saber cuánta mezcla va en cada molde.</p>
+      <div id="bowlList" style="display:flex;flex-direction:column;gap:6px;"></div>
+      <button type="button" class="ut-add-row" onclick="openUtensilCreateModal('bowl')"><span class="icon-slot" data-icon="plus"></span>Añadir bowl</button>
     </div>
   </div>
 
@@ -2310,6 +2501,16 @@
       </div>
       <div class="rep-acc-body" id="rep-acc-body-recetas">
         <div id="rep-recipes" style="display:flex;flex-direction:column;margin-top:9px;"></div>
+      </div>
+    </div>
+    <div class="grp-card" id="rep-acc-mermas">
+      <div class="rep-acc-head" onclick="toggleRepAcc('mermas')">
+        <p class="section-title" style="margin:0;"><span class="badge-ic"><span class="icon-slot" data-icon="trash"></span></span>Mermas</p>
+        <span id="rep-mermas-inline" style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);white-space:nowrap;margin-left:auto;margin-right:6px;"></span>
+        <span class="icon-slot rep-acc-chevron" data-icon="chevron-right" id="rep-acc-chev-mermas"></span>
+      </div>
+      <div class="rep-acc-body" id="rep-acc-body-mermas">
+        <div id="rep-mermas" style="display:flex;flex-direction:column;margin-top:6px;"></div>
       </div>
     </div>
     <div class="grp-card grp-card--action">
@@ -2451,7 +2652,12 @@
   <div class="screen" id="screen-cook">
     <div class="cook-top">
       <button id="cookExitBtn" onclick="exitCook()"><span class="icon-slot" data-icon="arrow-left"></span></button>
+      <div class="cook-timers" id="cook-timers"></div>
+      <button type="button" id="cookVoiceBtn" onclick="toggleCookVoice(event)" aria-label="Manos libres" style="display:none;"><span class="icon-slot" data-icon="mic"></span></button>
+      <button type="button" id="cookCalcBtn" onclick="openCookCalc(event)" aria-label="Calculadora"><span class="icon-slot" data-icon="calculator"></span></button>
     </div>
+    <div class="cook-preheat" id="cook-preheat"></div>
+    <div class="cook-alert" id="cook-alert"></div>
     <button class="btn btn-ghost" id="cook-switchPrepBtn" style="display:none;color:var(--k-bg);border-color:var(--k-muted);" onclick="renderCookPicker()">Cambiar de preparación</button>
     <div id="cook-mold-warning" style="display:none;align-items:flex-start;gap:8px;background:rgba(198,90,79,0.22);border:1px solid rgba(198,90,79,0.6);color:#f3c9c2;border-radius:12px;padding:10px 12px;font-size:calc(11.5px + var(--kobu-font-boost, 0px));margin:0 0 8px;">
       <span class="icon-slot" data-icon="alert-triangle" style="flex-shrink:0;margin-top:1px;"></span>
@@ -2472,6 +2678,7 @@
           <span id="cook-timer-val">00:00</span>
           <button type="button" id="cook-timer-stopbtn" onclick="stopCookTimer(event)"><span class="icon-slot" data-icon="x"></span></button>
         </div>
+        <button type="button" class="cook-nextprep" id="cook-nextprep-btn" onclick="cookNextPrep(event)"><b><span class="icon-slot" data-icon="arrow-right"></span>Seguir con la próxima preparación</b><span class="np-name"></span></button>
         <button type="button" class="cook-finish-btn" id="cook-bake-finish-btn" style="background:var(--k-card2);color:var(--k-bg);margin-bottom:8px;" onclick="finishCookAndBake(event)">
           <span class="icon-slot" data-icon="package"></span> Registrar horneada y finalizar
         </button>
@@ -2484,6 +2691,17 @@
         <p class="cook-next-text" id="cook-next-text"></p>
       </div>
       <div class="cook-dots" id="cook-dots"></div>
+    </div>
+    <div id="cookCalc" onclick="if(event.target===this) closeCookCalc()">
+      <div class="cc-panel" onclick="event.stopPropagation()">
+        <div class="cc-head">
+          <p>Calculadora</p>
+          <button type="button" id="ccHistBtn" onclick="ccToggleHist()" aria-label="Historial"><span class="icon-slot" data-icon="history"></span></button>
+          <button type="button" onclick="closeCookCalc()" aria-label="Cerrar"><span class="icon-slot" data-icon="x"></span></button>
+        </div>
+        <div class="cc-disp"><p class="cc-sub" id="ccSub"></p><p class="cc-val" id="ccVal">0</p></div>
+        <div id="ccBody" style="display:flex;flex-direction:column;gap:10px;"></div>
+      </div>
     </div>
   </div>
 
@@ -2614,6 +2832,8 @@ const ICONS = {
   'chevron-right': '<svg '+SVG_ATTRS+'><path d="M9 6l6 6l-6 6"/></svg>',
   'chevron-up': '<svg '+SVG_ATTRS+'><path d="M6 15l6 -6l6 6"/></svg>',
   'chevron-down': '<svg '+SVG_ATTRS+'><path d="M6 9l6 6l6 -6"/></svg>',
+  'history': '<svg '+SVG_ATTRS+'><path d="M12 8l0 4l2 2" /><path d="M3.05 11a9 9 0 1 1 .5 4m-.5 5v-5h5" /></svg>',
+  'backspace': '<svg '+SVG_ATTRS+'><path d="M20 6a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-11l-5 -5a1.5 1.5 0 0 1 0 -2l5 -5z" /><path d="M12 10l4 4m0 -4l-4 4" /></svg>',
   'calculator': '<svg '+SVG_ATTRS+'><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="11" x2="8" y2="11"/><line x1="12" y1="11" x2="12" y2="11"/><line x1="16" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="8" y2="15"/><line x1="12" y1="15" x2="12" y2="15"/><line x1="16" y1="15" x2="16" y2="17"/><line x1="8" y1="19" x2="8" y2="19"/><line x1="12" y1="19" x2="12" y2="19"/></svg>',
   'cash': '<svg '+SVG_ATTRS+'><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/><line x1="6" y1="9" x2="6" y2="9"/><line x1="18" y1="15" x2="18" y2="15"/></svg>',
   'credit-card': '<svg '+SVG_ATTRS+'><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><line x1="6" y1="15" x2="10" y2="15"/></svg>',
@@ -2653,6 +2873,7 @@ const ICONS = {
   'list': '<svg '+SVG_ATTRS+'><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>',
   'thermometer': '<svg '+SVG_ATTRS+'><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>',
   'wallet': '<svg '+SVG_ATTRS+'><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg>',
+  'bell-off': '<svg '+SVG_ATTRS+'><path d="M9.5 4.3A6 6 0 0 1 18 8c0 2.6.6 4.6 1.3 6"/><path d="M17 17H3s3-2 3-9c0-.7.1-1.3.3-1.9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/><line x1="2" y1="2" x2="22" y2="22"/></svg>',
   'bell': '<svg '+SVG_ATTRS+'><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>',
   'lock': '<svg '+SVG_ATTRS+'><rect x="5" y="11" width="14" height="10" rx="2"/><circle cx="12" cy="16" r="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>',
   'bolt': '<svg '+SVG_ATTRS+'><path d="M13 3l0 7l6 0l-8 11l0 -7l-6 0l8 -11"/></svg>',
@@ -3127,7 +3348,7 @@ function normalizeData(parsed){
   if(!parsed.couponCatalog) parsed.couponCatalog = [];
   [ migrateIngredientLinks, normalizeIngredientStock, migrateClientLinks, migrateShoppingManualItems,
     migrateExpenses, migrateChatSessions, migrateOvens, migrateUtensils, migrateOrderStatus,
-    migrateMoldCalibrations, migrateTheme, migrateQuickSales, migratePriceHistory, migrateWebLinks, migrateBotDismissed, migrateBotProcesadas
+    migrateMoldCalibrations, migrateTheme, migrateQuickSales, migratePriceHistory, migrateWebLinks, migrateBotDismissed, migrateBotProcesadas, migrateMermas
   ].forEach(function(fn){
     try{ fn(parsed); }catch(e){ console.error('Migración falló: '+(fn&&fn.name), e); }
   });
@@ -3140,6 +3361,10 @@ function migrateWebLinks(d){
 // Ventas con sabor pendiente del bot de Telegram que se descartaron en Vender (ids).
 function migrateBotDismissed(d){
   if(!Array.isArray(d.botDismissed)) d.botDismissed = [];
+}
+// Mermas (porciones listas que no se vendieron): [{id, recipeId, recipeName, porciones, motivo, costo, precio, ts, origen?}]
+function migrateMermas(d){
+  if(!Array.isArray(d.mermas)) d.mermas = [];
 }
 // Horneadas que mandó el bot (/hornee) y ya se aplicaron (ids).
 function migrateBotProcesadas(d){
@@ -3704,6 +3929,11 @@ function homeNoDeliveryMsg(){
   const idx = simpleDateSeed(todayStr()) % HOME_NO_DELIVERY_MSGS.length;
   return HOME_NO_DELIVERY_MSGS[idx];
 }
+// Aviso de poco stock: cada ingrediente/insumo tiene su campana (stockAlert, prendida por defecto) y su límite
+// (minStock; sin límite cargado avisa con 1 o menos). Con la campana apagada no aparece en los avisos.
+function ingStockAlertOn(p){ return !!p && p.stockAlert!==false; }
+function ingLowLimit(p){ const m = Number(p && p.minStock); return m>0 ? m : 1; }
+function ingIsLow(p){ return (Number(p && p.stock)||0) <= ingLowLimit(p); }
 function computeStockPredictions(){
   const lookbackDays = 14;
   const since = new Date(Date.now() - lookbackDays*24*60*60*1000);
@@ -3744,6 +3974,7 @@ function computeStockPredictions(){
   });
   const results = [];
   DATA.ingredientPrices.forEach(function(p){
+    if(!ingStockAlertOn(p)) return;
     const total = consumed[p.id]||0;
     if(total<=0) return;
     const dailyRate = total/lookbackDays;
@@ -3785,7 +4016,7 @@ function renderHomeSummary(){
   const today = todayStr(), tomorrow = tomorrowStr();
   const ordersToday = DATA.orders.filter(function(o){ return o.deliveryDate===today && o.status!=='cancelado' && o.status!=='entregado'; }).length;
   const ordersTomorrow = DATA.orders.filter(function(o){ return o.deliveryDate===tomorrow && o.status!=='cancelado' && o.status!=='entregado'; }).length;
-  const lowStock = DATA.ingredientPrices.filter(function(p){ return (p.stock||0)<=1; }).length;
+  const lowStock = DATA.ingredientPrices.filter(function(p){ return p.type!=='subproducto' && ingStockAlertOn(p) && ingIsLow(p); }).length;
   const msgs = [];
   if(ordersToday>0 && ordersTomorrow>0){
     msgs.push({ icon:'calendar', color:'var(--k-accent)', text:'Hoy hay '+ordersToday+' entrega'+(ordersToday===1?'':'s')+' y mañana '+ordersTomorrow+' más.', screen:'orders' });
@@ -4146,6 +4377,21 @@ function isMeaningfulStepEntry(s){
   return true;
 }
 function stepTitleText(s){ return (s||'').trim().replace(/^##\s*/,''); }
+// Timer de un paso: se guarda al final del texto como [[timer:SEGUNDOS]] (no se muestra nunca).
+const STEP_TIMER_RE = /\s*\[\[timer:(\d{1,6})\]\]\s*$/;
+function stepTimerSecs(s){ const m = String(s==null?'':s).match(STEP_TIMER_RE); return m ? (parseInt(m[1],10)||0) : 0; }
+function stepPlain(s){ return String(s==null?'':s).replace(STEP_TIMER_RE, ''); }
+function stepSetTimer(s, secs){ const p = stepPlain(s); secs = Math.round(Number(secs)||0); return secs>0 ? (p+' [[timer:'+Math.min(secs, 360000)+']]') : p; }
+function stepTimerLabel(secs){
+  secs = Math.round(Number(secs)||0);
+  if(!secs) return '';
+  if(secs%60===0) return (secs/60)+' min';
+  return Math.floor(secs/60)+':'+String(secs%60).padStart(2,'0')+' min';
+}
+function stepTimerBtnHtml(ciArg, i, s){
+  const secs = stepTimerSecs(s);
+  return '<button type="button" class="iconbtn step-timer-btn'+(secs?' on':'')+'" onclick="openStepTimerModal('+ciArg+','+i+')" title="Timer"><span class="icon-slot" data-icon="stopwatch"></span>'+(secs ? escapeHtml(stepTimerLabel(secs)) : '')+'</button>';
+}
 function applyBoldToTextarea(ta, onChange){
   if(!ta) return;
   const start = ta.selectionStart, end = ta.selectionEnd;
@@ -4745,7 +4991,7 @@ function closeUtensilPicker(){
 }
 function utensilsSorted(category){
   let list = DATA.utensils.slice();
-  if(category) list = list.filter(function(u){ return (u.category||'utensilio')===category; });
+  if(category) list = list.filter(function(u){ return utensilCatOf(u)===category; });
   return list.sort(function(a,b){ return (a.nombre||'').localeCompare(b.nombre||'', 'es', {sensitivity:'base'}); });
 }
 function renderUtensilPickerList(){
@@ -4979,7 +5225,8 @@ function renderStepRows(){
     }
     return '<div class="btn-row step-row" data-idx="'+i+'">'+
       '<button type="button" class="iconbtn step-drag" onpointerdown="stepDragStart(event,'+i+')"><span class="icon-slot" data-icon="grip"></span></button>'+
-      '<textarea class="input" id="step-ta-'+i+'" onfocus="noteStepFocus(\'main\','+i+')" style="flex:1;min-height:40px;" placeholder="paso '+(i+1)+'" oninput="updateStep('+i+',this.value)">'+escapeHtml(s)+'</textarea>'+
+      '<textarea class="input" id="step-ta-'+i+'" onfocus="noteStepFocus(\'main\','+i+')" style="flex:1;min-height:40px;" placeholder="paso '+(i+1)+'" oninput="updateStep('+i+',this.value)">'+escapeHtml(stepPlain(s))+'</textarea>'+
+      stepTimerBtnHtml('null', i, s)+
       '<button type="button" class="iconbtn" onclick="boldMainStep('+i+')" style="font-weight:800;" title="Negrita">N</button>'+
       '<button class="iconbtn" onclick="removeStepRow('+i+')" style="color:var(--k-danger);"><span class="icon-slot" data-icon="x"></span></button>'+
       '</div>';
@@ -5010,7 +5257,7 @@ function kobuRevealNew(el){
 function insertStepAt(arr, list, val){ const at = stepInsertIdx(list, arr); arr.splice(at, 0, val); return at; }
 function addStepRow(){ const at = insertStepAt(state.draft.steps, 'main', ''); renderStepRows(); kobuRevealNew(document.getElementById('step-ta-'+at)); }
 function removeStepRow(i){ state._stepFocus = null; state.draft.steps.splice(i,1); renderStepRows(); }
-function updateStep(i,val){ state.draft.steps[i]=val; }
+function updateStep(i,val){ state.draft.steps[i]=stepSetTimer(val, stepTimerSecs(state.draft.steps[i])); }
 function updateStepTitleText(i,val){ state.draft.steps[i]='## '+val; }
 function addMainStepTitle(){
   const at = insertStepAt(state.draft.steps, 'main', '## ');
@@ -5106,7 +5353,8 @@ function renderStepsAccordion(){
       }
       return '<div class="btn-row step-row" data-idx="'+si+'">'+
         '<button type="button" class="iconbtn step-drag" onpointerdown="stepDragStart(event,'+ci+','+si+')"><span class="icon-slot" data-icon="grip"></span></button>'+
-        '<textarea class="input" id="cstep-ta-'+ci+'-'+si+'" onfocus="noteStepFocus(\'c'+ci+'\','+si+')" style="flex:1;min-height:40px;" placeholder="paso '+(si+1)+'" oninput="updateComponentStep('+ci+','+si+',this.value)">'+escapeHtml(s)+'</textarea>'+
+        '<textarea class="input" id="cstep-ta-'+ci+'-'+si+'" onfocus="noteStepFocus(\'c'+ci+'\','+si+')" style="flex:1;min-height:40px;" placeholder="paso '+(si+1)+'" oninput="updateComponentStep('+ci+','+si+',this.value)">'+escapeHtml(stepPlain(s))+'</textarea>'+
+        stepTimerBtnHtml(String(ci), si, s)+
         '<button type="button" class="iconbtn" onclick="boldComponentStep('+ci+','+si+')" style="font-weight:800;" title="Negrita">N</button>'+
         '<button class="iconbtn" onclick="removeComponentStepRow('+ci+','+si+')" style="color:var(--k-danger);"><span class="icon-slot" data-icon="x"></span></button>'+
         '</div>';
@@ -5132,7 +5380,7 @@ function togglePrepCollapse(id){
 }
 function addComponentStepRow(ci){ const at = insertStepAt(state.draft.components[ci].steps, 'c'+ci, ''); renderStepsAccordion(); kobuRevealNew(document.getElementById('cstep-ta-'+ci+'-'+at)); }
 function removeComponentStepRow(ci,i){ state._stepFocus = null; state.draft.components[ci].steps.splice(i,1); renderStepsAccordion(); }
-function updateComponentStep(ci,i,val){ state.draft.components[ci].steps[i]=val; }
+function updateComponentStep(ci,i,val){ const a = state.draft.components[ci].steps; a[i]=stepSetTimer(val, stepTimerSecs(a[i])); }
 let prepDrag = null;
 function prepDragStart(e, ci){
   e.preventDefault();
@@ -5200,7 +5448,8 @@ function renderFinalStepRows(){
     }
     return '<div class="btn-row step-row" data-idx="'+i+'">'+
       '<button type="button" class="iconbtn step-drag" onpointerdown="stepDragStart(event,\'final\','+i+')"><span class="icon-slot" data-icon="grip"></span></button>'+
-      '<textarea class="input" id="finalstep-ta-'+i+'" onfocus="noteStepFocus(\'final\','+i+')" style="flex:1;min-height:40px;" placeholder="paso de armado '+(i+1)+'" oninput="updateFinalStep('+i+',this.value)">'+escapeHtml(s)+'</textarea>'+
+      '<textarea class="input" id="finalstep-ta-'+i+'" onfocus="noteStepFocus(\'final\','+i+')" style="flex:1;min-height:40px;" placeholder="paso de armado '+(i+1)+'" oninput="updateFinalStep('+i+',this.value)">'+escapeHtml(stepPlain(s))+'</textarea>'+
+      stepTimerBtnHtml("'final'", i, s)+
       '<button type="button" class="iconbtn" onclick="boldFinalStep('+i+')" style="font-weight:800;" title="Negrita">N</button>'+
       '<button class="iconbtn" onclick="removeFinalStepRow('+i+')" style="color:var(--k-danger);"><span class="icon-slot" data-icon="x"></span></button>'+
       '</div>';
@@ -5209,7 +5458,7 @@ function renderFinalStepRows(){
 }
 function addFinalStepRow(){ state.draft.finalSteps = state.draft.finalSteps||[]; const at = insertStepAt(state.draft.finalSteps, 'final', ''); renderFinalStepRows(); kobuRevealNew(document.getElementById('finalstep-ta-'+at)); }
 function removeFinalStepRow(i){ state._stepFocus = null; state.draft.finalSteps.splice(i,1); renderFinalStepRows(); }
-function updateFinalStep(i,val){ state.draft.finalSteps[i]=val; }
+function updateFinalStep(i,val){ state.draft.finalSteps[i]=stepSetTimer(val, stepTimerSecs(state.draft.finalSteps[i])); }
 function saveActiveComponentToLibrary(){
   const d = state.draft;
   if(!d.components || state._activeComponentIdx==null) return;
@@ -5384,6 +5633,44 @@ function updatePrepAccordionCounts(){
 function editCurrentPrep(){ openLibraryPrepEditor(state.currentPrepId); }
 function deleteCurrentPrep(){ deleteLibraryPreparation(state.currentPrepId); }
 let stepDrag = null;
+const STEP_TIMER_PRESETS = [5,10,15,20,30,45,60];
+function openStepTimerModal(ci, i){
+  const arr = stepDragArr(ci);
+  if(!arr || arr[i]==null) return;
+  state._stepTimerEdit = { ci:ci, i:i };
+  const secs = stepTimerSecs(arr[i]);
+  const txt = stripMdMarkers(stepPlain(arr[i])).trim();
+  document.getElementById('stm-step').textContent = txt ? ('“'+(txt.length>80 ? txt.slice(0,78)+'…' : txt)+'”') : '';
+  document.getElementById('stm-min').value = secs ? String(Math.round(secs/6)/10).replace(/\.0$/,'') : '';
+  document.getElementById('stm-remove').style.display = secs ? '' : 'none';
+  renderStepTimerChips();
+  document.getElementById('stepTimerModal').classList.add('active');
+}
+function renderStepTimerChips(){
+  const cur = parseFloat(String(document.getElementById('stm-min').value).replace(',','.'));
+  document.getElementById('stm-chips').innerHTML = STEP_TIMER_PRESETS.map(function(m){
+    return '<button type="button" class="chip'+(cur===m?' active':'')+'" onclick="pickStepTimerPreset('+m+')">'+m+' min</button>';
+  }).join('');
+}
+function pickStepTimerPreset(m){ document.getElementById('stm-min').value = m; renderStepTimerChips(); }
+function closeStepTimerModal(){ document.getElementById('stepTimerModal').classList.remove('active'); state._stepTimerEdit = null; }
+function saveStepTimer(remove){
+  const ed = state._stepTimerEdit;
+  if(!ed) return;
+  const arr = stepDragArr(ed.ci);
+  if(!arr || arr[ed.i]==null){ closeStepTimerModal(); return; }
+  let secs = 0;
+  if(!remove){
+    const min = parseFloat(String(document.getElementById('stm-min').value).replace(',','.'));
+    if(!(min>0)){ showToast('Elegí cuántos minutos'); return; }
+    if(min>600){ showToast('Máximo 600 minutos'); return; }
+    secs = Math.round(min*60);
+  }
+  arr[ed.i] = stepSetTimer(arr[ed.i], secs);
+  closeStepTimerModal();
+  stepDragRerender(ed.ci);
+  showToast(secs ? ('Timer de '+stepTimerLabel(secs)+' en el paso') : 'Timer sacado');
+}
 function stepDragWrapId(ci){
   if(ci==null) return 'f-steps';
   if(ci==='final') return 'f-finalsteps';
@@ -5591,23 +5878,32 @@ function renderDetailIngredients(r){
   const comps = (r.components && r.components.length) ? r.components : null;
   const wrap = document.getElementById('d-ingredients');
   const supWrap = document.getElementById('d-supplies-wrap');
+  // Orden: ingredientes, después subproductos y al final insumos (cada grupo con su separación).
+  const groupLists = function(list){
+    const g = { ingrediente:[], subproducto:[], insumo:[] };
+    (list||[]).forEach(function(i, idx){ g[ingredientGroupOf(i)].push({ing:i, idx:idx}); });
+    return g;
+  };
+  const rowsHtml = function(arr, ci){ return arr.map(function(o){ return ingRow(o.ing, ci, o.idx); }).join(''); };
+  const sepHtml = function(t){ return '<p class="ing-sep">'+t+'</p>'; };
   if(comps){
     let html = '';
     comps.forEach(function(c, ci){
-      const list = (c.ingredients||[]);
+      const g = groupLists(c.ingredients);
       html += '<p style="font-size:calc(11.5px + var(--kobu-font-boost, 0px));font-weight:600;color:var(--k-accent);margin:8px 0 2px;">'+escapeHtml(c.name||'Preparación')+'</p>';
-      html += list.map(function(i, ii){ return ingRow(i, ci, ii); }).join('') || '<p style="font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;">sin ingredientes cargados</p>';
+      let inner = rowsHtml(g.ingrediente, ci);
+      if(g.subproducto.length) inner += sepHtml('Subproductos') + rowsHtml(g.subproducto, ci);
+      if(g.insumo.length) inner += sepHtml('Insumos') + rowsHtml(g.insumo, ci);
+      html += inner || '<p style="font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;">sin ingredientes cargados</p>';
     });
     wrap.innerHTML = html;
     supWrap.style.display = 'none';
   } else {
-    const allIng = r.ingredients || [];
-    const ingList = [];
-    const supList = [];
-    allIng.forEach(function(i, idx){
-      (ingredientEntryType(i)==='insumo' ? supList : ingList).push({ing:i, idx:idx});
-    });
-    wrap.innerHTML = ingList.map(function(o){ return ingRow(o.ing, null, o.idx); }).join('') || '<p style="font-size:calc(12px + var(--kobu-font-boost, 0px));color:var(--k-muted);">sin ingredientes cargados</p>';
+    const g = groupLists(r.ingredients);
+    const supList = g.insumo;
+    let html = rowsHtml(g.ingrediente, null);
+    if(g.subproducto.length) html += sepHtml('Subproductos') + rowsHtml(g.subproducto, null);
+    wrap.innerHTML = html || '<p style="font-size:calc(12px + var(--kobu-font-boost, 0px));color:var(--k-muted);">sin ingredientes cargados</p>';
     if(supList.length){
       supWrap.style.display = '';
       document.getElementById('d-supplies').innerHTML = supList.map(function(o){ return ingRow(o.ing, null, o.idx); }).join('');
@@ -5625,7 +5921,8 @@ function dstepsHtml(steps){
       return t ? '<p class="dstep-title">'+mdBoldToHtml(t)+'</p>' : '';
     }
     n++;
-    return '<div class="dstep"><span class="dstep-num">'+n+'</span><span>'+mdBoldToHtml(s)+'</span></div>';
+    const tsecs = stepTimerSecs(s);
+    return '<div class="dstep"><span class="dstep-num">'+n+'</span><span>'+mdBoldToHtml(stepPlain(s))+(tsecs ? '<span class="dstep-timer"><span class="icon-slot" data-icon="stopwatch"></span>'+escapeHtml(stepTimerLabel(tsecs))+'</span>' : '')+'</span></div>';
   }).join('');
   return html || '<p style="font-size:calc(12px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;">sin pasos cargados</p>';
 }
@@ -5704,6 +6001,7 @@ function openDetailRender(id){
     parentEl.textContent = parent ? ('variante de: '+parent.title) : 'variante de una receta borrada';
   } else { parentEl.style.display = 'none'; }
   document.getElementById('d-notes').textContent = r.notes || '(sin anotaciones)';
+  renderDetailCookNotes(r);
   renderDetailMold(r);
   renderDetailIngredients(r);
   renderDetailSteps(r);
@@ -6118,10 +6416,10 @@ function generateDietVariantWithAi(baseId, type){
   const comps = recipeComponentsOrFallback(r);
   const recipeDump = comps.map(function(c,i){
     const ingTxt = (c.ingredients||[]).map(function(x){ return '- '+x.name+': '+x.qty+' '+x.unit; }).join('\n');
-    const stepsTxt = (c.steps||[]).map(function(s,si){ return (si+1)+'. '+s; }).join('\n');
+    const stepsTxt = (c.steps||[]).map(function(s,si){ return (si+1)+'. '+stepPlain(s); }).join('\n');
     return (comps.length>1 ? ('Preparación "'+(c.name||('#'+(i+1)))+'":\n') : '')+'Ingredientes:\n'+ingTxt+'\nPasos:\n'+stepsTxt;
   }).join('\n\n');
-  const finalStepsTxt = (r.finalSteps||[]).length ? '\n\nPasos de armado final:\n'+r.finalSteps.map(function(s,si){ return (si+1)+'. '+s; }).join('\n') : '';
+  const finalStepsTxt = (r.finalSteps||[]).length ? '\n\nPasos de armado final:\n'+r.finalSteps.map(function(s,si){ return (si+1)+'. '+stepPlain(s); }).join('\n') : '';
   const substitutionRules = {
     azucar: 'Reemplazá el azúcar y derivados (azúcar común, azúcar impalpable, dulce de leche azucarado, etc.) por edulcorante u otra alternativa sin azúcar apta para hornear, ajustando cantidades si la alternativa endulza distinto, y ajustá los pasos si el cambio lo requiere (por ejemplo tiempos o texturas).',
     tacc: 'Reemplazá la harina de trigo y cualquier ingrediente con gluten (harina 0000, harina leudante, avena común, etc.) por harinas o premezclas sin TACC (harina de arroz, premezcla sin TACC, fécula de maíz, goma xántica si hace falta), ajustando cantidades y pasos si la textura lo requiere.',
@@ -6439,6 +6737,14 @@ function resolvePurchaseTarget(ing, totalQty){
   }
   return { cat:cat, qty: convertQty(totalQty, ing.unit, cat.unit) };
 }
+function ingredientGroupOf(ing){
+  if(!ing) return 'ingrediente';
+  if(!ing.priceId) return ing.kind==='insumo' ? 'insumo' : 'ingrediente';
+  const cat = DATA.ingredientPrices.find(function(p){ return p.id===ing.priceId; });
+  if(cat && cat.type==='insumo') return 'insumo';
+  if(cat && cat.type==='subproducto') return 'subproducto';
+  return 'ingrediente';
+}
 function ingredientEntryType(ing){
   if(!ing.priceId) return 'ingrediente';
   const cat = DATA.ingredientPrices.find(function(p){ return p.id===ing.priceId; });
@@ -6518,7 +6824,8 @@ function buildRecipeStepsTextLines(r){
         if(lines.length) lines.push('');
         lines.push(t);
       } else {
-        lines.push('> '+stripMdMarkers(s));
+        const tsecs = stepTimerSecs(s);
+        lines.push('> '+stripMdMarkers(stepPlain(s))+(tsecs ? (' (timer '+stepTimerLabel(tsecs)+')') : ''));
       }
     });
   };
@@ -6753,6 +7060,25 @@ function renderSettings(){
         '</div>';
     }).join('');
   }
+  const bowlWrap = document.getElementById('bowlList');
+  if(bowlWrap){
+    const bowls = utensilsSorted('bowl');
+    if(bowls.length===0){
+      bowlWrap.innerHTML = '<p style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;">todavía no cargaste bowls.</p>';
+    } else {
+      bowlWrap.innerHTML = bowls.map(function(u){
+        const sub = bowlInfoLabel(u, true) + (u.cantidad ? (' ||| x'+u.cantidad) : '');
+        const icon = u.icon || 'bowl';
+        return '<div class="ut-row" data-id="'+u.id+'">'+
+          '<button type="button" class="ut-drag" onpointerdown="utensilDragStart(event,\''+u.id+'\')" title="arrastrar"><span class="icon-slot" data-icon="grip"></span></button>'+
+          '<span class="ut-ic"><span class="icon-slot" data-icon="'+icon+'"></span></span>'+
+          '<div class="ut-info"><p class="nm">'+escapeHtml(u.nombre)+'</p>'+(sub?'<p class="sub">'+escapeHtml(sub)+'</p>':'')+'</div>'+
+          '<button class="iconbtn" onclick="openUtensilEditModal(\''+u.id+'\')"><span class="icon-slot" data-icon="pencil"></span></button>'+
+          '<button class="iconbtn" onclick="removeUtensil(\''+u.id+'\')" style="color:var(--k-danger);"><span class="icon-slot" data-icon="trash"></span></button>'+
+          '</div>';
+      }).join('');
+    }
+  }
   const utWrap = document.getElementById('utensilList');
   const plainUtensils = utensilsSorted('utensilio');
   if(plainUtensils.length===0){
@@ -6779,6 +7105,7 @@ function renderSettings(){
   document.getElementById('notifEnabledSwitch').classList.toggle('on', notifEnabled());
   updateNotifNote();
   updateTelegramRow();
+  renderTimerSoundSetting();
   mountIcons();
 }
 
@@ -7329,11 +7656,18 @@ function saveOvenEdit(){
 let utensilEditId = null;
 let utensilEditIcon = null;
 let utensilEditCategory = 'utensilio';
+function utensilCatOf(u){
+  const c = u && u.category;
+  return (c==='molde' || c==='bowl') ? c : 'utensilio';
+}
 function setUtensilType(type){
-  utensilEditCategory = (type==='molde') ? 'molde' : 'utensilio';
+  utensilEditCategory = (type==='molde' || type==='bowl') ? type : 'utensilio';
   document.getElementById('ue-type-utensilio').classList.toggle('active', utensilEditCategory==='utensilio');
   document.getElementById('ue-type-molde').classList.toggle('active', utensilEditCategory==='molde');
+  document.getElementById('ue-type-bowl').classList.toggle('active', utensilEditCategory==='bowl');
   document.getElementById('ue-mold-fields').style.display = utensilEditCategory==='molde' ? 'flex' : 'none';
+  document.getElementById('ue-bowl-fields').style.display = utensilEditCategory==='bowl' ? 'flex' : 'none';
+  document.getElementById('ue-dims-row').style.display = utensilEditCategory==='bowl' ? 'none' : '';
   if(utensilEditCategory==='molde') onMoldShapeChange();
 }
 function tryAutofillDimsFromLegacyTamano(u){
@@ -7390,8 +7724,11 @@ function utensilDragMove(e){
   const utWrap = document.getElementById('utensilList');
   const overMold = isPointInsideEl(e.clientX, e.clientY, moldWrap);
   const overUtensil = isPointInsideEl(e.clientX, e.clientY, utWrap);
+  const bowlWrap = document.getElementById('bowlList');
+  const overBowl = isPointInsideEl(e.clientX, e.clientY, bowlWrap);
   if(moldWrap) moldWrap.classList.toggle('drop-target-active', overMold);
   if(utWrap) utWrap.classList.toggle('drop-target-active', overUtensil);
+  if(bowlWrap) bowlWrap.classList.toggle('drop-target-active', overBowl);
 }
 function utensilDragEnd(e){
   if(!utensilDrag) return;
@@ -7399,8 +7736,11 @@ function utensilDragEnd(e){
   const utWrap = document.getElementById('utensilList');
   const overMold = isPointInsideEl(e.clientX, e.clientY, moldWrap);
   const overUtensil = isPointInsideEl(e.clientX, e.clientY, utWrap);
+  const bowlWrap = document.getElementById('bowlList');
+  const overBowl = isPointInsideEl(e.clientX, e.clientY, bowlWrap);
   if(moldWrap) moldWrap.classList.remove('drop-target-active');
   if(utWrap) utWrap.classList.remove('drop-target-active');
+  if(bowlWrap) bowlWrap.classList.remove('drop-target-active');
   const u = DATA.utensils.find(function(x){ return x.id===utensilDrag.id; });
   if(u){
     if(overMold && u.category!=='molde'){
@@ -7423,11 +7763,16 @@ function utensilDragEnd(e){
       saveData(DATA);
       renderSettings();
       showToast(tookDims ? 'Movido a Moldes — medidas tomadas de "'+u.tamano+'"' : 'Movido a Moldes — completá forma y medidas para poder estimarlo');
-    } else if(overUtensil && u.category==='molde'){
+    } else if(overUtensil && utensilCatOf(u)!=='utensilio'){
       u.category = 'utensilio';
       saveData(DATA);
       renderSettings();
       showToast('Movido a Utensilios');
+    } else if(overBowl && u.category!=='bowl'){
+      u.category = 'bowl';
+      saveData(DATA);
+      renderSettings();
+      showToast('Movido a Bowls — cargale el peso para usarlo en la calculadora');
     }
   }
   utensilDrag = null;
@@ -7470,8 +7815,9 @@ function openUtensilCreateModal(type){
   document.getElementById('ue-mold-dim2').value = '';
   document.getElementById('ue-mold-dim3').value = '';
   document.getElementById('ue-mold-capacity-manual').value = '';
-  setUtensilType(type==='molde' ? 'molde' : 'utensilio');
-  document.getElementById('utensilEditModalTitle').textContent = (type==='molde') ? 'Nuevo molde' : 'Nuevo utensilio';
+  ['diam','alto','cap','peso'].forEach(function(k){ document.getElementById('ue-bowl-'+k).value = ''; });
+  setUtensilType(type);
+  document.getElementById('utensilEditModalTitle').textContent = utensilEditCategory==='molde' ? 'Nuevo molde' : (utensilEditCategory==='bowl' ? 'Nuevo bowl' : 'Nuevo utensilio');
   updateUtensilIconPreview();
   document.getElementById('utensilEditModal').classList.add('active');
 }
@@ -7488,10 +7834,12 @@ function openUtensilEditModal(id){
   document.getElementById('ue-mold-dim2').value = u.moldDim2!=null ? u.moldDim2 : '';
   document.getElementById('ue-mold-dim3').value = u.moldDim3!=null ? u.moldDim3 : '';
   document.getElementById('ue-mold-capacity-manual').value = u.moldCapacityManual!=null ? u.moldCapacityManual : '';
+  const bowlVals = {diam:u.bowlDiam, alto:u.bowlAlto, cap:u.bowlCap, peso:u.bowlPeso};
+  ['diam','alto','cap','peso'].forEach(function(k){ document.getElementById('ue-bowl-'+k).value = bowlVals[k]!=null ? bowlVals[k] : ''; });
   tryAutofillDimsFromLegacyTamano(u);
-  const cat = (u.category==='molde') ? 'molde' : 'utensilio';
+  const cat = utensilCatOf(u);
   setUtensilType(cat);
-  document.getElementById('utensilEditModalTitle').textContent = 'Editar '+(cat==='molde' ? 'molde' : 'utensilio');
+  document.getElementById('utensilEditModalTitle').textContent = 'Editar '+(cat==='molde' ? 'molde' : (cat==='bowl' ? 'bowl' : 'utensilio'));
   updateUtensilIconPreview();
   document.getElementById('utensilEditModal').classList.add('active');
 }
@@ -7528,11 +7876,18 @@ function saveUtensilEdit(){
   } else {
     u.moldShape = null; u.moldDim1 = null; u.moldDim2 = null; u.moldDim3 = null; u.moldCapacityManual = null;
   }
+  if(utensilEditCategory==='bowl'){
+    const bnum = function(k){ const v = parseFloat(document.getElementById('ue-bowl-'+k).value); return (!isNaN(v) && v>0) ? v : null; };
+    u.bowlDiam = bnum('diam'); u.bowlAlto = bnum('alto'); u.bowlCap = bnum('cap'); u.bowlPeso = bnum('peso');
+    if(!u.icon) u.icon = 'bowl';
+  } else {
+    u.bowlDiam = null; u.bowlAlto = null; u.bowlCap = null; u.bowlPeso = null;
+  }
   if(isNew) DATA.utensils.push(u);
   saveData(DATA);
   closeUtensilEditModal();
   renderSettings();
-  showToast(isNew ? ('Añadido a '+(utensilEditCategory==='molde'?'Moldes':'Utensilios')) : 'Guardado');
+  showToast(isNew ? ('Añadido a '+(utensilEditCategory==='molde'?'Moldes':(utensilEditCategory==='bowl'?'Bowls':'Utensilios'))) : 'Guardado');
 }
 function saveAiModel(val){
   const model = (val||'').trim() || KOBU_DEFAULT_AI_MODEL;
@@ -7679,6 +8034,14 @@ function updateBotResumen(){
     if(JSON.stringify(prevRes.compras)===JSON.stringify(compras) && JSON.stringify(prevRes.recetas)===JSON.stringify(recetas)) return;
     DATA.botResumen = { compras:compras, recetas:recetas, ts:new Date().toISOString() };
     try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA)); }catch(e){}
+  }catch(e){}
+}
+// Al abrir: si el resumen para el bot (recetas, lista de compras) cambió (ej. app nueva), se guarda y se sube.
+function kobuBotResumenAlDia(){
+  try{
+    const antes = JSON.stringify(DATA.botResumen||null);
+    updateBotResumen();
+    if(JSON.stringify(DATA.botResumen||null)!==antes) saveData(DATA);
   }catch(e){}
 }
 function doSyncPush(url, key, silent){
@@ -7872,13 +8235,14 @@ function autoPullOnOpen(){
       .catch(function(){});
     return;
   }
-  if(lastHash !== dataHash(DATA)) return;
+  if(lastHash !== dataHash(DATA)){ kobuBotResumenAlDia(); return; }
   fetch(url+'?key='+encodeURIComponent(key), { method:'GET' })
     .then(function(res){ return res.json(); })
     .then(function(parsed){
       if(!parsed || parsed.error || !parsed.recipes || !parsed.ovens) return;
-      if(cloudMatchesKnown(parsed)) return;
+      if(cloudMatchesKnown(parsed)){ kobuBotResumenAlDia(); return; }
       adoptCloudData(parsed);
+      kobuBotResumenAlDia();
     })
     .catch(function(){});
 }
@@ -7993,7 +8357,7 @@ function renderPriceRows(wrapId, list, emptyMsg, icon){
   if(list.length===0){ wrap.innerHTML = '<p style="font-size:calc(11.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);">'+emptyMsg+'</p>'; return; }
   wrap.innerHTML = list.map(function(p){
     const stock = roundQty(p.stock||0);
-    const low = stock <= 1;
+    const low = ingIsLow(p);
     const color = low ? 'var(--k-danger)' : 'var(--k-success)';
     const ref = p.qty>0 ? p.qty : 1;
     const pct = Math.max(stock>0?4:0, Math.min(100, Math.round((stock/ref)*100)));
@@ -8014,6 +8378,58 @@ function renderPriceRows(wrapId, list, emptyMsg, icon){
       '<div class="sr-bar"><div class="sr-bar-fill" style="width:'+pct+'%;background:'+color+';"></div></div>'+
       '</div>';
   }).join('');
+}
+// Campana en la ventana de editar: 1 toque prende/apaga el aviso; 4 toques seguidos abren el límite.
+// Se guarda con "Guardar" (como el resto de la ventana).
+let seAlert = { on:true, min:0 };
+let stockAlertTaps = { n:0, t:0, timer:null };
+function seAlertRender(){
+  const btn = document.getElementById('se-alert-btn');
+  if(!btn) return;
+  btn.classList.toggle('on', seAlert.on);
+  btn.setAttribute('aria-pressed', seAlert.on ? 'true' : 'false');
+  btn.innerHTML = '<span class="icon-slot" data-icon="'+(seAlert.on?'bell':'bell-off')+'"></span>';
+  const unit = document.getElementById('se-unit').value || '';
+  document.getElementById('se-alert-txt').textContent = seAlert.on
+    ? ('Te aviso cuando queden '+(seAlert.min>0 ? fmtQty(seAlert.min) : '1')+' '+unit+' o menos. 4 toques: cambiar desde cuánto.')
+    : 'Sin aviso de poco stock (no aparece en el inicio ni en el bot).';
+  mountIcons();
+}
+function seAlertLoad(p){
+  seAlert = { on: ingStockAlertOn(p), min: (p && Number(p.minStock)>0) ? Number(p.minStock) : 0 };
+  stockAlertTaps.n = 0;
+  seAlertRender();
+}
+function stockAlertTap(e){
+  if(e){ e.stopPropagation(); e.preventDefault(); }
+  const now = Date.now();
+  stockAlertTaps.n = (now-stockAlertTaps.t < 700) ? stockAlertTaps.n+1 : 1;
+  stockAlertTaps.t = now;
+  // Cada toque prende/apaga; al 4.º (4 cambios = como estaba) se abre el límite.
+  seAlert.on = !seAlert.on;
+  seAlertRender();
+  if(stockAlertTaps.n>=4){ stockAlertTaps.n = 0; openStockAlertModal(); }
+}
+function openStockAlertModal(){
+  const unit = document.getElementById('se-unit').value || '';
+  document.getElementById('sa-name').textContent = document.getElementById('se-name').value.trim();
+  document.getElementById('sa-unit').textContent = unit;
+  document.getElementById('sa-min').value = seAlert.min>0 ? seAlert.min : '';
+  const p = stockEditId ? DATA.ingredientPrices.find(function(x){ return x.id===stockEditId; }) : null;
+  document.getElementById('sa-now').textContent = (p ? ('Ahora hay '+fmtQty(roundQty(p.stock||0))+' '+unit+'. ') : '')+'Si lo dejás vacío, avisa con 1 '+unit+' o menos.';
+  document.getElementById('stockAlertModal').classList.add('active');
+}
+function closeStockAlertModal(){
+  document.getElementById('stockAlertModal').classList.remove('active');
+}
+function saveStockAlertModal(){
+  const raw = String(document.getElementById('sa-min').value||'').replace(',','.').trim();
+  const v = raw==='' ? 0 : parseFloat(raw);
+  if(raw!=='' && !(v>=0)){ showToast('Poné un número'); return; }
+  seAlert.min = v>0 ? Math.round(v*100)/100 : 0;
+  seAlert.on = true;
+  closeStockAlertModal();
+  seAlertRender();
 }
 function renderIngredientPrices(){
   renderPriceRows('ingredientPriceList', foodIngredientsSorted().filter(function(p){ return p.type!=='subproducto'; }), 'todavía no cargaste ingredientes.', 'list');
@@ -8124,6 +8540,7 @@ function applyStockEditTypeVisibility(){
   document.getElementById('se-yield-row').style.display = isSub ? '' : 'none';
   document.getElementById('se-price-row').style.display = isSub ? 'none' : '';
   document.getElementById('se-provider-row').style.display = isSub ? 'none' : '';
+  document.getElementById('se-alert-row').style.display = isSub ? 'none' : 'flex';
   const unitLabel = document.getElementById('se-unit-label');
   if(unitLabel) unitLabel.textContent = isSub ? 'Unidad del rinde' : 'Unidad';
 }
@@ -8136,6 +8553,7 @@ function openIngredientCreateModal(){
   document.getElementById('se-price').value = '';
   document.getElementById('se-provider').value = '';
   document.getElementById('se-unit').innerHTML = stockUnitOptionsHtml('ingrediente');
+  seAlertLoad(null);
   document.getElementById('stockEditModalTitle').textContent = 'Nuevo ingrediente';
   document.getElementById('se-delete-row').style.display = 'none';
   document.getElementById('se-price-trend').style.display = 'none';
@@ -8153,6 +8571,7 @@ function openSupplyCreateModal(){
   document.getElementById('se-price').value = '';
   document.getElementById('se-provider').value = '';
   document.getElementById('se-unit').innerHTML = stockUnitOptionsHtml('insumo');
+  seAlertLoad(null);
   document.getElementById('stockEditModalTitle').textContent = 'Nuevo insumo';
   document.getElementById('se-delete-row').style.display = 'none';
   document.getElementById('se-price-trend').style.display = 'none';
@@ -8217,6 +8636,7 @@ function openStockEditModal(id){
     }
   }
   document.getElementById('stockEditModalTitle').textContent = stockEditType==='insumo' ? 'Editar insumo' : (stockEditType==='subproducto' ? 'Editar subproducto' : 'Editar ingrediente');
+  if(stockEditType!=='subproducto') seAlertLoad(p);
   document.getElementById('se-delete-row').style.display = '';
   applyStockEditTypeVisibility();
   document.getElementById('stockEditModal').classList.add('active');
@@ -8295,6 +8715,8 @@ function saveStockEdit(){
   p.unit = unit;
   p.price = price;
   p.provider = provider;
+  p.stockAlert = !!seAlert.on;
+  p.minStock = seAlert.min>0 ? seAlert.min : 0;
   if(nameChanged) cascadeIngredientNameRename(p.id, name);
   if(isNew){
     p.priceHistory = (price!=null) ? [{ price: price, date: todayStr() }] : [];
@@ -9209,6 +9631,7 @@ function confirmBakeModal(){
   renderOrderList();
   if(fromCook && document.getElementById('screen-cook').classList.contains('active')){
     exitCook();
+    askCookNote(r.id);
   }
 }
 function finishCookAndBake(e){
@@ -11134,6 +11557,7 @@ function applyReportsFigures(rep){
 function renderReportsForRange(start, end, label){
   const rep = computeReportsRawForRange({start:start, end:end});
   applyReportsFigures(rep);
+  renderMermasCard({start:start, end:end});
   const note = document.getElementById('rep-viewing-note');
   const labelEl = document.getElementById('rep-viewing-label');
   if(note && labelEl){ labelEl.textContent = label; note.style.display = 'block'; }
@@ -11331,6 +11755,7 @@ function renderReportsScreen(){
   applyReportsFigures(rep);
   renderRepBars(reportsPeriod);
   renderTrendsCard(reportsPeriod);
+  renderMermasCard(getPeriodRange(reportsPeriod));
 }
 let recipeStockTapCount = 0;
 let recipeStockTapTimer = null;
@@ -11691,6 +12116,10 @@ function refreshBotSales(force){
 function botValidHorneada(v){
   return v && v.tipo==='horneada' && typeof v.id==='string' && /^hb-bot-[\d-]{10,40}$/.test(v.id) && typeof v.recipeId==='string' && Number.isInteger(v.porciones) && v.porciones>=1 && v.porciones<=2000;
 }
+// Mermas desde el bot (/mermas brownie 2 rota): bajan el stock listo una sola vez.
+function botValidMerma(v){
+  return v && v.tipo==='merma' && typeof v.id==='string' && /^mm-bot-[\d-]{10,40}$/.test(v.id) && typeof v.recipeId==='string' && Number.isInteger(v.porciones) && v.porciones>=1 && v.porciones<=500;
+}
 // Compras cargadas desde el bot (/compre): suman stock (y el gasto) una sola vez.
 const BOT_COMPRA_UNID = ['kg','g','mg','l','ml'];
 function botValidCompra(v){
@@ -11771,6 +12200,16 @@ function applyBotSales(ventas){
     DATA.botProcesadas.push(v.id); procesadas[v.id] = true;
     horneadas++;
   });
+  let mermas = 0;
+  ventas.forEach(function(v){
+    if(!botValidMerma(v) || procesadas[v.id]) return;
+    const r = DATA.recipes.find(function(x){ return x.id===v.recipeId; });
+    if(r){
+      const ts = (typeof v.ts==='string' && !isNaN(new Date(v.ts).getTime())) ? v.ts : new Date().toISOString();
+      if(registrarMerma(r.id, v.porciones, String(v.motivo||''), { id:v.id, ts:ts, origen:'bot' })) mermas++;
+    }
+    DATA.botProcesadas.push(v.id); procesadas[v.id] = true;
+  });
   let compras = 0, comprasVistas = 0;
   ventas.forEach(function(v){
     if(!botValidCompra(v) || procesadas[v.id]) return;
@@ -11780,9 +12219,9 @@ function applyBotSales(ventas){
   });
   // Se conservan mientras el bot pueda tenerlas en su lista (14 días): el id trae la hora en ms.
   const limiteHb = Date.now() - 30*86400000;
-  DATA.botProcesadas = DATA.botProcesadas.filter(function(id){ const m = /^(?:hb|cp)-bot-(\d+)/.exec(String(id)); return !m || Number(m[1]) >= limiteHb; });
+  DATA.botProcesadas = DATA.botProcesadas.filter(function(id){ const m = /^(?:hb|cp|mm)-bot-(\d+)/.exec(String(id)); return !m || Number(m[1]) >= limiteHb; });
   botSales.pendientes = pend;
-  if(nuevas || deshechas || horneadas || comprasVistas){
+  if(nuevas || deshechas || horneadas || comprasVistas || mermas){
     saveData(DATA);
     if(comprasVistas){ try{ renderIngredientPrices(); refreshIngredientPickers(); }catch(e){} }
     const msgs = [];
@@ -11790,10 +12229,11 @@ function applyBotSales(ventas){
     else if(deshechas) msgs.push('Se deshizo una venta del bot');
     if(horneadas) msgs.push(horneadas===1 ? 'Se cargó 1 horneada del bot' : 'Se cargaron '+horneadas+' horneadas del bot');
     if(compras) msgs.push(compras===1 ? 'Se cargó 1 compra del bot al stock' : 'Se cargaron '+compras+' compras del bot al stock');
+    if(mermas) msgs.push(mermas===1 ? 'Se anotó 1 merma del bot' : 'Se anotaron '+mermas+' mermas del bot');
     if(msgs.length) showToast(msgs.join(' · '));
   }
   if(state.stack[state.stack.length-1]==='quicksell') renderQuickSellScreen();
-  return { nuevas:nuevas, deshechas:deshechas, pendientes:pend.length, horneadas:horneadas, compras:compras };
+  return { nuevas:nuevas, deshechas:deshechas, pendientes:pend.length, horneadas:horneadas, compras:compras, mermas:mermas };
 }
 // Igual que registerQuickSale, pero con los datos del bot (mismo id, misma hora y medio de pago).
 function addBotQuickSale(v, r, payMethod, willDeduct){
@@ -13201,7 +13641,7 @@ function buildSystemPrompt(){
   if(recipeId){
     const r = DATA.recipes.find(function(x){ return x.id===recipeId; });
     if(r){
-      const stepsFlat = recipeComponentsOrFallback(r).reduce(function(acc,c){ return acc.concat(c.steps||[]); }, []).concat(r.finalSteps||[]);
+      const stepsFlat = recipeComponentsOrFallback(r).reduce(function(acc,c){ return acc.concat(c.steps||[]); }, []).concat(r.finalSteps||[]).map(stepPlain);
       return base+' Ahora mismo estás ayudando puntualmente con esta receta: "'+r.title+'". Ingredientes: '+flatRecipeIngredients(r).map(function(i){return i.name+' '+i.qty+' '+i.unit;}).join(', ')+'. Pasos: '+stepsFlat.join(' / ')+'. Notas: '+(r.notes||'ninguna')+'. '+
         'Respondé en español, corto y práctico.';
     }
@@ -13546,6 +13986,10 @@ function startCook(id){
   if(!r) return;
   state.cookRecipeId = id;
   state.cookComponentKey = null;
+  ccResetSession();
+  cookTimersReset();
+  state.cookProgress = {}; state.cookDone = {}; state.cookPreheatOff = false;
+  stopCookVoice();
   state._moldWarnDismissed = state._moldWarnDismissed || {};
   state._moldWarnDismissed.cook = false;
   if(r.components && r.components.length>1){
@@ -13559,29 +14003,48 @@ function startCook(id){
     showScreen('cook');
     renderCookStep();
   }
+  renderCookPreheat();
+  updateCookVoiceBtn();
   if(navigator.wakeLock){
     navigator.wakeLock.request('screen').then(function(lock){ state.wakeLock = lock; }).catch(function(){});
   }
 }
 function renderCookPicker(){
-  cancelCookTimer();
   const r = DATA.recipes.find(function(x){ return x.id===state.cookRecipeId; });
   if(!r) return;
   document.getElementById('cook-picker').style.display = 'flex';
   document.getElementById('cook-stepflow').style.display = 'none';
   document.getElementById('cook-switchPrepBtn').style.display = 'none';
   renderCookMoldWarning();
+  const done = state.cookDone || {};
+  const timerOf = function(k){
+    const all = cookTimers();
+    return Object.keys(all).map(function(x){ return all[x]; }).find(function(t){ return String(t.comp)===String(k) && (t.running || t.done); });
+  };
+  const status = function(k){
+    if(done[String(k)]) return ' · lista';
+    const t = timerOf(k);
+    if(t) return t.done ? ' · timer listo' : ' · timer corriendo';
+    return '';
+  };
   const buttons = (r.components||[]).map(function(c,i){
     const n = (c.steps||[]).filter(Boolean).length;
-    return '<button type="button" class="btn btn-primary" onclick="chooseCookComponent('+i+')">'+escapeHtml(c.name||('Preparación '+(i+1)))+' ('+n+' pasos)</button>';
+    return '<button type="button" class="btn btn-primary" onclick="chooseCookComponent('+i+')">'+(done[String(i)] ? '<span class="icon-slot" data-icon="check" style="vertical-align:-2px;"></span> ' : '')+escapeHtml(c.name||('Preparación '+(i+1)))+' ('+n+' pasos)'+status(i)+'</button>';
   }).join('');
   const finalSteps = (r.finalSteps||[]).filter(isMeaningfulStepEntry);
-  const finalBtn = finalSteps.length ? '<button type="button" class="btn btn-ghost" style="color:var(--k-bg);border-color:var(--k-muted);" onclick="chooseCookComponent(\'final\')">Montaje final ('+finalSteps.length+' pasos)</button>' : '';
+  const finalBtn = finalSteps.length ? '<button type="button" class="btn btn-ghost" style="color:var(--k-bg);border-color:var(--k-muted);" onclick="chooseCookComponent(\'final\')">Montaje final ('+finalSteps.length+' pasos)'+status('final')+'</button>' : '';
   document.getElementById('cook-picker-buttons').innerHTML = buttons + finalBtn;
+  mountIcons();
+  renderCookTimerUI();
 }
 function chooseCookComponent(key){
+  state.cookDone = state.cookDone || {};
+  state.cookProgress = state.cookProgress || {};
+  const k = String(key);
+  const step = state.cookDone[k] ? 0 : (state.cookProgress[k]||0);
+  delete state.cookDone[k];
   state.cookComponentKey = key;
-  state.cookStep = 0;
+  state.cookStep = Math.max(0, Math.min(step, cookStepsOf(key).length-1));
   renderCookStep();
 }
 function currentCookSteps(){
@@ -13606,7 +14069,14 @@ function isCookTrulyDone(){
   return true;
 }
 function renderCookStep(){
-  cancelCookTimer();
+  const newKey = cookCurKey();
+  if(state.cookLastKey && state.cookLastKey!==newKey){
+    const old = cookTimers()[state.cookLastKey];
+    if(old && old.done) delete cookTimers()[state.cookLastKey];
+  }
+  state.cookLastKey = newKey;
+  state.cookProgress = state.cookProgress || {};
+  state.cookProgress[String(state.cookComponentKey)] = state.cookStep;
   document.getElementById('cook-picker').style.display = 'none';
   document.getElementById('cook-stepflow').style.display = 'contents';
   const r = DATA.recipes.find(function(x){ return x.id===state.cookRecipeId; });
@@ -13618,7 +14088,7 @@ function renderCookStep(){
   const isTitle = isStepTitleText(rawStep);
   const cookTextEl = document.getElementById('cook-text');
   cookTextEl.classList.toggle('cook-text-title', isTitle);
-  cookTextEl.innerHTML = mdBoldToHtml(isTitle ? stepTitleText(rawStep) : rawStep);
+  cookTextEl.innerHTML = mdBoldToHtml(isTitle ? stepTitleText(rawStep) : stepPlain(rawStep));
   document.getElementById('cook-dots').innerHTML = steps.map(function(_,i){ return '<span class="'+(i===idx?'on':'')+'"></span>'; }).join('');
   applyCookStepColor(idx);
   const isLast = idx === steps.length-1;
@@ -13631,26 +14101,18 @@ function renderCookStep(){
   const nextText = document.getElementById('cook-next-text');
   if(idx+1 < steps.length){
     nextLabel.style.visibility = 'visible'; nextText.style.visibility = 'visible';
-    nextText.textContent = isStepTitleText(steps[idx+1]) ? stepTitleText(steps[idx+1]) : steps[idx+1];
+    nextText.textContent = isStepTitleText(steps[idx+1]) ? stepTitleText(steps[idx+1]) : stripMdMarkers(stepPlain(steps[idx+1]));
   } else {
     nextLabel.style.visibility = 'hidden'; nextText.style.visibility = 'hidden'; nextText.textContent = '';
   }
-  const match = isTitle ? null : rawStep.match(/(\d+)\s*(min|minutos)/i);
-  const timerPill = document.getElementById('cook-timer-pill');
-  if(match){
-    timerPill.style.display = 'flex';
-    state.cookTimerSeconds = (parseInt(match[1])||1)*60;
-    state.cookTimerLabel = (r ? r.title : 'Kobu') + ' — paso '+(idx+1);
-    updateCookTimerDisplay();
-    setCookTimerIcon(false);
-  } else {
-    timerPill.style.display = 'none';
-  }
+  renderCookTimerUI();
 }
 function nextCookStep(){
   const steps = currentCookSteps();
   if(state.cookStep < steps.length-1){ state.cookStep++; renderCookStep(); }
   else if(!isCookTrulyDone()){
+    state.cookDone = state.cookDone || {};
+    state.cookDone[String(state.cookComponentKey)] = true;
     showToast('¡Preparación lista!');
     renderCookPicker();
   }
@@ -13660,19 +14122,10 @@ function prevCookStep(){
 }
 function finishCook(e){
   if(e) e.stopPropagation();
+  const rid = state.cookRecipeId;
   showToast('¡Listo! buen trabajo');
   exitCook();
-}
-function updateCookTimerDisplay(){
-  const s = Math.max(0, state.cookTimerSeconds||0);
-  const m = Math.floor(s/60), sec = s%60;
-  const el = document.getElementById('cook-timer-val');
-  if(el) el.textContent = (m<10?'0':'')+m+':'+(sec<10?'0':'')+sec;
-}
-function setCookTimerIcon(running){
-  const el = document.querySelector('#cook-timer-playbtn .icon-slot');
-  if(!el) return;
-  el.innerHTML = running ? ICONS['player-pause'] : ICONS['player-play'];
+  askCookNote(rid);
 }
 const COOK_TIMER_TAG = 'kobu-cook-timer';
 const COOK_TIMER_STATE_KEY = 'kobuCookTimerState';
@@ -13697,11 +14150,6 @@ function clearCookTimerState(){
 function ensureNotifPermission(){
   if(!('Notification' in window)) return;
   if(Notification.permission==='default'){ Notification.requestPermission().catch(function(){}); }
-}
-function cookTimerFmt(seconds){
-  const s = Math.max(0, seconds|0);
-  const m = Math.floor(s/60), sec = s%60;
-  return (m<10?'0':'')+m+':'+(sec<10?'0':'')+sec;
 }
 function showCookTimerNotification(running){
   if(!('Notification' in window) || Notification.permission!=='granted' || !('serviceWorker' in navigator)) return;
@@ -13730,8 +14178,8 @@ function closeCookTimerNotification(){
     });
   }).catch(function(){});
 }
-function showCookTimerDoneNotification(){
-  const label = state.cookTimerLabel || 'Kobu';
+function showCookTimerDoneNotification(lbl){
+  const label = lbl || state.cookTimerLabel || 'Kobu';
   closeCookTimerNotification();
   if(!('Notification' in window) || Notification.permission!=='granted' || !('serviceWorker' in navigator)) return;
   navigator.serviceWorker.ready.then(function(reg){
@@ -13743,65 +14191,878 @@ function showCookTimerDoneNotification(){
     }catch(e){}
   }).catch(function(){});
 }
-function cookTimerTick(){
-  const remaining = Math.max(0, Math.round((state.cookTimerEndTime - Date.now())/1000));
-  state.cookTimerSeconds = remaining;
-  updateCookTimerDisplay();
-  if(remaining<=0){
-    clearInterval(state.cookTimerHandle);
-    state.cookTimerHandle = null;
-    state.cookTimerEndTime = null;
-    setCookTimerIcon(false);
-    showToast('¡Timer terminado!');
-    if(navigator.vibrate) navigator.vibrate([200,100,200,100,400]);
-    showCookTimerDoneNotification();
-    clearCookTimerState();
-  }
+/* =========================================================
+   TIMERS DEL MODO COCINA
+   Cada paso puede tener su timer (cargado con el reloj en el editor de pasos).
+   Los timers siguen corriendo al cambiar de paso o de preparación; arriba
+   quedan como pastillas para volver. Se borran al salir del modo cocina.
+   ========================================================= */
+function cookStepKey(comp, step){ return (comp==null ? 's' : String(comp))+':'+step; }
+function cookCurKey(){ return cookStepKey(state.cookComponentKey, state.cookStep); }
+function cookRecipe(){ return DATA.recipes.find(function(x){ return x.id===state.cookRecipeId; }) || null; }
+function cookIsMulti(r){ r = r || cookRecipe(); return !!(r && r.components && r.components.length>1); }
+function cookCompName(comp){
+  const r = cookRecipe();
+  if(comp==='pre') return 'Horno';
+  if(comp==='final') return 'Montaje final';
+  if(r && r.components && comp!=null && r.components[comp]) return r.components[comp].name || ('Preparación '+(Number(comp)+1));
+  return '';
 }
+function cookTimerTitle(t){
+  if(t.comp==='pre') return 'Horno';
+  if(cookIsMulti()) return cookCompName(t.comp);
+  return 'Paso '+(t.step+1);
+}
+function cookTimerFmt(seconds){
+  const s = Math.max(0, seconds|0);
+  const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
+  return (h ? h+':' : '')+(m<10?'0':'')+m+':'+(sec<10?'0':'')+sec;
+}
+function cookTimerRemaining(t){
+  if(!t) return 0;
+  return t.running ? Math.max(0, Math.round((t.endTime - Date.now())/1000)) : Math.max(0, t.remaining|0);
+}
+function cookTimers(){ if(!state.cookTimers) state.cookTimers = {}; return state.cookTimers; }
+function cookStepsOf(comp){
+  const r = cookRecipe();
+  if(!r) return [];
+  if(r.components && r.components.length){
+    if(comp==='final') return (r.finalSteps||[]).filter(isMeaningfulStepEntry);
+    if(comp!=null && r.components[comp]) return (r.components[comp].steps||[]).filter(Boolean);
+    return [];
+  }
+  return (r.steps||[]).filter(Boolean);
+}
+function cookCurrentStepSecs(){
+  const raw = currentCookSteps()[state.cookStep] || '';
+  return isStepTitleText(raw) ? 0 : stepTimerSecs(raw);
+}
+function cookAudioUnlock(){
+  try{
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if(!AC) return null;
+    if(!state.cookAudio) state.cookAudio = new AC();
+    if(state.cookAudio.state==='suspended') state.cookAudio.resume();
+    return state.cookAudio;
+  }catch(e){ return null; }
+}
+// Sonidos del timer (generados por la app, sin archivos). Se elige en Ajustes (por celular).
+const TIMER_SOUNDS = [
+  { v:'bips', l:'Bips' },
+  { v:'campana', l:'Campanita' },
+  { v:'alarma', l:'Alarma' },
+  { v:'suave', l:'Suave' }
+];
+function timerSoundKind(){
+  let k = '';
+  try{ k = localStorage.getItem('kobuTimerSound') || ''; }catch(e){}
+  return TIMER_SOUNDS.some(function(x){ return x.v===k; }) ? k : 'bips';
+}
+function timerRepeatOn(){
+  try{ return localStorage.getItem('kobuTimerRepeat')==='1'; }catch(e){ return false; }
+}
+function timerSoundNotes(kind){
+  if(kind==='campana') return [0, 1.1, 2.2].map(function(o){ return [{ f:1320, o:o, d:1.0, type:'triangle', v:0.35 }, { f:660, o:o, d:1.0, type:'sine', v:0.25 }]; }).reduce(function(a,b){ return a.concat(b); }, []);
+  if(kind==='alarma'){ const out = []; for(let i=0;i<10;i++) out.push({ f: i%2 ? 760 : 1000, o:i*0.2, d:0.18, type:'square', v:0.18 }); return out; }
+  if(kind==='suave') return [523, 659, 784, 1047, 523, 659, 784, 1047].map(function(f, i){ return { f:f, o:i*0.22 + (i>3 ? 0.5 : 0), d:0.5, type:'sine', v:0.3 }; });
+  return [0, 0.3, 0.6, 1.3, 1.6, 1.9].map(function(o){ return { f:880, o:o, d:0.24, type:'sine', v:0.4 }; });
+}
+function cookBeep(kind){
+  const ctx = cookAudioUnlock();
+  if(!ctx) return;
+  try{
+    const t0 = ctx.currentTime + 0.05;
+    timerSoundNotes(kind || timerSoundKind()).forEach(function(n){
+      const osc = ctx.createOscillator(), g = ctx.createGain();
+      osc.type = n.type; osc.frequency.value = n.f;
+      g.gain.setValueAtTime(0.0001, t0+n.o);
+      g.gain.exponentialRampToValueAtTime(n.v, t0+n.o+0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0+n.o+n.d);
+      osc.connect(g); g.connect(ctx.destination);
+      osc.start(t0+n.o); osc.stop(t0+n.o+n.d+0.05);
+    });
+  }catch(e){}
+}
+// Repetir: como mucho 20 segundos (pedido del usuario).
+const COOK_SOUND_MAX_MS = 20000;
+function cookPlayTimerSound(){
+  stopCookSound();
+  cookBeep();
+  if(!timerRepeatOn()) return;
+  const hasta = Date.now() + COOK_SOUND_MAX_MS;
+  state.cookSoundLoop = setInterval(function(){
+    if(Date.now() + 3400 > hasta){ stopCookSound(); return; } // que la última vuelta también termine antes de los 20 s
+    cookBeep();
+  }, 3500);
+}
+function stopCookSound(){
+  if(state.cookSoundLoop){ clearInterval(state.cookSoundLoop); state.cookSoundLoop = null; }
+}
+function renderTimerSoundSetting(){
+  const wrap = document.getElementById('timerSoundChips');
+  if(!wrap) return;
+  const k = timerSoundKind();
+  wrap.innerHTML = TIMER_SOUNDS.map(function(x){
+    return '<button type="button" class="chip'+(x.v===k?' active':'')+'" onclick="setTimerSound(\''+x.v+'\')">'+x.l+'</button>';
+  }).join('');
+  const sw = document.getElementById('timerRepeatSwitch');
+  if(sw) sw.classList.toggle('on', timerRepeatOn());
+}
+function setTimerSound(v){
+  try{ localStorage.setItem('kobuTimerSound', v); }catch(e){}
+  renderTimerSoundSetting();
+  cookBeep(v);
+}
+function testTimerSound(){ cookBeep(timerSoundKind()); }
+function toggleTimerRepeat(){
+  try{ localStorage.setItem('kobuTimerRepeat', timerRepeatOn() ? '0' : '1'); }catch(e){}
+  renderTimerSoundSetting();
+}
+function cookTimerStart(key){
+  const t = cookTimers()[key];
+  if(!t) return;
+  if(t.done || t.remaining<=0){ t.remaining = t.total; t.done = false; }
+  t.running = true;
+  t.endTime = Date.now() + t.remaining*1000;
+  ensureNotifPermission();
+  cookAudioUnlock();
+  cookTimersEnsureTick();
+  cookTimersNotify();
+  renderCookTimerUI();
+}
+function cookTimerPause(key){
+  const t = cookTimers()[key];
+  if(!t || !t.running) return;
+  t.remaining = cookTimerRemaining(t);
+  t.running = false; t.endTime = null;
+  cookTimersEnsureTick();
+  cookTimersNotify();
+  renderCookTimerUI();
+}
+function cookTimerRemove(key){
+  delete cookTimers()[key];
+  if(state.cookAlertKey===key) hideCookAlert();
+  cookTimersEnsureTick();
+  cookTimersNotify();
+  renderCookTimerUI();
+}
+function cookTimerCreate(key, comp, step, secs){
+  const t = { key:key, comp:comp, step:step, total:secs, remaining:secs, running:false, endTime:null, done:false };
+  cookTimers()[key] = t;
+  return t;
+}
+function cookTimersEnsureTick(){
+  const anyRunning = Object.keys(cookTimers()).some(function(k){ return cookTimers()[k].running; });
+  if(anyRunning && !state.cookTimerHandle) state.cookTimerHandle = setInterval(cookTimersTick, 1000);
+  if(!anyRunning && state.cookTimerHandle){ clearInterval(state.cookTimerHandle); state.cookTimerHandle = null; }
+}
+function cookTimersTick(){
+  const all = cookTimers();
+  Object.keys(all).forEach(function(k){
+    const t = all[k];
+    if(t.running && cookTimerRemaining(t)<=0){
+      t.running = false; t.endTime = null; t.remaining = 0; t.done = true;
+      cookTimerFinished(t);
+    }
+  });
+  cookTimersEnsureTick();
+  renderCookTimerUI();
+}
+function cookTimerFinished(t){
+  cookPlayTimerSound();
+  if(navigator.vibrate) navigator.vibrate([200,100,200,100,400]);
+  const r = cookRecipe();
+  showCookTimerDoneNotification((r ? r.title : 'Kobu')+' — '+cookTimerTitle(t));
+  cookTimersNotify();
+  showCookAlert(t);
+}
+// Notificación "corriendo": muestra el timer que termina primero; sus botones actúan sobre ese.
+function cookTimersNotify(){
+  const all = cookTimers();
+  const running = Object.keys(all).map(function(k){ return all[k]; }).filter(function(t){ return t.running; })
+    .sort(function(a,b){ return a.endTime - b.endTime; });
+  const paused = Object.keys(all).map(function(k){ return all[k]; }).filter(function(t){ return !t.running && !t.done && t.remaining>0 && t.remaining<t.total; });
+  const t = running[0] || paused[0];
+  if(!t){ state.cookNotifKey = null; closeCookTimerNotification(); return; }
+  const r = cookRecipe();
+  state.cookNotifKey = t.key;
+  state.cookTimerLabel = (r ? r.title : 'Kobu')+' — '+cookTimerTitle(t);
+  state.cookTimerSeconds = cookTimerRemaining(t);
+  showCookTimerNotification(!!t.running);
+}
+function cookTimersReset(){
+  stopCookSound();
+  if(state.cookTimerHandle){ clearInterval(state.cookTimerHandle); state.cookTimerHandle = null; }
+  state.cookTimers = {};
+  state.cookNotifKey = null;
+  state.cookAlertKey = null;
+  state.cookLastKey = null;
+  closeCookTimerNotification();
+  const al = document.getElementById('cook-alert'); if(al) al.classList.remove('on');
+}
+// Compatibilidad: antes había un solo timer; ahora "cancelar" borra todos.
+function cancelCookTimer(){ cookTimersReset(); }
 function toggleCookTimer(e){
   if(e) e.stopPropagation();
-  if(state.cookTimerHandle){
-    clearInterval(state.cookTimerHandle);
-    state.cookTimerHandle = null;
-    state.cookTimerSeconds = Math.max(0, Math.round((state.cookTimerEndTime - Date.now())/1000));
-    state.cookTimerEndTime = null;
-    setCookTimerIcon(false);
-    saveCookTimerState();
-    showCookTimerNotification(false);
-    return;
+  const key = cookCurKey();
+  let t = cookTimers()[key];
+  if(!t){
+    const secs = cookCurrentStepSecs();
+    if(!secs) return;
+    t = cookTimerCreate(key, state.cookComponentKey, state.cookStep, secs);
   }
-  ensureNotifPermission();
-  setCookTimerIcon(true);
-  state.cookTimerEndTime = Date.now() + (state.cookTimerSeconds||0)*1000;
-  saveCookTimerState();
-  showCookTimerNotification(true);
-  cookTimerTick();
-  state.cookTimerHandle = setInterval(cookTimerTick, 1000);
+  if(t.running) cookTimerPause(key);
+  else cookTimerStart(key);
 }
 function stopCookTimer(e){
   if(e) e.stopPropagation();
-  cancelCookTimer();
-  showToast('Cronómetro detenido');
-}
-function cancelCookTimer(){
-  if(state.cookTimerHandle){ clearInterval(state.cookTimerHandle); state.cookTimerHandle = null; }
-  state.cookTimerEndTime = null;
-  state.cookTimerSeconds = 0;
-  clearCookTimerState();
-  closeCookTimerNotification();
-  const pill = document.getElementById('cook-timer-pill');
-  if(pill) pill.style.display = 'none';
+  const key = cookCurKey();
+  if(!cookTimers()[key]) return;
+  cookTimerRemove(key);
+  showToast('Timer detenido');
 }
 function handleCookTimerNotifAction(action){
-  if(action==='cook-pause' && state.cookTimerHandle){ toggleCookTimer(null); }
-  else if(action==='cook-resume' && !state.cookTimerHandle && state.cookTimerSeconds>0){ toggleCookTimer(null); }
-  else if(action==='cook-stop'){ stopCookTimer(null); }
+  const key = state.cookNotifKey;
+  const t = key ? cookTimers()[key] : null;
+  if(!t) return;
+  if(action==='cook-pause' && t.running) cookTimerPause(key);
+  else if(action==='cook-resume' && !t.running && !t.done) cookTimerStart(key);
+  else if(action==='cook-stop') cookTimerRemove(key);
+}
+function cookGoTo(comp, step){
+  state.cookComponentKey = comp;
+  state.cookStep = step;
+  renderCookStep();
+}
+function cookGoTimer(key){
+  stopCookSound();
+  const t = cookTimers()[key];
+  hideCookAlert();
+  if(!t) return;
+  if(t.comp==='pre'){
+    if(t.done) cookTimerRemove(key);
+    else showToast('Horno: '+(t.running ? 'faltan ' : 'en pausa en ')+cookTimerFmt(cookTimerRemaining(t)));
+    return;
+  }
+  cookGoTo(t.comp, t.step);
+}
+function cookNextPrepTarget(){
+  const r = cookRecipe();
+  if(!cookIsMulti(r)) return null;
+  const order = r.components.map(function(_, i){ return i; });
+  if((r.finalSteps||[]).filter(isMeaningfulStepEntry).length) order.push('final');
+  const cur = state.cookComponentKey;
+  const start = order.indexOf(cur);
+  const done = state.cookDone || {};
+  for(let n=1; n<order.length; n++){
+    const k = order[(start + n + order.length) % order.length];
+    if(k===cur || done[String(k)]) continue;
+    if(k==='final' && order.some(function(x){ return x!=='final' && x!==cur && !done[String(x)]; })) continue;
+    return k;
+  }
+  return null;
+}
+function cookNextPrep(e){
+  if(e) e.stopPropagation();
+  const k = cookNextPrepTarget();
+  if(k==null){ renderCookPicker(); return; }
+  chooseCookComponent(k);
+}
+function showCookAlert(t){
+  const el = document.getElementById('cook-alert');
+  if(!el) return;
+  state.cookAlertKey = t.key;
+  const isHere = t.comp!=='pre' && t.key===cookCurKey() && document.getElementById('cook-picker').style.display!=='flex';
+  const title = cookTimerTitle(t);
+  let sub = '';
+  if(t.comp==='pre') sub = 'El horno ya debería estar caliente.';
+  else {
+    const raw = cookStepsOf(t.comp)[t.step] || '';
+    sub = stripMdMarkers(stepPlain(raw));
+    if(sub.length>90) sub = sub.slice(0,88)+'…';
+  }
+  const goLbl = t.comp==='pre' ? 'Listo' : (isHere ? 'OK' : ('Ir a '+(cookIsMulti() ? title : ('paso '+(t.step+1)))));
+  el.innerHTML = '<div class="h"><span class="icon-slot" data-icon="stopwatch"></span>Terminó el timer'+(isHere ? '' : (': '+escapeHtml(title)))+'</div>'+
+    (sub ? '<p class="s">'+escapeHtml(sub)+'</p>' : '')+
+    '<div class="btns">'+
+      ((isHere || t.comp==='pre') ? '' : '<button type="button" class="later" onclick="hideCookAlert()">Después</button>')+
+      '<button type="button" class="go" onclick="cookGoTimer(\''+t.key+'\')">'+escapeHtml(goLbl)+'</button>'+
+    '</div>';
+  el.classList.add('on');
+  mountIcons();
+}
+function hideCookAlert(){
+  stopCookSound();
+  state.cookAlertKey = null;
+  const el = document.getElementById('cook-alert');
+  if(el) el.classList.remove('on');
+}
+function renderCookTimerUI(){
+  const pill = document.getElementById('cook-timer-pill');
+  if(!pill) return;
+  const inPicker = document.getElementById('cook-picker').style.display==='flex';
+  const curKey = cookCurKey();
+  const secs = inPicker ? 0 : cookCurrentStepSecs();
+  const t = cookTimers()[curKey];
+  if(secs && !inPicker){
+    pill.style.display = 'flex';
+    const rem = t ? cookTimerRemaining(t) : secs;
+    pill.classList.toggle('done', !!(t && t.done));
+    document.getElementById('cook-timer-val').textContent = (t && t.done) ? '¡Listo!' : cookTimerFmt(rem);
+    const ic = document.querySelector('#cook-timer-playbtn .icon-slot');
+    if(ic) ic.innerHTML = (t && t.running) ? ICONS['player-pause'] : ICONS['player-play'];
+    document.getElementById('cook-timer-stopbtn').style.visibility = t ? 'visible' : 'hidden';
+  } else {
+    pill.style.display = 'none';
+  }
+  // "Seguir con la próxima preparación": con el timer de este paso corriendo y otra preparación por hacer
+  const np = document.getElementById('cook-nextprep-btn');
+  if(np){
+    const target = (!inPicker && t && t.running && state.cookComponentKey!=='final') ? cookNextPrepTarget() : null;
+    if(target!=null){
+      np.style.display = 'flex';
+      np.querySelector('.np-name').textContent = cookCompName(target);
+    } else np.style.display = 'none';
+  }
+  // Pastillas de arriba: todos los timers menos el del paso que se está viendo
+  const bar = document.getElementById('cook-timers');
+  if(!bar) return;
+  const all = cookTimers();
+  const list = Object.keys(all).map(function(k){ return all[k]; })
+    .filter(function(x){ return inPicker || x.key!==curKey; })
+    .filter(function(x){ return x.running || x.done || x.remaining<x.total; });
+  const sig = list.map(function(x){ return x.key+(x.running?'r':x.done?'d':'p'); }).join('|');
+  if(bar.getAttribute('data-sig')!==sig){
+    bar.setAttribute('data-sig', sig);
+    bar.innerHTML = list.map(function(x){
+      return '<button type="button" class="cook-tchip'+(x.done?' done':(x.running?'':' paused'))+'" data-key="'+x.key+'" onclick="cookGoTimer(\''+x.key+'\')">'+
+        '<span class="dot"></span><span class="icon-slot" data-icon="'+(x.comp==='pre'?'flame':'stopwatch')+'"></span>'+
+        '<span class="n">'+escapeHtml(cookTimerTitle(x))+'</span><span class="v"></span></button>';
+    }).join('');
+    mountIcons();
+  }
+  list.forEach(function(x){
+    const v = bar.querySelector('[data-key="'+x.key+'"] .v');
+    if(v) v.textContent = x.done ? '¡Listo!' : cookTimerFmt(cookTimerRemaining(x));
+  });
+}
+/* Precalentar el horno: aviso al arrancar si la receta tiene temperatura cargada */
+function cookPreheatInfo(r){
+  if(!r || !r.ovenSettings) return null;
+  const ids = (r.ovenIds||[]).filter(function(id){ return r.ovenSettings[id]; });
+  const id = ids[0] || Object.keys(r.ovenSettings).find(function(k){ return r.ovenSettings[k]; });
+  if(!id) return null;
+  const v = r.ovenSettings[id] || {};
+  const temp = parseFloat(v.temp);
+  if(!(temp>0)) return null;
+  const oven = (DATA.ovens||[]).find(function(o){ return o.id===id; });
+  return { temp:temp, mode:v.mode||'', oven: oven ? oven.name : '' };
+}
+function renderCookPreheat(){
+  const el = document.getElementById('cook-preheat');
+  if(!el) return;
+  const info = state.cookPreheatOff ? null : cookPreheatInfo(cookRecipe());
+  if(!info || cookTimers().pre){ el.style.display = 'none'; return; }
+  el.style.display = 'flex';
+  el.innerHTML = '<div class="row"><span class="icon-slot" data-icon="flame"></span>'+
+    '<div style="flex:1;min-width:0;"><p class="t">Precalentá el horno a '+escapeHtml(String(info.temp))+' °C</p>'+
+    '<p class="s">'+escapeHtml([info.oven, info.mode].filter(Boolean).join(' · '))+'</p></div>'+
+    '<button type="button" class="x" onclick="dismissCookPreheat(event)" aria-label="Cerrar"><span class="icon-slot" data-icon="x"></span></button></div>'+
+    '<div class="chips"><span class="s" style="align-self:center;">Timer:</span>'+[10,15,20].map(function(m){
+      return '<button type="button" onclick="startCookPreheat('+m+',event)">'+m+' min</button>';
+    }).join('')+'</div>';
+  mountIcons();
+}
+function dismissCookPreheat(e){ if(e) e.stopPropagation(); state.cookPreheatOff = true; renderCookPreheat(); }
+function startCookPreheat(min, e){
+  if(e) e.stopPropagation();
+  cookTimerCreate('pre', 'pre', 0, min*60);
+  cookTimerStart('pre');
+  state.cookPreheatOff = true;
+  renderCookPreheat();
+  showToast('Timer del horno: '+min+' min');
+}
+/* Manos libres: "siguiente", "atrás", "timer", "pausa", "calculadora" */
+function cookVoiceSupported(){ return !!(window.SpeechRecognition || window.webkitSpeechRecognition); }
+function cookVoiceNorm(s){ return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,''); }
+function cookVoiceCommand(txt){
+  const t = cookVoiceNorm(txt);
+  if(!document.getElementById('screen-cook').classList.contains('active')) return '';
+  if(/\bcalculadora\b/.test(t)){ openCookCalc(); return 'calculadora'; }
+  const inPicker = document.getElementById('cook-picker').style.display==='flex';
+  if(inPicker) return '';
+  if(/\b(siguiente|proximo|adelante|seguir|sigue)\b/.test(t)){ nextCookStep(); return 'siguiente'; }
+  if(/\b(atras|anterior|volver|volve)\b/.test(t)){ prevCookStep(); return 'atras'; }
+  const key = cookCurKey(), cur = cookTimers()[key];
+  if(/\b(pausa|pausar|pausalo|parar|para|frena|frenar|detener)\b/.test(t)){ if(cur && cur.running){ cookTimerPause(key); return 'pausa'; } return ''; }
+  if(/\b(timer|temporizador|empezar|empeza|arrancar|arranca|iniciar|reloj)\b/.test(t)){
+    if(cookCurrentStepSecs() && !(cur && cur.running)){ toggleCookTimer(null); return 'timer'; }
+    return '';
+  }
+  return '';
+}
+function updateCookVoiceBtn(){
+  const b = document.getElementById('cookVoiceBtn');
+  if(!b) return;
+  b.style.display = cookVoiceSupported() ? 'flex' : 'none';
+  b.classList.toggle('on', !!state.cookVoice);
+}
+function toggleCookVoice(e){
+  if(e) e.stopPropagation();
+  if(state.cookVoice) stopCookVoice(); else startCookVoice();
+}
+function startCookVoice(){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR){ showToast('Este celular no permite comandos de voz'); return; }
+  let rec;
+  try{ rec = new SR(); }catch(e){ showToast('No se pudo activar el micrófono'); return; }
+  rec.lang = 'es-AR'; rec.continuous = true; rec.interimResults = false; rec.maxAlternatives = 1;
+  const restarts = [];
+  rec.onresult = function(ev){
+    for(let i=ev.resultIndex; i<ev.results.length; i++){
+      if(!ev.results[i].isFinal) continue;
+      const said = ev.results[i][0] ? ev.results[i][0].transcript : '';
+      if(cookVoiceCommand(said)) break;
+    }
+  };
+  rec.onerror = function(ev){
+    const err = ev && ev.error;
+    if(err==='not-allowed' || err==='service-not-allowed'){ stopCookVoice(); showToast('Kobu no tiene permiso para usar el micrófono'); }
+    else if(err==='network'){ stopCookVoice(); showToast('Los comandos de voz necesitan internet'); }
+  };
+  rec.onend = function(){
+    if(state.cookVoice!==rec) return;
+    const now = Date.now();
+    restarts.push(now);
+    while(restarts.length && now-restarts[0]>15000) restarts.shift();
+    if(restarts.length>6){ stopCookVoice(); showToast('Se apagaron los comandos de voz'); return; }
+    try{ rec.start(); }catch(e){}
+  };
+  state.cookVoice = rec;
+  try{ rec.start(); }catch(e){}
+  updateCookVoiceBtn();
+  showToast('Decí "siguiente", "atrás", "timer" o "pausa"');
+}
+function stopCookVoice(){
+  const rec = state.cookVoice;
+  state.cookVoice = null;
+  if(rec){ try{ rec.onend = null; rec.stop(); }catch(e){} }
+  updateCookVoiceBtn();
+}
+/* Nota al terminar: queda en la receta con la fecha */
+function askCookNote(recipeId){
+  const r = DATA.recipes.find(function(x){ return x.id===recipeId; });
+  const m = document.getElementById('cookNoteModal');
+  if(!r || !m) return;
+  state.cookNoteRecipeId = recipeId;
+  document.getElementById('cn-text').value = '';
+  document.getElementById('cn-title').textContent = r.title || '';
+  m.classList.add('active');
+}
+function closeCookNoteModal(){
+  const m = document.getElementById('cookNoteModal');
+  if(m) m.classList.remove('active');
+  state.cookNoteRecipeId = null;
+}
+function saveCookNote(){
+  const txt = (document.getElementById('cn-text').value||'').trim().slice(0,500);
+  const r = DATA.recipes.find(function(x){ return x.id===state.cookNoteRecipeId; });
+  closeCookNoteModal();
+  if(!txt || !r) return;
+  r.cookNotes = Array.isArray(r.cookNotes) ? r.cookNotes : [];
+  r.cookNotes.unshift({ d: localDateStr(), t: txt });
+  if(r.cookNotes.length>50) r.cookNotes.length = 50;
+  saveData(DATA);
+  if(state.currentId===r.id) renderDetailCookNotes(r);
+  showToast('Nota guardada en la receta');
+}
+function cookNoteDateTxt(d){
+  const m = String(d||'').match(/^(\d{4})-(\d{2})-(\d{2})/);
+  return m ? (m[3]+'/'+m[2]+'/'+m[1].slice(2)) : '';
+}
+/* =========================================================
+   MERMAS: porciones listas que no se venden (regalo, degustación, se rompió, se venció, otro).
+   Bajan el stock listo; el costo se muestra en Reportes (no se suma a gastos: ya está en las compras).
+   ========================================================= */
+const MERMA_MOTIVOS = [
+  { v:'regalo', l:'Regalo' },
+  { v:'degustacion', l:'Degustación' },
+  { v:'rota', l:'Se rompió' },
+  { v:'vencida', l:'Se venció' },
+  { v:'otro', l:'Otro' }
+];
+function mermaMotivoLabel(v){ const m = MERMA_MOTIVOS.find(function(x){ return x.v===v; }); return m ? m.l : 'Sin motivo'; }
+function mermaCostUnit(r){
+  try{ const c = computeRecipeCost(r); return (c && c.costPerUnit!=null && isFinite(c.costPerUnit)) ? c.costPerUnit : 0; }catch(e){ return 0; }
+}
+function registrarMerma(recipeId, porciones, motivo, opts){
+  opts = opts || {};
+  const r = DATA.recipes.find(function(x){ return x.id===recipeId; });
+  const n = Math.round(Number(porciones)||0);
+  if(!r || n<1) return null;
+  if(!Array.isArray(DATA.mermas)) DATA.mermas = [];
+  const cu = mermaCostUnit(r);
+  const precio = Number(r.salePrice)||0;
+  const e = {
+    id: opts.id || ('mm-'+Date.now()+'-'+Math.floor(Math.random()*1e4)),
+    recipeId: r.id, recipeName: String(r.title||''), porciones: n,
+    motivo: MERMA_MOTIVOS.some(function(x){ return x.v===motivo; }) ? motivo : 'otro',
+    costo: Math.round(cu*n), precio: Math.round(precio*n),
+    ts: opts.ts || new Date().toISOString()
+  };
+  if(opts.origen) e.origen = opts.origen;
+  r.stock = Math.max(0, (Number(r.stock)||0) - n);
+  DATA.mermas.push(e);
+  if(DATA.mermas.length>2000) DATA.mermas.splice(0, DATA.mermas.length-2000);
+  return e;
+}
+function openMermaModal(id){
+  const r = DATA.recipes.find(function(x){ return x.id===id; });
+  if(!r) return;
+  state._merma = { id:id, motivo:'rota' };
+  document.getElementById('mm-name').textContent = r.title || '';
+  const st = Number(r.stock)||0;
+  document.getElementById('mm-stock').textContent = st>0 ? ('Hay '+st+' listas para vender') : 'No hay stock listo cargado (igual se anota)';
+  document.getElementById('mm-qty').value = 1;
+  mermaRenderChips();
+  mermaRenderCost();
+  document.getElementById('mermaModal').classList.add('active');
+}
+function closeMermaModal(){ document.getElementById('mermaModal').classList.remove('active'); state._merma = null; }
+function mermaRenderChips(){
+  const cur = state._merma ? state._merma.motivo : '';
+  document.getElementById('mm-chips').innerHTML = MERMA_MOTIVOS.map(function(m){
+    return '<button type="button" class="chip'+(m.v===cur?' active':'')+'" onclick="mermaSetMotivo(\''+m.v+'\')">'+m.l+'</button>';
+  }).join('');
+}
+function mermaSetMotivo(v){ if(state._merma){ state._merma.motivo = v; mermaRenderChips(); } }
+function mermaStep(d){
+  const el = document.getElementById('mm-qty');
+  el.value = Math.max(1, Math.min(500, (parseInt(el.value,10)||0) + d));
+  mermaRenderCost();
+}
+function mermaRenderCost(){
+  const r = state._merma ? DATA.recipes.find(function(x){ return x.id===state._merma.id; }) : null;
+  const n = Math.max(0, parseInt(document.getElementById('mm-qty').value,10)||0);
+  const el = document.getElementById('mm-cost');
+  if(!r){ el.textContent = ''; return; }
+  const cu = mermaCostUnit(r);
+  el.innerHTML = cu>0 ? ('Costo perdido: <b>'+escapeHtml(fmtMoney(Math.round(cu*n)))+'</b>') : 'Sin costo calculado para esta receta';
+}
+function saveMerma(){
+  if(!state._merma) return;
+  const id = state._merma.id, motivo = state._merma.motivo;
+  const n = parseInt(document.getElementById('mm-qty').value,10);
+  if(!(n>=1 && n<=500)){ showToast('Cantidad: de 1 a 500'); return; }
+  const e = registrarMerma(id, n, motivo);
+  if(!e) return;
+  saveData(DATA);
+  closeMermaModal();
+  if(state.currentId===id){ try{ openDetailRender(id); }catch(err){} }
+  showToast('Merma anotada: '+n+' '+e.recipeName+(e.costo ? (' · costo '+fmtMoney(e.costo)) : ''));
+}
+function mermasEnRango(range){
+  return (DATA.mermas||[]).filter(function(m){
+    if(!m || !m.ts) return false;
+    if(!range) return true;
+    const d = new Date(m.ts);
+    return d >= range.start && d <= range.end;
+  });
+}
+function renderMermasCard(range){
+  const wrap = document.getElementById('rep-mermas');
+  const inl = document.getElementById('rep-mermas-inline');
+  if(!wrap) return;
+  const list = mermasEnRango(range);
+  const total = list.reduce(function(a,m){ return a+(Number(m.porciones)||0); }, 0);
+  const costo = list.reduce(function(a,m){ return a+(Number(m.costo)||0); }, 0);
+  const precio = list.reduce(function(a,m){ return a+(Number(m.precio)||0); }, 0);
+  if(inl) inl.textContent = total ? (total+' · '+fmtMoney(costo)) : '';
+  if(!list.length){ wrap.innerHTML = '<p style="font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:4px 0 0;">Sin mermas en este período.</p>'; return; }
+  const porMotivo = {}, porProd = {};
+  list.forEach(function(m){
+    const k = m.motivo || 'otro';
+    porMotivo[k] = porMotivo[k] || { n:0, c:0 }; porMotivo[k].n += m.porciones; porMotivo[k].c += (m.costo||0);
+    const pk = m.recipeName || 'Producto';
+    porProd[pk] = porProd[pk] || { n:0, c:0 }; porProd[pk].n += m.porciones; porProd[pk].c += (m.costo||0);
+  });
+  const fila = function(a, b){ return '<div class="rep-mm-row"><span>'+a+'</span><span>'+b+'</span></div>'; };
+  let html = fila('<b>'+total+' porciones</b>', 'Costo '+escapeHtml(fmtMoney(costo)));
+  if(precio>0) html += fila('Si las vendías', escapeHtml(fmtMoney(precio)));
+  html += '<p class="rep-mm-sub">Por motivo</p>' + MERMA_MOTIVOS.filter(function(m){ return porMotivo[m.v]; }).map(function(m){
+    return fila(escapeHtml(m.l), porMotivo[m.v].n+' · '+escapeHtml(fmtMoney(porMotivo[m.v].c)));
+  }).join('');
+  html += '<p class="rep-mm-sub">Por producto</p>' + Object.keys(porProd).sort(function(a,b){ return porProd[b].c-porProd[a].c || porProd[b].n-porProd[a].n; }).slice(0,8).map(function(k){
+    return fila(escapeHtml(k), porProd[k].n+' · '+escapeHtml(fmtMoney(porProd[k].c)));
+  }).join('');
+  html += '<p style="font-size:calc(10px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:8px 0 0;">El costo no se suma a Gastos (ya está en las compras): es lo que se perdió.</p>';
+  wrap.innerHTML = html;
+}
+function renderDetailCookNotes(r){
+  const el = document.getElementById('d-cooknotes');
+  if(!el) return;
+  const list = (r && Array.isArray(r.cookNotes)) ? r.cookNotes : [];
+  if(!list.length){ el.innerHTML = ''; return; }
+  el.innerHTML = '<p class="cooknotes-title">De las horneadas</p>'+list.map(function(n, i){
+    return '<div class="cooknote"><span class="d">'+escapeHtml(cookNoteDateTxt(n.d))+'</span><span class="t">'+escapeHtml(n.t||'')+'</span>'+
+      '<button type="button" class="iconbtn" onclick="removeCookNote(\''+r.id+'\','+i+')" aria-label="Borrar nota"><span class="icon-slot" data-icon="x"></span></button></div>';
+  }).join('');
+  mountIcons();
+}
+function removeCookNote(recipeId, i){
+  const r = DATA.recipes.find(function(x){ return x.id===recipeId; });
+  if(!r || !Array.isArray(r.cookNotes) || !r.cookNotes[i]) return;
+  const removed = r.cookNotes.splice(i,1)[0];
+  saveData(DATA);
+  renderDetailCookNotes(r);
+  showUndoToast('Nota borrada', function(){
+    r.cookNotes.splice(i,0,removed);
+    saveData(DATA);
+    renderDetailCookNotes(r);
+  });
+}
+/* =========================================================
+   CALCULADORA DEL MODO COCINA (con bowl)
+   El historial vive solo en memoria y se borra al salir o terminar.
+   ========================================================= */
+// "Atrás" del celular con un popup abierto: lo cierra (con su propio botón de cerrar/cancelar) en vez de cambiar de pantalla.
+function kobuCloseTopPopup(){
+  const open = Array.from(document.querySelectorAll('.modal-overlay.active')).filter(function(m){
+    return m.id!=='shopCelebrateOverlay' && getComputedStyle(m).display!=='none';
+  });
+  if(!open.length) return false;
+  let top = open[0], topZ = -Infinity;
+  open.forEach(function(m){ const z = parseInt(getComputedStyle(m).zIndex,10)||0; if(z>=topZ){ topZ = z; top = m; } });
+  if(top.id==='confirmModal'){ closeConfirmModal(false); return true; }
+  const closeBtn = Array.from(top.querySelectorAll('[onclick]')).find(function(el){
+    return /^\s*close[A-Z]\w*\((false|null)?\)\s*;?\s*$/.test(el.getAttribute('onclick')||'');
+  });
+  if(closeBtn) closeBtn.click();
+  else {
+    const btn = Array.from(top.querySelectorAll('button')).find(function(b){ return /^(cancelar|cerrar|saltar|volver)$/i.test((b.textContent||'').trim()); });
+    if(btn) btn.click();
+  }
+  if(top.classList.contains('active')) top.classList.remove('active');
+  return true;
+}
+function kobuNumTxt(n, dec){
+  if(n==null || !isFinite(n)) return '';
+  const f = Math.pow(10, dec==null ? 2 : dec);
+  return String(Math.round(n*f)/f).replace('.', ',');
+}
+function bowlInfoLabel(u, withMaterial){
+  const parts = [];
+  if(withMaterial && u.material) parts.push(u.material);
+  if(u.bowlDiam) parts.push('Ø '+kobuNumTxt(u.bowlDiam,1)+' cm');
+  if(u.bowlAlto) parts.push('alto '+kobuNumTxt(u.bowlAlto,1)+' cm');
+  if(u.bowlCap) parts.push(kobuNumTxt(u.bowlCap,0)+' ml');
+  if(withMaterial) parts.push(u.bowlPeso ? (kobuNumTxt(u.bowlPeso,1)+' g') : 'sin peso');
+  return parts.join(' · ');
+}
+const CC_OPS = '+-*/';
+function ccNew(){ return { expr:'', sub:'', unit:'', done:false, mode:'keys', back:'keys', hist:[], mezcla:null, div:null }; }
+function ccState(){ if(!state.cookCalc) state.cookCalc = ccNew(); return state.cookCalc; }
+function ccResetSession(){
+  state.cookCalc = null;
+  const el = document.getElementById('cookCalc');
+  if(el) el.classList.remove('on');
+}
+function ccIsOpen(){ const el = document.getElementById('cookCalc'); return !!el && el.classList.contains('on'); }
+function openCookCalc(e){
+  if(e) e.stopPropagation();
+  const s = ccState();
+  if(s.mode==='hist' || s.mode==='bowls') s.mode = 'keys';
+  document.getElementById('cookCalc').classList.add('on');
+  renderCookCalc();
+}
+function closeCookCalc(){ const el = document.getElementById('cookCalc'); if(el) el.classList.remove('on'); }
+function ccTokens(expr){
+  const out = [];
+  const re = /(\d+\.?\d*|\.\d+)|([+\-*\/])/g;
+  let m, pos = 0;
+  while((m = re.exec(expr))){
+    if(m.index!==pos) return null;
+    pos = re.lastIndex;
+    out.push(m[1]!=null ? parseFloat(m[1]) : m[2]);
+  }
+  return pos===expr.length ? out : null;
+}
+function ccEval(expr){
+  let t = ccTokens(String(expr||''));
+  if(!t || !t.length) return NaN;
+  if(typeof t[t.length-1]==='string') t = t.slice(0,-1);
+  if(t[0]==='-' && typeof t[1]==='number') t = [-t[1]].concat(t.slice(2));
+  if(!t.length || typeof t[0]!=='number') return NaN;
+  const nums = [t[0]], ops = [];
+  for(let i=1;i<t.length;i+=2){
+    const op = t[i], n = t[i+1];
+    if(typeof op!=='string' || typeof n!=='number') return NaN;
+    if(op==='*') nums[nums.length-1] *= n;
+    else if(op==='/'){ if(n===0) return NaN; nums[nums.length-1] /= n; }
+    else { ops.push(op); nums.push(n); }
+  }
+  let r = nums[0];
+  ops.forEach(function(op, i){ r = op==='+' ? r+nums[i+1] : r-nums[i+1]; });
+  return isFinite(r) ? r : NaN;
+}
+function ccPretty(expr){
+  return String(expr||'').replace(/\./g, ',').replace(/([0-9,])([+\-*\/])/g, '$1 $2 ').replace(/\*/g,'×').replace(/\//g,'÷').replace(/-/g,'−').trim();
+}
+function ccNum(v, dec){ const f = Math.pow(10, dec==null ? 6 : dec); return String(Math.round(v*f)/f); }
+function ccPush(text, v, note){
+  const s = ccState();
+  s.hist.unshift({ t:text, r:v, n:note||'' });
+  if(s.hist.length>60) s.hist.length = 60;
+}
+function ccHasOp(expr){ return /[+\-*\/]/.test(String(expr||'').replace(/^-/,'')); }
+function ccKey(k){
+  const s = ccState();
+  s.unit = '';
+  if(k==='C'){ s.expr=''; s.sub=''; s.done=false; s.div=null; }
+  else if(k==='back'){
+    if(s.done){ s.expr=''; s.sub=''; s.done=false; }
+    else s.expr = s.expr.slice(0,-1);
+  }
+  else if(k==='='){ ccEquals(); return; }
+  else if(CC_OPS.indexOf(k)!==-1){
+    if(s.expr && CC_OPS.indexOf(s.expr.slice(-1))!==-1) s.expr = s.expr.slice(0,-1);
+    if((!s.expr && k!=='-') || s.expr.length>=60){ renderCookCalc(); return; }
+    s.expr += k; s.done = false; s.sub = '';
+  }
+  else {
+    if(s.done){ s.expr=''; s.sub=''; s.done=false; }
+    const cur = s.expr.match(/[\d.]*$/)[0];
+    if(s.expr.length>=60 || cur.replace('.','').length>=10){ renderCookCalc(); return; }
+    if(k==='.'){
+      if(cur.indexOf('.')!==-1){ renderCookCalc(); return; }
+      s.expr += (cur==='' ? '0.' : '.');
+    } else {
+      if(cur==='0') s.expr = s.expr.slice(0,-1);
+      s.expr += k;
+    }
+  }
+  renderCookCalc();
+}
+function ccEquals(){
+  const s = ccState();
+  let e = s.expr;
+  if(e && CC_OPS.indexOf(e.slice(-1))!==-1) e = e.slice(0,-1);
+  if(!ccHasOp(e)){ renderCookCalc(); return; }
+  const v = ccEval(e);
+  if(!isFinite(v)){ showToast(/\/0*\.?0*$|\/0*\.?0*[+\-*\/]/.test(e) ? 'No se puede dividir por 0' : 'Revisá la cuenta'); return; }
+  ccPush(ccPretty(e), v, '');
+  s.sub = ccPretty(e)+' =';
+  s.expr = ccNum(v); s.done = true;
+  renderCookCalc();
+}
+function ccToggleHist(){
+  const s = ccState();
+  if(s.mode==='hist'){ s.mode = s.back || 'keys'; }
+  else { s.back = (s.mode==='div') ? 'div' : 'keys'; s.mode = 'hist'; }
+  renderCookCalc();
+}
+function ccUseHist(i){
+  const s = ccState();
+  const h = s.hist[i];
+  if(!h) return;
+  s.expr = ccNum(h.r); s.sub = h.t+' ='; s.done = true; s.unit = h.n ? 'g' : '';
+  s.mode = 'keys';
+  renderCookCalc();
+}
+function ccMode(m){ const s = ccState(); s.mode = m; renderCookCalc(); }
+function ccOpenBowls(){ ccMode('bowls'); }
+function ccPickBowl(id){
+  const s = ccState();
+  const b = DATA.utensils.find(function(x){ return x.id===id; });
+  const peso = b ? (Number(b.bowlPeso)||0) : 0;
+  if(!b || !(peso>0)) return;
+  const total = ccEval(s.expr);
+  if(!isFinite(total) || total<=0){ showToast('Primero escribí cuánto pesa todo (con el bowl)'); s.mode='keys'; renderCookCalc(); return; }
+  const mezcla = total - peso;
+  if(!(mezcla>0)){ showToast('Ese peso es menor que el del bowl'); return; }
+  ccPush(kobuNumTxt(total)+' − '+kobuNumTxt(peso)+' ('+b.nombre+')', mezcla, 'g de mezcla');
+  s.mezcla = mezcla; s.div = null;
+  s.expr = ccNum(mezcla); s.done = true; s.unit = 'g';
+  s.sub = 'Mezcla sin el bowl: '+kobuNumTxt(total)+' − '+kobuNumTxt(peso);
+  s.mode = 'div';
+  renderCookCalc();
+}
+function ccDivide(n){
+  const s = ccState();
+  if(s.mezcla==null || !(n>0)) return;
+  const per = s.mezcla/n;
+  ccPush(kobuNumTxt(s.mezcla)+' ÷ '+n+' moldes', per, 'g por molde');
+  s.div = n;
+  s.expr = ccNum(per, 1); s.done = true; s.unit = 'g';
+  s.sub = kobuNumTxt(s.mezcla)+' g ÷ '+n+' moldes · en cada molde';
+  renderCookCalc();
+}
+function ccDivideOtro(){
+  const s = ccState();
+  if(s.mezcla==null) return;
+  s.expr = ccNum(s.mezcla)+'/'; s.done = false; s.unit = ''; s.div = null;
+  s.sub = 'Escribí la cantidad de moldes y tocá =';
+  s.mode = 'keys';
+  renderCookCalc();
+}
+function renderCookCalc(){
+  const s = ccState();
+  const subEl = document.getElementById('ccSub');
+  const valEl = document.getElementById('ccVal');
+  const body = document.getElementById('ccBody');
+  if(!subEl || !valEl || !body) return;
+  let sub = s.sub;
+  if(!s.done && ccHasOp(s.expr)){
+    const v = ccEval(s.expr);
+    if(isFinite(v)) sub = '= '+kobuNumTxt(v);
+  }
+  subEl.textContent = sub || '';
+  valEl.innerHTML = escapeHtml(s.done ? kobuNumTxt(parseFloat(s.expr), s.unit ? 1 : 6) : (ccPretty(s.expr) || '0')) + (s.unit ? '<small>'+escapeHtml(s.unit)+'</small>' : '');
+  document.getElementById('ccHistBtn').classList.toggle('on', s.mode==='hist');
+  let html = '';
+  if(s.mode==='hist'){
+    html += '<p class="cc-label">Historial de esta horneada</p>';
+    html += s.hist.length ? ('<div class="cc-list">'+s.hist.map(function(h, i){
+      return '<button type="button" class="cc-item" onclick="ccUseHist('+i+')"><span class="nm"><b>'+escapeHtml(h.t)+'</b>'+(h.n?'<span>'+escapeHtml(h.n)+'</span>':'')+'</span><span class="w">= '+escapeHtml(kobuNumTxt(h.r, h.n ? 1 : 6))+'</span></button>';
+    }).join('')+'</div>') : '<p class="cc-note">Todavía no hiciste ninguna cuenta.</p>';
+    html += '<button type="button" class="cc-back" onclick="ccToggleHist()">Volver</button>';
+  } else if(s.mode==='bowls'){
+    const bowls = utensilsSorted('bowl');
+    html += '<p class="cc-label">¿En qué bowl está la mezcla? Se le resta su peso al número de la pantalla.</p>';
+    html += bowls.length ? ('<div class="cc-list">'+bowls.map(function(b){
+      const ok = Number(b.bowlPeso)>0;
+      const info = bowlInfoLabel(b, false);
+      return '<button type="button" class="cc-item" '+(ok?'':'disabled ')+'onclick="ccPickBowl(\''+b.id+'\')"><span class="icon-slot" data-icon="'+escapeHtml(b.icon||'bowl')+'"></span><span class="nm"><b>'+escapeHtml(b.nombre)+'</b>'+(info?'<span>'+escapeHtml(info)+'</span>':'')+'</span><span class="w">'+(ok ? ('− '+escapeHtml(kobuNumTxt(b.bowlPeso,1))+' g') : 'sin peso')+'</span></button>';
+    }).join('')+'</div>') : '<p class="cc-note">Todavía no cargaste bowls. Cargalos en Ajustes → Utensilios → Bowls.</p>';
+    html += '<button type="button" class="cc-back" onclick="ccMode(\'keys\')">Volver a la calculadora</button>';
+  } else if(s.mode==='div'){
+    html += '<p class="cc-label">¿En cuántos moldes la repartís?</p>';
+    html += '<div class="cc-divs">'+[2,3,4,6].map(function(n){
+      return '<button type="button" class="'+(s.div===n?'on':'')+'" onclick="ccDivide('+n+')">÷'+n+'</button>';
+    }).join('')+'<button type="button" class="otro" onclick="ccDivideOtro()">Otro</button></div>';
+    html += '<button type="button" class="cc-back" onclick="ccMode(\'keys\')">Volver a la calculadora</button>';
+  } else {
+    const k = function(label, key, cls){ return '<button type="button"'+(cls?' class="'+cls+'"':'')+' onclick="ccKey(\''+key+'\')">'+label+'</button>'; };
+    html += '<div class="cc-keys">'+
+      k('C','C','fn')+k('<span class="icon-slot" data-icon="backspace"></span>','back','fn')+k('÷','/','op')+k('×','*','op')+
+      k('7','7')+k('8','8')+k('9','9')+k('−','-','op')+
+      k('4','4')+k('5','5')+k('6','6')+k('+','+','op')+
+      k('1','1')+k('2','2')+k('3','3')+k('=','=','eq')+
+      k('0','0','zero')+k(',','.')+
+      '</div>';
+    html += '<button type="button" class="cc-bowlbtn" onclick="ccOpenBowls()"><span class="icon-slot" data-icon="bowl"></span>Bowl</button>';
+  }
+  body.innerHTML = html;
+  mountIcons();
 }
 function exitCook(){
   playBackArrowAnim('cookExitBtn');
+  ccResetSession();
+  stopCookVoice();
   cancelCookTimer();
   if(state.wakeLock){ state.wakeLock.release().catch(function(){}); state.wakeLock = null; }
   state.cookComponentKey = null;
+  if(state.cookRecipeId) state.currentId = state.cookRecipeId;
   state.stack = ['home','detail'];
   render();
   openDetailRender(state.cookRecipeId);
@@ -13845,8 +15106,12 @@ window.addEventListener('popstate', function(){
   // el próximo toque de atrás no tiene qué interceptar y cierra la app de golpe.
   let shouldRearm = true;
   try{
+    if(kobuCloseTopPopup()) return;
     const cur = state.stack[state.stack.length-1];
     if(cur==='cook'){
+      if(ccIsOpen()){ closeCookCalc(); return; }
+      const cal = document.getElementById('cook-alert');
+      if(cal && cal.classList.contains('on')){ hideCookAlert(); return; }
       const pickerEl = document.getElementById('cook-picker');
       const inPicker = !!pickerEl && pickerEl.style.display === 'flex';
       if(!inPicker && state.cookStep>0){ prevCookStep(); }

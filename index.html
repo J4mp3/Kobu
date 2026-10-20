@@ -702,6 +702,25 @@
   .rep-mm-row span:last-child{ color:var(--k-muted); white-space:nowrap; }
   .rep-mm-sub{ margin:10px 0 2px; font-size:calc(10.5px + var(--kobu-font-boost, 0px)); font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--k-muted); }
   .snd-chips{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+  #screen-detail.is-combo .no-combo{ display:none !important; }
+  #screen-detail.is-combo .d-diet-float, #screen-detail.is-combo #d-dietBanner{ display:none !important; }
+  .combo-row{ display:flex; align-items:center; gap:8px; }
+  .combo-row select{ flex:1; min-width:0; }
+  .combo-row .cq{ display:flex; align-items:center; gap:4px; flex-shrink:0; }
+  .combo-row .cq input{ width:46px; text-align:center; padding:8px 4px; }
+  .combo-sum{ background:var(--k-card2); border-radius:10px; padding:9px 11px; display:flex; flex-direction:column; gap:3px; font-size:calc(11.5px + var(--kobu-font-boost, 0px)); color:var(--k-text); }
+  .combo-sum div{ display:flex; justify-content:space-between; gap:8px; }
+  .combo-sum div span:first-child{ color:var(--k-muted); }
+  .combo-item{ display:flex; justify-content:space-between; align-items:center; gap:8px; padding:7px 0; border-top:1px dashed var(--k-border); font-size:calc(12.5px + var(--kobu-font-boost, 0px)); }
+  .combo-item:first-child{ border-top:none; }
+  .combo-item .st{ font-size:calc(11px + var(--kobu-font-boost, 0px)); color:var(--k-muted); white-space:nowrap; }
+  .combo-item .st.low{ color:var(--k-danger); font-weight:600; }
+  .combo-tag{ display:inline-flex; align-items:center; gap:3px; padding:1px 7px; border-radius:999px; background:var(--k-card2); color:var(--k-accent); font-size:calc(10px + var(--kobu-font-boost, 0px)); font-weight:700; vertical-align:2px; margin-left:4px; }
+  .prov-row{ display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:calc(12px + var(--kobu-font-boost, 0px)); padding:5px 0; border-top:1px dashed var(--k-border); }
+  .prov-row:first-child{ border-top:none; }
+  .prov-row .pv{ font-weight:600; white-space:nowrap; }
+  .prov-best{ display:inline-block; margin-left:5px; padding:0 6px; border-radius:999px; background:var(--k-success-bg); color:var(--k-success); font-size:calc(9.5px + var(--kobu-font-boost, 0px)); font-weight:700; }
+  .homeaction-row{ flex-wrap:wrap; }
   .cook-top{ gap:8px; min-height:40px; }
   .cook-timers{ flex:1; min-width:0; display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; position:relative; z-index:5; padding:2px 0; }
   .cook-timers::-webkit-scrollbar{ display:none; }
@@ -1191,6 +1210,7 @@
       </div>
       <div class="field" id="se-price-row"><label>Precio del envase ($)</label><input class="input" id="se-price" type="text" inputmode="decimal" placeholder="800 (o '-' si no lo sabés)"><p id="se-price-trend" style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));margin:4px 0 0;display:none;"></p></div>
       <div class="field" id="se-provider-row"><label>Proveedor</label><input class="input" id="se-provider" placeholder="ej. Distribuidora Sur"></div>
+      <div class="field" id="se-prov-wrap" style="display:none;"><label>Precio del envase por proveedor</label><div id="se-prov-list"></div></div>
       <div class="btn-row" id="se-delete-row" style="display:none;">
         <button class="btn btn-ghost" style="flex:1;color:var(--k-danger);" onclick="deleteStockEntry()"><span class="icon-slot" data-icon="trash" style="vertical-align:-2px;"></span> Eliminar</button>
       </div>
@@ -1299,6 +1319,31 @@
   </div>
 
   <!-- UTENSIL EDIT MODAL -->
+  <div class="modal-overlay" id="comboModal">
+    <div class="modal-box" style="padding:0;gap:0;">
+      <div class="oe-headtint">
+        <p class="modal-msg" id="comboModalTitle" style="font-weight:600;margin:0;">Nueva caja / combo</p>
+      </div>
+      <div class="oe-headbody">
+        <div class="field"><label>Nombre</label><input class="input" id="cb-name" placeholder="ej. Caja regalo dulce" maxlength="60"></div>
+        <div class="field"><label>Qué lleva</label><div id="cb-items" style="display:flex;flex-direction:column;gap:6px;"></div></div>
+        <button type="button" class="ut-add-row" onclick="comboAddRow()"><span class="icon-slot" data-icon="plus"></span>Agregar producto</button>
+        <div class="btn-row">
+          <div class="field" style="flex:1;"><label>Packaging ($)</label><input class="input" id="cb-extra" type="number" min="0" step="1" inputmode="decimal" placeholder="caja, moño…" oninput="comboRenderSum()"></div>
+          <div class="field" style="flex:1;"><label>Precio de la caja ($)</label><input class="input" id="cb-price" type="number" min="0" step="1" inputmode="decimal" oninput="comboRenderSum()"></div>
+        </div>
+        <div class="combo-sum" id="cb-sum"></div>
+        <div class="rowline" style="padding:2px 0;">
+          <span class="l">Lista para vender</span>
+          <div class="switch on" id="cb-ready" onclick="this.classList.toggle('on')"><div class="knob-sw"></div></div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-ghost" onclick="closeComboModal()">Cancelar</button>
+          <button class="btn btn-primary" onclick="saveCombo()">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="modal-overlay" id="mermaModal">
     <div class="modal-box">
       <p class="modal-msg" style="font-weight:600;margin:0;">Anotar merma</p>
@@ -1832,6 +1877,7 @@
     <div class="homeaction-row" id="recetasActionsRow" style="display:none;">
       <button class="homeaction-btn primary" onclick="openForm()"><span class="homeaction-icon"><span class="icon-slot" data-icon="plus"></span></span>Añadir receta</button>
       <button class="homeaction-btn ghost" onclick="openImportRecipeModal()"><span class="homeaction-icon"><span class="icon-slot" data-icon="download"></span></span>Importar receta</button>
+      <button class="homeaction-btn ghost" onclick="openComboModal()"><span class="homeaction-icon"><span class="icon-slot" data-icon="gift"></span></span>Caja / combo</button>
     </div>
     <div class="homeaction-row" id="prepActionsRow" style="display:none;">
       <button class="homeaction-btn primary" onclick="openLibraryPrepEditor()"><span class="homeaction-icon"><span class="icon-slot" data-icon="plus"></span></span>Añadir preparación</button>
@@ -2041,14 +2087,14 @@
     </div>
     <div class="grp-card">
       <div style="display:flex;gap:8px;">
-        <button class="cook-btn-sm" style="flex:1;" onclick="startCook(state.currentId)"><span class="icon-slot" data-icon="flame"></span> Cocinar</button>
-        <button class="cook-btn-sm ghost" style="flex:1;" onclick="openBakeModal(state.currentId)"><span class="icon-slot" data-icon="flame"></span> Hornear</button>
+        <button class="cook-btn-sm no-combo" style="flex:1;" onclick="startCook(state.currentId)"><span class="icon-slot" data-icon="flame"></span> Cocinar</button>
+        <button class="cook-btn-sm ghost no-combo" style="flex:1;" onclick="openBakeModal(state.currentId)"><span class="icon-slot" data-icon="flame"></span> Hornear</button>
         <button class="cook-btn-sm ghost" style="flex:1;" onclick="openMermaModal(state.currentId)"><span class="icon-slot" data-icon="trash"></span> Merma</button>
       </div>
       <div class="d-actions-bare">
         <button class="iconbtn" onclick="openChat()" aria-label="Preguntar a la IA" title="Preguntar a la IA"><span class="icon-slot" data-icon="message-circle"></span></button>
         <button class="iconbtn" onclick="openLabelExportModal(state.currentId)" aria-label="Exportar" title="Exportar"><span class="icon-slot" data-icon="tag"></span></button>
-        <button class="iconbtn" onclick="generateVariant(state.currentId)" aria-label="Generar variante" title="Generar variante"><span class="icon-slot" data-icon="copy"></span></button>
+        <button class="iconbtn no-combo" onclick="generateVariant(state.currentId)" aria-label="Generar variante" title="Generar variante"><span class="icon-slot" data-icon="copy"></span></button>
         <button class="iconbtn" onclick="exportRecipeAsText(state.currentId)" aria-label="Extraer texto" title="Extraer texto"><span class="icon-slot" data-icon="share"></span></button>
       </div>
     </div>
@@ -2087,7 +2133,18 @@
           </div>
         </div>
       </div>
-      <div class="d-acc-item">
+      <div class="d-acc-item open" id="d-combo-wrap" style="display:none;">
+        <div class="d-acc-head" onclick="toggleDetailAccordion(this)">
+          <span class="badge-ic"><span class="icon-slot" data-icon="gift"></span></span>
+          <span class="d-acc-title">Qué lleva</span>
+          <span class="icon-slot d-acc-chev" data-icon="chevron-down"></span>
+        </div>
+        <div class="d-acc-body">
+          <div id="d-combo-items"></div>
+          <div class="combo-sum" id="d-combo-sum" style="margin-top:8px;"></div>
+        </div>
+      </div>
+      <div class="d-acc-item no-combo">
         <div class="d-acc-head" onclick="toggleDetailAccordion(this)">
           <span class="badge-ic"><span class="icon-slot" data-icon="list"></span></span>
           <span class="d-acc-title">Ingredientes</span>
@@ -2116,7 +2173,7 @@
           <div id="d-supplies"></div>
         </div>
       </div>
-      <div class="d-acc-item">
+      <div class="d-acc-item no-combo">
         <div class="d-acc-head" onclick="toggleDetailAccordion(this)">
           <span class="badge-ic"><span class="icon-slot" data-icon="clipboard"></span></span>
           <span class="d-acc-title" id="d-steps-title">Pasos</span>
@@ -2137,7 +2194,7 @@
           <div class="steps-list" id="d-finalsteps"></div>
         </div>
       </div>
-      <div class="d-acc-item">
+      <div class="d-acc-item no-combo">
         <div class="d-acc-head" onclick="toggleDetailAccordion(this)">
           <span class="badge-ic"><span class="icon-slot" data-icon="flame"></span></span>
           <span class="d-acc-title">Parámetros de horno</span>
@@ -2150,7 +2207,7 @@
           <button class="btn btn-primary" id="d-saveOvenBtn" style="display:none;margin-top:10px;" onclick="saveOvenFromDetail()">Guardar parámetros</button>
         </div>
       </div>
-      <div class="d-acc-item">
+      <div class="d-acc-item no-combo">
         <div class="d-acc-head" onclick="toggleDetailAccordion(this)">
           <span class="badge-ic"><span class="icon-slot" data-icon="calculator"></span></span>
           <span class="d-acc-title">Costo de producción</span>
@@ -2511,6 +2568,16 @@
       </div>
       <div class="rep-acc-body" id="rep-acc-body-mermas">
         <div id="rep-mermas" style="display:flex;flex-direction:column;margin-top:6px;"></div>
+      </div>
+    </div>
+    <div class="grp-card" id="rep-acc-prov">
+      <div class="rep-acc-head" onclick="toggleRepAcc('prov')">
+        <p class="section-title" style="margin:0;"><span class="badge-ic"><span class="icon-slot" data-icon="cart"></span></span>Dónde conviene comprar</p>
+        <span id="rep-prov-inline" style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);white-space:nowrap;margin-left:auto;margin-right:6px;"></span>
+        <span class="icon-slot rep-acc-chevron" data-icon="chevron-right" id="rep-acc-chev-prov"></span>
+      </div>
+      <div class="rep-acc-body" id="rep-acc-body-prov">
+        <div id="rep-prov" style="display:flex;flex-direction:column;margin-top:6px;"></div>
       </div>
     </div>
     <div class="grp-card grp-card--action">
@@ -4197,7 +4264,7 @@ function renderRecipes(){
     const readyMark = r.readyToSell ? '<span class="ready-mark active"><span class="icon-slot" data-icon="check"></span></span>' : '<span class="ready-mark"></span>';
     const readyBtn = '<button type="button" class="iconbtn card-ready" onclick="event.stopPropagation();toggleReadyToSell(\''+r.id+'\')" title="lista para vender">'+readyMark+'</button>';
     const dragBtn = (unfiltered && r.favorite) ? '<button type="button" class="iconbtn card-drag" onclick="event.stopPropagation();" onpointerdown="event.stopPropagation();recipeDragStart(event,\''+r.id+'\')" title="mover"><span class="icon-slot" data-icon="grip"></span></button>' : '';
-    const stockBadge = '<span class="thumb-stock-badge" style="background:'+stockColor(r.stock||0)+';" title="stock: '+(r.stock||0)+'" onclick="event.stopPropagation();handleRecipeStockBadgeTap(\''+r.id+'\')">'+(r.stock||0)+'</span>';
+    const stockBadge = '<span class="thumb-stock-badge" style="background:'+stockColor(recipeStockOf(r))+';" title="stock: '+recipeStockOf(r)+'" onclick="event.stopPropagation();handleRecipeStockBadgeTap(\''+r.id+'\')">'+recipeStockOf(r)+'</span>';
     const dietTypes = recipeDisplayDietTypes(r);
     const dietIcons = dietTypes.map(function(t){
       return '<span class="diet-icon-badge" style="background:color-mix(in srgb, '+t.meta.color+' 18%, transparent);" title="'+escapeHtml(t.meta.label)+'"><span class="icon-slot" data-icon="'+t.meta.icon+'" style="color:'+t.meta.color+';"></span></span>';
@@ -5844,7 +5911,53 @@ function recipeComponentsOrFallback(r){
   return (r.components && r.components.length) ? r.components : [{ name:'', ingredients:r.ingredients||[], steps:r.steps||[] }];
 }
 function flatRecipeIngredients(r){
+  if(isCombo(r)){
+    // Caja: los ingredientes de lo que lleva, escalados a una caja (cada receta rinde yieldQty por tanda).
+    return comboItems(r).reduce(function(acc, ci){
+      const f = ci.qty / (parseFloat(ci.r.yieldQty)||1);
+      return acc.concat(recipeComponentsOrFallback(ci.r).reduce(function(a,c){ return a.concat(c.ingredients||[]); }, []).map(function(ing){
+        const q = parseFloat((ing.qty==null?'':ing.qty).toString().replace(',','.'));
+        return Object.assign({}, ing, { qty: isNaN(q) ? ing.qty : Math.round(q*f*10000)/10000 });
+      }));
+    }, []);
+  }
   return recipeComponentsOrFallback(r).reduce(function(acc,c){ return acc.concat(c.ingredients||[]); }, []);
+}
+/* =========================================================
+   CAJAS Y COMBOS: una "receta" con r.combo = [{recipeId, qty}] (+ r.comboExtra = costo de packaging).
+   No se hornea: su stock sale de lo que lleva y al venderla se descuenta de cada producto.
+   ========================================================= */
+function isCombo(r){ return !!(r && Array.isArray(r.combo) && r.combo.length); }
+function comboItems(r){
+  if(!isCombo(r)) return [];
+  return r.combo.map(function(c){
+    const cr = DATA.recipes.find(function(x){ return x.id===c.recipeId; });
+    const q = Math.round(Number(c.qty)||0);
+    return (cr && !isCombo(cr) && q>0) ? { r:cr, qty:q } : null;
+  }).filter(Boolean);
+}
+function recipeStockOf(r){
+  if(!r) return 0;
+  if(isCombo(r)){
+    const items = comboItems(r);
+    if(!items.length) return 0;
+    return Math.max(0, Math.min.apply(null, items.map(function(ci){ return Math.floor((Number(ci.r.stock)||0)/ci.qty); })));
+  }
+  return Number(r.stock)||0;
+}
+function addRecipeStock(r, delta){
+  if(!r || !delta) return;
+  if(isCombo(r)){
+    comboItems(r).forEach(function(ci){ ci.r.stock = roundQty(Math.max(0, (Number(ci.r.stock)||0) + delta*ci.qty)); });
+    return;
+  }
+  r.stock = roundQty(Math.max(0, (Number(r.stock)||0) + delta));
+}
+function comboSeparatePrice(r){
+  return comboItems(r).reduce(function(a, ci){ const pu = recipeSellsByPack(ci.r) ? (ci.r.packPrice/ci.r.packSize) : (Number(ci.r.salePrice)||0); return a + pu*ci.qty; }, 0);
+}
+function comboCost(r){
+  return comboItems(r).reduce(function(a, ci){ const c = computeRecipeCost(ci.r); return a + (c.costPerUnit||0)*ci.qty; }, 0) + (Number(r.comboExtra)||0);
 }
 function ingGramEquivalent(qtyStr, unit){
   const u = normalizeUnit(unit);
@@ -5977,7 +6090,7 @@ function resetScale(){
 function refreshScaledDetail(){
   const r = DATA.recipes.find(function(x){ return x.id===state.currentId; });
   if(!r) return;
-  document.getElementById('d-badges').innerHTML = buildBadgesHtml(r);
+  document.getElementById('d-badges').innerHTML = isCombo(r) ? '' : buildBadgesHtml(r);
   renderDetailIngredients(r);
   renderCostSection(r);
   updateMoldChipHighlight();
@@ -5991,7 +6104,9 @@ function openDetailRender(id){
   document.getElementById('d-hero').style.background = r.photo ? ('url('+r.photo+') center/cover') : placeholderBg(r.colorIdx);
   document.getElementById('d-hero').innerHTML = mediaIconHtml(r,'hero-icon');
   document.getElementById('d-title').textContent = r.title;
-  document.getElementById('d-badges').innerHTML = buildBadgesHtml(r);
+  document.getElementById('d-badges').innerHTML = isCombo(r) ? '' : buildBadgesHtml(r);
+  document.getElementById('screen-detail').classList.toggle('is-combo', isCombo(r));
+  renderDetailCombo(r);
   document.getElementById('d-tags').innerHTML = (r.tags||[]).map(function(t){ return '<span class="chip">'+escapeHtml(t)+'</span>'; }).join('');
   renderDietVariantRow(r);
   const parentEl = document.getElementById('d-parent');
@@ -6208,7 +6323,11 @@ function saveOvenFromDetail(){
   showToast('Parámetros guardados');
   renderDetailKnobs();
 }
-function editCurrent(){ openForm(state.currentId); }
+function editCurrent(){
+  const r = DATA.recipes.find(function(x){ return x.id===state.currentId; });
+  if(isCombo(r)){ openComboModal(r.id); return; }
+  openForm(state.currentId);
+}
 function deleteCurrent(){
   const r = DATA.recipes.find(function(x){ return x.id===state.currentId; });
   if(!r) return;
@@ -6773,6 +6892,10 @@ function computeEnergyCost(r){
 }
 function computeRecipeCost(r, scale){
   scale = (scale && scale>0) ? scale : 1;
+  if(isCombo(r)){
+    const t = comboCost(r)*scale;
+    return { groups:[], breakdown:[], total:t, costPerUnit: comboCost(r), yieldQty:scale, yieldUnit:'cajas', energyCost:0 };
+  }
   let total = 0;
   const groups = recipeComponentsOrFallback(r).map(function(comp){
     const breakdown = (comp.ingredients||[]).map(function(ing){
@@ -8026,7 +8149,7 @@ function updateBotResumen(){
         return { t:String(it.name||''), q:q.trim(), ok: !!(DATA.shopping.checked||{})[it.key] };
       });
     }
-    const recetas = (DATA.recipes||[]).filter(function(r){ return r && r.id && r.title; }).slice(0, 100).map(function(r){
+    const recetas = (DATA.recipes||[]).filter(function(r){ return r && r.id && r.title && !isCombo(r); }).slice(0, 100).map(function(r){
       let x = '';
       try{ x = buildRecipeExportText(r); }catch(e){}
       return { id:String(r.id), t:String(r.title).slice(0, 80), x:String(x).slice(0, 3800) };
@@ -8555,6 +8678,7 @@ function openIngredientCreateModal(){
   document.getElementById('se-unit').innerHTML = stockUnitOptionsHtml('ingrediente');
   seAlertLoad(null);
   document.getElementById('stockEditModalTitle').textContent = 'Nuevo ingrediente';
+  renderStockEditProviders(null);
   document.getElementById('se-delete-row').style.display = 'none';
   document.getElementById('se-price-trend').style.display = 'none';
   document.getElementById('se-stock-info').style.display = 'none';
@@ -8573,6 +8697,7 @@ function openSupplyCreateModal(){
   document.getElementById('se-unit').innerHTML = stockUnitOptionsHtml('insumo');
   seAlertLoad(null);
   document.getElementById('stockEditModalTitle').textContent = 'Nuevo insumo';
+  renderStockEditProviders(null);
   document.getElementById('se-delete-row').style.display = 'none';
   document.getElementById('se-price-trend').style.display = 'none';
   document.getElementById('se-stock-info').style.display = 'none';
@@ -8590,6 +8715,7 @@ function openSubproductCreateModal(){
   document.getElementById('se-yield-max').value = '';
   document.getElementById('se-unit').innerHTML = unitOptionsHtml('ml');
   document.getElementById('stockEditModalTitle').textContent = 'Nuevo subproducto';
+  renderStockEditProviders(null);
   document.getElementById('se-delete-row').style.display = 'none';
   document.getElementById('se-price-trend').style.display = 'none';
   document.getElementById('se-stock-info').style.display = 'none';
@@ -8637,6 +8763,7 @@ function openStockEditModal(id){
   }
   document.getElementById('stockEditModalTitle').textContent = stockEditType==='insumo' ? 'Editar insumo' : (stockEditType==='subproducto' ? 'Editar subproducto' : 'Editar ingrediente');
   if(stockEditType!=='subproducto') seAlertLoad(p);
+  renderStockEditProviders(stockEditType!=='subproducto' ? p : null);
   document.getElementById('se-delete-row').style.display = '';
   applyStockEditTypeVisibility();
   document.getElementById('stockEditModal').classList.add('active');
@@ -8715,6 +8842,7 @@ function saveStockEdit(){
   p.unit = unit;
   p.price = price;
   p.provider = provider;
+  if(provider && price!=null && (isNew || priceChanged || !providerPriceList(p).some(function(x){ return provKey(x.name)===provKey(provider); }))) recordProviderPrice(p, provider, price, todayStr());
   p.stockAlert = !!seAlert.on;
   p.minStock = seAlert.min>0 ? seAlert.min : 0;
   if(nameChanged) cascadeIngredientNameRename(p.id, name);
@@ -9446,11 +9574,11 @@ function adjustPortionStockForOrder(order, direction){
     const rawQty = parseFloat(it.qty)||0;
     const qty = recipeSellsByPack(r) ? rawQty*r.packSize : rawQty;
     if(direction<0){
-      it.shortfall = roundQty(Math.max(0, qty - (r.stock||0)));
+      it.shortfall = roundQty(Math.max(0, qty - recipeStockOf(r)));
     } else {
       it.shortfall = 0;
     }
-    r.stock = roundQty(Math.max(0, (r.stock||0) + direction*qty));
+    addRecipeStock(r, direction*qty);
   });
 }
 function orderHasShortfall(o){
@@ -9528,6 +9656,7 @@ let bakeModalRecipeId = null;
 function openBakeModal(id){
   const r = DATA.recipes.find(function(x){ return x.id===id; });
   if(!r) return;
+  if(isCombo(r)){ showToast('Las cajas no se hornean: horneá lo que llevan'); return; }
   bakeModalRecipeId = id;
   document.getElementById('bakeModalMsg').textContent = r.title;
   document.getElementById('bakeModalStockVal').textContent = r.stock||0;
@@ -9643,7 +9772,7 @@ function finishCookAndBake(e){
 function recipeStockShortfall(it){
   if(!it || !it.recipeId) return null;
   const r = DATA.recipes.find(function(x){ return x.id===it.recipeId; });
-  if(!r) return null;
+  if(!r || isCombo(r)) return null;
   const rawQty = parseFloat(it.qty)||0;
   const qty = recipeSellsByPack(r) ? rawQty*r.packSize : rawQty;
   const stock = r.stock||0;
@@ -10380,6 +10509,16 @@ function reconcileRecipeOrderShortfalls(recipeId){
         r.stock = roundQty(avail-cover);
         it.shortfall = roundQty(it.shortfall-cover);
       }
+    });
+  });
+  // Cajas que llevan esta receta y tenían faltante: se cubren con lo que alcance.
+  DATA.recipes.filter(function(c){ return isCombo(c) && c.combo.some(function(x){ return x.recipeId===recipeId; }); }).forEach(function(c){
+    DATA.orders.forEach(function(o){
+      (o.items||[]).forEach(function(it){
+        if(it.recipeId!==c.id || !(it.shortfall>0)) return;
+        const cover = Math.min(recipeStockOf(c), it.shortfall);
+        if(cover>0){ addRecipeStock(c, -cover); it.shortfall = roundQty(it.shortfall-cover); }
+      });
     });
   });
   saveData(DATA);
@@ -11558,6 +11697,7 @@ function renderReportsForRange(start, end, label){
   const rep = computeReportsRawForRange({start:start, end:end});
   applyReportsFigures(rep);
   renderMermasCard({start:start, end:end});
+  renderProvidersCard({start:start, end:end});
   const note = document.getElementById('rep-viewing-note');
   const labelEl = document.getElementById('rep-viewing-label');
   if(note && labelEl){ labelEl.textContent = label; note.style.display = 'block'; }
@@ -11756,6 +11896,7 @@ function renderReportsScreen(){
   renderRepBars(reportsPeriod);
   renderTrendsCard(reportsPeriod);
   renderMermasCard(getPeriodRange(reportsPeriod));
+  renderProvidersCard(getPeriodRange(reportsPeriod));
 }
 let recipeStockTapCount = 0;
 let recipeStockTapTimer = null;
@@ -11801,6 +11942,7 @@ let recipeStockCorrectId = null;
 function openRecipeStockCorrectModal(id){
   const r = DATA.recipes.find(function(x){ return x.id===id; });
   if(!r) return;
+  if(isCombo(r)){ showToast('El stock de la caja sale de lo que lleva ('+recipeStockOf(r)+' para armar)'); return; }
   recipeStockCorrectId = id;
   document.getElementById('rsc-name').textContent = '— '+r.title+' · stock —';
   document.getElementById('rsc-qty').value = fmtQty(roundQty(r.stock||0));
@@ -11913,6 +12055,7 @@ function stockColor(stock){
 function adjustReadyStock(id, delta){
   const r = DATA.recipes.find(function(x){ return x.id===id; });
   if(!r) return;
+  if(isCombo(r)){ showToast('El stock de la caja sale de lo que lleva'); return; }
   r.stock = Math.max(0, (r.stock||0) + delta);
   saveData(DATA);
   renderQuickSellScreen();
@@ -11920,7 +12063,7 @@ function adjustReadyStock(id, delta){
 function selectQuickSellRecipe(id){
   const r = DATA.recipes.find(function(x){ return x.id===id; });
   if(!r) return;
-  if((r.stock||0)<=0){ showToast('No queda stock de '+r.title); return; }
+  if(recipeStockOf(r)<=0){ showToast(isCombo(r) ? ('No alcanza para armar '+r.title) : ('No queda stock de '+r.title)); return; }
   if(!r.salePrice && !(r.packSize>0 && r.packPrice>0)){ showToast(r.title+' no tiene precio cargado — poneselo en la receta antes de vender'); return; }
   const packMode = recipeSellsByPack(r);
   if(packMode && Math.floor((r.stock||0)/r.packSize)<=0){ showToast('No alcanza el stock para un paquete completo de '+r.title); return; }
@@ -11931,7 +12074,7 @@ function changeQuickSaleQty(delta){
   if(!state.quickSale) return;
   const r = DATA.recipes.find(function(x){ return x.id===state.quickSale.recipeId; });
   const mode = state.quickSale.mode||'unit';
-  let max = r ? (r.stock||0) : 999999;
+  let max = r ? recipeStockOf(r) : 999999;
   if(mode==='pack' && r && r.packSize>0) max = Math.floor((r.stock||0)/r.packSize);
   if(max<1) max = 1;
   state.quickSale.qty = Math.max(1, Math.min(max, (state.quickSale.qty||1) + delta));
@@ -11968,12 +12111,13 @@ function registerQuickSale(){
   };
   DATA.quickSales.push(entry);
   if(willDeduct){
-    r.stock = Math.max(0, (r.stock||0) - totalUnits);
+    addRecipeStock(r, -totalUnits);
   }
   state.quickSale = null;
   saveData(DATA);
-  if(r.stock<=0) showToast('Venta registrada — sin stock de '+r.title);
-  else if(r.stock<=2) showToast('Venta registrada — quedan '+r.stock+' de '+r.title);
+  const quedan = recipeStockOf(r);
+  if(quedan<=0) showToast('Venta registrada — sin stock de '+r.title);
+  else if(quedan<=2) showToast('Venta registrada — quedan '+quedan+' de '+r.title);
   else showToast('Venta registrada');
   renderQuickSellScreen();
 }
@@ -11984,7 +12128,7 @@ async function undoLastQuickSale(){
   const last = DATA.quickSales.pop();
   if(last.stockDeducted!==false){
     const r = DATA.recipes.find(function(x){ return x.id===last.recipeId; });
-    if(r) r.stock = (r.stock||0) + (last.unitsDeducted!=null ? last.unitsDeducted : last.qty);
+    if(r) addRecipeStock(r, (last.unitsDeducted!=null ? last.unitsDeducted : last.qty));
   }
   saveData(DATA);
   showToast('Venta deshecha');
@@ -12026,7 +12170,7 @@ function renderQuickSellScreen(){
   } else {
     emptyMsg.style.display = 'none';
     gridWrap.innerHTML = ready.map(function(r){
-      const stock = r.stock||0;
+      const stock = recipeStockOf(r);
       const active = state.quickSale && state.quickSale.recipeId===r.id;
       const color = stockColor(stock);
       const pct = Math.max(stock>0?6:0, Math.min(100, stock*10));
@@ -12146,7 +12290,7 @@ function applyBotCompra(v){
     if(!p) return;
     // Con medida (1 kg × 2) suma 2 kg; sin medida (o si no se puede convertir) suma paquetes como los de Stock.
     const conMedida = it.q && normalizeUnit(p.unit)!=='u' && convertQty(1, it.u, p.unit)!=null;
-    const r = applyIngredientPurchase(p.id, conMedida ? it.q*it.cant : it.cant, conMedida ? it.u : null, Number(it.total)||0, null,
+    const r = applyIngredientPurchase(p.id, conMedida ? it.q*it.cant : it.cant, conMedida ? it.u : null, Number(it.total)||0, (typeof v.prov==='string' && v.prov.trim()) ? v.prov.replace(/[\u0000-\u001f<>]/g,'').trim().slice(0,40) : null,
       { noSave:true, expId:'exp-'+v.id+'-'+k, date:fecha, note:'Compra (bot): '+p.name });
     if(r) n++;
   });
@@ -12182,7 +12326,7 @@ function applyBotSales(ventas){
     const q = DATA.quickSales[idx];
     if(q.stockDeducted!==false){
       const r = DATA.recipes.find(function(x){ return x.id===q.recipeId; });
-      if(r) r.stock = (r.stock||0) + (q.unitsDeducted!=null ? q.unitsDeducted : q.qty);
+      if(r) addRecipeStock(r, (q.unitsDeducted!=null ? q.unitsDeducted : q.qty));
     }
     DATA.quickSales.splice(idx, 1);
     deshechas++;
@@ -12196,6 +12340,7 @@ function applyBotSales(ventas){
     if(!botValidHorneada(v) || procesadas[v.id]) return;
     const r = DATA.recipes.find(function(x){ return x.id===v.recipeId; });
     if(!r) return;
+    if(isCombo(r)){ DATA.botProcesadas.push(v.id); procesadas[v.id] = true; return; } // una caja no se hornea
     registrarHorneada(r.id, v.porciones);
     DATA.botProcesadas.push(v.id); procesadas[v.id] = true;
     horneadas++;
@@ -12204,7 +12349,7 @@ function applyBotSales(ventas){
   ventas.forEach(function(v){
     if(!botValidMerma(v) || procesadas[v.id]) return;
     const r = DATA.recipes.find(function(x){ return x.id===v.recipeId; });
-    if(r){
+    if(r && !isCombo(r)){
       const ts = (typeof v.ts==='string' && !isNaN(new Date(v.ts).getTime())) ? v.ts : new Date().toISOString();
       if(registrarMerma(r.id, v.porciones, String(v.motivo||''), { id:v.id, ts:ts, origen:'bot' })) mermas++;
     }
@@ -12249,7 +12394,7 @@ function addBotQuickSale(v, r, payMethod, willDeduct){
     unitPrice: price, unitCost: (c.costPerUnit||0)*unitsPerSale, payMethod: payMethod==='transferencia' ? 'transferencia' : 'efectivo',
     ts: v.ts && !isNaN(new Date(v.ts)) ? v.ts : new Date().toISOString(), stockDeducted: willDeduct, origen:'bot'
   });
-  if(willDeduct) r.stock = Math.max(0, (r.stock||0) - units);
+  if(willDeduct) addRecipeStock(r, -units);
   return true;
 }
 function botPendSel(v){
@@ -12296,7 +12441,7 @@ function renderBotPending(){
       const hora = new Date(v.ts); const hm = isNaN(hora) ? '' : ' · '+hora.toLocaleTimeString('es-AR', { hour:'2-digit', minute:'2-digit' });
       const cands = (v.candidatos||[]).map(function(id){ return DATA.recipes.find(function(r){ return r.id===id; }); }).filter(Boolean);
       const chips = cands.map(function(r){
-        return '<button type="button" class="bp-chip'+(s.recipeId===r.id?' on':'')+((r.stock||0)<=0?' off':'')+'" data-v="'+escapeHtml(v.id)+'" data-r="'+escapeHtml(r.id)+'" onclick="botPendChoose(this.dataset.v, this.dataset.r)">'+escapeHtml(r.title)+' ('+(r.stock||0)+')</button>';
+        return '<button type="button" class="bp-chip'+(s.recipeId===r.id?' on':'')+(recipeStockOf(r)<=0?' off':'')+'" data-v="'+escapeHtml(v.id)+'" data-r="'+escapeHtml(r.id)+'" onclick="botPendChoose(this.dataset.v, this.dataset.r)">'+escapeHtml(r.title)+' ('+recipeStockOf(r)+')</button>';
       }).join('') || '<span style="font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);">Esos productos ya no están en Kobu.</span>';
       const precio = s.recipeId ? (function(){ const r = DATA.recipes.find(function(x){ return x.id===s.recipeId; }); return r ? (recipeSellsByPack(r) ? r.packPrice : r.salePrice) : v.unitPrice; })() : v.unitPrice;
       const efe = s.pay!=='transferencia';
@@ -12608,9 +12753,11 @@ function applyIngredientPurchase(priceId, qty, unit, price, provider, opts){
     p.priceHistory = p.priceHistory || [];
     p.priceHistory.push({ price:scaledPrice, date: opts.date || todayStr() });
   }
-  if(provider) p.provider = provider;
+  if(provider){ p.provider = provider; recordProviderPrice(p, provider, scaledPrice, opts.date || todayStr()); }
   if(DATA.settings.addStockAsExpense!==false){
-    DATA.expenses.push({ id: opts.expId || ('exp-'+Date.now()), date: opts.date || todayStr(), amount: price, note: opts.note || ('Stock: '+p.name) });
+    const exp = { id: opts.expId || ('exp-'+Date.now()), date: opts.date || todayStr(), amount: price, note: opts.note || ('Stock: '+p.name) };
+    if(provider){ exp.priceId = p.id; exp.provider = String(provider).slice(0,40); exp.pkgs = roundQty(addedStock/pkgRef); }
+    DATA.expenses.push(exp);
   }
   if(!opts.noSave){
     saveData(DATA);
@@ -12933,8 +13080,11 @@ function computeProductionPlan(startDate, endDate){
       if(!it.recipeId) return;
       const r = DATA.recipes.find(function(x){ return x.id===it.recipeId; });
       if(!r) return;
-      if(!recipeMap[it.recipeId]) recipeMap[it.recipeId] = { recipeId:it.recipeId, recipe:r, qty:0 };
-      recipeMap[it.recipeId].qty += (parseFloat(it.qty)||0);
+      const parts = isCombo(r) ? comboItems(r).map(function(ci){ return { r:ci.r, q:(parseFloat(it.qty)||0)*ci.qty }; }) : [{ r:r, q:(parseFloat(it.qty)||0) }];
+      parts.forEach(function(pt){
+        if(!recipeMap[pt.r.id]) recipeMap[pt.r.id] = { recipeId:pt.r.id, recipe:pt.r, qty:0 };
+        recipeMap[pt.r.id].qty += pt.q;
+      });
     });
   });
   const recipes = Object.keys(recipeMap).map(function(k){ return recipeMap[k]; }).sort(function(a,b){ return b.qty-a.qty; });
@@ -13596,7 +13746,7 @@ function buildFullAppContext(){
     const precio = r.salePrice ? fmtMoney(r.salePrice) : 'sin precio';
     const costo = (c && c.costPerUnit) ? fmtMoney(c.costPerUnit) : 'sin costo calculado';
     const packTxt = recipeSellsByPack(r) ? (', se vende por paquete de '+r.packSize+' a '+fmtMoney(r.packPrice)) : '';
-    return r.title+' (precio '+precio+', costo '+costo+packTxt+(r.readyToSell?', lista para vender, stock actual '+(r.stock||0):'')+')';
+    return r.title+' (precio '+precio+', costo '+costo+packTxt+(r.readyToSell?', lista para vender, stock actual '+recipeStockOf(r):'')+(isCombo(r)?', caja con: '+comboItems(r).map(function(ci){ return ci.qty+' '+ci.r.title; }).join(', '):'')+')';
   }).join(' | ');
   parts.push('Recetas: '+(recetasTxt || 'todavía no hay recetas cargadas')+'.');
   const fmtStockItem = function(p){
@@ -13984,6 +14134,7 @@ function importPreparationWithAi(){
 function startCook(id){
   const r = DATA.recipes.find(function(x){ return x.id===id; });
   if(!r) return;
+  if(isCombo(r)){ showToast('Las cajas no se cocinan: cociná lo que llevan'); return; }
   state.cookRecipeId = id;
   state.cookComponentKey = null;
   ccResetSession();
@@ -14711,7 +14862,7 @@ function registrarMerma(recipeId, porciones, motivo, opts){
     ts: opts.ts || new Date().toISOString()
   };
   if(opts.origen) e.origen = opts.origen;
-  r.stock = Math.max(0, (Number(r.stock)||0) - n);
+  addRecipeStock(r, -n);
   DATA.mermas.push(e);
   if(DATA.mermas.length>2000) DATA.mermas.splice(0, DATA.mermas.length-2000);
   return e;
@@ -14721,7 +14872,7 @@ function openMermaModal(id){
   if(!r) return;
   state._merma = { id:id, motivo:'rota' };
   document.getElementById('mm-name').textContent = r.title || '';
-  const st = Number(r.stock)||0;
+  const st = recipeStockOf(r);
   document.getElementById('mm-stock').textContent = st>0 ? ('Hay '+st+' listas para vender') : 'No hay stock listo cargado (igual se anota)';
   document.getElementById('mm-qty').value = 1;
   mermaRenderChips();
@@ -14797,6 +14948,160 @@ function renderMermasCard(range){
   }).join('');
   html += '<p style="font-size:calc(10px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:8px 0 0;">El costo no se suma a Gastos (ya está en las compras): es lo que se perdió.</p>';
   wrap.innerHTML = html;
+}
+// ---- Ventana de caja / combo ----
+let comboDraft = null;
+function comboRecipeOptions(sel){
+  return '<option value="">Elegí un producto</option>' + DATA.recipes.filter(function(r){ return !isCombo(r) && r.title; })
+    .slice().sort(function(a,b){ return (a.title||'').localeCompare(b.title||'', 'es', {sensitivity:'base'}); })
+    .map(function(r){ return '<option value="'+escapeHtml(r.id)+'"'+(r.id===sel?' selected':'')+'>'+escapeHtml(r.title)+'</option>'; }).join('');
+}
+function openComboModal(id){
+  const r = id ? DATA.recipes.find(function(x){ return x.id===id; }) : null;
+  comboDraft = { id: r ? r.id : null, items: r ? r.combo.map(function(c){ return { recipeId:c.recipeId, qty:Math.max(1, Math.round(Number(c.qty)||1)) }; }) : [{ recipeId:'', qty:1 }] };
+  document.getElementById('comboModalTitle').textContent = r ? 'Editar caja' : 'Nueva caja / combo';
+  document.getElementById('cb-name').value = r ? (r.title||'') : '';
+  document.getElementById('cb-extra').value = r && Number(r.comboExtra)>0 ? r.comboExtra : '';
+  document.getElementById('cb-price').value = r && Number(r.salePrice)>0 ? r.salePrice : '';
+  document.getElementById('cb-ready').classList.toggle('on', r ? !!r.readyToSell : true);
+  comboRenderRows();
+  document.getElementById('comboModal').classList.add('active');
+}
+function closeComboModal(){ document.getElementById('comboModal').classList.remove('active'); comboDraft = null; }
+function comboRenderRows(){
+  if(!comboDraft) return;
+  document.getElementById('cb-items').innerHTML = comboDraft.items.map(function(it, i){
+    return '<div class="combo-row">'+
+      '<select class="input" onchange="comboSet('+i+',\'recipeId\',this.value)">'+comboRecipeOptions(it.recipeId)+'</select>'+
+      '<div class="cq"><span style="color:var(--k-muted);font-size:calc(11px + var(--kobu-font-boost, 0px));">×</span><input class="input" type="number" min="1" max="99" step="1" inputmode="numeric" value="'+it.qty+'" oninput="comboSet('+i+',\'qty\',this.value)"></div>'+
+      '<button type="button" class="iconbtn" onclick="comboRemoveRow('+i+')" style="color:var(--k-danger);" aria-label="Sacar"><span class="icon-slot" data-icon="x"></span></button>'+
+      '</div>';
+  }).join('');
+  mountIcons();
+  comboRenderSum();
+}
+function comboSet(i, k, v){
+  if(!comboDraft || !comboDraft.items[i]) return;
+  comboDraft.items[i][k] = k==='qty' ? Math.max(1, Math.min(99, parseInt(v,10)||1)) : v;
+  comboRenderSum();
+}
+function comboAddRow(){ if(!comboDraft) return; comboDraft.items.push({ recipeId:'', qty:1 }); comboRenderRows(); }
+function comboRemoveRow(i){ if(!comboDraft) return; comboDraft.items.splice(i,1); if(!comboDraft.items.length) comboDraft.items.push({ recipeId:'', qty:1 }); comboRenderRows(); }
+function comboDraftRecipe(){
+  return { combo: (comboDraft ? comboDraft.items : []).filter(function(x){ return x.recipeId; }), comboExtra: parseFloat(document.getElementById('cb-extra').value)||0 };
+}
+function comboRenderSum(){
+  const el = document.getElementById('cb-sum');
+  if(!el || !comboDraft) return;
+  const tmp = comboDraftRecipe();
+  if(!isCombo(tmp)){ el.innerHTML = '<div><span>Elegí qué lleva la caja</span><span></span></div>'; return; }
+  const sep = comboSeparatePrice(tmp), cost = comboCost(tmp);
+  const price = parseFloat(document.getElementById('cb-price').value);
+  const gan = isNaN(price) ? null : price - cost;
+  el.innerHTML = '<div><span>Por separado</span><span>'+escapeHtml(fmtMoney(sep))+'</span></div>'+
+    '<div><span>Costo (con packaging)</span><span>'+escapeHtml(fmtMoney(cost))+'</span></div>'+
+    (gan==null ? '' : '<div><span>Ganancia por caja</span><span style="font-weight:700;color:'+(gan>=0?'var(--k-success)':'var(--k-danger)')+';">'+escapeHtml(fmtMoney(gan))+'</span></div>')+
+    (!isNaN(price) && sep>0 && price<sep ? '<div><span>Descuento para el cliente</span><span>'+Math.round((1-price/sep)*100)+'%</span></div>' : '')+
+    '<div><span>Se pueden armar hoy</span><span>'+recipeStockOf(tmp)+'</span></div>';
+}
+function saveCombo(){
+  if(!comboDraft) return;
+  const name = document.getElementById('cb-name').value.trim();
+  const tmp = comboDraftRecipe();
+  const price = parseFloat(document.getElementById('cb-price').value);
+  if(!name){ showToast('Ponele un nombre a la caja'); return; }
+  if(!isCombo(tmp)){ showToast('Elegí al menos un producto'); return; }
+  if(!(price>0)){ showToast('Poné el precio de la caja'); return; }
+  // Un producto repetido se junta en un solo renglón
+  const merged = [];
+  tmp.combo.forEach(function(c){ const m = merged.find(function(x){ return x.recipeId===c.recipeId; }); if(m) m.qty += c.qty; else merged.push({ recipeId:c.recipeId, qty:c.qty }); });
+  const isNew = !comboDraft.id;
+  let r = isNew ? null : DATA.recipes.find(function(x){ return x.id===comboDraft.id; });
+  if(!r){
+    r = { id:'cb-'+Date.now(), title:name, icon:'gift', colorIdx: randomWarmColorIdx(), yieldQty:1, yieldUnit:'cajas', ingredients:[], steps:[], components:[], finalSteps:[], stock:0, tags:[] };
+    DATA.recipes.push(r);
+  }
+  r.title = name; r.combo = merged; r.comboExtra = tmp.comboExtra>0 ? tmp.comboExtra : 0;
+  r.salePrice = Math.round(price*100)/100; r.readyToSell = document.getElementById('cb-ready').classList.contains('on');
+  r.yieldQty = 1; r.yieldUnit = 'cajas';
+  saveData(DATA);
+  closeComboModal();
+  try{ renderRecipes(); }catch(e){}
+  if(state.currentId===r.id) openDetailRender(r.id); else openDetail(r.id);
+  showToast(isNew ? 'Caja creada' : 'Caja guardada');
+}
+function renderDetailCombo(r){
+  const wrap = document.getElementById('d-combo-wrap');
+  if(!wrap) return;
+  if(!isCombo(r)){ wrap.style.display = 'none'; return; }
+  wrap.style.display = '';
+  const items = comboItems(r);
+  document.getElementById('d-combo-items').innerHTML = items.length ? items.map(function(ci){
+    const st = Number(ci.r.stock)||0;
+    return '<div class="combo-item"><span>'+ci.qty+' × '+escapeHtml(ci.r.title)+'</span><span class="st'+(st<ci.qty?' low':'')+'">hay '+fmtQty(st)+'</span></div>';
+  }).join('') : '<p style="margin:0;color:var(--k-muted);font-size:calc(11.5px + var(--kobu-font-boost, 0px));">Los productos de esta caja ya no existen.</p>';
+  const sep = comboSeparatePrice(r), cost = comboCost(r), price = Number(r.salePrice)||0;
+  document.getElementById('d-combo-sum').innerHTML =
+    '<div><span>Se pueden armar</span><span style="font-weight:700;">'+recipeStockOf(r)+'</span></div>'+
+    '<div><span>Precio</span><span>'+escapeHtml(fmtMoney(price))+'</span></div>'+
+    '<div><span>Por separado</span><span>'+escapeHtml(fmtMoney(sep))+'</span></div>'+
+    '<div><span>Costo (con packaging)</span><span>'+escapeHtml(fmtMoney(cost))+'</span></div>'+
+    '<div><span>Ganancia por caja</span><span style="font-weight:700;color:'+((price-cost)>=0?'var(--k-success)':'var(--k-danger)')+';">'+escapeHtml(fmtMoney(price-cost))+'</span></div>';
+}
+/* =========================================================
+   PROVEEDORES: precio del envase por proveedor (p.providerPrices) y "Dónde conviene comprar".
+   ========================================================= */
+function provKey(name){ return normalizeMatchText(String(name||'')).slice(0,40); }
+function recordProviderPrice(p, provider, pkgPrice, date){
+  const name = String(provider||'').trim().slice(0,40);
+  const price = Number(pkgPrice);
+  if(!p || !name || !(price>0)) return;
+  if(!p.providerPrices || typeof p.providerPrices!=='object' || Array.isArray(p.providerPrices)) p.providerPrices = {};
+  p.providerPrices[provKey(name)] = { name:name, price: Math.round(price*100)/100, date: date || todayStr() };
+  const keys = Object.keys(p.providerPrices);
+  if(keys.length>12){ keys.sort(function(a,b){ return String(p.providerPrices[a].date).localeCompare(String(p.providerPrices[b].date)); }); delete p.providerPrices[keys[0]]; }
+}
+function providerPriceList(p){
+  const pp = (p && p.providerPrices && typeof p.providerPrices==='object') ? p.providerPrices : {};
+  return Object.keys(pp).map(function(k){ return pp[k]; }).filter(function(x){ return x && x.name && Number(x.price)>0; })
+    .sort(function(a,b){ return a.price-b.price; });
+}
+function renderStockEditProviders(p){
+  const wrap = document.getElementById('se-prov-wrap');
+  if(!wrap) return;
+  const list = p ? providerPriceList(p) : [];
+  if(!list.length){ wrap.style.display = 'none'; return; }
+  wrap.style.display = '';
+  document.getElementById('se-prov-list').innerHTML = list.map(function(x, i){
+    return '<div class="prov-row"><span>'+escapeHtml(x.name)+(i===0 && list.length>1 ? '<span class="prov-best">más barato</span>' : '')+'<span style="display:block;font-size:calc(10px + var(--kobu-font-boost, 0px));color:var(--k-muted);">'+escapeHtml(cookNoteDateTxt(x.date))+'</span></span><span class="pv">'+escapeHtml(fmtMoney(x.price))+'</span></div>';
+  }).join('') + (list.length>1 ? '<p style="margin:6px 0 0;font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);">Comprando en '+escapeHtml(list[0].name)+' ahorrás '+escapeHtml(fmtMoney(list[list.length-1].price-list[0].price))+' por envase.</p>' : '');
+}
+function renderProvidersCard(range){
+  const wrap = document.getElementById('rep-prov');
+  const inl = document.getElementById('rep-prov-inline');
+  if(!wrap) return;
+  const rows = DATA.ingredientPrices.filter(function(p){ return p.type!=='subproducto'; }).map(function(p){
+    const l = providerPriceList(p);
+    return l.length>1 ? { p:p, best:l[0], worst:l[l.length-1] } : null;
+  }).filter(Boolean).sort(function(a,b){ return (b.worst.price-b.best.price)/b.worst.price - (a.worst.price-a.best.price)/a.worst.price; });
+  // Lo que se podría haber ahorrado en el período: compras con proveedor que no fue el más barato.
+  let ahorro = 0;
+  (DATA.expenses||[]).forEach(function(e){
+    if(!e || !e.priceId || !e.provider || !(e.pkgs>0)) return;
+    if(range){ const d = parseDateLoose(e.date); if(!(d >= range.start && d <= range.end)) return; }
+    const p = DATA.ingredientPrices.find(function(x){ return x.id===e.priceId; });
+    const l = p ? providerPriceList(p) : [];
+    if(l.length<2) return;
+    const pagado = e.amount / e.pkgs;
+    if(pagado > l[0].price) ahorro += (pagado - l[0].price)*e.pkgs;
+  });
+  if(inl) inl.textContent = rows.length ? (rows.length+' para comparar') : '';
+  if(!rows.length){ wrap.innerHTML = '<p style="font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:4px 0 0;">Cuando compres lo mismo en dos lugares (cargando el proveedor), acá vas a ver dónde conviene.</p>'; return; }
+  wrap.innerHTML = (ahorro>0 ? '<div class="rep-mm-row"><span><b>Podías ahorrar en el período</b></span><span style="color:var(--k-danger);font-weight:700;">'+escapeHtml(fmtMoney(Math.round(ahorro)))+'</span></div>' : '')+
+    rows.slice(0,10).map(function(x){
+      const pct = Math.round((1 - x.best.price/x.worst.price)*100);
+      return '<div class="rep-mm-row"><span>'+escapeHtml(x.p.name)+'<span style="display:block;font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);">'+escapeHtml(x.best.name)+' '+escapeHtml(fmtMoney(x.best.price))+' · '+escapeHtml(x.worst.name)+' '+escapeHtml(fmtMoney(x.worst.price))+'</span></span><span style="color:var(--k-success);font-weight:700;">'+escapeHtml(x.best.name)+' −'+pct+'%</span></div>';
+    }).join('');
 }
 function renderDetailCookNotes(r){
   const el = document.getElementById('d-cooknotes');

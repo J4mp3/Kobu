@@ -978,6 +978,55 @@
   }
 
   /* Pedidos web (bandeja de pedidos que llegan desde la página) */
+  /* Tarjeta de fidelidad */
+  .fid-dots{ display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin:4px 0 2px; }
+  .fid-dot{ position:relative; aspect-ratio:1; border-radius:50%; border:1.5px dashed var(--k-border); background:var(--k-card2); display:flex; align-items:center; justify-content:center; color:var(--k-muted); font-size:calc(22px + var(--kobu-font-boost, 0px)); }
+  .fid-dot.on{ background:var(--k-accent); border:1.5px solid var(--k-accent); color:var(--k-bg); }
+  .fid-dot .fid-mk{ position:absolute; bottom:-7px; left:50%; transform:translateX(-50%); background:var(--k-warning-bg); color:var(--k-warning); font-size:calc(9px + var(--kobu-font-boost, 0px)); font-weight:700; border-radius:999px; padding:1px 5px; white-space:nowrap; line-height:1.3; display:flex; align-items:center; gap:2px; }
+  .fid-dot.on .fid-mk{ background:var(--k-card); color:var(--k-accent); }
+  .fid-sum{ font-size:calc(12.5px + var(--kobu-font-boost, 0px)); color:var(--k-text); margin:12px 0 0; }
+  .fid-sum b{ font-weight:700; }
+  .fid-sub{ font-size:calc(11px + var(--kobu-font-boost, 0px)); color:var(--k-muted); margin:2px 0 0; }
+  .fid-chip{ display:inline-flex; align-items:center; gap:4px; font-size:calc(10px + var(--kobu-font-boost, 0px)); font-weight:600; border-radius:999px; padding:3px 8px; background:var(--k-card2); color:var(--k-accent); white-space:nowrap; }
+  .fid-chip.ok{ background:var(--k-success-bg); color:var(--k-success); }
+  .fid-chip.warn{ background:var(--k-warning-bg); color:var(--k-warning); }
+  .fid-prize{ display:flex; align-items:center; gap:8px; background:var(--k-warning-bg); color:var(--k-warning); border-radius:10px; padding:8px 10px; font-size:calc(11.5px + var(--kobu-font-boost, 0px)); font-weight:600; margin-top:8px; }
+  .fid-hist{ display:flex; flex-direction:column; margin-top:10px; border-top:1px dashed var(--k-border); }
+  .fid-hrow{ display:flex; align-items:center; gap:8px; padding:7px 0; border-bottom:1px dashed var(--k-border); font-size:calc(11.5px + var(--kobu-font-boost, 0px)); color:var(--k-text); }
+  .fid-hrow:last-child{ border-bottom:none; }
+  .fid-hrow .ic{ color:var(--k-accent); display:flex; font-size:calc(13px + var(--kobu-font-boost, 0px)); }
+  .fid-hrow .d{ margin-left:auto; color:var(--k-muted); font-size:calc(10.5px + var(--kobu-font-boost, 0px)); white-space:nowrap; }
+  .client-pill.fid{ gap:3px; font-weight:600; }
+  .client-pill.warn{ background:var(--k-warning-bg); color:var(--k-warning); }
+  .acm-bday{ display:flex; align-items:center; gap:6px; }
+  .acm-bday .lb{ display:flex; align-items:center; gap:5px; font-size:calc(12px + var(--kobu-font-boost, 0px)); color:var(--k-muted); flex-shrink:0; }
+  .acm-bday select{ flex:1; min-width:0; }
+  .acm-bday select:first-of-type{ flex:0 0 74px; }
+  .fa-row{ display:flex; align-items:center; gap:10px; background:var(--k-card); border:.5px solid var(--k-border); border-radius:12px; padding:10px 12px; cursor:pointer; text-align:left; width:100%; font-family:inherit; color:var(--k-text); }
+  .fa-row .t{ font-weight:600; font-size:calc(13px + var(--kobu-font-boost, 0px)); }
+  .fa-row .s{ font-size:calc(11px + var(--kobu-font-boost, 0px)); color:var(--k-muted); }
+  .fa-data{ display:flex; flex-direction:column; gap:2px; background:var(--k-card2); border-radius:12px; padding:10px 12px; }
+  .fa-data div{ display:flex; justify-content:space-between; gap:10px; font-size:calc(12px + var(--kobu-font-boost, 0px)); padding:3px 0; }
+  .fa-data span:first-child{ color:var(--k-muted); }
+  .fa-data span:last-child{ font-weight:600; text-align:right; word-break:break-word; }
+  .fa-sug{ display:flex; align-items:center; gap:10px; border:1.5px solid var(--k-border); border-radius:12px; padding:9px 11px; background:var(--k-card); cursor:pointer; width:100%; font-family:inherit; color:var(--k-text); text-align:left; }
+  .fa-sug.best{ border-color:var(--k-accent); }
+  .fa-sug .why{ font-size:calc(10.5px + var(--kobu-font-boost, 0px)); color:var(--k-success); }
+  .fidscan-box{ background:#1b1210; color:#FBF3E7; width:100%; max-width:420px; height:100%; max-height:100%; display:flex; flex-direction:column; gap:12px; padding:16px; overflow-y:auto; }
+  .fidscan-head{ display:flex; align-items:center; justify-content:space-between; }
+  .fidscan-head p{ margin:0; font-weight:700; font-size:calc(16px + var(--kobu-font-boost, 0px)); display:flex; align-items:center; gap:8px; }
+  .fidscan-x{ border:none; background:rgba(255,255,255,.12); color:#FBF3E7; width:38px; height:38px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:18px; cursor:pointer; }
+  .fidscan-cam{ position:relative; width:100%; aspect-ratio:1; border-radius:20px; overflow:hidden; background:#000; flex-shrink:0; }
+  .fidscan-cam video{ width:100%; height:100%; object-fit:cover; display:block; }
+  .fidscan-frame{ position:absolute; inset:18%; border:3px solid rgba(251,243,231,.9); border-radius:18px; box-shadow:0 0 0 999px rgba(0,0,0,.35); }
+  .fidscan-msg{ margin:0; text-align:center; font-size:calc(13px + var(--kobu-font-boost, 0px)); opacity:.85; }
+  .fidscan-res{ background:var(--k-card); color:var(--k-text); border-radius:16px; padding:14px; display:flex; flex-direction:column; gap:8px; }
+  .fidscan-res .nm{ display:flex; align-items:center; gap:10px; font-weight:700; font-size:calc(15px + var(--kobu-font-boost, 0px)); }
+  .fidscan-search{ display:flex; flex-direction:column; gap:6px; }
+  .fidscan-search input{ background:rgba(255,255,255,.1); border:none; color:#FBF3E7; border-radius:12px; padding:11px 12px; font-size:calc(13px + var(--kobu-font-boost, 0px)); font-family:inherit; }
+  .fidscan-search input::placeholder{ color:rgba(251,243,231,.6); }
+  .fidscan-item{ display:flex; align-items:center; gap:10px; background:rgba(255,255,255,.08); border:none; border-radius:12px; padding:10px 12px; color:#FBF3E7; text-align:left; font-family:inherit; cursor:pointer; font-size:calc(13px + var(--kobu-font-boost, 0px)); width:100%; }
+  .fidscan-item .s{ margin-left:auto; opacity:.7; font-size:calc(11.5px + var(--kobu-font-boost, 0px)); }
   .wb-banner{ display:flex; align-items:center; gap:12px; background:var(--k-card); border:1.5px solid var(--k-accent); border-radius:16px; padding:12px 14px; cursor:pointer; }
   .wb-ic{ width:40px; height:40px; border-radius:12px; background:var(--k-accent); color:var(--k-bg); display:flex; align-items:center; justify-content:center; flex:none; font-size:22px; }
   .wb-t{ font-weight:700; color:var(--k-text); font-size:calc(15px + var(--kobu-font-boost, 0px)); }
@@ -1643,6 +1692,7 @@
         <div style="display:flex;flex-direction:column;gap:8px;">
           <input class="input" id="acm-phone" placeholder="Teléfono (opcional, con código de país sin +)">
           <input class="input" id="acm-email" type="email" placeholder="Mail (opcional)">
+          <div class="acm-bday"><span class="lb"><span class="icon-slot" data-icon="cake"></span>Cumpleaños</span><select class="input" id="acm-bday-d"></select><select class="input" id="acm-bday-m"></select></div>
         </div>
         <p class="acm-sectionlabel">Etiquetas</p>
         <div class="field" style="gap:6px;">
@@ -1655,6 +1705,46 @@
           <button class="btn btn-primary" style="flex:1;" id="acm-submitBtn" onclick="confirmAddClient()"><span class="icon-slot" data-icon="plus" style="vertical-align:-2px;"></span> Añadir cliente</button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- TARJETA DE FIDELIDAD: escáner -->
+  <div class="modal-overlay" id="fidScanModal" style="z-index:130;padding:0;">
+    <div class="fidscan-box">
+      <div class="fidscan-head"><p><span class="icon-slot" data-icon="scan-qr"></span>Escanear tarjeta</p><button class="fidscan-x" onclick="closeFidScan()" title="Cerrar"><span class="icon-slot" data-icon="x"></span></button></div>
+      <div class="fidscan-cam" id="fidScanCam"><video id="fidScanVideo" playsinline muted autoplay></video><div class="fidscan-frame"></div></div>
+      <p class="fidscan-msg" id="fidScanMsg">Apuntá al QR de la tarjeta del cliente</p>
+      <div id="fidScanResult"></div>
+      <div class="fidscan-search">
+        <input id="fidScanSearch" placeholder="O buscalo por nombre" oninput="fidScanBuscar(this.value)" autocomplete="off">
+        <div id="fidScanList" style="display:flex;flex-direction:column;gap:6px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TARJETA DE FIDELIDAD: pendientes por registrar -->
+  <div class="modal-overlay" id="fidAltasModal">
+    <div class="modal-box wb-box" style="text-align:left;">
+      <div class="acm-headtint" style="padding:16px 18px 12px;">
+        <p class="acm-title" id="fa-title" style="margin:0;">Pendientes por registrar</p>
+        <p style="margin:2px 0 0;font-size:calc(11.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);" id="fa-sub">Se sumaron a la tarjeta desde la página</p>
+      </div>
+      <div id="fa-body" style="display:flex;flex-direction:column;gap:8px;padding:12px 16px;overflow-y:auto;"></div>
+      <div class="btn-row" style="padding:0 16px 16px;"><button class="btn btn-ghost" style="flex:1;" id="fa-closeBtn" onclick="closeFidAltas()">Cerrar</button></div>
+    </div>
+  </div>
+
+  <!-- TARJETA DE FIDELIDAD: ajustes -->
+  <div class="modal-overlay" id="fidCfgModal">
+    <div class="modal-box" style="max-width:340px;text-align:left;">
+      <p class="modal-msg" style="font-weight:600;display:flex;align-items:center;gap:8px;margin:0;"><span class="icon-slot" data-icon="paw"></span>Tarjeta de fidelidad</p>
+      <p style="margin:0;font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);">Un sello por pedido entregado (solo clientes, nunca mayoristas). Al completar la tarjeta vuelve a 0 y el historial sigue. Lo que cambies acá se ve en la página para sumarse y en la tarjeta de cada cliente; el premio que alguien ya ganó lo conserva.</p>
+      <div class="field"><label>Sellos para el descuento</label><div class="btn-row"><input class="input" id="fc-desc" type="number" min="1" max="29" step="1"><input class="input" id="fc-pct" type="number" min="1" max="50" step="1"><span style="align-self:center;">%</span></div></div>
+      <div class="field"><label>Sellos para el regalo (completa la tarjeta)</label><input class="input" id="fc-regalo" type="number" min="4" max="12" step="1"></div>
+      <div class="field"><label>Regalo</label><input class="input" id="fc-regaloTxt" maxlength="40" placeholder="Budín chico gratis"></div>
+      <div class="field"><label>Avisarme y mandarle "Hoy está para un budín" a los</label><div class="btn-row"><input class="input" id="fc-dias" type="number" min="7" max="180" step="1"><span style="align-self:center;white-space:nowrap;">días sin comprar</span></div></div>
+      <div class="rowline" style="cursor:pointer;padding:8px 0;" onclick="fidCopiarLink()"><span class="l">Copiar el link de la página para sumarse</span><span class="icon-slot" data-icon="copy" style="color:var(--k-muted);"></span></div>
+      <div class="btn-row"><button class="btn btn-ghost" style="flex:1;" onclick="closeFidCfg()">Cancelar</button><button class="btn btn-primary" style="flex:1;" onclick="saveFidCfg()">Guardar</button></div>
     </div>
   </div>
 
@@ -1846,6 +1936,7 @@
     <button class="iconbtn" id="backBtn" onclick="handleBack()" style="visibility:hidden;"><span class="icon-slot" data-icon="arrow-left"></span></button>
     <h1><span class="icon-slot topbar-title-icon" id="screenTitleIcon" data-icon="home"></span><span id="screenTitle">Inicio</span></h1>
     <div style="display:flex;gap:2px;">
+      <button class="iconbtn" id="scanCardBtn" onclick="openFidScan()" title="escanear tarjeta" style="display:none;"><span class="icon-slot" data-icon="scan-qr"></span></button>
       <button class="iconbtn" id="themeToggleBtn" onclick="handleThemeToggleClick()" title="cambiar tema"><span class="icon-slot" data-icon="moonstars"></span></button>
       <button class="iconbtn" id="globalSearchBtn" onclick="openGlobalSearch()" title="buscar"><span class="icon-slot" data-icon="search"></span></button>
       <button class="iconbtn" id="chatHistoryBtn" onclick="openChatList()" style="display:none;"><span class="icon-slot" data-icon="list"></span></button>
@@ -2313,6 +2404,10 @@
         <span class="l">Descuento mayorista para productos que no están en la lista<br><span style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);">Se usa solo si el producto no tiene precio mayorista publicado</span></span>
         <span style="display:flex;align-items:center;gap:4px;flex-shrink:0;"><input class="input" id="mayPctInput" type="number" min="0" max="90" step="1" style="width:58px;text-align:center;padding:6px 4px;" onchange="setMayoristaPct(this.value)"> %</span>
       </div>
+      <div class="rowline" style="cursor:pointer;" onclick="openFidCfg()">
+        <span class="l">Tarjeta de fidelidad (sellos y premios)</span>
+        <span class="icon-slot" data-icon="chevron-right" style="color:var(--k-muted);"></span>
+      </div>
       <div class="rowline" style="cursor:pointer;" onclick="connectTelegram()">
         <span class="l">Conectar Telegram (bot de Kobu)</span>
         <span id="tgConnectState" style="font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);">Conectar ›</span>
@@ -2603,6 +2698,7 @@
         <div id="cd-coupons" style="display:flex;gap:6px;overflow-x:auto;padding-top:2px;"></div>
       </div>
     </div>
+    <div class="grp-card" id="cd-fid" style="display:none;"></div>
     <div class="grp-card">
       <p class="section-title"><span class="badge-ic"><span class="icon-slot" data-icon="clipboard"></span></span>Historial de pedidos</p>
       <div id="cd-orders" style="display:flex;flex-direction:column;gap:8px;"></div>
@@ -2812,6 +2908,16 @@
     <div id="ordersClientesPanel" style="display:none;flex-direction:column;gap:12px;">
       <button class="addbtn" onclick="openAddClientModal()"><span class="icon-slot" data-icon="plus"></span> Añadir cliente</button>
       <button class="btn btn-ghost" style="width:100%;font-size:calc(11.5px + var(--kobu-font-boost, 0px));" onclick="showScreen('coupons')"><span class="icon-slot" data-icon="gift-card" style="vertical-align:-2px;"></span> Cuponera</button>
+      <div class="wb-banner" id="fidAltasBanner" style="display:none;" onclick="openFidAltas()">
+        <div class="wb-ic"><span class="icon-slot" data-icon="paw"></span></div>
+        <div><div class="wb-t">Pendientes por registrar</div><div class="wb-s">Se sumaron a la tarjeta desde la página · tocá para vincularlos</div></div>
+        <div class="wb-badge" id="fidAltasCount">0</div>
+      </div>
+      <div class="pill-tabs" id="cliTabRow">
+        <div class="pill-thumb" id="cliTabThumb"></div>
+        <div class="pill-tab active" id="cliTabClientesBtn" onclick="setClientsTab('clientes')">Clientes <span id="cliTabClientesN"></span></div>
+        <div class="pill-tab" id="cliTabMayBtn" onclick="setClientsTab('mayoristas')">Mayoristas <span id="cliTabMayN"></span></div>
+      </div>
       <div class="orders-toolbar">
         <div class="searchbar" style="flex:1;">
           <span class="icon-slot" data-icon="search"></span>
@@ -2894,6 +3000,7 @@ window.addEventListener('orientationchange', function(){ setTimeout(setKobuVh, 1
 const SVG_ATTRS = 'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"';
 const ICONS = {
   'arrow-left': '<svg '+SVG_ATTRS+'><path d="M19 12H5M12 19l-7-7 7-7"/></svg>',
+  'scan-qr': '<svg '+SVG_ATTRS+'><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><rect x="8" y="8" width="3" height="3" rx=".5"/><rect x="13" y="8" width="3" height="3" rx=".5"/><rect x="8" y="13" width="3" height="3" rx=".5"/><path d="M13 13h3v3M13 16h.01"/></svg>',
   'search': '<svg '+SVG_ATTRS+'><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>',
   'dots-vertical': '<svg '+SVG_ATTRS+'><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/><circle cx="12" cy="5" r="1"/></svg>',
   'chevron-right': '<svg '+SVG_ATTRS+'><path d="M9 6l6 6l-6 6"/></svg>',
@@ -3727,6 +3834,7 @@ function render(){
   document.getElementById('chatHistoryBtn').style.display = inChat ? 'inline-flex' : 'none';
   document.getElementById('chatNewBtn').style.display = (inChat||inChatList) ? 'inline-flex' : 'none';
   document.getElementById('chatPawBtn').style.display = (inChat||inChatList) ? 'none' : 'inline-flex';
+  const scanBtn = document.getElementById('scanCardBtn'); if(scanBtn) scanBtn.style.display = cur==='home' ? 'inline-flex' : 'none';
   if(cur==='home') renderRecipes();
   if(cur==='settings' || cur==='ovens' || cur==='utensils') renderSettings();
   if(cur==='shopping') renderShoppingScreen();
@@ -4110,13 +4218,14 @@ function renderHomeSummary(){
     const extraShort = prodPlan7.shortages.length>1 ? ' (y '+(prodPlan7.shortages.length-1)+' más)' : '';
     msgs.push({ icon:'whisk', color:'var(--k-warning)', text: 'Para los próximos 7 días te falta '+firstShort.name+extraShort+' para la producción.', screen:'orders', tab:'produccion' });
   }
+  fidHomeMsgs().forEach(function(m){ msgs.push(m); });
   if(cloudSyncConfigured()) msgs.push({ icon:'cloud', color:'var(--k-muted)', text: stripTags(cloudSyncStatusText()), screen:null });
   else if(backupIsOverdue()) msgs.push({ icon:'cloud', color:'var(--k-danger)', text: stripTags(backupReminderText()), screen:null });
   homeTickerMsgs = msgs;
   homeTickerIdx = 0;
   const dotsHtml = msgs.map(function(m,i){ return '<span class="home-ticker-dot'+(i===0?' active':'')+'"></span>'; }).join('');
   document.getElementById('homeSummaryBody').innerHTML =
-    '<div class="home-ticker" id="homeTickerBox" onclick="homeTickerClick()" style="cursor:'+(msgs[0].screen?'pointer':'default')+';">'+
+    '<div class="home-ticker" id="homeTickerBox" onclick="homeTickerClick()" style="cursor:'+((msgs[0].screen||msgs[0].client)?'pointer':'default')+';">'+
       '<span class="icon-slot home-ticker-icon" id="homeTickerIcon" data-icon="'+msgs[0].icon+'" style="color:'+msgs[0].color+';"></span>'+
       '<span class="home-ticker-text" id="homeTickerText" style="color:'+msgs[0].color+';">'+escapeHtml(msgs[0].text)+'</span>'+
     '</div>'+
@@ -4144,7 +4253,7 @@ function advanceHomeTicker(){
     text.textContent = m.text;
     text.style.color = m.color;
     text.style.transform = 'translateX(10px)';
-    if(box) box.style.cursor = m.screen ? 'pointer' : 'default';
+    if(box) box.style.cursor = (m.screen || m.client) ? 'pointer' : 'default';
     requestAnimationFrame(function(){
       text.style.transform = 'translateX(0)';
       text.style.opacity = '1';
@@ -4156,6 +4265,7 @@ function advanceHomeTicker(){
 }
 function homeTickerClick(){
   const m = homeTickerMsgs[homeTickerIdx];
+  if(m && m.client){ openClientDetail(m.client); return; }
   if(!m || !m.screen) return;
   if(m.tab) ordersTab = m.tab;
   showScreen(m.screen);
@@ -9062,7 +9172,7 @@ function deleteCouponCatalogItem(){
   removeCouponCatalogItem(id);
 }
 function clientCouponStackHtml(c){
-  const list = c.coupons||[];
+  const list = cuponesActivos(c);
   if(list.length===0) return '';
   if(list.length===1){
     return '<span class="client-pill coupon-pill" onclick="event.stopPropagation();openBadgeStackPopup(\''+c.id+'\',\'coupons\')"><span class="icon-slot" data-icon="gift-card" style="font-size:9px;"></span>'+escapeHtml(couponDisplayLabel(list[0]))+'</span>';
@@ -9095,7 +9205,7 @@ function openBadgeStackPopup(clientId, kind){
   document.getElementById('badgeStackPopupTitle').textContent = kind==='coupons' ? 'Cupones' : 'Etiquetas';
   const wrap = document.getElementById('badgeStackPopupList');
   if(kind==='coupons'){
-    wrap.innerHTML = (c.coupons||[]).map(function(cp){
+    wrap.innerHTML = cuponesActivos(c).map(function(cp){
       return '<div class="ut-row"><span class="ut-ic"><span class="icon-slot" data-icon="gift-card"></span></span><div class="ut-info"><p class="nm">'+escapeHtml(couponDisplayLabel(cp))+'</p></div></div>';
     }).join('') || '<p style="font-size:calc(12px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;">Sin cupones.</p>';
   } else {
@@ -9155,11 +9265,20 @@ function renderClientsScreen(){
   renderClientTagChips();
   const wrap = document.getElementById('clientList');
   let sorted = clientsSorted();
+  const nMay = sorted.filter(clientIsMayorista).length;
+  const nCli = document.getElementById('cliTabClientesN'), nMayEl = document.getElementById('cliTabMayN');
+  if(nCli) nCli.textContent = '('+(sorted.length-nMay)+')';
+  if(nMayEl) nMayEl.textContent = '('+nMay+')';
+  sorted = sorted.filter(function(c){ return clientsTab==='mayoristas' ? clientIsMayorista(c) : !clientIsMayorista(c); });
+  updateFidAltasBanner();
   if(clientTagFilter) sorted = sorted.filter(function(c){ return (c.tags||[]).includes(clientTagFilter); });
   if(clientSearchQuery) sorted = sorted.filter(function(c){ return (c.name||'').toLowerCase().includes(clientSearchQuery); });
-  if(sorted.length===0){ wrap.innerHTML = '<div class="empty"><span class="icon-slot" data-icon="users"></span>Todavía no cargaste clientes.</div>'; mountIcons(); return; }
+  if(sorted.length===0){
+    const vacio = (clientSearchQuery || clientTagFilter) ? 'No hay resultados.' : clientsTab==='mayoristas' ? 'No hay mayoristas. Un cliente pasa acá con la etiqueta "Mayorista".' : 'Todavía no cargaste clientes.';
+    wrap.innerHTML = '<div class="empty"><span class="icon-slot" data-icon="users"></span>'+vacio+'</div>'; mountIcons(); return;
+  }
   wrap.innerHTML = sorted.map(function(c,i){
-    const couponsHtml = clientCouponStackHtml(c);
+    const couponsHtml = clientCouponStackHtml(c) + clientFidPillsHtml(c);
     const tagsHtml = clientTagStackHtml(c);
     const subParts = [];
     if(c.company) subParts.push('<span><span class="icon-slot" data-icon="building"></span>'+escapeHtml(c.company)+'</span>');
@@ -9283,9 +9402,12 @@ function renderClientDetail(){
   const subParts = [];
   if(c.phone) subParts.push('<span><span class="icon-slot" data-icon="phone"></span>'+escapeHtml(c.phone)+'</span>');
   if(c.company) subParts.push('<span><span class="icon-slot" data-icon="building"></span>'+escapeHtml(c.company)+'</span>');
+  if(c.email) subParts.push('<span><span class="icon-slot" data-icon="message-circle"></span>'+escapeHtml(c.email)+'</span>');
+  if(bdayValid(c.birthday)) subParts.push('<span><span class="icon-slot" data-icon="cake"></span>'+escapeHtml(bdayLabel(c.birthday))+'</span>');
   document.getElementById('cd-contactRow').innerHTML = subParts.length ? subParts.join('') : '<span>Sin datos de contacto</span>';
   document.getElementById('cd-tags').innerHTML = (c.tags||[]).map(function(t){ return '<span class="client-pill">'+escapeHtml(t)+'</span>'; }).join('');
-  const couponChips = (c.coupons||[]).map(function(cp){
+  renderClientFidCard(c);
+  const couponChips = cuponesActivos(c).map(function(cp){
     return '<span class="client-pill coupon-pill" style="flex-shrink:0;" onclick="removeClientCoupon(\''+c.id+'\',\''+cp.id+'\')" title="Tocar para quitar"><span class="icon-slot" data-icon="gift-card" style="font-size:9px;"></span>'+escapeHtml(couponDisplayLabel(cp))+'</span>';
   }).join('');
   document.getElementById('cd-coupons').innerHTML = couponChips+'<span class="client-pill" style="flex-shrink:0;border:1px dashed var(--k-border);background:none;cursor:pointer;" onclick="openAssignCouponModal()"><span class="icon-slot" data-icon="plus" style="font-size:9px;"></span> Agregar</span>';
@@ -9341,6 +9463,7 @@ function openAddClientModal(){
   document.getElementById('acm-phone').value = '';
   document.getElementById('acm-email').value = '';
   document.getElementById('acm-company').value = '';
+  acmBdayFill('');
   document.getElementById('acm-newTagForm').innerHTML = '';
   renderAcmTags();
   updateAcmAvatarPreview();
@@ -9359,6 +9482,7 @@ function openEditClientModal(id){
   document.getElementById('acm-phone').value = c.phone || '';
   document.getElementById('acm-email').value = c.email || '';
   document.getElementById('acm-company').value = c.company || '';
+  acmBdayFill(c.birthday || '');
   document.getElementById('acm-newTagForm').innerHTML = '';
   renderAcmTags();
   updateAcmAvatarPreview();
@@ -9435,6 +9559,7 @@ function confirmAddClient(){
     const c = DATA.clients.find(function(x){ return x.id===state._editingClientId; });
     if(!c){ closeAddClientModal(); return; }
     c.name = name; c.phone = phone; c.email = email; c.company = company;
+    const bday = acmBdayRead(); if(bday) c.birthday = bday; else delete c.birthday;
     c.tags = (state._newClientTags||[]).slice();
     c.icon = state._newClientIcon || null;
     saveData(DATA);
@@ -9444,6 +9569,7 @@ function confirmAddClient(){
     return;
   }
   const newClient = { id:'cli-'+Date.now(), name:name, phone:phone, email:email, company:company, tags:(state._newClientTags||[]).slice(), icon:(state._newClientIcon||null) };
+  const nbday = acmBdayRead(); if(nbday) newClient.birthday = nbday;
   const returnTo = state._clientModalReturnTo;
   DATA.clients.push(newClient);
   saveData(DATA);
@@ -10287,8 +10413,12 @@ function toggleOrderStatus(id){
   if(next==='entregado'){ o.deliveredAt = new Date().toISOString(); }
   else if(cur==='entregado' && next==='pendiente'){ o.deliveredAt = null; }
   o.status = next;
+  let fidMsg = '';
+  if(next==='entregado') fidMsg = fidAlEntregar(o);
+  else if(cur==='entregado') fidAlDesentregar(o);
   saveData(DATA);
   renderOrderList();
+  if(fidMsg) showToast(fidMsg);
 }
 async function cancelOrder(id){
   const o = DATA.orders.find(function(x){ return x.id===id; });
@@ -10303,6 +10433,7 @@ async function cancelOrder(id){
     reconcileRecipeIdsFromOrder(o);
   }
   o.status = 'cancelado';
+  fidLiberarCupones(o);
   saveData(DATA);
   renderOrderList();
   showToast('Pedido cancelado');
@@ -10332,11 +10463,16 @@ async function deleteOrder(id){
   if(removed.stockDeducted) adjustStockForOrder(removed, 1);
   if(removed.portionsDeducted){ adjustPortionStockForOrder(removed, 1); reconcileRecipeIdsFromOrder(removed); }
   DATA.orders.splice(idx,1);
+  const teniaSello = !!removed.fidSello;
+  fidLiberarCupones(removed); fidAlDesentregar(removed);
   saveData(DATA);
   renderOrderList();
   showUndoToast('Pedido borrado', function(){
     if(removed.stockDeducted) adjustStockForOrder(removed, -1);
     if(removed.portionsDeducted) adjustPortionStockForOrder(removed, -1);
+    const cli = DATA.clients.find(function(x){ return x.id===removed.clientId; });
+    if(cli) fidMarcarCupones(cli, removed.id, removed.appliedCoupons||[]);
+    if(teniaSello && removed.status==='entregado') fidAlEntregar(removed);
     DATA.orders.splice(idx,0,removed);
     saveData(DATA);
     renderOrderList();
@@ -10779,9 +10915,10 @@ function saveOrder(){
       mayorista: !!state.orderDraft.mayorista
     };
     if(willDeductPortions) adjustPortionStockForOrder(newOrder, -1);
+    const fidDesc = fidAplicarDesc(newOrder, client);
     DATA.orders.push(newOrder);
     saveData(DATA);
-    showToast('Pedido guardado');
+    showToast(fidDesc ? 'Pedido guardado con el '+fidDesc+'% de la tarjeta' : 'Pedido guardado');
   }
   state.editingOrderId = null;
   handleBack();
@@ -10827,7 +10964,7 @@ function npClientChange(val){
     return;
   }
   state.newOrderDraft.clientId = val || null;
-  state.newOrderDraft.couponIds = [];
+  state.newOrderDraft.couponIds = fidCuponesAuto(val ? DATA.clients.find(function(x){ return x.id===val; }) : null);
   npSyncMayFromClient();
   npRenderClientCoupons();
   npRenderItems();
@@ -10848,7 +10985,7 @@ function npRenderClientCoupons(){
   if(!wrap) return;
   const clientId = state.newOrderDraft.clientId;
   const client = clientId ? DATA.clients.find(function(x){ return x.id===clientId; }) : null;
-  const coupons = client ? (client.coupons||[]) : [];
+  const coupons = client ? cuponesActivos(client, state.editingOrderId) : [];
   if(!client || coupons.length===0){ wrap.style.display = 'none'; wrap.innerHTML = ''; return; }
   const checked = state.newOrderDraft.couponIds||[];
   wrap.innerHTML = coupons.map(function(cp){
@@ -11018,8 +11155,8 @@ function saveNewOrder(){
   const discountPct = appliedCoupon ? (appliedCoupon.value||0) : 0;
   const total = discountPct>0 ? Math.round(rawTotal*(1-discountPct/100)) : rawTotal;
   const appliedCoupons = (state.newOrderDraft.couponIds||[]).map(function(id){
-    const cp = (client.coupons||[]).find(function(x){ return x.id===id; });
-    return cp ? { clientCouponId:cp.id, label:couponDisplayLabel(cp), type:cp.type, value:cp.value } : null;
+    const cp = cuponesActivos(client, state.editingOrderId).find(function(x){ return x.id===id; });
+    return cp ? (cp.fid ? { clientCouponId:cp.id, label:couponDisplayLabel(cp), type:cp.type, value:cp.value, fid:cp.fid } : { clientCouponId:cp.id, label:couponDisplayLabel(cp), type:cp.type, value:cp.value }) : null;
   }).filter(Boolean);
   const willDeductPortions = DATA.settings.discountStockOnSale!==false;
 
@@ -11040,6 +11177,7 @@ function saveNewOrder(){
     o.total = (webCarried ? webRecalcTotal(snapItems, typeof discountPct==='number' ? discountPct : 0) : total) + (Number(o.envio)||0);
     o.discountPct = discountPct;
     o.appliedCoupons = appliedCoupons;
+    fidMarcarCupones(client, o.id, appliedCoupons);
     if(willDeductPortions){ adjustPortionStockForOrder(o, -1); o.portionsDeducted = true; }
     else { o.portionsDeducted = false; }
     if(o.stockDeducted) adjustStockForOrder(o, -1);
@@ -11071,6 +11209,7 @@ function saveNewOrder(){
     mayorista: !!state.newOrderDraft.mayorista
   };
   if(willDeductPortions) adjustPortionStockForOrder(newOrder, -1);
+  fidMarcarCupones(client, newOrder.id, appliedCoupons);
   DATA.orders.push(newOrder);
   saveData(DATA);
   closeNewOrderModal();
@@ -11132,13 +11271,14 @@ function refreshWebInbox(force){
           .map(function(p){ if(p.orderId && !/^ord-\d{10,16}$/.test(String(p.orderId))) p.orderId = ''; return p; });
         webInbox.productos = Array.isArray(j.productos) ? j.productos : [];
         webInbox.cargado = true; webInbox.error = '';
+        fidAltasDe(j);
       } else {
         webInbox.error = (j && j.error==='clave incorrecta') ? 'clave' : 'script';
       }
       webInbox.ultimo = Date.now();
     })
     .catch(function(){ webInbox.error = webInbox.cargado ? '' : 'red'; })
-    .then(function(){ webInbox.promesa = null; updateWebInboxBanner(); webRerenderOpen(); return webInbox; });
+    .then(function(){ webInbox.promesa = null; updateWebInboxBanner(); updateFidAltasBanner(); webRerenderOpen(); return webInbox; });
   return webInbox.promesa;
 }
 function updateWebInboxBanner(){
@@ -11427,6 +11567,7 @@ function createOrderFromWeb(p, s, orderId){
   if(p.pago==='Transferencia') order.payMethod = 'transferencia';
   else if(p.pago==='Efectivo') order.payMethod = 'efectivo';
   if(willDeductPortions) adjustPortionStockForOrder(order, -1);
+  fidAplicarDesc(order, client);
   DATA.orders.push(order);
   saveData(DATA);
   if(typeof renderOrderList==='function' && document.getElementById('orderList')) renderOrderList();
@@ -15371,6 +15512,577 @@ function exitCook(){
   state.stack = ['home','detail'];
   render();
   openDetailRender(state.cookRecipeId);
+}
+
+/* =========================================================
+   TARJETA DE FIDELIDAD
+   Un sello por pedido entregado (también a mano o escaneando la tarjeta del cliente).
+   Solo clientes: los mayoristas nunca suman. Premios = cupones del cliente con `fid`
+   ('desc' = % de descuento que se aplica solo en el próximo pedido, 'regalo' = completa
+   la tarjeta, vuelve a 0 y el historial sigue). La tarjeta de Google Wallet la arma el
+   script con c.fid.token (el cliente se suma desde la página y queda en "Pendientes").
+   ========================================================= */
+var FID_TOKEN_RE = /^[a-z0-9]{20}$/;
+var FID_QR_RE = /^KOBU1-([a-z0-9]{20})$/;
+var FID_ALTA_RE = /^fa-\d{10,16}-\d{1,7}$/;
+var FID_HIST_MAX = 300;
+var FID_PAGE_URL = 'https://j4mp3.github.io/kobudulce/tarjeta/';
+var MESES_LARGOS = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+var clientsTab = 'clientes';
+function setClientsTab(tab){
+  clientsTab = tab==='mayoristas' ? 'mayoristas' : 'clientes';
+  const a = document.getElementById('cliTabClientesBtn'), b = document.getElementById('cliTabMayBtn'), th = document.getElementById('cliTabThumb');
+  if(a) a.classList.toggle('active', clientsTab==='clientes');
+  if(b) b.classList.toggle('active', clientsTab==='mayoristas');
+  if(th) th.classList.toggle('right', clientsTab==='mayoristas');
+  renderClientsScreen();
+}
+function fidCfg(){
+  const s = (DATA.settings && DATA.settings.fid && typeof DATA.settings.fid==='object') ? DATA.settings.fid : {};
+  const n = function(v, d, lo, hi){ v = parseInt(v, 10); return (isFinite(v) && v>=lo && v<=hi) ? v : d; };
+  const regalo = n(s.regalo, 10, 4, 12);
+  return { desc: Math.min(n(s.desc, 5, 1, 29), regalo-1), pct: n(s.pct, 5, 1, 50), regalo: regalo,
+    regaloTxt: (typeof s.regaloTxt==='string' && s.regaloTxt.trim()) ? s.regaloTxt.trim().slice(0, 40) : 'Budín chico gratis',
+    dias: n(s.dias, 30, 7, 180) };
+}
+// La tarjeta del cliente (null si no tiene o si es mayorista).
+function fidOf(c){
+  if(!(c && c.fid && typeof c.fid==='object' && !clientIsMayorista(c))) return null;
+  const f = c.fid;
+  ['sellos','total','ciclos'].forEach(function(k){ const v = parseInt(f[k], 10); f[k] = (isFinite(v) && v>0) ? v : 0; });
+  if(!Array.isArray(f.hist)) f.hist = [];
+  if(f.token!=null && !/^[a-z0-9]{20}$/.test(String(f.token))) delete f.token;
+  return f;
+}
+function fidEnsure(c){
+  if(!c.fid || typeof c.fid!=='object') c.fid = { sellos:0, total:0, ciclos:0, hist:[], desde:new Date().toISOString() };
+  if(!Array.isArray(c.fid.hist)) c.fid.hist = [];
+  c.fid.sellos = Math.max(0, parseInt(c.fid.sellos, 10) || 0);
+  return c.fid;
+}
+function fidHistPush(f, e){ e.ts = e.ts || new Date().toISOString(); f.hist.unshift(e); if(f.hist.length>FID_HIST_MAX) f.hist.length = FID_HIST_MAX; }
+// Cupones que todavía se pueden usar (uno ya usado solo se ve en el pedido que lo usó).
+function cuponesActivos(c, orderId){
+  return ((c && c.coupons) || []).filter(function(cp){ return cp && (!cp.usadoEn || (orderId && cp.usadoEn===orderId)); });
+}
+function fidCupon(c, kind){ return cuponesActivos(c).find(function(cp){ return cp.fid===kind; }) || null; }
+// +1 sello. Devuelve el premio ganado ('' si no hay).
+function fidSumar(c, motivo, orderId){
+  const f = fidEnsure(c), cfg = fidCfg();
+  f.sellos += 1; f.total = (parseInt(f.total, 10) || 0) + 1;
+  const e = { t:'+', m:motivo==='pedido' ? 'pedido' : 'manual' }; if(orderId) e.o = orderId;
+  fidHistPush(f, e);
+  let premio = '';
+  c.coupons = c.coupons || [];
+  if(f.sellos===cfg.desc && !fidCupon(c, 'desc')){
+    c.coupons.push({ id:'ccp-fid-'+Date.now()+'-d', fid:'desc', type:'percent', value:cfg.pct, label:'Tarjeta: '+cfg.pct+'% off' });
+    fidHistPush(f, { t:'p1', v:cfg.pct });
+    premio = cfg.pct+'% de descuento en el próximo pedido';
+  }
+  if(f.sellos>=cfg.regalo){
+    c.coupons.push({ id:'ccp-fid-'+Date.now()+'-r', fid:'regalo', type:'gift', label:'Tarjeta: '+cfg.regaloTxt });
+    f.sellos = 0; f.ciclos = (parseInt(f.ciclos, 10) || 0) + 1;
+    fidHistPush(f, { t:'p2', v:cfg.regaloTxt });
+    premio = cfg.regaloTxt;
+  }
+  // Los cupones de la tarjeta ya usados se guardan como mucho 6 (los más viejos se borran).
+  const usados = c.coupons.filter(function(cp){ return cp.fid && cp.usadoEn; });
+  if(usados.length>6){ const sobran = usados.slice(0, usados.length-6); c.coupons = c.coupons.filter(function(cp){ return sobran.indexOf(cp)===-1; }); }
+  return premio;
+}
+function fidQuitar(c, orderId){
+  const f = fidOf(c); if(!f || !(f.sellos>0)) return false;
+  const cfg = fidCfg();
+  if(f.sellos===cfg.desc){ const cp = fidCupon(c, 'desc'); if(cp) c.coupons = c.coupons.filter(function(x){ return x!==cp; }); }
+  f.sellos -= 1; f.total = Math.max(0, (parseInt(f.total, 10) || 0) - 1);
+  const e = { t:'-' }; if(orderId) e.o = orderId;
+  fidHistPush(f, e);
+  return true;
+}
+// Pedido entregado: +1 sello (solo clientes con tarjeta, nunca pedidos mayoristas). Si en las
+// últimas 12 h ya le sumaste un sello a mano (por ejemplo escaneando su tarjeta), ese es el de este pedido.
+function fidAlEntregar(o){
+  if(!o || o.fidSello || orderIsMayorista(o)) return '';
+  const c = DATA.clients.find(function(x){ return x.id===o.clientId; });
+  const f = fidOf(c); if(!f) return '';
+  o.fidSello = true;
+  const manual = f.hist.find(function(e){ return e.t==='+' && e.m==='manual' && !e.o && Date.now()-new Date(e.ts).getTime() < 12*3600000; });
+  if(manual){ manual.o = o.id; return ''; }
+  const premio = fidSumar(c, 'pedido', o.id);
+  return premio ? c.name+' completó '+(f.sellos===0 ? 'la tarjeta' : fidCfg().desc+' sellos')+': '+premio : 'Sello para '+c.name+' · '+f.sellos+' de '+fidCfg().regalo;
+}
+// Pedido que vuelve de Entregado: se quita su sello si sigue en la tarjeta actual.
+function fidAlDesentregar(o){
+  if(!o || !o.fidSello) return;
+  o.fidSello = false;
+  const c = DATA.clients.find(function(x){ return x.id===o.clientId; });
+  const f = fidOf(c); if(!f) return;
+  const i = f.hist.findIndex(function(e){ return e.t==='+' && e.o===o.id; });
+  if(i===-1) return;
+  if(f.hist[i].m==='manual'){ delete f.hist[i].o; return; }
+  const reinicio = f.hist.findIndex(function(e){ return e.t==='p2'; });
+  if(reinicio===-1 || i<reinicio) fidQuitar(c, o.id);
+}
+// Cupones de la tarjeta que se tildan solos en un pedido nuevo (el % sí; el regalo lo elegís vos).
+function fidCuponesAuto(c){
+  if(!c || clientIsMayorista(c)) return [];
+  const cp = fidCupon(c, 'desc');
+  return cp ? [cp.id] : [];
+}
+function fidMarcarCupones(c, orderId, applied){
+  if(!c || !orderId) return;
+  const ids = (applied||[]).map(function(a){ return a.clientCouponId; });
+  (c.coupons||[]).forEach(function(cp){
+    if(!cp.fid) return;
+    if(ids.indexOf(cp.id)>-1){
+      if(cp.usadoEn!==orderId){ cp.usadoEn = orderId; const f = fidOf(c); if(f) fidHistPush(f, { t:'u', k:cp.fid, v:couponDisplayLabel(cp), o:orderId }); }
+    } else if(cp.usadoEn===orderId) delete cp.usadoEn;
+  });
+}
+function fidLiberarCupones(o){
+  const c = o ? DATA.clients.find(function(x){ return x.id===o.clientId; }) : null;
+  if(!c) return;
+  (c.coupons||[]).forEach(function(cp){ if(cp.fid && cp.usadoEn===o.id) delete cp.usadoEn; });
+}
+// Pedido nuevo cargado sin la ventana (Repetir, pedido web): el % de la tarjeta se aplica solo.
+function fidAplicarDesc(o, c){
+  if(!o || !c || o.mayorista || clientIsMayorista(c) || (o.discountPct||0)>0) return 0;
+  const cp = fidCupon(c, 'desc'); if(!cp) return 0;
+  const pct = Math.max(0, Math.min(50, Number(cp.value)||0)); if(!pct) return 0;
+  const sub = (o.items||[]).reduce(function(a, it){ return a + (it.unitPrice||0)*it.qty; }, 0);
+  if(!(sub>0)) return 0;
+  o.discountPct = pct;
+  o.total = Math.round(sub*(1-pct/100)) + (Number(o.envio)||0);
+  o.appliedCoupons = (o.appliedCoupons||[]).concat([{ clientCouponId:cp.id, label:couponDisplayLabel(cp), type:'percent', value:pct, fid:'desc' }]);
+  fidMarcarCupones(c, o.id, o.appliedCoupons);
+  return pct;
+}
+// ---- Cumpleaños ('MM-DD') y días sin comprar ----
+function bdayValid(b){ if(typeof b!=='string' || !/^\d{2}-\d{2}$/.test(b)) return false; const m = +b.slice(0,2), d = +b.slice(3); return m>=1 && m<=12 && d>=1 && d<=31; }
+function bdayLabel(b){ return bdayValid(b) ? (+b.slice(3))+' de '+MESES_LARGOS[+b.slice(0,2)-1] : ''; }
+function bdayDiasFaltan(b){
+  if(!bdayValid(b)) return null;
+  const hoy = parseDateLoose(todayStr());
+  let d = new Date(hoy.getFullYear(), +b.slice(0,2)-1, +b.slice(3));
+  if(d < hoy) d = new Date(hoy.getFullYear()+1, +b.slice(0,2)-1, +b.slice(3));
+  return Math.round((d - hoy)/86400000);
+}
+function acmBdayFill(val){
+  const dSel = document.getElementById('acm-bday-d'), mSel = document.getElementById('acm-bday-m');
+  if(!dSel || !mSel) return;
+  const v = bdayValid(val) ? val : '';
+  let dh = '<option value="">Día</option>'; for(let i=1;i<=31;i++) dh += '<option value="'+(i<10?'0':'')+i+'">'+i+'</option>';
+  dSel.innerHTML = dh;
+  mSel.innerHTML = '<option value="">Mes</option>' + MESES_LARGOS.map(function(m, i){ return '<option value="'+(i<9?'0':'')+(i+1)+'">'+m.charAt(0).toUpperCase()+m.slice(1)+'</option>'; }).join('');
+  dSel.value = v ? v.slice(3) : ''; mSel.value = v ? v.slice(0,2) : '';
+}
+function acmBdayRead(){
+  const d = (document.getElementById('acm-bday-d')||{}).value || '', m = (document.getElementById('acm-bday-m')||{}).value || '';
+  const b = (m && d) ? m+'-'+d : '';
+  return bdayValid(b) ? b : '';
+}
+function clientDiasSinComprar(c){
+  let ult = 0;
+  DATA.orders.forEach(function(o){
+    if(o.clientId!==c.id || o.status==='cancelado') return;
+    const t = new Date(o.deliveredAt || o.createdAt).getTime(); if(t>ult) ult = t;
+  });
+  if(!ult) return null;
+  return Math.floor((parseDateLoose(todayStr()) - parseDateLoose(localDateStr(new Date(ult))))/86400000);
+}
+function clientFidPillsHtml(c){
+  let h = '';
+  const f = fidOf(c);
+  if(f) h += '<span class="client-pill fid"><span class="icon-slot" data-icon="paw" style="font-size:9px;"></span>'+f.sellos+'/'+fidCfg().regalo+'</span>';
+  if(f){ const dias = clientDiasSinComprar(c); if(dias!=null && dias>=fidCfg().dias) h += '<span class="client-pill warn">'+dias+' días sin comprar</span>'; }
+  const fb = clientIsMayorista(c) ? null : bdayDiasFaltan(c.birthday);
+  if(fb!=null && fb<=7) h += '<span class="client-pill warn"><span class="icon-slot" data-icon="cake" style="font-size:9px;"></span>'+(fb===0 ? 'Hoy cumple' : fb===1 ? 'Cumple mañana' : 'Cumple en '+fb+' días')+'</span>';
+  return h;
+}
+function fidHomeMsgs(){
+  const out = [], cfg = fidCfg();
+  const cli = DATA.clients.filter(function(c){ return c && !clientIsMayorista(c); });
+  cli.forEach(function(c){
+    const fb = bdayDiasFaltan(c.birthday);
+    if(fb===0) out.push({ icon:'cake', color:'var(--k-accent)', text:'Hoy cumple '+c.name+'.', client:c.id });
+    else if(fb!=null && fb<=3) out.push({ icon:'cake', color:'var(--k-accent)', text:c.name+' cumple '+(fb===1 ? 'mañana' : 'en '+fb+' días')+' ('+bdayLabel(c.birthday)+').', client:c.id });
+  });
+  const sin = cli.filter(fidOf).map(function(c){ return { c:c, d:clientDiasSinComprar(c) }; })
+    .filter(function(x){ return x.d!=null && x.d>=cfg.dias; }).sort(function(a, b){ return b.d - a.d; });
+  if(sin.length===1) out.push({ icon:'paw', color:'var(--k-warning)', text:sin[0].c.name+' hace '+sin[0].d+' días que no compra.', client:sin[0].c.id });
+  else if(sin.length>1) out.push({ icon:'paw', color:'var(--k-warning)', text:sin[0].c.name+' hace '+sin[0].d+' días que no compra (y '+(sin.length-1)+' más de la tarjeta).', screen:'orders', tab:'clientes' });
+  return out;
+}
+// ---- Ficha del cliente ----
+var FID_HIST_TXT = { '+':'Sello', '-':'Se quitó un sello', p1:'Ganó', p2:'Completó la tarjeta', u:'Usó', a:'Se sumó a la tarjeta', w:'Tarjeta en Google Wallet' };
+function fidHistRow(e){
+  let ic = 'paw', t = FID_HIST_TXT[e.t] || '';
+  if(e.t==='+') t += e.m==='pedido' ? ' · pedido entregado' : ' · a mano';
+  if(e.t==='-') ic = 'history';
+  if(e.t==='p1'){ ic = 'gift-card'; t += ' '+(e.v||'')+'% de descuento'; }
+  if(e.t==='p2'){ ic = 'gift'; t += ': '+(e.v||''); }
+  if(e.t==='u'){ ic = 'check'; t += ' '+(e.v||'el premio'); }
+  if(e.t==='a' || e.t==='w') ic = 'scan-qr';
+  const d = new Date(e.ts);
+  return '<div class="fid-hrow"><span class="ic"><span class="icon-slot" data-icon="'+ic+'"></span></span><span>'+escapeHtml(t)+'</span><span class="d">'+(isNaN(d) ? '' : d.toLocaleDateString('es-AR', { day:'numeric', month:'short' }))+'</span></div>';
+}
+function fidDotsHtml(f){
+  const cfg = fidCfg();
+  let h = '<div class="fid-dots">';
+  for(let i=1;i<=cfg.regalo;i++){
+    const on = i<=f.sellos;
+    const mk = i===cfg.desc ? '<span class="fid-mk">'+cfg.pct+'%</span>' : i===cfg.regalo ? '<span class="fid-mk"><span class="icon-slot" data-icon="gift"></span></span>' : '';
+    h += '<div class="fid-dot'+(on?' on':'')+'">'+(on ? '<span class="icon-slot" data-icon="paw"></span>' : '<span style="font-size:calc(11px + var(--kobu-font-boost, 0px));font-weight:600;">'+i+'</span>')+mk+'</div>';
+  }
+  return h+'</div>';
+}
+function fidFaltaTxt(f){
+  const cfg = fidCfg();
+  if(f.sellos<cfg.desc){ const k = cfg.desc-f.sellos; return 'Falta'+(k>1?'n ':' ')+k+' para el '+cfg.pct+'% de descuento'; }
+  const k = cfg.regalo-f.sellos; return 'Falta'+(k>1?'n ':' ')+k+' para '+cfg.regaloTxt.charAt(0).toLowerCase()+cfg.regaloTxt.slice(1);
+}
+function renderClientFidCard(c){
+  const box = document.getElementById('cd-fid'); if(!box) return;
+  if(!c || clientIsMayorista(c)){ box.style.display = 'none'; box.innerHTML = ''; return; }
+  box.style.display = '';
+  const f = fidOf(c);
+  const head = '<p class="section-title"><span class="badge-ic"><span class="icon-slot" data-icon="paw"></span></span>Tarjeta de fidelidad'+
+    (f ? '<span class="fid-chip'+(f.token?' ok':'')+'" style="margin-left:auto;">'+(f.token ? '<span class="icon-slot" data-icon="check"></span>Google Wallet' : 'Sin Wallet')+'</span>' : '')+'</p>';
+  if(!f){
+    box.innerHTML = head+'<p class="fid-sub" style="margin:0 0 10px;">Todavía no tiene tarjeta. Se suma sola cuando escanea el QR, o la activás acá para sellarle a mano.</p>'+
+      '<button class="btn btn-primary" style="width:100%;" onclick="fidActivarManual(\''+c.id+'\')"><span class="icon-slot" data-icon="paw" style="vertical-align:-2px;"></span> Activar tarjeta</button>';
+    mountIcons(); return;
+  }
+  const cfg = fidCfg();
+  const premios = cuponesActivos(c).filter(function(cp){ return cp.fid; });
+  const dias = clientDiasSinComprar(c);
+  box.innerHTML = head + fidDotsHtml(f) +
+    '<p class="fid-sum"><b>'+f.sellos+' de '+cfg.regalo+' sellos</b> · '+escapeHtml(fidFaltaTxt(f))+'</p>'+
+    '<p class="fid-sub">Lleva '+(f.total||0)+' sello'+((f.total||0)===1?'':'s')+' en total'+(f.ciclos ? ' · '+f.ciclos+' tarjeta'+(f.ciclos===1?'':'s')+' completa'+(f.ciclos===1?'':'s') : '')+
+      (dias!=null ? ' · '+(dias===0 ? 'compró hoy' : 'hace '+dias+' día'+(dias===1?'':'s')+' que no compra') : '')+'</p>'+
+    premios.map(function(cp){ return '<div class="fid-prize"><span class="icon-slot" data-icon="'+(cp.fid==='desc'?'gift-card':'gift')+'"></span>'+(cp.fid==='desc' ? 'Tiene '+escapeHtml(String(cp.value))+'% de descuento para el próximo pedido' : 'Tiene de regalo: '+escapeHtml(couponDisplayLabel(cp).replace(/^Tarjeta: /, '')))+'</div>'; }).join('')+
+    '<div class="btn-row" style="margin-top:12px;">'+
+      '<button class="btn btn-ghost" style="flex:0 0 auto;padding:0 16px;" onclick="fidQuitarManual(\''+c.id+'\')" '+(f.sellos>0?'':'disabled')+'>Quitar</button>'+
+      '<button class="btn btn-primary" style="flex:1;" onclick="fidSumarManual(\''+c.id+'\')"><span class="icon-slot" data-icon="plus" style="vertical-align:-2px;"></span> Sumar sello</button>'+
+    '</div>'+
+    (f.hist.length ? '<div class="fid-hist">'+f.hist.slice(0, 4).map(fidHistRow).join('')+'</div>'+
+      (f.hist.length>4 ? '<button class="btn btn-ghost" style="width:100%;margin-top:6px;font-size:calc(11.5px + var(--kobu-font-boost, 0px));" onclick="fidVerHistorial(\''+c.id+'\')">Ver todo el historial</button>' : '') : '');
+  mountIcons();
+}
+function fidActivarManual(id){
+  const c = DATA.clients.find(function(x){ return x.id===id; }); if(!c || clientIsMayorista(c)) return;
+  const f = fidEnsure(c); if(!f.hist.length) fidHistPush(f, { t:'a', m:'manual' });
+  saveData(DATA); renderClientDetail(); renderClientsScreen(); showToast('Tarjeta activada');
+}
+var fidSumarBloqueo = {};
+function fidSumarManual(id){
+  const c = DATA.clients.find(function(x){ return x.id===id; }); if(!c || !fidOf(c)) return;
+  if(fidSumarBloqueo[id] && Date.now()-fidSumarBloqueo[id] < 2500) return; // doble toque
+  fidSumarBloqueo[id] = Date.now();
+  const premio = fidSumar(c, 'manual');
+  saveData(DATA);
+  if(state.currentClientId===id && document.getElementById('screen-clientdetail').classList.contains('active')) renderClientDetail();
+  renderClientsScreen();
+  const f = fidOf(c);
+  showUndoToast(premio ? c.name+' ganó: '+premio : 'Sello sumado · '+f.sellos+' de '+fidCfg().regalo, function(){
+    fidDeshacerUltimo(c); saveData(DATA);
+    if(state.currentClientId===id) renderClientDetail();
+    renderClientsScreen(); fidScanRenderRes();
+  });
+  fidScanRenderRes();
+}
+// Deshacer el último sello sumado a mano (también si completó la tarjeta en ese toque).
+function fidDeshacerUltimo(c){
+  const f = fidOf(c); if(!f) return;
+  const i = f.hist.findIndex(function(e){ return e.t==='+'; });
+  if(i===-1) return;
+  const quitados = f.hist.slice(0, i+1);
+  if(quitados.some(function(e){ return e.t==='p2'; })){
+    f.sellos = fidCfg().regalo - 1; f.ciclos = Math.max(0, (f.ciclos||0)-1);
+    const cp = fidCupon(c, 'regalo'); if(cp) c.coupons = c.coupons.filter(function(x){ return x!==cp; });
+  } else {
+    f.sellos = Math.max(0, f.sellos-1);
+    if(quitados.some(function(e){ return e.t==='p1'; })){ const cp = fidCupon(c, 'desc'); if(cp) c.coupons = c.coupons.filter(function(x){ return x!==cp; }); }
+  }
+  f.total = Math.max(0, (f.total||0)-1);
+  f.hist.splice(0, i+1);
+}
+async function fidQuitarManual(id){
+  const c = DATA.clients.find(function(x){ return x.id===id; }); if(!c || !fidOf(c) || !(fidOf(c).sellos>0)) return;
+  const ok = await showConfirm('¿Quitarle un sello a '+c.name+'?');
+  if(!ok) return;
+  fidQuitar(c); saveData(DATA); renderClientDetail(); renderClientsScreen(); showToast('Sello quitado');
+}
+function fidVerHistorial(id){
+  const c = DATA.clients.find(function(x){ return x.id===id; }); const f = fidOf(c); if(!f) return;
+  document.getElementById('badgeStackPopupTitle').textContent = 'Historial de la tarjeta';
+  document.getElementById('badgeStackPopupList').innerHTML = '<div class="fid-hist" style="border-top:none;margin:0;">'+f.hist.map(fidHistRow).join('')+'</div>';
+  mountIcons();
+  document.getElementById('badgeStackPopupModal').classList.add('active');
+}
+// ---- Ajustes ----
+function openFidCfg(){
+  const cfg = fidCfg();
+  document.getElementById('fc-desc').value = cfg.desc; document.getElementById('fc-pct').value = cfg.pct;
+  document.getElementById('fc-regalo').value = cfg.regalo; document.getElementById('fc-regaloTxt').value = cfg.regaloTxt;
+  document.getElementById('fc-dias').value = cfg.dias;
+  mountIcons();
+  document.getElementById('fidCfgModal').classList.add('active');
+}
+function closeFidCfg(){ document.getElementById('fidCfgModal').classList.remove('active'); }
+function saveFidCfg(){
+  const g = function(id){ return document.getElementById(id).value; };
+  const desc = parseInt(g('fc-desc'), 10), regalo = parseInt(g('fc-regalo'), 10);
+  if(!(regalo>=4 && regalo<=12)){ showToast('Sellos para el regalo: de 4 a 12'); return; }
+  if(!(desc>=1 && desc<regalo)){ showToast('El descuento tiene que llegar antes que el regalo'); return; }
+  DATA.settings.fid = { desc:desc, pct:parseInt(g('fc-pct'), 10), regalo:regalo, regaloTxt:String(g('fc-regaloTxt')||'').trim().slice(0, 40), dias:parseInt(g('fc-dias'), 10) };
+  DATA.settings.fid = fidCfg(); // normalizado
+  saveData(DATA); closeFidCfg(); showToast('Tarjeta guardada');
+}
+function fidCopiarLink(){
+  try{ navigator.clipboard.writeText(FID_PAGE_URL).then(function(){ showToast('Link copiado'); }, function(){ showToast(FID_PAGE_URL); }); }catch(e){ showToast(FID_PAGE_URL); }
+}
+// ---- Pendientes por registrar (llegan con la bandeja de pedidos web) ----
+var fidAltas = { lista:[], cargado:false, abierta:null };
+function fidTxt(v, n){ return String(v==null ? '' : v).replace(/[\u0000-\u001f]/g, ' ').trim().slice(0, n); }
+function fidAltasDe(j){
+  if(!j || !Array.isArray(j.altasFid)) return;
+  fidAltas.lista = j.altasFid.filter(function(a){ return a && typeof a.id==='string' && FID_ALTA_RE.test(a.id) && FID_TOKEN_RE.test(String(a.token||'')); })
+    .map(function(a){ return { id:a.id, token:String(a.token), nombre:fidTxt(a.nombre, 60), cumple:bdayValid(a.cumple) ? a.cumple : '', tel:fidTxt(a.tel, 30), mail:fidTxt(a.mail, 80), ts:fidTxt(a.ts, 30), estado:fidTxt(a.estado, 12) || 'nuevo' }; });
+  fidAltas.cargado = true;
+}
+function fidTokenCliente(token){ return DATA.clients.find(function(c){ return c && c.fid && c.fid.token===token; }) || null; }
+function fidAltasPendientes(){ return fidAltas.lista.filter(function(a){ return a.estado==='nuevo' && !fidTokenCliente(a.token); }); }
+function updateFidAltasBanner(){
+  const b = document.getElementById('fidAltasBanner'); if(!b) return;
+  const n = fidAltasPendientes().length;
+  b.style.display = n ? 'flex' : 'none';
+  const cnt = document.getElementById('fidAltasCount'); if(cnt) cnt.textContent = n;
+  const m = document.getElementById('fidAltasModal'); if(m && m.classList.contains('active') && !fidAltas.abierta) renderFidAltas();
+}
+function openFidAltas(id){
+  fidAltas.abierta = id || null;
+  renderFidAltas();
+  document.getElementById('fidAltasModal').classList.add('active');
+}
+function closeFidAltas(){
+  if(fidAltas.abierta && fidAltasPendientes().length>1){ fidAltas.abierta = null; renderFidAltas(); return; }
+  fidAltas.abierta = null;
+  document.getElementById('fidAltasModal').classList.remove('active');
+}
+function fidDigitos(t){ return String(t||'').replace(/\D/g, '').slice(-8); }
+function fidSugerencias(a){
+  const tel = fidDigitos(a.tel), mail = String(a.mail||'').trim().toLowerCase();
+  const pal = normalizeMatchText(a.nombre).split(' ').filter(function(w){ return w.length>2; });
+  return DATA.clients.map(function(c){
+    let sc = 0, why = [];
+    if(tel.length>=6 && fidDigitos(c.phone)===tel){ sc += 5; why.push('mismo teléfono'); }
+    if(mail && String(c.email||'').trim().toLowerCase()===mail){ sc += 5; why.push('mismo mail'); }
+    const cw = normalizeMatchText(c.name).split(' ');
+    const k = pal.filter(function(w){ return cw.indexOf(w)>-1; }).length;
+    if(k){ sc += k*2; if(!why.length) why.push('nombre parecido'); }
+    return { c:c, sc:sc, why:why.join(' y ') };
+  }).filter(function(x){ return x.sc>=2; }).sort(function(x, y){ return y.sc - x.sc; }).slice(0, 3);
+}
+function renderFidAltas(){
+  const body = document.getElementById('fa-body'); if(!body) return;
+  const pend = fidAltasPendientes();
+  let a = fidAltas.abierta ? pend.find(function(x){ return x.id===fidAltas.abierta; }) : null;
+  if(!a && pend.length===1) a = pend[0];
+  document.getElementById('fa-closeBtn').textContent = (a && pend.length>1) ? 'Volver' : 'Cerrar';
+  if(!a){
+    document.getElementById('fa-title').textContent = 'Pendientes por registrar';
+    document.getElementById('fa-sub').textContent = 'Se sumaron a la tarjeta desde la página';
+    body.innerHTML = (pend.length>2 ? '<button class="btn btn-ghost" style="width:100%;color:var(--k-danger);" onclick="fidDescartarTodas()">Descartar todos ('+pend.length+')</button>' : '') + (pend.length ? pend.map(function(x){
+      const d = new Date(x.ts);
+      return '<button class="fa-row" onclick="openFidAltas(\''+x.id+'\')"><span class="client-avatar"><span class="icon-slot" data-icon="paw"></span></span><span style="flex:1;min-width:0;"><span class="t" style="display:block;">'+escapeHtml(x.nombre)+'</span><span class="s">'+escapeHtml(x.tel || x.mail)+(isNaN(d) ? '' : ' · '+d.toLocaleDateString('es-AR', { day:'numeric', month:'short' }))+'</span></span><span class="icon-slot" data-icon="chevron-right" style="color:var(--k-muted);"></span></button>';
+    }).join('') : '<div class="empty"><span class="icon-slot" data-icon="check"></span>No hay nadie por registrar.</div>');
+    mountIcons(); return;
+  }
+  fidAltas.abierta = a.id;
+  document.getElementById('fa-title').textContent = a.nombre;
+  document.getElementById('fa-sub').textContent = 'Se sumó a la tarjeta · ¿ya es cliente?';
+  const sug = fidSugerencias(a);
+  const fila = function(l, v){ return v ? '<div><span>'+l+'</span><span>'+escapeHtml(v)+'</span></div>' : ''; };
+  body.innerHTML =
+    '<div class="fa-data">'+fila('Apellido y nombre', a.nombre)+fila('Cumpleaños', bdayLabel(a.cumple))+fila('Teléfono', a.tel)+fila('Mail', a.mail)+'</div>'+
+    '<p class="fid-sub" style="margin:0;">El teléfono y el mail no se verifican: si dudás, pedile que te muestre la tarjeta y escaneala desde Inicio.</p>'+
+    (sug.length ? '<p class="acm-sectionlabel" style="margin:6px 0 0;">Es este cliente</p>'+sug.map(function(x, i){
+      return '<button class="fa-sug'+(i===0 && x.sc>=5 ? ' best' : '')+'" onclick="fidVincularAlta(\''+a.id+'\',\''+x.c.id+'\')"><span class="client-avatar">'+clientAvatarHtml(x.c)+'</span><span style="flex:1;min-width:0;"><span style="display:block;font-weight:600;">'+escapeHtml(x.c.name)+'</span><span class="why">'+escapeHtml(x.why)+'</span></span><span class="fid-chip">Vincular</span></button>';
+    }).join('') : '')+
+    '<p class="acm-sectionlabel" style="margin:6px 0 0;">'+(sug.length ? 'Otro cliente' : 'Vincular con un cliente')+'</p>'+
+    '<select class="input" onchange="if(this.value) fidVincularAlta(\''+a.id+'\', this.value)"><option value="">Elegir cliente...</option>'+
+      clientsSorted().filter(function(c){ return !clientIsMayorista(c); }).map(function(c){ return '<option value="'+c.id+'">'+escapeHtml(c.name)+'</option>'; }).join('')+'</select>'+
+    '<button class="btn btn-primary" style="width:100%;margin-top:4px;" onclick="fidCrearDesdeAlta(\''+a.id+'\')"><span class="icon-slot" data-icon="plus" style="vertical-align:-2px;"></span> Crear cliente nuevo</button>'+
+    '<button class="btn btn-ghost" style="width:100%;color:var(--k-danger);" onclick="fidDescartarAlta(\''+a.id+'\')">Descartar</button>';
+  mountIcons();
+}
+function fidAltaEstado(a, estado){
+  const c = webCreds();
+  if(!c || !fidAltas.cargado) return Promise.reject(new Error('sin conexión'));
+  return fetch(c.url+'?key='+encodeURIComponent(c.key)+'&action=fidAltaEstado', {
+    method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' }, body: JSON.stringify({ id:a.id, estado:estado })
+  }).then(function(r){ return r.json(); }).then(function(j){
+    if(!j || !j.ok) throw new Error((j && j.error) || 'sin respuesta');
+    a.estado = estado;
+  });
+}
+function fidLigar(c, a){
+  if(!c.phone && a.tel) c.phone = a.tel;
+  if(!c.email && a.mail) c.email = a.mail;
+  if(!bdayValid(c.birthday) && a.cumple) c.birthday = a.cumple;
+  DATA.clients.forEach(function(o){ if(o!==c && o.fid && o.fid.token===a.token) delete o.fid.token; });
+  const f = fidEnsure(c);
+  f.token = a.token;
+  fidHistPush(f, { t:'w' });
+}
+async function fidVincularAlta(altaId, clientId){
+  const a = fidAltas.lista.find(function(x){ return x.id===altaId; });
+  const c = DATA.clients.find(function(x){ return x.id===clientId; });
+  if(!a || !c) return;
+  if(clientIsMayorista(c)){ showToast('Los mayoristas no tienen tarjeta'); return; }
+  if(c.fid && c.fid.token && c.fid.token!==a.token){
+    const ok = await showConfirm(c.name+' ya tiene una tarjeta en su celular. ¿Reemplazarla por esta? La anterior deja de actualizarse. Si dudás, pedile que te muestre la tarjeta y escaneala.');
+    if(!ok) return;
+  }
+  return fidAltaEstado(a, 'vinculado').then(function(){
+    fidLigar(c, a); saveData(DATA);
+    fidAltas.abierta = null; showToast('Tarjeta vinculada a '+c.name);
+    if(fidAltasPendientes().length) renderFidAltas(); else document.getElementById('fidAltasModal').classList.remove('active');
+    updateFidAltasBanner(); renderClientsScreen();
+  }).catch(function(){ showToast('No se pudo conectar. Probá de nuevo.'); });
+}
+function fidCrearDesdeAlta(altaId){
+  const a = fidAltas.lista.find(function(x){ return x.id===altaId; }); if(!a) return;
+  fidAltaEstado(a, 'vinculado').then(function(){
+    const c = { id:'cli-'+Date.now(), name:a.nombre || 'Cliente', phone:a.tel, email:a.mail, company:'', tags:[], icon:null };
+    if(a.cumple) c.birthday = a.cumple;
+    DATA.clients.push(c); fidLigar(c, a); saveData(DATA);
+    fidAltas.abierta = null; showToast('Cliente creado con su tarjeta');
+    if(fidAltasPendientes().length) renderFidAltas(); else document.getElementById('fidAltasModal').classList.remove('active');
+    updateFidAltasBanner(); renderClientsScreen();
+  }).catch(function(){ showToast('No se pudo conectar. Probá de nuevo.'); });
+}
+async function fidDescartarAlta(altaId){
+  const a = fidAltas.lista.find(function(x){ return x.id===altaId; }); if(!a) return;
+  const ok = await showConfirm('¿Descartar el registro de '+a.nombre+'? Su tarjeta queda sin sellos.');
+  if(!ok) return;
+  fidAltaEstado(a, 'descartado').then(function(){
+    fidAltas.abierta = null; showToast('Registro descartado');
+    if(fidAltasPendientes().length) renderFidAltas(); else document.getElementById('fidAltasModal').classList.remove('active');
+    updateFidAltasBanner();
+  }).catch(function(){ showToast('No se pudo conectar. Probá de nuevo.'); });
+}
+async function fidDescartarTodas(){
+  const pend = fidAltasPendientes();
+  if(!pend.length) return;
+  const ok = await showConfirm('¿Descartar los '+pend.length+' registros pendientes?');
+  if(!ok) return;
+  let bien = 0;
+  for(const a of pend){ try{ await fidAltaEstado(a, 'descartado'); bien++; }catch(e){} }
+  showToast(bien===pend.length ? 'Registros descartados' : 'Se descartaron '+bien+' de '+pend.length+'. Probá de nuevo.');
+  fidAltas.abierta = null; renderFidAltas(); updateFidAltasBanner();
+}
+// ---- Escáner (cámara del celular; Chrome en Android lee QR sin librerías) ----
+var fidScan = { stream:null, timer:null, det:null, clientId:null, altaId:null };
+function openFidScan(){
+  fidScan.clientId = null; fidScan.altaId = null;
+  document.getElementById('fidScanSearch').value = '';
+  document.getElementById('fidScanList').innerHTML = '';
+  fidScanRenderRes();
+  mountIcons();
+  document.getElementById('fidScanModal').classList.add('active');
+  fidScanStart();
+}
+function closeFidScan(){
+  fidScanStop();
+  document.getElementById('fidScanModal').classList.remove('active');
+}
+function fidScanMsg(t){ const el = document.getElementById('fidScanMsg'); if(el) el.textContent = t; }
+function fidScanStart(){
+  const cam = document.getElementById('fidScanCam');
+  if(!('BarcodeDetector' in window) || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    if(cam) cam.style.display = 'none';
+    fidScanMsg('Este celular no puede leer el QR desde Kobu. Buscá al cliente por nombre.');
+    return;
+  }
+  if(cam) cam.style.display = '';
+  fidScanMsg('Apuntá al QR de la tarjeta del cliente');
+  try{ fidScan.det = new window.BarcodeDetector({ formats:['qr_code'] }); }catch(e){ fidScan.det = null; }
+  navigator.mediaDevices.getUserMedia({ video:{ facingMode:'environment' }, audio:false }).then(function(st){
+    if(!document.getElementById('fidScanModal').classList.contains('active')){ st.getTracks().forEach(function(t){ t.stop(); }); return; }
+    fidScan.stream = st;
+    const v = document.getElementById('fidScanVideo'); v.srcObject = st; try{ v.play(); }catch(e){}
+    fidScanLoop();
+  }).catch(function(){
+    if(cam) cam.style.display = 'none';
+    fidScanMsg('No se pudo abrir la cámara. Dale permiso a Kobu o buscá al cliente por nombre.');
+  });
+}
+function fidScanStop(){
+  if(fidScan.timer){ clearTimeout(fidScan.timer); fidScan.timer = null; }
+  if(fidScan.stream){ fidScan.stream.getTracks().forEach(function(t){ t.stop(); }); fidScan.stream = null; }
+  const v = document.getElementById('fidScanVideo'); if(v) v.srcObject = null;
+}
+function fidScanLoop(){
+  if(!fidScan.stream || !fidScan.det) return;
+  const v = document.getElementById('fidScanVideo');
+  fidScan.det.detect(v).then(function(codes){
+    const raw = codes && codes[0] ? String(codes[0].rawValue||'') : '';
+    if(raw && fidScanLeer(raw)) return;
+    fidScan.timer = setTimeout(fidScanLoop, 300);
+  }).catch(function(){ fidScan.timer = setTimeout(fidScanLoop, 600); });
+}
+// Devuelve true si el QR es una tarjeta de Kobu (y deja de escanear).
+function fidScanLeer(raw){
+  const m = FID_QR_RE.exec(String(raw).trim());
+  if(!m){ fidScanMsg('Ese QR no es una tarjeta de Kobu'); return false; }
+  const c = fidTokenCliente(m[1]);
+  fidScan.clientId = c ? c.id : null;
+  fidScan.altaId = null;
+  if(!c){ const a = fidAltasPendientes().find(function(x){ return x.token===m[1]; }); if(a) fidScan.altaId = a.id; }
+  fidScanStop();
+  const cam = document.getElementById('fidScanCam'); if(cam) cam.style.display = 'none';
+  fidScanMsg(c ? 'Tarjeta encontrada' : fidScan.altaId ? 'Esta tarjeta está en Pendientes por registrar' : 'No conozco esta tarjeta todavía');
+  fidScanRenderRes();
+  return true;
+}
+function fidScanRenderRes(){
+  const box = document.getElementById('fidScanResult'); if(!box) return;
+  if(fidScan.altaId){
+    const a = fidAltas.lista.find(function(x){ return x.id===fidScan.altaId; });
+    box.innerHTML = '<div class="fidscan-res"><div class="nm"><span class="client-avatar"><span class="icon-slot" data-icon="paw"></span></span>'+escapeHtml(a ? a.nombre : '')+'</div>'+
+      '<p class="fid-sub" style="margin:0;">Se sumó desde la página. Vinculalo a un cliente para empezar a sellar.</p>'+
+      '<button class="btn btn-primary" onclick="closeFidScan();openFidAltas(\''+fidScan.altaId+'\')">Vincular</button></div>';
+    mountIcons(); return;
+  }
+  const c = fidScan.clientId ? DATA.clients.find(function(x){ return x.id===fidScan.clientId; }) : null;
+  const f = fidOf(c);
+  if(!c || !f){ box.innerHTML = ''; return; }
+  const cfg = fidCfg();
+  box.innerHTML = '<div class="fidscan-res"><div class="nm"><span class="client-avatar">'+clientAvatarHtml(c)+'</span><span>'+escapeHtml(c.name)+'</span></div>'+
+    fidDotsHtml(f)+'<p class="fid-sum" style="margin-top:8px;"><b>'+f.sellos+' de '+cfg.regalo+' sellos</b> · '+escapeHtml(fidFaltaTxt(f))+'</p>'+
+    '<div class="btn-row"><button class="btn btn-ghost" style="flex:1;" onclick="closeFidScan();openClientDetail(\''+c.id+'\')">Ver cliente</button>'+
+    '<button class="btn btn-primary" style="flex:1;" onclick="fidSumarManual(\''+c.id+'\')"><span class="icon-slot" data-icon="plus" style="vertical-align:-2px;"></span> Sumar sello</button></div>'+
+    '<button class="btn btn-ghost" style="width:100%;background:none;" onclick="openFidScan()">Escanear otra</button></div>';
+  mountIcons();
+}
+function fidScanBuscar(q){
+  q = normalizeMatchText(q||'');
+  const list = document.getElementById('fidScanList');
+  if(!q){ list.innerHTML = ''; return; }
+  const res = clientsSorted().filter(function(c){ return fidOf(c) && normalizeMatchText(c.name).indexOf(q)>-1; }).slice(0, 6);
+  list.innerHTML = res.length ? res.map(function(c){
+    return '<button class="fidscan-item" onclick="fidScanElegir(\''+c.id+'\')"><span class="icon-slot" data-icon="paw"></span>'+escapeHtml(c.name)+'<span class="s">'+fidOf(c).sellos+'/'+fidCfg().regalo+'</span></button>';
+  }).join('') : '<p class="fidscan-msg" style="font-size:calc(12px + var(--kobu-font-boost, 0px));">Nadie con tarjeta se llama así.</p>';
+  mountIcons();
+}
+function fidScanElegir(id){
+  fidScan.clientId = id; fidScan.altaId = null; fidScanStop();
+  const cam = document.getElementById('fidScanCam'); if(cam) cam.style.display = 'none';
+  document.getElementById('fidScanList').innerHTML = ''; document.getElementById('fidScanSearch').value = '';
+  fidScanMsg('');
+  fidScanRenderRes();
 }
 
 /* =========================================================

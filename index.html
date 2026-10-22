@@ -417,6 +417,9 @@
   .add-pair{ display:flex; gap:8px; }
   .no-mode{ display:flex; gap:6px; margin-top:8px; margin-bottom:0; }
   .no-mode .mediaTab{ padding:7px 0; }
+  .fid-sello-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; border:0.5px solid var(--k-border); border-radius:10px; padding:8px 10px; margin-bottom:10px; }
+  .fid-sello-row .l{ display:flex; flex-direction:column; gap:2px; font-size:calc(12.5px + var(--kobu-font-boost, 0px)); color:var(--k-text); min-width:0; }
+  .fid-sello-row small{ font-size:calc(10.5px + var(--kobu-font-boost, 0px)); color:var(--k-muted); }
   .no-maynote{ font-size:calc(10.5px + var(--kobu-font-boost, 0px)); color:var(--k-muted); text-align:right; margin-top:2px; }
   .no-item-price{ color:var(--k-muted); font-size:calc(11px + var(--kobu-font-boost, 0px)); margin-left:auto; margin-right:6px; white-space:nowrap; }
   .add-pair .btn{ flex:1; }
@@ -1848,6 +1851,7 @@
       </div>
       <div class="no-headbody">
         <div id="no-coupons" style="display:none;flex-direction:column;gap:6px;margin-bottom:10px;border:0.5px solid var(--k-border);border-radius:10px;padding:8px;"></div>
+        <div class="fid-sello-row" id="no-fidrow" style="display:none;"><span class="l"><span><span class="icon-slot" data-icon="paw" style="vertical-align:-2px;"></span> Suma sello en la tarjeta</span><small id="no-fidhint"></small></span><div class="switch" id="no-fidsw" onclick="npToggleSello()"><div class="knob-sw"></div></div></div>
         <div id="no-items"></div>
         <div class="no-addtrigger" onclick="npStartAdd()"><span class="icon-slot" data-icon="plus"></span>agregar producto</div>
         <div id="no-addform"></div>
@@ -2952,6 +2956,7 @@
       <button class="btn btn-ghost" onclick="addOrderItemRow()"><span class="icon-slot" data-icon="plus" style="vertical-align:-2px;"></span> Agregar item</button>
       <div class="cost-total" id="of-total"><span>Total estimado</span><span>$0</span></div>
       <div class="no-maynote" id="of-maynote" style="display:none;"></div>
+      <div class="fid-sello-row" id="of-fidrow" style="display:none;margin:4px 0 0;"><span class="l"><span><span class="icon-slot" data-icon="paw" style="vertical-align:-2px;"></span> Suma sello en la tarjeta</span><small id="of-fidhint"></small></span><div class="switch" id="of-fidsw" onclick="ofToggleSello()"><div class="knob-sw"></div></div></div>
       <div class="field"><label>Seña / adelanto recibido (opcional)</label><input class="input" id="of-deposit" type="number" min="0" step="any" placeholder="0" oninput="updateOrderTotalPreview()"></div>
       <div class="cost-total" id="of-balance"><span>Saldo pendiente</span><span>$0</span></div>
     </div>
@@ -10505,7 +10510,8 @@ function editOrder(id){
     note: o.note || '',
     mayorista: orderIsMayorista(o),
     _mayManual: true,
-    envio: o.envio || 0
+    envio: o.envio || 0,
+    selloSi: fidSelloDeOrden(o)
   };
   state._newClientInOrder = false;
   showScreen('orderform');
@@ -10545,7 +10551,8 @@ function openEditOrderPopup(id){
     couponIds: priorCouponIds,
     mayorista: orderIsMayorista(o),
     _mayManual: true,
-    envio: o.envio || 0
+    envio: o.envio || 0,
+    selloSi: fidSelloDeOrden(o)
   };
   npPopulateClientSelect(o.clientId || null);
   npRenderClientCoupons();
@@ -10707,7 +10714,8 @@ function repeatOrder(id){
     deposit: 0,
     note: '',
     mayorista: orderIsMayorista(o),
-    _mayManual: true
+    _mayManual: true,
+    selloSi: null
   };
   state._newClientInOrder = false;
   kobuMayCargar().then(function(){ if(state.orderDraft) renderOrderItemRows(); });
@@ -10740,6 +10748,8 @@ function onOrderClientPick(val){
   state._newClientInOrder = false;
   document.getElementById('of-newclient-form').innerHTML = '';
   state.orderDraft.clientId = val || null;
+  state.orderDraft.selloSi = null;
+  fidSelloRender(state.orderDraft, 'of');
   if(val){
     const c = DATA.clients.find(function(x){ return x.id===val; });
     if(c && !state.orderDraft._mayManual){ state.orderDraft.mayorista = clientIsMayorista(c); renderOrderItemRows(); }
@@ -10844,6 +10854,7 @@ function updateOrderTotalPreview(){
   if(mb) mb.classList.toggle('active', may);
   const mn = document.getElementById('of-maynote');
   if(mn){ mn.style.display = may ? 'block' : 'none'; mn.textContent = may ? mayoristaNote(state.orderDraft.items) : ''; }
+  fidSelloRender(state.orderDraft, 'of');
   const depositEl = document.getElementById('of-deposit');
   const deposit = depositEl ? (parseFloat(depositEl.value)||0) : 0;
   const balanceEl = document.getElementById('of-balance');
@@ -10882,6 +10893,7 @@ function saveOrder(){
     const o = DATA.orders[idx];
     if(o.stockDeducted) adjustStockForOrder(o, 1);
     if(o.portionsDeducted) adjustPortionStockForOrder(o, 1);
+    const prevCli = o.clientId;
     o.clientId = state.orderDraft.clientId;
     o.customerName = name;
     o.deliveryDate = deliveryDate;
@@ -10894,8 +10906,9 @@ function saveOrder(){
     if(willDeductPortions){ resolveOrderBakeChoices(state.orderDraft.items); adjustPortionStockForOrder(o, -1); o.portionsDeducted = true; }
     else { o.portionsDeducted = false; }
     if(o.stockDeducted) adjustStockForOrder(o, -1);
+    const selloMsg = fidSelloGuardar(o, client, state.orderDraft, prevCli);
     saveData(DATA);
-    showToast('Pedido actualizado');
+    showToast(selloMsg || 'Pedido actualizado');
   } else {
     if(willDeductPortions) resolveOrderBakeChoices(state.orderDraft.items);
     const newOrder = {
@@ -10915,6 +10928,7 @@ function saveOrder(){
       mayorista: !!state.orderDraft.mayorista
     };
     if(willDeductPortions) adjustPortionStockForOrder(newOrder, -1);
+    fidSelloGuardar(newOrder, client, state.orderDraft);
     const fidDesc = fidAplicarDesc(newOrder, client);
     DATA.orders.push(newOrder);
     saveData(DATA);
@@ -10925,7 +10939,7 @@ function saveOrder(){
 }
 function openNewOrderModal(){
   state.editingOrderId = null;
-  state.newOrderDraft = { clientId:null, deliveryDate:'', items:[], deposit:0, note:'', couponIds:[], mayorista:false, _mayManual:false };
+  state.newOrderDraft = { clientId:null, deliveryDate:'', items:[], deposit:0, note:'', couponIds:[], mayorista:false, _mayManual:false, selloSi:null };
   kobuMayCargar().then(function(){ if(document.getElementById('newOrderModal').classList.contains('active')) npRenderItems(); });
   document.getElementById('no-title').textContent = 'Nuevo pedido';
   document.getElementById('no-submitBtn').textContent = 'Guardar pedido';
@@ -10965,6 +10979,7 @@ function npClientChange(val){
   }
   state.newOrderDraft.clientId = val || null;
   state.newOrderDraft.couponIds = fidCuponesAuto(val ? DATA.clients.find(function(x){ return x.id===val; }) : null);
+  state.newOrderDraft.selloSi = null;
   npSyncMayFromClient();
   npRenderClientCoupons();
   npRenderItems();
@@ -11090,6 +11105,7 @@ function npRemoveItem(i){
   npRenderItems();
 }
 function npRenderMode(){
+  fidSelloRender(state.newOrderDraft, 'no');
   const may = !!(state.newOrderDraft && state.newOrderDraft.mayorista);
   const a = document.getElementById('no-mode-cli'), b = document.getElementById('no-mode-may');
   if(a) a.classList.toggle('active', !may);
@@ -11166,6 +11182,7 @@ function saveNewOrder(){
     if(o.stockDeducted) adjustStockForOrder(o, 1);
     if(o.portionsDeducted) adjustPortionStockForOrder(o, 1);
     if(willDeductPortions) resolveOrderBakeChoices(items);
+    const prevCli = o.clientId;
     o.clientId = client.id;
     o.customerName = client.name;
     o.deliveryDate = state.newOrderDraft.deliveryDate || todayStr();
@@ -11181,11 +11198,12 @@ function saveNewOrder(){
     if(willDeductPortions){ adjustPortionStockForOrder(o, -1); o.portionsDeducted = true; }
     else { o.portionsDeducted = false; }
     if(o.stockDeducted) adjustStockForOrder(o, -1);
+    const selloMsg = fidSelloGuardar(o, client, state.newOrderDraft, prevCli);
     saveData(DATA);
     state.editingOrderId = null;
     closeNewOrderModal();
     renderOrderList();
-    showToast('Pedido actualizado');
+    showToast(selloMsg || 'Pedido actualizado');
     return;
   }
 
@@ -11210,6 +11228,7 @@ function saveNewOrder(){
   };
   if(willDeductPortions) adjustPortionStockForOrder(newOrder, -1);
   fidMarcarCupones(client, newOrder.id, appliedCoupons);
+  fidSelloGuardar(newOrder, client, state.newOrderDraft);
   DATA.orders.push(newOrder);
   saveData(DATA);
   closeNewOrderModal();
@@ -15601,27 +15620,82 @@ function fidQuitar(c, orderId){
 }
 // Pedido entregado: +1 sello (solo clientes con tarjeta, nunca pedidos mayoristas). Si en las
 // últimas 12 h ya le sumaste un sello a mano (por ejemplo escaneando su tarjeta), ese es el de este pedido.
+// o.selloSi: true = suma sí o sí, false = este pedido no suma (switch del pedido); sin elegir = como antes.
 function fidAlEntregar(o){
-  if(!o || o.fidSello || orderIsMayorista(o)) return '';
+  if(!o || o.fidSello || orderIsMayorista(o) || o.selloSi===false) return '';
   const c = DATA.clients.find(function(x){ return x.id===o.clientId; });
   const f = fidOf(c); if(!f) return '';
   o.fidSello = true;
-  const manual = f.hist.find(function(e){ return e.t==='+' && e.m==='manual' && !e.o && Date.now()-new Date(e.ts).getTime() < 12*3600000; });
+  const manual = o.selloSi===true ? null : f.hist.find(function(e){ return e.t==='+' && e.m==='manual' && !e.o && Date.now()-new Date(e.ts).getTime() < 12*3600000; });
   if(manual){ manual.o = o.id; return ''; }
   const premio = fidSumar(c, 'pedido', o.id);
   return premio ? c.name+' completó '+(f.sellos===0 ? 'la tarjeta' : fidCfg().desc+' sellos')+': '+premio : 'Sello para '+c.name+' · '+f.sellos+' de '+fidCfg().regalo;
 }
+// Switch "Suma sello en la tarjeta" del pedido. Arranca apagado si en las últimas 12 h ya le sumaste un sello a mano.
+function fidSelloReciente(c){
+  const f = fidOf(c); if(!f) return false;
+  return f.hist.some(function(e){ return e.t==='+' && e.m==='manual' && !e.o && Date.now()-new Date(e.ts).getTime() < 12*3600000; });
+}
+function fidSelloDeOrden(o){ return o.selloSi===true || o.selloSi===false ? o.selloSi : null; }
+// Estado que muestra el switch: lo que elegiste; si no tocaste nada, un pedido entregado muestra si sumó, y uno
+// nuevo arranca prendido salvo que hoy ya le hayas sumado un sello a mano.
+function fidSelloCtx(d){
+  const c = d && d.clientId ? DATA.clients.find(function(x){ return x.id===d.clientId; }) : null;
+  const o0 = state.editingOrderId ? DATA.orders.find(function(x){ return x.id===state.editingOrderId; }) : null;
+  const o = o0 && o0.clientId===d.clientId && o0.status==='entregado' ? o0 : null;
+  const on = d && d.selloSi!=null ? !!d.selloSi : (o ? !!o.fidSello : !fidSelloReciente(c));
+  return { c:c, o:o, on:on };
+}
+function fidSelloRender(d, pre){
+  const row = document.getElementById(pre+'-fidrow'); if(!row || !d) return;
+  const x = fidSelloCtx(d);
+  const show = !!fidOf(x.c) && !d.mayorista;
+  row.style.display = show ? '' : 'none';
+  if(!show) return;
+  document.getElementById(pre+'-fidsw').classList.toggle('on', x.on);
+  document.getElementById(pre+'-fidhint').textContent = x.o
+    ? (x.on ? (x.o.fidSello ? 'Ya sumó su sello' : 'Al guardar le suma 1 sello') : (x.o.fidSello ? 'Al guardar se le quita el sello' : 'Este pedido no sumó sello'))
+    : (x.on ? 'Suma 1 sello al entregarlo (si ese día ya le sumaste uno a mano, no suma otro)' : (d.selloSi===false ? 'Este pedido no suma sello' : 'Hoy ya le sumaste un sello a mano'));
+  mountIcons();
+}
+function npToggleSello(){ const d = state.newOrderDraft; if(!d) return; d.selloSi = !fidSelloCtx(d).on; fidSelloRender(d, 'no'); }
+function ofToggleSello(){ const d = state.orderDraft; if(!d) return; d.selloSi = !fidSelloCtx(d).on; fidSelloRender(d, 'of'); }
+// Al guardar (después de actualizar el pedido). prevCli = cliente que tenía antes de editarlo.
+function fidSelloGuardar(o, c, d, prevCli){
+  if(!o) return '';
+  let msg = '';
+  // Cambió de cliente un pedido que ya había sumado: el sello sale del cliente anterior y pasa al nuevo.
+  if(prevCli && prevCli!==o.clientId && o.fidSello){
+    const nuevo = o.clientId; o.clientId = prevCli;
+    const salio = fidAlDesentregar(o);
+    o.clientId = nuevo;
+    if(salio && o.status==='entregado' && !(d && d.selloSi===false) && !orderIsMayorista(o)){ fidAlEntregar(o); msg = 'Pedido actualizado · el sello pasó al nuevo cliente'; }
+    else if(salio) msg = 'Pedido actualizado · se quitó el sello del cliente anterior';
+  }
+  // Pasó a mayorista: los pedidos mayoristas no suman.
+  if(orderIsMayorista(o) && o.fidSello) return fidAlDesentregar(o) ? 'Pedido actualizado · se quitó su sello (mayorista)' : 'Ese sello es de una tarjeta ya completada: queda como estaba';
+  if(!d || !fidOf(c) || orderIsMayorista(o)) return msg;
+  // Lo que se vio es lo que pasa: un pedido nuevo que arrancó apagado (sello a mano reciente) queda apagado.
+  if(d.selloSi==null && o.status!=='entregado' && !o.fidSello && fidSelloReciente(c)){ o.selloSi = false; return msg; }
+  if(d.selloSi==null) return msg;
+  o.selloSi = !!d.selloSi;
+  if(o.status!=='entregado') return msg;
+  if(!o.selloSi && o.fidSello) return fidAlDesentregar(o) ? 'Pedido actualizado · se quitó su sello' : 'Ese sello es de una tarjeta ya completada: queda como estaba';
+  if(o.selloSi && !o.fidSello){ const t = fidAlEntregar(o); return t || 'Pedido actualizado'; }
+  return msg;
+}
 // Pedido que vuelve de Entregado: se quita su sello si sigue en la tarjeta actual.
+// Devuelve false si el sello es de una tarjeta ya completada: no se quita y el pedido lo sigue contando (así no se duplica).
 function fidAlDesentregar(o){
-  if(!o || !o.fidSello) return;
-  o.fidSello = false;
+  if(!o || !o.fidSello) return false;
   const c = DATA.clients.find(function(x){ return x.id===o.clientId; });
-  const f = fidOf(c); if(!f) return;
+  const f = fidOf(c); if(!f){ o.fidSello = false; return true; }
   const i = f.hist.findIndex(function(e){ return e.t==='+' && e.o===o.id; });
-  if(i===-1) return;
-  if(f.hist[i].m==='manual'){ delete f.hist[i].o; return; }
+  if(i===-1){ o.fidSello = false; return true; }
+  if(f.hist[i].m==='manual'){ delete f.hist[i].o; o.fidSello = false; return true; }
   const reinicio = f.hist.findIndex(function(e){ return e.t==='p2'; });
-  if(reinicio===-1 || i<reinicio) fidQuitar(c, o.id);
+  if(reinicio===-1 || i<reinicio){ fidQuitar(c, o.id); o.fidSello = false; return true; }
+  return false;
 }
 // Cupones de la tarjeta que se tildan solos en un pedido nuevo (el % sí; el regalo lo elegís vos).
 function fidCuponesAuto(c){
@@ -15768,8 +15842,43 @@ function renderClientFidCard(c){
     '</div>'+
     (f.hist.length ? '<div class="fid-hist">'+f.hist.slice(0, 4).map(fidHistRow).join('')+'</div>'+
       (f.hist.length>4 ? '<button class="btn btn-ghost" style="width:100%;margin-top:6px;font-size:calc(11.5px + var(--kobu-font-boost, 0px));" onclick="fidVerHistorial(\''+c.id+'\')">Ver todo el historial</button>' : '') : '')+
+    (f.token ? '<button class="btn btn-ghost" style="width:100%;margin-top:10px;" onclick="fidMandarTarjeta(\''+c.id+'\')"><span class="icon-slot" data-icon="send" style="vertical-align:-2px;"></span> Mandar su tarjeta por WhatsApp</button>' : '')+
     (f.token ? '<button class="btn btn-ghost" style="width:100%;margin-top:6px;background:none;color:var(--k-danger);font-size:calc(11.5px + var(--kobu-font-boost, 0px));" onclick="fidDesvincularPedir(\''+c.id+'\')"><span class="icon-slot" data-icon="lock" style="vertical-align:-2px;"></span> Desvincular tarjeta</button>' : '');
   mountIcons();
+}
+// Link a "Mi tarjeta" (la página muestra sus sellos y su QR; sirve para iPhone). Con la cuenta de prueba, ?prueba.
+function fidLinkTarjeta(token){
+  const cr = webCreds();
+  return FID_PAGE_URL + (cr && /^kobuprueba-/.test(cr.key) ? '?prueba' : '') + '#t=' + token;
+}
+// Teléfono argentino para wa.me: 549 + código de área + número (sin 0 ni 15). null si no se puede saber.
+function fidWaPhone(tel){
+  let d = String(tel||'').replace(/\D/g,'');
+  if(/^00/.test(d)) d = d.slice(2);
+  if(/^549\d{10}$/.test(d)) return d;
+  if(/^54\d{10}$/.test(d)) return '549'+d.slice(2);
+  d = d.replace(/^0/, '');
+  if(/^\d{2}15\d{8}$/.test(d)) d = d.slice(0, 2)+d.slice(4);
+  return /^\d{10}$/.test(d) ? '549'+d : null;
+}
+function fidNombrePila(n){
+  n = String(n||'').trim();
+  if(n.indexOf(',')>-1) n = n.split(',')[1] || '';
+  return (n.trim().split(/\s+/)[0] || '');
+}
+function fidWaTarjetaUrl(c){
+  const f = fidOf(c);
+  if(!f || !f.token || !/^[a-z0-9]{20}$/.test(f.token)) return '';
+  const phone = fidWaPhone(c.phone);
+  if(!phone) return null;
+  const nombre = fidNombrePila(c.name);
+  const text = 'Hola'+(nombre ? ' '+nombre : '')+'! Esta es tu tarjeta de fidelidad de Kobu: ahí ves tus sellos y el código para mostrar cuando retirás tu pedido. '+fidLinkTarjeta(f.token);
+  return 'https://wa.me/'+phone+'?text='+encodeURIComponent(text);
+}
+function fidMandarTarjeta(id){
+  const u = fidWaTarjetaUrl(DATA.clients.find(function(x){ return x.id===id; }));
+  if(u===null){ showToast('Revisá el teléfono del cliente: tiene que tener código de área (ej. 11 5555 1234)'); return; }
+  if(u) location.href = u;
 }
 // Desvincular la tarjeta de Google Wallet (PIN 2610): la tarjeta vuelve a "Pendientes por registrar" para
 // vincularla con el cliente correcto. Los sellos quedan en el cliente (se pueden quitar con "Quitar sello").

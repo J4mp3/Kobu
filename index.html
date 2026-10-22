@@ -1008,6 +1008,16 @@
   .fa-row{ display:flex; align-items:center; gap:10px; background:var(--k-card); border:.5px solid var(--k-border); border-radius:12px; padding:10px 12px; cursor:pointer; text-align:left; width:100%; font-family:inherit; color:var(--k-text); }
   .fa-row .t{ font-weight:600; font-size:calc(13px + var(--kobu-font-boost, 0px)); }
   .fa-row .s{ font-size:calc(11px + var(--kobu-font-boost, 0px)); color:var(--k-muted); }
+  #fidAltasModal .modal-box{ position:relative; }
+  .fa-wait{ position:absolute; inset:0; z-index:5; display:none; flex-direction:column; align-items:center; justify-content:center; gap:10px; border-radius:inherit; background:color-mix(in srgb, var(--k-card) 93%, transparent); color:var(--k-text); font-weight:600; font-size:calc(13.5px + var(--kobu-font-boost, 0px)); text-align:center; padding:20px; }
+  #fidAltasModal.fa-ocupado .fa-wait{ display:flex; }
+  .fa-wait-ic{ width:56px; height:56px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--k-card2); color:var(--k-accent); position:relative; }
+  .fa-wait-ic::after{ content:''; position:absolute; inset:-4px; border-radius:50%; border:3px solid transparent; border-top-color:var(--k-accent); animation:faWaitGiro .9s linear infinite; }
+  .fa-wait-ic .icon-slot{ width:26px; height:26px; display:flex; animation:faWaitPata 1.2s ease-in-out infinite; }
+  .fa-wait-ic .icon-slot svg{ width:100%; height:100%; }
+  @keyframes faWaitGiro{ to{ transform:rotate(360deg); } }
+  @keyframes faWaitPata{ 0%,100%{ transform:translateY(0) rotate(0); } 40%{ transform:translateY(-4px) rotate(-14deg); } }
+  @media (prefers-reduced-motion: reduce){ .fa-wait-ic::after{ animation-duration:2.4s; } .fa-wait-ic .icon-slot{ animation:none; } }
   .fa-data{ display:flex; flex-direction:column; gap:2px; background:var(--k-card2); border-radius:12px; padding:10px 12px; }
   .fa-data div{ display:flex; justify-content:space-between; gap:10px; font-size:calc(12px + var(--kobu-font-boost, 0px)); padding:3px 0; }
   .fa-data span:first-child{ color:var(--k-muted); }
@@ -1734,6 +1744,7 @@
       </div>
       <div id="fa-body" style="display:flex;flex-direction:column;gap:8px;padding:12px 16px;overflow-y:auto;"></div>
       <div class="btn-row" style="padding:0 16px 16px;"><button class="btn btn-ghost" style="flex:1;" id="fa-closeBtn" onclick="closeFidAltas()">Cerrar</button></div>
+      <div class="fa-wait" id="fa-wait" role="status" aria-live="polite"><span class="fa-wait-ic"><span class="icon-slot" data-icon="paw"></span></span><span id="fa-waitTxt">Un momento...</span></div>
     </div>
   </div>
 
@@ -15980,7 +15991,16 @@ function fidCopiarLink(){
   try{ navigator.clipboard.writeText(FID_PAGE_URL).then(function(){ showToast('Link copiado'); }, function(){ showToast(FID_PAGE_URL); }); }catch(e){ showToast(FID_PAGE_URL); }
 }
 // ---- Pendientes por registrar (llegan con la bandeja de pedidos web) ----
-var fidAltas = { lista:[], cargado:false, abierta:null };
+var fidAltas = { lista:[], cargado:false, abierta:null, ocupado:false };
+// Mientras se habla con el script: tapa el cartel con la espera y bloquea los botones (no se puede tocar dos veces).
+function fidAltasOcupado(txt){
+  fidAltas.ocupado = !!txt;
+  const m = document.getElementById('fidAltasModal'); if(!m) return;
+  m.classList.toggle('fa-ocupado', !!txt);
+  const t = document.getElementById('fa-waitTxt'); if(t && txt) t.textContent = txt;
+  m.querySelectorAll('#fa-body button, #fa-body select, #fa-closeBtn').forEach(function(b){ b.disabled = !!txt; });
+  if(txt) mountIcons();
+}
 function fidTxt(v, n){ return String(v==null ? '' : v).replace(/[\u0000-\u001f]/g, ' ').trim().slice(0, n); }
 function fidAltasDe(j){
   if(!j || !Array.isArray(j.altasFid)) return;
@@ -15995,14 +16015,16 @@ function updateFidAltasBanner(){
   const n = fidAltasPendientes().length;
   b.style.display = n ? 'flex' : 'none';
   const cnt = document.getElementById('fidAltasCount'); if(cnt) cnt.textContent = n;
-  const m = document.getElementById('fidAltasModal'); if(m && m.classList.contains('active') && !fidAltas.abierta) renderFidAltas();
+  const m = document.getElementById('fidAltasModal'); if(m && m.classList.contains('active') && !fidAltas.abierta && !fidAltas.ocupado) renderFidAltas();
 }
 function openFidAltas(id){
+  if(fidAltas.ocupado) return;
   fidAltas.abierta = id || null;
   renderFidAltas();
   document.getElementById('fidAltasModal').classList.add('active');
 }
 function closeFidAltas(){
+  if(fidAltas.ocupado) return;
   if(fidAltas.abierta && fidAltasPendientes().length>1){ fidAltas.abierta = null; renderFidAltas(); return; }
   fidAltas.abierta = null;
   document.getElementById('fidAltasModal').classList.remove('active');
@@ -16042,7 +16064,7 @@ function renderFidAltas(){
   const sug = fidSugerencias(a);
   const fila = function(l, v){ return v ? '<div><span>'+l+'</span><span>'+escapeHtml(v)+'</span></div>' : ''; };
   body.innerHTML =
-    '<div class="fa-data">'+fila('Apellido y nombre', a.nombre)+fila('Cumpleaños', bdayLabel(a.cumple))+fila('Teléfono', a.tel)+fila('Mail', a.mail)+'</div>'+
+    '<div class="fa-data">'+fila('Nombre y apellido', a.nombre)+fila('Cumpleaños', bdayLabel(a.cumple))+fila('Teléfono', a.tel)+fila('Mail', a.mail)+'</div>'+
     '<p class="fid-sub" style="margin:0;">El teléfono y el mail no se verifican: si dudás, pedile que te muestre la tarjeta y escaneala desde Inicio.</p>'+
     (sug.length ? '<p class="acm-sectionlabel" style="margin:6px 0 0;">Es este cliente</p>'+sug.map(function(x, i){
       return '<button class="fa-sug'+(i===0 && x.sc>=5 ? ' best' : '')+'" onclick="fidVincularAlta(\''+a.id+'\',\''+x.c.id+'\')"><span class="client-avatar">'+clientAvatarHtml(x.c)+'</span><span style="flex:1;min-width:0;"><span style="display:block;font-weight:600;">'+escapeHtml(x.c.name)+'</span><span class="why">'+escapeHtml(x.why)+'</span></span><span class="fid-chip">Vincular</span></button>';
@@ -16076,53 +16098,61 @@ function fidLigar(c, a){
 async function fidVincularAlta(altaId, clientId){
   const a = fidAltas.lista.find(function(x){ return x.id===altaId; });
   const c = DATA.clients.find(function(x){ return x.id===clientId; });
-  if(!a || !c) return;
+  if(!a || !c || fidAltas.ocupado) return;
   if(clientIsMayorista(c)){ showToast('Los mayoristas no tienen tarjeta'); return; }
   const yaTiene = c.fid && c.fid.token && c.fid.token!==a.token;
   const ok = await showConfirm(yaTiene
     ? c.name+' ya tiene una tarjeta en su celular. ¿Reemplazarla por la de '+a.nombre+'? La anterior deja de actualizarse. Si dudás, pedile que te muestre la tarjeta y escaneala.'
     : '¿Vincular la tarjeta de '+a.nombre+' con '+c.name+'? Los sellos de '+c.name+' van a aparecer en esa tarjeta.');
-  if(!ok) return;
+  if(!ok || fidAltas.ocupado) return;
+  fidAltasOcupado('Vinculando la tarjeta...');
   return fidAltaEstado(a, 'vinculado').then(function(){
+    fidAltasOcupado(null);
     fidLigar(c, a); saveData(DATA);
     fidAltas.abierta = null; showToast('Tarjeta vinculada a '+c.name);
     if(fidAltasPendientes().length) renderFidAltas(); else document.getElementById('fidAltasModal').classList.remove('active');
     updateFidAltasBanner(); renderClientsScreen();
-  }).catch(function(){ showToast('No se pudo conectar. Probá de nuevo.'); });
+  }).catch(function(){ fidAltasOcupado(null); renderFidAltas(); showToast('No se pudo conectar. Probá de nuevo.'); });
 }
 function fidCrearDesdeAlta(altaId){
-  const a = fidAltas.lista.find(function(x){ return x.id===altaId; }); if(!a) return;
-  fidAltaEstado(a, 'vinculado').then(function(){
+  const a = fidAltas.lista.find(function(x){ return x.id===altaId; }); if(!a || fidAltas.ocupado) return;
+  fidAltasOcupado('Creando el cliente...');
+  return fidAltaEstado(a, 'vinculado').then(function(){
+    fidAltasOcupado(null);
     const c = { id:'cli-'+Date.now(), name:a.nombre || 'Cliente', phone:a.tel, email:a.mail, company:'', tags:[], icon:null };
     if(a.cumple) c.birthday = a.cumple;
     DATA.clients.push(c); fidLigar(c, a); saveData(DATA);
     fidAltas.abierta = null; showToast('Cliente creado con su tarjeta');
     if(fidAltasPendientes().length) renderFidAltas(); else document.getElementById('fidAltasModal').classList.remove('active');
     updateFidAltasBanner(); renderClientsScreen();
-  }).catch(function(){ showToast('No se pudo conectar. Probá de nuevo.'); });
+  }).catch(function(){ fidAltasOcupado(null); renderFidAltas(); showToast('No se pudo conectar. Probá de nuevo.'); });
 }
 async function fidCrearDesdeAltaConfirmar(altaId){
   const a = fidAltas.lista.find(function(x){ return x.id===altaId; }); if(!a) return;
+  if(fidAltas.ocupado) return;
   const ok = await showConfirm('¿Crear el cliente '+a.nombre+' con su tarjeta?');
-  if(ok) fidCrearDesdeAlta(altaId);
+  if(ok) return fidCrearDesdeAlta(altaId);
 }
 async function fidDescartarAlta(altaId){
-  const a = fidAltas.lista.find(function(x){ return x.id===altaId; }); if(!a) return;
+  const a = fidAltas.lista.find(function(x){ return x.id===altaId; }); if(!a || fidAltas.ocupado) return;
   const ok = await showConfirm('¿Descartar el registro de '+a.nombre+'? Su tarjeta queda sin sellos.');
-  if(!ok) return;
-  fidAltaEstado(a, 'descartado').then(function(){
+  if(!ok || fidAltas.ocupado) return;
+  fidAltasOcupado('Descartando el registro...');
+  return fidAltaEstado(a, 'descartado').then(function(){
+    fidAltasOcupado(null);
     fidAltas.abierta = null; showToast('Registro descartado');
     if(fidAltasPendientes().length) renderFidAltas(); else document.getElementById('fidAltasModal').classList.remove('active');
     updateFidAltasBanner();
-  }).catch(function(){ showToast('No se pudo conectar. Probá de nuevo.'); });
+  }).catch(function(){ fidAltasOcupado(null); renderFidAltas(); showToast('No se pudo conectar. Probá de nuevo.'); });
 }
 async function fidDescartarTodas(){
   const pend = fidAltasPendientes();
-  if(!pend.length) return;
+  if(!pend.length || fidAltas.ocupado) return;
   const ok = await showConfirm('¿Descartar los '+pend.length+' registros pendientes?');
-  if(!ok) return;
-  let bien = 0;
-  for(const a of pend){ try{ await fidAltaEstado(a, 'descartado'); bien++; }catch(e){} }
+  if(!ok || fidAltas.ocupado) return;
+  let bien = 0, i = 0;
+  for(const a of pend){ fidAltasOcupado('Descartando '+(++i)+' de '+pend.length+'...'); try{ await fidAltaEstado(a, 'descartado'); bien++; }catch(e){} }
+  fidAltasOcupado(null);
   showToast(bien===pend.length ? 'Registros descartados' : 'Se descartaron '+bien+' de '+pend.length+'. Probá de nuevo.');
   fidAltas.abierta = null; renderFidAltas(); updateFidAltasBanner();
 }

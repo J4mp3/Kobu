@@ -15714,7 +15714,7 @@ function fidHomeMsgs(){
   return out;
 }
 // ---- Ficha del cliente ----
-var FID_HIST_TXT = { '+':'Sello', '-':'Se quitó un sello', p1:'Ganó', p2:'Completó la tarjeta', u:'Usó', a:'Se sumó a la tarjeta', w:'Tarjeta en Google Wallet' };
+var FID_HIST_TXT = { '+':'Sello', '-':'Se quitó un sello', p1:'Ganó', p2:'Completó la tarjeta', u:'Usó', a:'Se sumó a la tarjeta', w:'Tarjeta en Google Wallet', x:'Se desvinculó la tarjeta de Google Wallet' };
 function fidHistRow(e){
   let ic = 'paw', t = FID_HIST_TXT[e.t] || '';
   if(e.t==='+') t += e.m==='pedido' ? ' · pedido entregado' : ' · a mano';
@@ -15723,6 +15723,7 @@ function fidHistRow(e){
   if(e.t==='p2'){ ic = 'gift'; t += ': '+(e.v||''); }
   if(e.t==='u'){ ic = 'check'; t += ' '+(e.v||'el premio'); }
   if(e.t==='a' || e.t==='w') ic = 'scan-qr';
+  if(e.t==='x') ic = 'lock';
   const d = new Date(e.ts);
   return '<div class="fid-hrow"><span class="ic"><span class="icon-slot" data-icon="'+ic+'"></span></span><span>'+escapeHtml(t)+'</span><span class="d">'+(isNaN(d) ? '' : d.toLocaleDateString('es-AR', { day:'numeric', month:'short' }))+'</span></div>';
 }
@@ -15762,12 +15763,39 @@ function renderClientFidCard(c){
       (dias!=null ? ' · '+(dias===0 ? 'compró hoy' : 'hace '+dias+' día'+(dias===1?'':'s')+' que no compra') : '')+'</p>'+
     premios.map(function(cp){ return '<div class="fid-prize"><span class="icon-slot" data-icon="'+(cp.fid==='desc'?'gift-card':'gift')+'"></span>'+(cp.fid==='desc' ? 'Tiene '+escapeHtml(String(cp.value))+'% de descuento para el próximo pedido' : 'Tiene de regalo: '+escapeHtml(couponDisplayLabel(cp).replace(/^Tarjeta: /, '')))+'</div>'; }).join('')+
     '<div class="btn-row" style="margin-top:12px;">'+
-      '<button class="btn btn-ghost" style="flex:0 0 auto;padding:0 16px;" onclick="fidQuitarManual(\''+c.id+'\')" '+(f.sellos>0?'':'disabled')+'>Quitar</button>'+
+      '<button class="btn btn-ghost" style="flex:0 0 auto;padding:0 16px;" onclick="fidQuitarManual(\''+c.id+'\')" '+(f.sellos>0?'':'disabled')+'>Quitar sello</button>'+
       '<button class="btn btn-primary" style="flex:1;" onclick="fidSumarManual(\''+c.id+'\')"><span class="icon-slot" data-icon="plus" style="vertical-align:-2px;"></span> Sumar sello</button>'+
     '</div>'+
     (f.hist.length ? '<div class="fid-hist">'+f.hist.slice(0, 4).map(fidHistRow).join('')+'</div>'+
-      (f.hist.length>4 ? '<button class="btn btn-ghost" style="width:100%;margin-top:6px;font-size:calc(11.5px + var(--kobu-font-boost, 0px));" onclick="fidVerHistorial(\''+c.id+'\')">Ver todo el historial</button>' : '') : '');
+      (f.hist.length>4 ? '<button class="btn btn-ghost" style="width:100%;margin-top:6px;font-size:calc(11.5px + var(--kobu-font-boost, 0px));" onclick="fidVerHistorial(\''+c.id+'\')">Ver todo el historial</button>' : '') : '')+
+    (f.token ? '<button class="btn btn-ghost" style="width:100%;margin-top:6px;background:none;color:var(--k-danger);font-size:calc(11.5px + var(--kobu-font-boost, 0px));" onclick="fidDesvincularPedir(\''+c.id+'\')"><span class="icon-slot" data-icon="lock" style="vertical-align:-2px;"></span> Desvincular tarjeta</button>' : '');
   mountIcons();
+}
+// Desvincular la tarjeta de Google Wallet (PIN 2610): la tarjeta vuelve a "Pendientes por registrar" para
+// vincularla con el cliente correcto. Los sellos quedan en el cliente (se pueden quitar con "Quitar sello").
+async function fidDesvincularPedir(id){
+  const c = DATA.clients.find(function(x){ return x.id===id; }); const f = fidOf(c);
+  if(!f || !f.token) return;
+  const pin = await showPinModal('PIN para desvincular la tarjeta', 4);
+  if(pin==null) return;
+  if(pin !== '2610'){ showToast('PIN incorrecto'); return; }
+  const ok = await showConfirm('La tarjeta de Google Wallet de '+c.name+' vuelve a "Pendientes por registrar" para que la vincules con el cliente correcto. Los sellos quedan en '+c.name+'.');
+  if(!ok) return;
+  const cr = webCreds();
+  if(!cr){ showToast('Configurá la sincronización para desvincular'); return; }
+  const token = f.token;
+  fetch(cr.url+'?key='+encodeURIComponent(cr.key)+'&action=fidAltaEstado', {
+    method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' },
+    body: JSON.stringify({ token:token, estado:'nuevo', nombre:c.name||'', cumple:bdayValid(c.birthday) ? c.birthday : '', tel:c.phone||'', mail:c.email||'' })
+  }).then(function(r){ return r.json(); }).then(function(j){
+    if(!j || !j.ok) throw new Error((j && j.error) || 'sin respuesta');
+    const c2 = DATA.clients.find(function(x){ return x.id===id; }); const f2 = fidOf(c2);
+    if(f2 && f2.token===token){ delete f2.token; fidHistPush(f2, { t:'x' }); }
+    if(j.alta){ const prev = fidAltas.lista.slice(); fidAltasDe({ altasFid:[j.alta] }); fidAltas.lista = prev.filter(function(x){ return x.token!==token; }).concat(fidAltas.lista); }
+    saveData(DATA);
+    renderClientDetail(); renderClientsScreen(); updateFidAltasBanner();
+    showToast('La tarjeta volvió a Pendientes por registrar');
+  }).catch(function(e){ showToast(/no existe/.test(e.message) ? 'Esa tarjeta no está registrada en el servidor' : 'No se pudo conectar. Probá de nuevo.'); });
 }
 function fidActivarManual(id){
   const c = DATA.clients.find(function(x){ return x.id===id; }); if(!c || clientIsMayorista(c)) return;
@@ -15913,7 +15941,7 @@ function renderFidAltas(){
     '<p class="acm-sectionlabel" style="margin:6px 0 0;">'+(sug.length ? 'Otro cliente' : 'Vincular con un cliente')+'</p>'+
     '<select class="input" onchange="if(this.value) fidVincularAlta(\''+a.id+'\', this.value)"><option value="">Elegir cliente...</option>'+
       clientsSorted().filter(function(c){ return !clientIsMayorista(c); }).map(function(c){ return '<option value="'+c.id+'">'+escapeHtml(c.name)+'</option>'; }).join('')+'</select>'+
-    '<button class="btn btn-primary" style="width:100%;margin-top:4px;" onclick="fidCrearDesdeAlta(\''+a.id+'\')"><span class="icon-slot" data-icon="plus" style="vertical-align:-2px;"></span> Crear cliente nuevo</button>'+
+    '<button class="btn btn-primary" style="width:100%;margin-top:4px;" onclick="fidCrearDesdeAltaConfirmar(\''+a.id+'\')"><span class="icon-slot" data-icon="plus" style="vertical-align:-2px;"></span> Crear cliente nuevo</button>'+
     '<button class="btn btn-ghost" style="width:100%;color:var(--k-danger);" onclick="fidDescartarAlta(\''+a.id+'\')">Descartar</button>';
   mountIcons();
 }
@@ -15941,10 +15969,11 @@ async function fidVincularAlta(altaId, clientId){
   const c = DATA.clients.find(function(x){ return x.id===clientId; });
   if(!a || !c) return;
   if(clientIsMayorista(c)){ showToast('Los mayoristas no tienen tarjeta'); return; }
-  if(c.fid && c.fid.token && c.fid.token!==a.token){
-    const ok = await showConfirm(c.name+' ya tiene una tarjeta en su celular. ¿Reemplazarla por esta? La anterior deja de actualizarse. Si dudás, pedile que te muestre la tarjeta y escaneala.');
-    if(!ok) return;
-  }
+  const yaTiene = c.fid && c.fid.token && c.fid.token!==a.token;
+  const ok = await showConfirm(yaTiene
+    ? c.name+' ya tiene una tarjeta en su celular. ¿Reemplazarla por la de '+a.nombre+'? La anterior deja de actualizarse. Si dudás, pedile que te muestre la tarjeta y escaneala.'
+    : '¿Vincular la tarjeta de '+a.nombre+' con '+c.name+'? Los sellos de '+c.name+' van a aparecer en esa tarjeta.');
+  if(!ok) return;
   return fidAltaEstado(a, 'vinculado').then(function(){
     fidLigar(c, a); saveData(DATA);
     fidAltas.abierta = null; showToast('Tarjeta vinculada a '+c.name);
@@ -15962,6 +15991,11 @@ function fidCrearDesdeAlta(altaId){
     if(fidAltasPendientes().length) renderFidAltas(); else document.getElementById('fidAltasModal').classList.remove('active');
     updateFidAltasBanner(); renderClientsScreen();
   }).catch(function(){ showToast('No se pudo conectar. Probá de nuevo.'); });
+}
+async function fidCrearDesdeAltaConfirmar(altaId){
+  const a = fidAltas.lista.find(function(x){ return x.id===altaId; }); if(!a) return;
+  const ok = await showConfirm('¿Crear el cliente '+a.nombre+' con su tarjeta?');
+  if(ok) fidCrearDesdeAlta(altaId);
 }
 async function fidDescartarAlta(altaId){
   const a = fidAltas.lista.find(function(x){ return x.id===altaId; }); if(!a) return;

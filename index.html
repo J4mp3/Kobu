@@ -15717,17 +15717,21 @@ function fidCuponesAuto(c){
 function fidMarcarCupones(c, orderId, applied){
   if(!c || !orderId) return;
   const ids = (applied||[]).map(function(a){ return a.clientCouponId; });
+  // Todos los cupones son de un solo uso (los de la cuponera y los premios de la tarjeta): quedan usados en ese pedido.
   (c.coupons||[]).forEach(function(cp){
-    if(!cp.fid) return;
+    if(!cp) return;
     if(ids.indexOf(cp.id)>-1){
-      if(cp.usadoEn!==orderId){ cp.usadoEn = orderId; const f = fidOf(c); if(f) fidHistPush(f, { t:'u', k:cp.fid, v:couponDisplayLabel(cp), o:orderId }); }
+      if(cp.usadoEn!==orderId){ cp.usadoEn = orderId; const f = cp.fid ? fidOf(c) : null; if(f) fidHistPush(f, { t:'u', k:cp.fid, v:couponDisplayLabel(cp), o:orderId }); }
     } else if(cp.usadoEn===orderId) delete cp.usadoEn;
   });
+  // Los de la cuponera ya usados se guardan como mucho 10 (los más viejos se borran).
+  const usadosC = (c.coupons||[]).filter(function(cp){ return cp && !cp.fid && cp.usadoEn; });
+  if(usadosC.length>10){ const sobran = usadosC.slice(0, usadosC.length-10); c.coupons = c.coupons.filter(function(cp){ return sobran.indexOf(cp)===-1; }); }
 }
 function fidLiberarCupones(o){
   const c = o ? DATA.clients.find(function(x){ return x.id===o.clientId; }) : null;
   if(!c) return;
-  (c.coupons||[]).forEach(function(cp){ if(cp.fid && cp.usadoEn===o.id) delete cp.usadoEn; });
+  (c.coupons||[]).forEach(function(cp){ if(cp && cp.usadoEn===o.id) delete cp.usadoEn; });
 }
 // Pedido nuevo cargado sin la ventana (Repetir, pedido web): el % de la tarjeta se aplica solo.
 function fidAplicarDesc(o, c){

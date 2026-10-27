@@ -635,6 +635,11 @@
   .chat-msg.chat-md{ white-space:normal; max-width:88%; overflow-wrap:anywhere; }
   .cite-chip{ display:inline-flex; align-items:center; gap:3px; padding:0 7px 0 5px; border-radius:999px; background:var(--k-card); color:var(--k-accent); font-weight:600; cursor:pointer; white-space:nowrap; line-height:1.55; vertical-align:baseline; border:1px solid var(--k-border); }
   .cite-chip .icon-slot{ font-size:.9em; }
+  .live-val{ color:var(--k-accent); font-weight:600; border-bottom:1px dotted var(--k-accent); white-space:nowrap; }
+  .chat-refresh{ display:inline-flex; align-items:center; gap:4px; margin-top:8px; padding:3px 9px; border-radius:999px; border:1px solid var(--k-border); background:var(--k-card); color:var(--k-muted); font-size:calc(10.5px + var(--kobu-font-boost, 0px)); cursor:pointer; }
+  .chat-refresh .icon-slot{ color:var(--k-accent); }
+  .chat-refresh[disabled]{ opacity:.6; cursor:default; }
+  .chat-upd{ display:block; margin-top:6px; color:var(--k-muted); font-size:calc(10px + var(--kobu-font-boost, 0px)); }
   .chat-msg.user .cite-chip{ background:rgba(255,255,255,.18); color:inherit; border-color:rgba(255,255,255,.35); }
   .chat-rcard{ display:flex; gap:10px; align-items:center; margin-top:8px; padding:10px; border-radius:12px; background:var(--k-card); border:1px solid var(--k-border); cursor:pointer; white-space:normal; }
   .chat-rcard-ic{ width:42px; height:42px; border-radius:10px; background:var(--k-card2); color:var(--k-accent); display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:calc(20px + var(--kobu-font-boost, 0px)); }
@@ -3111,6 +3116,7 @@ const ICONS = {
   'cash': '<svg '+SVG_ATTRS+'><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/><line x1="6" y1="9" x2="6" y2="9"/><line x1="18" y1="15" x2="18" y2="15"/></svg>',
   'credit-card': '<svg '+SVG_ATTRS+'><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><line x1="6" y1="15" x2="10" y2="15"/></svg>',
   'check': '<svg '+SVG_ATTRS+'><path d="M5 12l5 5l10 -10"/></svg>',
+  'refresh': '<svg '+SVG_ATTRS+'><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/></svg>',
   'at': '<svg '+SVG_ATTRS+'><path d="M8 12a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/><path d="M16 12v1.5a2.5 2.5 0 0 0 5 0v-1.5a9 9 0 1 0 -5.5 8.28"/></svg>',
   'plus': '<svg '+SVG_ATTRS+'><path d="M12 5v14M5 12h14"/></svg>',
   'x': '<svg '+SVG_ATTRS+'><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg>',
@@ -8336,6 +8342,16 @@ function syncEnabled(){
 var CLAUDE_MD_MAX = 390000;
 function claudeVivoOn(){ return !!(DATA.settings && DATA.settings.claudeVivo===true); }
 function claudeCell(v){ return String(v==null?'':v).replace(/\|/g,'/').replace(/[\r\n]+/g,' ').trim(); }
+// Precio por gramo, mililitro o unidad (kg y l se pasan a g y ml).
+function claudePorUnidad(p){
+  const q = parseFloat(p && p.qty), pr = parseFloat(p && p.price);
+  if(!(q>0) || isNaN(pr) || p.price==null) return '';
+  let u = String(p.unit||'').toLowerCase().trim(), f = 1;
+  if(u==='kg'){ u = 'g'; f = 1000; } else if(u==='l' || u==='lt' || u==='litro' || u==='litros'){ u = 'ml'; f = 1000; }
+  const v = pr/(q*f);
+  const r = v>=10 ? Math.round(v*100)/100 : v>=1 ? Math.round(v*1000)/1000 : Math.round(v*10000)/10000;
+  return '$'+String(r).replace('.', ',')+' por '+(u||'u');
+}
 function claudeNum(n){ const x = Math.round((parseFloat(n)||0)*100)/100; return String(x).replace('.', ','); }
 function buildClaudeExportMd(opts){
   opts = opts || {};
@@ -8429,13 +8445,13 @@ function buildClaudeExportMd(opts){
       .sort(function(a,b){ return String(a.name).localeCompare(String(b.name), 'es'); });
     if(!list.length) return;
     L.push(''); L.push('### '+tp[1]+' ('+list.length+')');
-    L.push('| Nombre | Paquete | Precio paquete | Stock | Mínimo | Proveedores (más barato primero) |');
-    L.push('|---|---|---|---|---|---|');
+    L.push('| Nombre | Paquete | Precio paquete | Precio por g/ml/u | Stock | Mínimo | Proveedores (más barato primero) |');
+    L.push('|---|---|---|---|---|---|---|');
     list.forEach(function(p){
       const u = claudeCell(p.unit||'');
       let prov = '';
       try{ prov = providerPriceList(p).map(function(x){ return claudeCell(x.name)+' '+fmtMoney(x.price); }).join(', '); }catch(e){}
-      L.push('| '+claudeCell(p.name)+' | '+(parseFloat(p.qty)>0 ? claudeNum(p.qty)+' '+u : '')+' | '+(p.price!=null && !isNaN(p.price) ? fmtMoney(p.price) : 'sin precio')+' | '+(p.stock!=null ? claudeNum(p.stock)+' '+u : '')+' | '+(parseFloat(p.minStock)>0 ? claudeNum(p.minStock) : '')+' | '+prov+' |');
+      L.push('| '+claudeCell(p.name)+' | '+(parseFloat(p.qty)>0 ? claudeNum(p.qty)+' '+u : '')+' | '+(p.price!=null && !isNaN(p.price) ? fmtMoney(p.price) : 'sin precio')+' | '+claudePorUnidad(p)+' | '+(p.stock!=null ? claudeNum(p.stock)+' '+u : '')+' | '+(parseFloat(p.minStock)>0 ? claudeNum(p.minStock) : '')+' | '+prov+' |');
     });
   });
   L.push(''); L.push('## Utensilios');
@@ -14174,12 +14190,75 @@ function shareChatSession(id){
 // recién después se dan formato a negrita, cursiva, subrayado (<u>), tachado, código, títulos, listas, separadores y tablas.
 function chatMdInline(s){
   const chips = [];
-  s = String(s).replace(/@\[([^\]\n]{1,80})\]/g, function(m0, name){
+  s = String(s).replace(/\{\{\s*(precio|costo|costotanda|stock)\s*:\s*([^}\n]{1,80}?)\s*\}\}/gi, function(m0, tipo, name){
+    const v = chatLiveValue(tipo.toLowerCase(), name);
+    chips.push(v!=null ? '<span class="live-val" title="Valor al día">'+escapeHtml(v)+'</span>' : '<b>'+name+'</b>');
+    return '\u0001'+(chips.length-1)+'\u0001';
+  });
+  s = s.replace(/@\[([^\]\n]{1,80})\]/g, function(m0, name){
     const it = chatCiteFind(name);
     chips.push(it ? chatCiteChipHtml(it) : '<b>'+name+'</b>');
     return '\u0001'+(chips.length-1)+'\u0001';
   });
   return chatMdInlineFmt(s).replace(/\u0001(\d+)\u0001/g, function(m0, i){ return chips[+i] || ''; });
+}
+// Valor al día de una receta o un ingrediente (por nombre, sin importar tildes ni mayúsculas). null = no existe.
+function chatLiveValue(tipo, nameEsc){
+  const k = chatNorm(String(nameEsc).replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&lt;/g,'<').replace(/&gt;/g,'>'));
+  if(!k) return null;
+  const r = (DATA.recipes||[]).find(function(x){ return x && chatNorm(x.title)===k; });
+  const i = (DATA.ingredientPrices||[]).find(function(x){ return x && chatNorm(x.name)===k; });
+  const n2 = function(n){ return String(Math.round((parseFloat(n)||0)*100)/100).replace('.', ','); };
+  try{
+    if(tipo==='precio'){
+      if(i) return (i.price==null || isNaN(i.price)) ? 'sin precio' : (fmtMoney(i.price)+(parseFloat(i.qty)>0 ? ' / '+n2(i.qty)+' '+(i.unit||'') : ''));
+      if(r) return parseFloat(r.salePrice)>0 ? fmtMoney(parseFloat(r.salePrice)) : 'sin precio';
+    } else if(tipo==='costo' || tipo==='costotanda'){
+      if(r){ const c = computeRecipeCost(r, 1); return tipo==='costotanda' ? fmtMoney(c.total) : (c.costPerUnit!=null ? fmtMoney(c.costPerUnit) : fmtMoney(c.total)); }
+      if(i) return (i.price==null || isNaN(i.price)) ? 'sin precio' : (fmtMoney(i.price)+(parseFloat(i.qty)>0 ? ' / '+n2(i.qty)+' '+(i.unit||'') : ''));
+    } else if(tipo==='stock'){
+      if(i) return n2(i.stock)+' '+(i.unit||'');
+      if(r) return n2(recipeStockOf(r))+' listos';
+    }
+  }catch(e){}
+  return null;
+}
+// Texto plano con los valores al día (para pasar a la tarjeta de receta).
+function chatLivePlain(text){
+  return String(text||'').replace(/\{\{\s*(precio|costo|costotanda|stock)\s*:\s*([^}\n]{1,80}?)\s*\}\}/gi, function(m0, tipo, name){
+    const v = chatLiveValue(tipo.toLowerCase(), escapeHtml(name));
+    return v!=null ? v : name;
+  });
+}
+function chatRefreshable(m){
+  return !!(m && m.role==='model' && (m.ai || !m.id) && !m.recipeCard && m.text!=='escribiendo...' && /\$|\{\{/.test(m.text||''));
+}
+function chatRefreshMsg(idx){
+  const session = activeChatSession();
+  if(!session) return;
+  const m = session.messages[idx];
+  if(!chatRefreshable(m) || m._busy) return;
+  const hist = session.messages.slice(0, idx);
+  if(!hist.some(function(x){ return x.role==='user'; })) return;
+  m._busy = true;
+  renderChatScreen();
+  callAi(hist).then(function(reply){
+    delete m._busy;
+    m.text = reply;
+    m.ai = true;
+    if(!m.id) m.id = 'm-'+Date.now()+'-'+Math.random().toString(36).slice(2,6);
+    m.updatedTs = new Date().toISOString();
+    const kind = chatRecipeAskKind(reply);
+    if(kind){ m.recipeAsk = kind; m.actions = [ { id:'recipe-confirm', label:'Sí, confirmar', kind:'primary' }, { id:'recipe-change', label:'Cambiar algo', kind:'ghost' } ]; }
+    else { delete m.recipeAsk; if(m.actions && m.actions.some(function(a){ return /^recipe-/.test(a.id); })) m.actions = null; }
+    session.updatedAt = new Date().toISOString();
+    saveData(DATA);
+    renderChatScreen();
+  }).catch(function(err){
+    delete m._busy;
+    renderChatScreen();
+    showToast('No se pudo actualizar: '+((err && err.message) || 'error'));
+  });
 }
 function chatMdInlineFmt(s){
   return String(s)
@@ -14274,7 +14353,13 @@ function renderChatScreen(){
         }).join('')+'</div>' : '';
         const bodyHtml = (m.role==='model' ? chatMdHtml(m.text) : escapeHtml(m.text)) + (m.recipeCard ? chatRecipeCardHtml(m) : '');
         const hasTable = bodyHtml.indexOf('<table')>-1 ? ' has-table' : '';
-        return '<div class="chat-msg-row'+hasTable+'"><span class="chat-avatar"><span class="icon-slot" data-icon="paw"></span></span><div class="chat-msg '+m.role+(m.role==='model' ? ' chat-md' : '')+hasTable+'" style="transform-origin:bottom left;'+animStyle+'">'+bodyHtml+actionsHtml+'</div></div>';
+        let refreshHtml = '';
+        if(chatRefreshable(m)){
+          const upd = m.updatedTs ? new Date(m.updatedTs) : null;
+          refreshHtml = (upd && !isNaN(upd) ? '<span class="chat-upd">Actualizado con los precios del '+upd.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'})+' '+upd.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit',hour12:false})+'</span>' : '')+
+            '<button type="button" class="chat-refresh" onclick="chatRefreshMsg('+idx+')"'+(m._busy ? ' disabled' : '')+'><span class="icon-slot" data-icon="refresh"></span>'+(m._busy ? 'Actualizando…' : 'Actualizar con precios de hoy')+'</button>';
+        }
+        return '<div class="chat-msg-row'+hasTable+'"><span class="chat-avatar"><span class="icon-slot" data-icon="paw"></span></span><div class="chat-msg '+m.role+(m.role==='model' ? ' chat-md' : '')+hasTable+'" style="transform-origin:bottom left;'+animStyle+'">'+bodyHtml+actionsHtml+refreshHtml+'</div></div>';
       }
       const imgHtml = m.image ? '<img class="chat-msg-img" src="'+m.image+'">' : '';
       return '<div class="chat-msg '+m.role+'" style="transform-origin:bottom right;'+animStyle+'">'+imgHtml+chatUserTextHtml(m)+'</div>';
@@ -14417,7 +14502,7 @@ function chatConfirmRecipe(session, msg, typed){
   session.updatedAt = new Date().toISOString();
   saveData(DATA);
   renderChatScreen();
-  const src = String(msg.text||'').replace(/¿?\s*confirm[aá]s\s+(esta|la)\s+(receta|preparaci[oó]n)\s*\??\s*\**\s*$/i, '').replace(/@\[([^\]]+)\]/g, '$1');
+  const src = chatLivePlain(msg.text).replace(/¿?\s*confirm[aá]s\s+(esta|la)\s+(receta|preparaci[oó]n)\s*\??\s*\**\s*$/i, '').replace(/@\[([^\]]+)\]/g, '$1');
   callAiExtractRecipe(src, { chat:true }).then(function(parsed){
     const draft = aiRecipeToDraft(parsed, kind);
     const k = (parsed && /^prep/i.test(String(parsed.kind||''))) ? 'prep' : kind;
@@ -14744,17 +14829,88 @@ function buildAiDataContext(nivel, session){
   }
   return { txt: md+'\n\n## Pedidos, producción y economía\n'+estado, compact:true };
 }
+// Ficha técnica de los moldes, bowls, utensilios y hornos citados con @ (para que la IA razone con datos concretos).
+function moldUsosTxt(u){
+  const L = parseFloat(u.moldDim1)||0, A = parseFloat(u.moldDim2)||0, H = parseFloat(u.moldDim3)||0;
+  const sh = u.moldShape || '';
+  const cuadrado = (sh==='rectangular' || sh==='cuadrado') && L>0 && A>0 && Math.abs(L-A)<=1;
+  if(sh==='budinera') return 'budinera: budines, pan de molde, budín inglés, terrinas. Altura alta: masa de budín.';
+  if(sh==='tubo') return 'tubo/savarín: roscas, bundt cakes, savarines, budines en corona (cocción pareja por el tubo central).';
+  if(sh==='redondo') return H>0 && H<=4 ? 'redondo bajo: tartas, pies, pastafrolas, lemon pie, tarteletas grandes.' : 'redondo: tortas, bizcochuelos, cheesecakes, chocotortas, tortas húmedas.';
+  if(sh==='rectangular' || cuadrado){
+    if(H>0 && H<=6) return (cuadrado ? 'cuadrado' : 'rectangular')+' bajo (placa): brownies, blondies, lemonies, barras de limón, cuadrados de coco y dulce de leche, crumble bars, pastafrola o alfajor de maicena en placa, carrot cake o torta húmeda en placa, chipá o focaccia en placa. NO es para budines (necesitan budinera).';
+    return (cuadrado ? 'cuadrado' : 'rectangular')+' alto: tortas en placa, postres en capas, tiramisú, bizcochuelos para cortar en cuadrados.';
+  }
+  return 'forma especial: usarlo según su capacidad.';
+}
+function chatCitedToolsTxt(session){
+  const msgs = ((session && session.messages) || []).slice(-8);
+  const seen = {};
+  const out = [];
+  msgs.forEach(function(m){ (m.cites||[]).forEach(function(c){
+    if(seen[c.t+c.id] || 'mbuo'.indexOf(c.t)===-1) return;
+    seen[c.t+c.id] = 1;
+    if(c.t==='o'){
+      const o = (DATA.ovens||[]).find(function(x){ return x.id===c.id; });
+      if(o) out.push('### Horno citado: '+o.name+'\n- '+(o.tipo||'horno')+(o.fuente ? ', '+o.fuente : '')+(o.filas ? ', '+o.filas+' rejillas' : '')+(o.tempMax ? ', hasta '+o.tempMax+'°' : '')+((o.funciones||[]).length ? ', funciones: '+o.funciones.join(', ') : ''));
+      return;
+    }
+    const u = (DATA.utensils||[]).find(function(x){ return x.id===c.id; });
+    if(!u) return;
+    const cat = utensilCatOf(u);
+    if(cat==='bowl'){
+      out.push('### Bowl citado: '+u.nombre+'\n- Diámetro '+(u.bowlDiam||'?')+' cm, alto '+(u.bowlAlto||'?')+' cm, capacidad '+(u.bowlCap ? u.bowlCap+' ml' : '?')+(u.bowlPeso ? ', pesa '+u.bowlPeso+' g vacío (para tarar la balanza)' : '')+(u.material ? ', '+u.material : ''));
+      return;
+    }
+    if(cat!=='molde'){ out.push('### Utensilio citado: '+u.nombre+(u.material ? ' ('+u.material+')' : '')+(parseFloat(u.cantidad)>1 ? ', tiene '+u.cantidad : '')); return; }
+    const L = parseFloat(u.moldDim1)||0, A = parseFloat(u.moldDim2)||0, H = parseFloat(u.moldDim3)||0;
+    const cap = moldCapacityCm3(u);
+    const lines = ['### Molde citado: '+u.nombre];
+    lines.push('- Forma '+(u.moldShape||'?')+', '+(moldDimsLabel(u) || 'sin medidas')+(cap ? ', capacidad '+Math.round(cap)+' cm³ (≈ '+Math.round(cap)+' ml al ras; se llena al 60-70 %: ≈ '+Math.round(cap*0.65)+' ml de masa)' : '')+(parseFloat(u.cantidad)>1 ? ', tiene '+u.cantidad : '')+(u.material ? ', '+u.material : ''));
+    lines.push('- Para qué sirve: '+moldUsosTxt(u));
+    if((u.moldShape==='rectangular') && L>0 && A>0){
+      const por = function(t){ return Math.floor(L/t)*Math.floor(A/t); };
+      lines.push('- Porciones al cortar: '+por(4)+' cuadrados de 4 cm, '+por(5)+' de 5 cm, '+por(6)+' de 6 cm.');
+    }
+    if(u.moldShape==='redondo' && L>0) lines.push('- Porciones: '+(L<=18 ? '6-8' : L<=22 ? '8-10' : L<=26 ? '10-14' : '14-18')+' porciones de torta.');
+    const calib = [], escalar = [];
+    (DATA.recipes||[]).forEach(function(r){
+      (r.moldCalibrations||[]).forEach(function(mc){
+        if(mc.moldId===u.id){ calib.push(r.title+' (rinde '+mc.yieldQty+(mc.unitWeight ? ', '+mc.unitWeight+' g c/u' : '')+')'); return; }
+        const u2 = (DATA.utensils||[]).find(function(x){ return x.id===mc.moldId; });
+        const cap2 = u2 ? moldCapacityCm3(u2) : null;
+        if(cap && cap2 && escalar.length<10) escalar.push(r.title+' (calibrada en '+u2.nombre+') × '+(Math.round(cap/cap2*100)/100));
+      });
+    });
+    if(calib.length) lines.push('- Recetas que ya usan este molde: '+calib.join('; '));
+    if(escalar.length) lines.push('- Para hacer en este molde recetas calibradas en otro, multiplicar la receta por: '+escalar.join('; '));
+    out.push(lines.join('\n'));
+  }); });
+  return out.length ? '\n\n## Lo que citó en esta charla (ficha técnica)\n'+out.join('\n\n') : '';
+}
+function aiPlainNums(t){
+  return String(t||'')
+    .replace(/\$\s?(\d{1,3}(?:\.\d{3})+|\d+)(?:,(\d+))?/g, function(m0, ent, dec){ return '$'+ent.replace(/\./g, '')+(dec ? '.'+dec : ''); })
+    .replace(/(\d),(\d)/g, '$1.$2');
+}
 function buildSystemPrompt(nivel){
   const session = activeChatSession();
   const recipeId = session ? session.recipeId : state.chatRecipeId;
   const ctx = buildAiDataContext(nivel||0, session);
-  const appContext = '\n\n'+ctx.txt+'\n\n'+
+  const appContext = '\n\n'+aiPlainNums(ctx.txt+chatCitedToolsTxt(session))+'\n\n'+
+    'Números de estos datos: pesos argentinos, sin separador de miles y con punto decimal ($1260 = mil doscientos sesenta pesos; $1.26 = un peso con veintiséis). '+
+    'Para el costo de un ingrediente en una receta: cantidad usada × "Precio por g/ml/u" (pasá kg a g y l a ml). En las tablas de costos mostrá siempre el costo de cada renglón (no mezcles precio del paquete con precio por gramo) y sumalos. Si un ingrediente está "sin precio", decilo. Para el costo de una receta que ya existe usá el costo calculado por la app. '+
     'Cómo usar estos datos: cuando sugieras o armes algo, basate en lo que hay en stock, en sus moldes, bowls y horno, y en sus costos y precios reales. Si falta algo en stock, decilo. '+
     (ctx.compact ? 'Algunas recetas están resumidas en una línea: si necesitás sus ingredientes o pasos, pedí que la citen con @. ' : '')+
     'Cuando nombres una receta, preparación, molde, bowl, utensilio, horno o ingrediente que existe en la app, escribilo así: @[Nombre exacto] (por ejemplo @[Brownie clásico]). '+
+    'Valores al día: cuando escribas el precio de un ingrediente o insumo, el costo o el precio de venta de una receta, o un stock, NO escribas el número: escribí la marca y la app muestra el valor actualizado: {{precio:Nombre exacto}} (precio del paquete de un ingrediente, o precio de venta de una receta), {{costo:Nombre de la receta}} (costo por unidad), {{costotanda:Nombre de la receta}} (costo de toda la tanda), {{stock:Nombre}} (stock de un ingrediente o lo listo para vender de una receta). Solo para cosas que existen en la app. Las cuentas que hagas con esos valores (cantidades usadas, totales, márgenes) sí escribilas con números. '+
     'Cuando te pidan una receta o preparación nueva (o cambiar una), escribila completa: título con ###, rinde, molde y horno sugeridos de los que tiene (con temperatura y tiempo), ingredientes con cantidades exactas (g, ml o u) usando los mismos nombres de su stock cuando existan, pasos numerados (podés usar **negrita** y subtítulos ## para separar partes como masa, relleno o armado), notas y el costo estimado con sus precios. '+
     'Terminá esa respuesta con una línea sola que diga exactamente "¿Confirmás esta receta?" (o "¿Confirmás esta preparación?" si es una preparación base como una crema, relleno, masa o cobertura). Si después te piden cambios, volvé a escribirla completa con los cambios y la misma pregunta al final.';
-  const base = 'Sos el asistente de la app Kobu, para alguien que vende repostería/panadería casera. Tenés acceso a TODOS los datos cargados en la app (economía, stock de ingredientes e insumos, utensilios, cocina, recetas y pedidos) — usalos para responder cualquier pregunta sobre esos temas. Nunca digas que no tenés acceso a esta información, ya la tenés en el contexto de abajo. Si te mandan una foto, analizala con atención y respondé sobre lo que ves, relacionándolo con estos datos si aplica. Datos actuales de la app: '+appContext;
+  const base = 'Sos Kobu IA, pastelero/a y panadero/a profesional con formación técnica, asesorando a Kobu Dulce, una pastelería casera que vende budines, brownies, tortas y panificados. '+
+    'Pensá como profesional antes de responder: técnica (método, temperaturas, tiempos, punto), química de la repostería (gluten, azúcares e higroscopía, grasas y emulsiones, huevos, leudantes, humedad, vida útil) y negocio (costo real con sus precios, margen, qué se vende más, que sea rico y rentable para vender). '+
+    'Cuando sugieras qué hacer: revisá que el producto corresponda a la forma, medidas y capacidad del molde (por ejemplo, un budín va en budinera; un molde cuadrado o rectangular bajo es para brownies, blondies, barras o cuadrados), que haya stock de los ingredientes, que entre en su horno, y priorizá lo que tiene buena salida en sus ventas o buen margen. Proponé cantidades concretas escaladas al molde. '+
+    'Respondé solo sobre repostería, panadería, cocina, sus insumos, su producción y su negocio. '+
+    'Sos el asistente de la app Kobu, para alguien que vende repostería/panadería casera. Tenés acceso a TODOS los datos cargados en la app (economía, stock de ingredientes e insumos, utensilios, cocina, recetas y pedidos) — usalos para responder cualquier pregunta sobre esos temas. Nunca digas que no tenés acceso a esta información, ya la tenés en el contexto de abajo. Si te mandan una foto, analizala con atención y respondé sobre lo que ves, relacionándolo con estos datos si aplica. Datos actuales de la app: '+appContext;
   if(recipeId){
     const r = DATA.recipes.find(function(x){ return x.id===recipeId; });
     if(r){
@@ -14903,7 +15059,7 @@ function sendChatMessage(){
   renderChatScreen();
   callAi(session.messages.slice(0,-1)).then(function(reply){
     session.messages.pop();
-    const out = { id:'m-'+Date.now()+'-'+Math.random().toString(36).slice(2,6), role:'model', text:reply };
+    const out = { id:'m-'+Date.now()+'-'+Math.random().toString(36).slice(2,6), role:'model', text:reply, ai:true };
     const kind = chatRecipeAskKind(reply);
     if(kind){
       out.recipeAsk = kind;

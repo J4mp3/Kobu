@@ -14190,9 +14190,9 @@ function shareChatSession(id){
 // recién después se dan formato a negrita, cursiva, subrayado (<u>), tachado, código, títulos, listas, separadores y tablas.
 function chatMdInline(s){
   const chips = [];
-  s = String(s).replace(/\{\{\s*(precio|costo|costotanda|stock)\s*:\s*([^}\n]{1,80}?)\s*\}\}/gi, function(m0, tipo, name){
-    const v = chatLiveValue(tipo.toLowerCase(), name);
-    chips.push(v!=null ? '<span class="live-val" title="Valor al día">'+escapeHtml(v)+'</span>' : '<b>'+name+'</b>');
+  s = String(s).replace(CHAT_LIVE_RE, function(m0, tipo, name, cant, totTag, totDiv){
+    const v = chatLiveToken(tipo, name, cant, totTag, totDiv);
+    chips.push(v!=null ? '<span class="live-val" title="Valor al día">'+escapeHtml(v)+'</span>' : '<b>'+(name||'')+'</b>');
     return '\u0001'+(chips.length-1)+'\u0001';
   });
   s = s.replace(/@\[([^\]\n]{1,80})\]/g, function(m0, name){
@@ -14225,10 +14225,52 @@ function chatLiveValue(tipo, nameEsc){
 }
 // Texto plano con los valores al día (para pasar a la tarjeta de receta).
 function chatLivePlain(text){
-  return String(text||'').replace(/\{\{\s*(precio|costo|costotanda|stock)\s*:\s*([^}\n]{1,80}?)\s*\}\}/gi, function(m0, tipo, name){
-    const v = chatLiveValue(tipo.toLowerCase(), escapeHtml(name));
-    return v!=null ? v : name;
+  chatLiveSumReset();
+  return String(text||'').replace(CHAT_LIVE_RE, function(m0, tipo, name, cant, totTag, totDiv){
+    const v = chatLiveToken(tipo, name!=null ? escapeHtml(name) : name, cant, totTag, totDiv);
+    return v!=null ? v : (name||'');
   });
+}
+// {{precio:X}} {{costo:X}} {{costo:X|200 g}} {{costotanda:X}} {{stock:X}} {{total}} {{total/16}}
+var CHAT_LIVE_RE = /\{\{\s*(?:(precio|costo|costotanda|stock)\s*:\s*([^}|\u0002\n]{1,80}?)\s*(?:[|\u0002]\s*([^}\n]{1,30}?))?|(total)\s*(?:\/\s*(\d+(?:[.,]\d+)?))?)\s*\}\}/gi;
+var chatLiveSum = { t:0, n:0, falta:0 };
+function chatLiveSumReset(){ chatLiveSum = { t:0, n:0, falta:0 }; }
+function chatLiveToken(tipo, name, cant, totTag, totDiv){
+  // Con el regex de arriba: (tipo, name, cant) o (undefined, undefined, undefined, 'total', div)
+  if(!tipo && totTag){
+    if(!chatLiveSum.n) return null;
+    const d = totDiv ? parseFloat(String(totDiv).replace(',', '.')) : 1;
+    const v = chatLiveSum.t/(d>0 ? d : 1);
+    return fmtMoney(v)+(chatLiveSum.falta ? ' (faltan precios de '+chatLiveSum.falta+')' : '');
+  }
+  tipo = String(tipo||'').toLowerCase();
+  if(tipo==='costo' && cant){
+    const v = chatLineCost(name, cant);
+    if(v==null){ chatLiveSum.falta++; return null; }
+    chatLiveSum.t += v; chatLiveSum.n++;
+    return fmtMoney(Math.round(v*100)/100);
+  }
+  return chatLiveValue(tipo, name);
+}
+// Costo de "200 g" de un ingrediente (o "3 u" de una receta) con los precios de hoy. null = no se puede calcular.
+function chatLineCost(nameEsc, cant){
+  const k = chatNorm(String(nameEsc).replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&lt;/g,'<').replace(/&gt;/g,'>'));
+  const m = String(cant||'').replace(',', '.').match(/^\s*(\d+(?:\.\d+)?)\s*(.*)$/);
+  if(!k || !m) return null;
+  const q = parseFloat(m[1]);
+  const unit = normalizeUnit(m[2].trim()) || m[2].trim() || 'u';
+  const i = (DATA.ingredientPrices||[]).find(function(x){ return x && chatNorm(x.name)===k; });
+  try{
+    if(i){
+      if(i.price==null || isNaN(i.price) || !(parseFloat(i.qty)>0)) return null;
+      const conv = convertQty(q, unit, i.unit);
+      if(conv==null) return null;
+      return conv/parseFloat(i.qty)*parseFloat(i.price);
+    }
+    const r = (DATA.recipes||[]).find(function(x){ return x && chatNorm(x.title)===k; });
+    if(r){ const c = computeRecipeCost(r, 1); return c.costPerUnit!=null ? c.costPerUnit*q : null; }
+  }catch(e){}
+  return null;
 }
 function chatRefreshable(m){
   return !!(m && m.role==='model' && (m.ai || !m.id) && !m.recipeCard && m.text!=='escribiendo...' && /\$|\{\{/.test(m.text||''));
@@ -14274,6 +14316,9 @@ function chatMdInlineFmt(s){
     .replace(/&lt;br\s*\/?&gt;/gi, '<br>');
 }
 function chatMdHtml(text){
+  chatLiveSumReset();
+  // El | de {{costo:X|200 g}} no separa columnas de una tabla.
+  text = String(text==null ? '' : text).replace(/\{\{[^}\n]{0,140}\}\}/g, function(m){ return m.replace(/\|/g, '\u0002'); });
   const lines = escapeHtml(String(text==null ? '' : text)).replace(/\r/g, '').split('\n');
   const out = [];
   let para = [];
@@ -14903,7 +14948,9 @@ function buildSystemPrompt(nivel){
     'Cómo usar estos datos: cuando sugieras o armes algo, basate en lo que hay en stock, en sus moldes, bowls y horno, y en sus costos y precios reales. Si falta algo en stock, decilo. '+
     (ctx.compact ? 'Algunas recetas están resumidas en una línea: si necesitás sus ingredientes o pasos, pedí que la citen con @. ' : '')+
     'Cuando nombres una receta, preparación, molde, bowl, utensilio, horno o ingrediente que existe en la app, escribilo así: @[Nombre exacto] (por ejemplo @[Brownie clásico]). '+
-    'Valores al día: cuando escribas el precio de un ingrediente o insumo, el costo o el precio de venta de una receta, o un stock, NO escribas el número: escribí la marca y la app muestra el valor actualizado: {{precio:Nombre exacto}} (precio del paquete de un ingrediente, o precio de venta de una receta), {{costo:Nombre de la receta}} (costo por unidad), {{costotanda:Nombre de la receta}} (costo de toda la tanda), {{stock:Nombre}} (stock de un ingrediente o lo listo para vender de una receta). Solo para cosas que existen en la app. Las cuentas que hagas con esos valores (cantidades usadas, totales, márgenes) sí escribilas con números. '+
+    'Valores al día: cuando escribas el precio de un ingrediente o insumo, el costo o el precio de venta de una receta, o un stock, NO escribas el número: escribí la marca y la app muestra el valor actualizado: {{precio:Nombre exacto}} (precio del paquete de un ingrediente, o precio de venta de una receta), {{costo:Nombre de la receta}} (costo por unidad), {{costotanda:Nombre de la receta}} (costo de toda la tanda), {{stock:Nombre}} (stock de un ingrediente o lo listo para vender de una receta). Solo para cosas que existen en la app. '+
+    'En las tablas de costos de una receta, escribí el costo de cada renglón como {{costo:Nombre exacto del ingrediente|cantidad unidad}} (por ejemplo {{costo:Harina 000|200 g}}; también sirve con una receta: {{costo:Brownie|3 u}}), el total como {{total}} y el costo por unidad como {{total/RINDE}} (por ejemplo {{total/16}}): la app hace la cuenta con los precios de hoy. Si un ingrediente no está en la app o no tiene precio, ponelo sin marca y aclaralo. '+
+    'Los márgenes y precios sugeridos sí escribilos con números. '+
     'Cuando te pidan una receta o preparación nueva (o cambiar una), escribila completa: título con ###, rinde, molde y horno sugeridos de los que tiene (con temperatura y tiempo), ingredientes con cantidades exactas (g, ml o u) usando los mismos nombres de su stock cuando existan, pasos numerados (podés usar **negrita** y subtítulos ## para separar partes como masa, relleno o armado), notas y el costo estimado con sus precios. '+
     'Terminá esa respuesta con una línea sola que diga exactamente "¿Confirmás esta receta?" (o "¿Confirmás esta preparación?" si es una preparación base como una crema, relleno, masa o cobertura). Si después te piden cambios, volvé a escribirla completa con los cambios y la misma pregunta al final.';
   const base = 'Sos Kobu IA, pastelero/a y panadero/a profesional con formación técnica, asesorando a Kobu Dulce, una pastelería casera que vende budines, brownies, tortas y panificados. '+

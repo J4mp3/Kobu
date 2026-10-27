@@ -2559,7 +2559,7 @@
         <input class="input" id="cIn" type="number" placeholder="°C" oninput="convertTemp('c')">
       </div>
     </div>
-    <p style="text-align:center;font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin-top:2px;">Kobu · hecho con ❤ para tu emprendimiento</p>
+    <p style="text-align:center;font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin-top:2px;">Kobu · hecho con <span class="icon-slot" data-icon="heart" style="vertical-align:-2px;color:var(--k-accent);"></span> para tu emprendimiento</p>
   </div>
 
   <!-- AVANZADO (lista) -->
@@ -8496,7 +8496,8 @@ function buildClaudeExportMd(opts){
   const desde = new Date(); desde.setDate(desde.getDate()-90);
   const desdeStr = localDateStr(desde);
   const prod = {}, meses = {};
-  const fila = function(nombre){ const k = String(nombre||'?'); if(!prod[k]) prod[k] = { ped:0, calle:0, fact:0, merma:0, mermaCosto:0 }; return prod[k]; };
+  // Por receta (con el nombre actual): una receta renombrada no queda partida en dos.
+  const fila = function(nombre, recipeId){ const rr = recipeId ? recOf(recipeId) : null; const k = String((rr && rr.title) || nombre || '?'); if(!prod[k]) prod[k] = { ped:0, calle:0, fact:0, merma:0, mermaCosto:0 }; return prod[k]; };
   let nPed = 0;
   (DATA.orders||[]).forEach(function(o){
     if(!o || o.status==='cancelado') return;
@@ -8505,7 +8506,7 @@ function buildClaudeExportMd(opts){
     nPed++;
     meses[d.slice(0, 7)] = (meses[d.slice(0, 7)]||0) + (parseFloat(o.total)||0);
     (o.items||[]).forEach(function(it){
-      const f = fila(it.recipeName); const q = parseFloat(it.qty)||0;
+      const f = fila(it.recipeName, it.recipeId); const q = parseFloat(it.qty)||0;
       f.ped += q; f.fact += q*(parseFloat(it.unitPrice)||0);
     });
   });
@@ -8513,7 +8514,7 @@ function buildClaudeExportMd(opts){
     if(!v) return;
     const d = String(v.ts||'').slice(0, 10);
     if(!d || d < desdeStr) return;
-    const f = fila(v.recipeName); const q = parseFloat(v.qty)||0;
+    const f = fila(v.recipeName, v.recipeId); const q = parseFloat(v.qty)||0;
     f.calle += q; f.fact += q*(parseFloat(v.unitPrice)||0);
     meses[d.slice(0, 7)] = (meses[d.slice(0, 7)]||0) + q*(parseFloat(v.unitPrice)||0);
   });
@@ -8521,7 +8522,7 @@ function buildClaudeExportMd(opts){
     if(!m) return;
     const d = String(m.ts||'').slice(0, 10);
     if(!d || d < desdeStr) return;
-    const f = fila(m.recipeName); f.merma += parseFloat(m.porciones)||0; f.mermaCosto += parseFloat(m.costo)||0;
+    const f = fila(m.recipeName, m.recipeId); f.merma += parseFloat(m.porciones)||0; f.mermaCosto += parseFloat(m.costo)||0;
   });
   L.push(''); L.push('## Ventas resumidas (desde '+desdeStr+')');
   L.push('Pedidos no cancelados: '+nPed+'. Cantidades en la unidad de venta (unidad o paquete).');
@@ -10593,7 +10594,7 @@ function notifyOrderReady(id){
   const client = o.clientId ? DATA.clients.find(function(c){ return c.id===o.clientId; }) : null;
   const phone = client ? (client.phone||'').replace(/\D/g,'') : '';
   if(!phone){ showToast('Este cliente no tiene teléfono cargado'); return; }
-  const text = 'Hola *'+(o.customerName||'')+'*, tu pedido ya está listo para retirar/entregar. ¡Gracias por elegirnos! 🍰';
+  const text = 'Hola *'+(o.customerName||'')+'*, tu pedido ya está listo para retirar/entregar. ¡Gracias por elegirnos!';
   location.href = 'https://wa.me/'+phone+'?text='+encodeURIComponent(text);
 }
 function openReviewModal(orderId){
@@ -13907,7 +13908,7 @@ function handleChatAction(msgId, actionIdx){
     const result = addShortagesToShoppingList(msg.shortageItems||[]);
     msg.actions = null;
     if(result.addedCount>0){
-      msg.text += '\n\n✅ Agregué '+result.addedCount+' ingrediente'+(result.addedCount===1?'':'s')+' a tu Lista de compras'+(DATA.settings.autoShoppingFromOrders===false?' (desactivé la lista automática para poder sumarlos)':'')+'.';
+      msg.text += '\n\n**Listo:** agregué '+result.addedCount+' ingrediente'+(result.addedCount===1?'':'s')+' a tu Lista de compras'+(DATA.settings.autoShoppingFromOrders===false?' (desactivé la lista automática para poder sumarlos)':'')+'.';
     }
     if(result.skipped.length){
       msg.text += ' No pude agregar automáticamente: '+result.skipped.join(', ')+' (revisalos a mano).';
@@ -13938,7 +13939,7 @@ function handleChatAction(msgId, actionIdx){
     const r = applyIngredientPurchase(priceId, pending.qty, pending.unit, pending.price, pending.provider);
     if(r){
       const provTxt = r.provider ? ' · proveedor: '+r.provider : '';
-      msg.text += '\n\n✅ Sumé '+fmtQty(r.addedStock)+' '+r.unit+' de '+r.name+' al stock (pagaste '+fmtMoney(r.totalPaid)+provTxt+').';
+      msg.text += '\n\n**Listo:** sumé '+fmtQty(r.addedStock)+' '+r.unit+' de '+r.name+' al stock (pagaste '+fmtMoney(r.totalPaid)+provTxt+').';
     } else {
       msg.text += '\n\nNo encontré ese ingrediente — puede que se haya eliminado.';
     }

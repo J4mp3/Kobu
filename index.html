@@ -632,6 +632,27 @@
   .chat-avatar{ width:20px; height:20px; border-radius:50%; background:var(--k-accent); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
   .chat-avatar .icon-slot{ font-size:calc(11px + var(--kobu-font-boost, 0px)); color:var(--k-bg); }
   .chat-msg-actions{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+  .chat-msg.chat-md{ white-space:normal; max-width:88%; overflow-wrap:anywhere; }
+  .chat-md .cmd-p{ margin:0 0 6px; }
+  .chat-md > :last-child{ margin-bottom:0; }
+  .chat-md > :first-child{ margin-top:0; }
+  .chat-md .cmd-h{ font-weight:700; color:var(--k-accent); font-size:calc(13.5px + var(--kobu-font-boost, 0px)); margin:10px 0 4px; line-height:1.3; }
+  .chat-md .cmd-h.h3{ font-size:calc(12.5px + var(--kobu-font-boost, 0px)); }
+  .chat-md .cmd-hr{ border:none; border-top:1px solid var(--k-border); margin:10px 0; }
+  .chat-md .cmd-li{ display:flex; gap:6px; margin:0 0 4px; }
+  .chat-md .cmd-li.l1{ padding-left:16px; }
+  .chat-md .cmd-li.l2{ padding-left:30px; }
+  .chat-md .cmd-b{ color:var(--k-accent); flex-shrink:0; font-weight:700; min-width:8px; }
+  .chat-msg-row.has-table{ width:100%; }
+  .chat-msg.chat-md.has-table{ flex:1; min-width:0; max-width:none; }
+  .chat-md .cmd-tw{ overflow-x:auto; margin:6px 0 8px; -webkit-overflow-scrolling:touch; border:1px solid var(--k-border); border-radius:10px; background:var(--k-card); }
+  .chat-md table{ border-collapse:collapse; font-size:calc(10.5px + var(--kobu-font-boost, 0px)); width:100%; line-height:1.3; }
+  .chat-md th, .chat-md td{ padding:5px 6px; text-align:left; vertical-align:top; border-bottom:1px solid var(--k-border); overflow-wrap:normal; word-break:normal; }
+  .chat-md tr:last-child td{ border-bottom:none; }
+  .chat-md th{ color:var(--k-accent); font-weight:700; background:var(--k-card2); }
+  .chat-md td.num, .chat-md th.num{ text-align:right; }
+  .chat-md code{ font-family:ui-monospace, monospace; font-size:.92em; background:var(--k-card); padding:0 4px; border-radius:4px; }
+  .chat-md b{ font-weight:700; }
   .chat-msg-img{ display:block; max-width:100%; max-height:220px; border-radius:10px; margin-bottom:6px; object-fit:cover; }
   .chat-img-preview{ display:flex; align-items:center; gap:8px; background:var(--k-card2); border-radius:12px; padding:6px 10px; flex-shrink:0; }
   .chat-img-preview img{ width:36px; height:36px; border-radius:8px; object-fit:cover; }
@@ -14062,6 +14083,67 @@ function shareChatSession(id){
     showToast('No se pudo copiar automáticamente');
   });
 }
+// Formato de las respuestas de la IA (Markdown simple). Primero se escapa TODO (nunca entra HTML de la respuesta);
+// recién después se dan formato a negrita, cursiva, subrayado (<u>), tachado, código, títulos, listas, separadores y tablas.
+function chatMdInline(s){
+  return String(s)
+    .replace(/\\([\\`*_{}\[\]()#+\-.!|~])/g, function(m, c){ return '&#'+c.charCodeAt(0)+';'; })
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\*\*\*(?!\s)(.+?)\*\*\*/g, '<b><i>$1</i></b>')
+    .replace(/\*\*(?!\s)(.+?)\*\*/g, '<b>$1</b>')
+    .replace(/__(?!\s)(.+?)__/g, '<b>$1</b>')
+    .replace(/(^|[^*\w])\*(?![\s*])([^*]+?)\*(?![*\w])/g, '$1<i>$2</i>')
+    .replace(/(^|[^_\w])_(?![\s_])([^_]+?)_(?![_\w])/g, '$1<i>$2</i>')
+    .replace(/~~(?!\s)(.+?)~~/g, '<s>$1</s>')
+    .replace(/&lt;u&gt;(.+?)&lt;\/u&gt;/gi, '<u>$1</u>')
+    .replace(/&lt;br\s*\/?&gt;/gi, '<br>');
+}
+function chatMdHtml(text){
+  const lines = escapeHtml(String(text==null ? '' : text)).replace(/\r/g, '').split('\n');
+  const out = [];
+  let para = [];
+  const flush = function(){ if(para.length){ out.push('<p class="cmd-p">'+para.map(chatMdInline).join('<br>')+'</p>'); para = []; } };
+  const isRow = function(l){ return /^\s*\|.*\|\s*$/.test(l); };
+  const isSep = function(l){ return /^\s*\|?\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)*\|?\s*$/.test(l) && l.indexOf('-')>-1; };
+  const cells = function(l){ return l.trim().replace(/^\|/, '').replace(/\|$/, '').split('|').map(function(c){ return c.trim(); }); };
+  const isNum = function(c){ return /^[\s$€%≈~×x*=\d.,+\-–()]+$/.test(c.replace(/<[^>]+>/g, '')) && /\d/.test(c); };
+  const cellHtml = function(c){ return chatMdInline(c).replace(/([$\d]) (?=\d)/g, '$1&nbsp;'); };
+  const itemRe = /^(\s*)([-*•+]|\d{1,3}[.)])\s+(.*)$/;
+  let i = 0;
+  while(i < lines.length){
+    const l = lines[i];
+    let m;
+    if(!l.trim()){ flush(); i++; continue; }
+    if(isRow(l) && i+1 < lines.length && isSep(lines[i+1])){
+      flush();
+      const head = cells(l); i += 2;
+      const rows = [];
+      while(i < lines.length && isRow(lines[i])){ rows.push(cells(lines[i])); i++; }
+      const numCol = head.map(function(h, ci){ return rows.length>0 && rows.every(function(r){ return !r[ci] || isNum(r[ci]); }); });
+      out.push('<div class="cmd-tw"><table><thead><tr>'+head.map(function(h, ci){ return '<th'+(numCol[ci] ? ' class="num"' : '')+'>'+cellHtml(h)+'</th>'; }).join('')+'</tr></thead><tbody>'+
+        rows.map(function(r){ return '<tr>'+head.map(function(h, ci){ return '<td'+(numCol[ci] ? ' class="num"' : '')+'>'+cellHtml(r[ci]||'')+'</td>'; }).join('')+'</tr>'; }).join('')+'</tbody></table></div>');
+      continue;
+    }
+    if(/^\s*([-*_])(\s*\1){2,}\s*$/.test(l)){ flush(); out.push('<hr class="cmd-hr">'); i++; continue; }
+    if((m = l.match(/^\s*(#{1,6})\s+(.*?)\s*#*\s*$/))){
+      flush(); out.push('<div class="cmd-h'+(m[1].length>=3 ? ' h3' : '')+'">'+chatMdInline(m[2])+'</div>'); i++; continue;
+    }
+    if((m = l.match(itemRe))){
+      flush();
+      const lvl = Math.min(2, Math.floor(m[1].replace(/\t/g, '    ').length/2));
+      const ord = /\d/.test(m[2]);
+      const partes = [chatMdInline(m[3])];
+      i++;
+      while(i < lines.length && lines[i].trim() && /^\s{2,}/.test(lines[i]) && !itemRe.test(lines[i]) && !isRow(lines[i])){ partes.push(chatMdInline(lines[i].trim())); i++; }
+      out.push('<div class="cmd-li'+(lvl ? ' l'+lvl : '')+'"><span class="cmd-b">'+(ord ? m[2] : '•')+'</span><span>'+partes.join('<br>')+'</span></div>');
+      continue;
+    }
+    para.push(l.trim());
+    i++;
+  }
+  flush();
+  return out.join('');
+}
 function renderChatScreen(){
   let session = activeChatSession();
   if(!session){
@@ -14091,7 +14173,9 @@ function renderChatScreen(){
         const actionsHtml = (m.actions && m.actions.length) ? '<div class="chat-msg-actions">'+m.actions.map(function(a,ai){
           return '<button type="button" class="btn '+(a.kind==='primary'?'':'btn-ghost')+'" style="font-size:calc(11.5px + var(--kobu-font-boost, 0px));padding:6px 10px;" onclick="handleChatAction(\''+m.id+'\','+ai+')">'+escapeHtml(a.label)+'</button>';
         }).join('')+'</div>' : '';
-        return '<div class="chat-msg-row"><span class="chat-avatar"><span class="icon-slot" data-icon="paw"></span></span><div class="chat-msg '+m.role+'" style="transform-origin:bottom left;'+animStyle+'">'+escapeHtml(m.text)+actionsHtml+'</div></div>';
+        const bodyHtml = m.role==='model' ? chatMdHtml(m.text) : escapeHtml(m.text);
+        const hasTable = bodyHtml.indexOf('<table')>-1 ? ' has-table' : '';
+        return '<div class="chat-msg-row'+hasTable+'"><span class="chat-avatar"><span class="icon-slot" data-icon="paw"></span></span><div class="chat-msg '+m.role+(m.role==='model' ? ' chat-md' : '')+hasTable+'" style="transform-origin:bottom left;'+animStyle+'">'+bodyHtml+actionsHtml+'</div></div>';
       }
       const imgHtml = m.image ? '<img class="chat-msg-img" src="'+m.image+'">' : '';
       return '<div class="chat-msg '+m.role+'" style="transform-origin:bottom right;'+animStyle+'">'+imgHtml+escapeHtml(m.text)+'</div>';

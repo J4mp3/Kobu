@@ -2486,6 +2486,10 @@
         <span class="l"><span class="icon-slot" data-icon="message-circle" style="vertical-align:-2px;margin-right:6px;color:var(--k-accent);"></span>Asistente IA</span>
         <span class="icon-slot" data-icon="arrow-left" style="transform:rotate(180deg);color:var(--k-muted);"></span>
       </div>
+      <div class="rowline" id="claudeRow">
+        <span class="l"><span class="icon-slot" data-icon="sparkles" style="vertical-align:-2px;margin-right:6px;color:var(--k-accent);"></span>Claude<br><span id="claudeNote" style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);">Recetas, stock, utensilios y ventas resumidas para consultarle. Sin clientes ni claves.</span></span>
+        <div class="switch" id="claudeSwitch" onclick="toggleClaudeVivo()"><div class="knob-sw"></div></div>
+      </div>
       <div class="rowline" onclick="openAdvDetail('backup')" style="cursor:pointer;">
         <span class="l"><span class="icon-slot" data-icon="download" style="vertical-align:-2px;margin-right:6px;color:var(--k-accent);"></span>Backup</span>
         <span class="icon-slot" data-icon="arrow-left" style="transform:rotate(180deg);color:var(--k-muted);"></span>
@@ -3859,6 +3863,7 @@ function render(){
   if(cur==='orders'){ applyOrdersTabUI(); if(ordersTab==='clientes') renderClientsScreen(); else if(ordersTab==='produccion') renderProductionPanel(); else renderOrdersScreen(); }
   if(cur==='reports') renderReportsScreen();
   if(cur==='advdetail') renderAdvDetail();
+  if(cur==='advanced') updateClaudeSwitch();
   if(cur==='chatlist') renderChatListScreen();
   if(cur==='quicksell') renderQuickSellScreen();
   if(cur==='coupons') renderCouponCatalogScreen();
@@ -8243,6 +8248,224 @@ function saveSyncConfig(){
 function syncEnabled(){
   return localStorage.getItem('kobuSyncEnabled') !== 'false';
 }
+/* ===== CLAUDE (datos para consultar) =====
+   Con el switch prendido (DATA.settings.claudeVivo, se sincroniza con la cuenta), después de cada subida la app arma
+   un resumen en Markdown (recetas, preparaciones, stock y precios, utensilios, hornos y ventas de 90 días) y lo manda
+   al script (action=claude), que lo guarda en Drive (kobu-claude.md; la cuenta de prueba en kobu-claude-demo.md).
+   NUNCA lleva clientes, teléfonos, mails, notas de pedidos, chats, claves ni configuración. Solo se manda si cambió. */
+var CLAUDE_MD_MAX = 390000;
+function claudeVivoOn(){ return !!(DATA.settings && DATA.settings.claudeVivo===true); }
+function claudeCell(v){ return String(v==null?'':v).replace(/\|/g,'/').replace(/[\r\n]+/g,' ').trim(); }
+function claudeNum(n){ const x = Math.round((parseFloat(n)||0)*100)/100; return String(x).replace('.', ','); }
+function buildClaudeExportMd(){
+  const L = [];
+  const recs = (DATA.recipes||[]).filter(function(r){ return r && r.title; });
+  const normales = recs.filter(function(r){ return !isCombo(r); });
+  const cajas = recs.filter(function(r){ return isCombo(r); });
+  const ovenOf = function(id){ return (DATA.ovens||[]).find(function(o){ return o.id===id; }); };
+  const utOf = function(id){ return (DATA.utensils||[]).find(function(u){ return u.id===id; }); };
+  const recOf = function(id){ return (DATA.recipes||[]).find(function(r){ return r.id===id; }); };
+  L.push('## Recetas ('+normales.length+')');
+  normales.forEach(function(r){
+    L.push(''); L.push('### '+claudeCell(r.title));
+    const meta = [];
+    try{
+      if(r.isDietVariant){ const par = recOf(r.parentId); meta.push('Variante '+claudeCell(r.variantType||'')+(par ? ' de '+claudeCell(par.title) : '')); }
+      if(parseFloat(r.yieldQty)>0) meta.push('Rinde por tanda: '+claudeNum(r.yieldQty)+' '+claudeCell(r.yieldUnit||'unidades'));
+      const c = computeRecipeCost(r, 1);
+      meta.push('Costo de la tanda: '+fmtMoney(c.total)+(c.costPerUnit!=null ? ' · por unidad: '+fmtMoney(c.costPerUnit) : ''));
+      if(parseFloat(r.salePrice)>0) meta.push('Precio de venta: '+fmtMoney(parseFloat(r.salePrice))+((parseFloat(r.packSize)>1 && parseFloat(r.packPrice)>0) ? ' · paquete de '+claudeNum(r.packSize)+': '+fmtMoney(parseFloat(r.packPrice)) : ''));
+      meta.push('Listo para vender ahora: '+claudeNum(recipeStockOf(r)));
+      if(parseFloat(r.shelfLifeDays)>0) meta.push('Dura: '+claudeNum(r.shelfLifeDays)+' días');
+      const ovIds = Array.isArray(r.ovenIds) ? r.ovenIds : Object.keys(r.ovenSettings||{});
+      ovIds.forEach(function(oid){
+        const o = ovenOf(oid); const v = (r.ovenSettings||{})[oid];
+        if(!o && !v) return;
+        let t = 'Horno '+claudeCell(o ? (o.name||'') : '');
+        if(v) t += ': '+[v.temp!=null ? v.temp+'°' : '', v.time!=null ? v.time+' min' : '', v.mode ? claudeCell(v.mode) : '', v.rack!=null ? 'rejilla '+v.rack : ''].filter(Boolean).join(', ');
+        meta.push(t);
+      });
+      (r.moldCalibrations||[]).forEach(function(mc){
+        const u = utOf(mc.moldId);
+        if(!u) return;
+        meta.push('En molde '+claudeCell(u.nombre||'')+(moldDimsLabel(u) ? ' ('+moldDimsLabel(u)+')' : '')+': rinde '+claudeNum(mc.yieldQty)+(parseFloat(mc.unitWeight)>0 ? ', '+claudeNum(mc.unitWeight)+' g c/u' : ''));
+      });
+    }catch(e){}
+    meta.forEach(function(m){ L.push('- '+m); });
+    let txt = '';
+    try{ txt = buildRecipeExportText(r); }catch(e){}
+    const body = String(txt).split('\n').slice(1).filter(function(x){ return !/^> Costo /.test(x); });
+    while(body.length && !body[0].trim()) body.shift();
+    if(body.length){ L.push(''); L.push.apply(L, body); }
+    (Array.isArray(r.cookNotes) ? r.cookNotes : []).slice(0, 3).forEach(function(n){
+      if(n && n.t) L.push('- Cómo salió ('+claudeCell(n.d||'')+'): '+claudeCell(n.t));
+    });
+  });
+  if(cajas.length){
+    L.push(''); L.push('## Cajas / combos ('+cajas.length+')');
+    cajas.forEach(function(r){
+      const items = comboItems(r).map(function(it){ const x = recOf(it.recipeId); return it.qty+'× '+claudeCell(x ? x.title : '?'); }).join(', ');
+      let t = '- '+claudeCell(r.title)+': '+items;
+      try{ t += ' · costo '+fmtMoney(comboCost(r)); }catch(e){}
+      if(parseFloat(r.salePrice)>0) t += ' · precio '+fmtMoney(parseFloat(r.salePrice));
+      L.push(t);
+    });
+  }
+  const preps = (DATA.preparationLibrary||[]).filter(function(p){ return p && p.name; });
+  if(preps.length){
+    L.push(''); L.push('## Preparaciones base ('+preps.length+')');
+    preps.forEach(function(p){
+      L.push(''); L.push('### '+claudeCell(p.name));
+      (p.ingredients||[]).forEach(function(i){ if(i && i.name) L.push('* '+claudeCell(i.name)+': '+claudeCell(i.qty)+' '+claudeCell(i.unit)); });
+      let n = 0;
+      (p.steps||[]).forEach(function(st){
+        const t = claudeCell(stripMdMarkers(stepPlain(st)));
+        if(!t) return;
+        if(isStepTitleText(st)) L.push(stripMdMarkers(stepTitleText(st)));
+        else { n++; L.push(n+'. '+t); }
+      });
+    });
+  }
+  const tipos = [['ingrediente','Ingredientes'],['insumo','Insumos (packaging y otros)'],['subproducto','Subproductos']];
+  L.push(''); L.push('## Stock y precios');
+  tipos.forEach(function(tp){
+    const list = (DATA.ingredientPrices||[]).filter(function(p){ return p && p.name && ((p.type||'ingrediente')===tp[0]); })
+      .sort(function(a,b){ return String(a.name).localeCompare(String(b.name), 'es'); });
+    if(!list.length) return;
+    L.push(''); L.push('### '+tp[1]+' ('+list.length+')');
+    L.push('| Nombre | Paquete | Precio paquete | Stock | Mínimo | Proveedores (más barato primero) |');
+    L.push('|---|---|---|---|---|---|');
+    list.forEach(function(p){
+      const u = claudeCell(p.unit||'');
+      let prov = '';
+      try{ prov = providerPriceList(p).map(function(x){ return claudeCell(x.name)+' '+fmtMoney(x.price); }).join(', '); }catch(e){}
+      L.push('| '+claudeCell(p.name)+' | '+(parseFloat(p.qty)>0 ? claudeNum(p.qty)+' '+u : '')+' | '+(p.price!=null && !isNaN(p.price) ? fmtMoney(p.price) : 'sin precio')+' | '+(p.stock!=null ? claudeNum(p.stock)+' '+u : '')+' | '+(parseFloat(p.minStock)>0 ? claudeNum(p.minStock) : '')+' | '+prov+' |');
+    });
+  });
+  L.push(''); L.push('## Utensilios');
+  const moldes = utensilsSorted('molde'), bowls = utensilsSorted('bowl'), uts = utensilsSorted('utensilio');
+  if(moldes.length){
+    L.push(''); L.push('### Moldes ('+moldes.length+')');
+    L.push('| Nombre | Forma | Medidas (largo x ancho x alto) | Capacidad | Cantidad | Material |');
+    L.push('|---|---|---|---|---|---|');
+    moldes.forEach(function(u){
+      const cap = moldCapacityCm3(u);
+      L.push('| '+claudeCell(u.nombre)+' | '+claudeCell(u.moldShape||'')+' | '+moldDimsLabel(u)+' | '+(cap ? Math.round(cap)+' cm³' : '')+' | '+claudeNum(u.cantidad||1)+' | '+claudeCell(u.material||'')+' |');
+    });
+  }
+  if(bowls.length){
+    L.push(''); L.push('### Bowls ('+bowls.length+')');
+    L.push('| Nombre | Diámetro | Alto | Capacidad | Peso vacío | Cantidad | Material |');
+    L.push('|---|---|---|---|---|---|---|');
+    bowls.forEach(function(u){
+      L.push('| '+claudeCell(u.nombre)+' | '+(parseFloat(u.bowlDiam)>0 ? claudeNum(u.bowlDiam)+' cm' : '')+' | '+(parseFloat(u.bowlAlto)>0 ? claudeNum(u.bowlAlto)+' cm' : '')+' | '+(parseFloat(u.bowlCap)>0 ? claudeNum(u.bowlCap)+' ml' : '')+' | '+(parseFloat(u.bowlPeso)>0 ? claudeNum(u.bowlPeso)+' g' : '')+' | '+claudeNum(u.cantidad||1)+' | '+claudeCell(u.material||'')+' |');
+    });
+  }
+  if(uts.length){
+    L.push(''); L.push('### Otros utensilios ('+uts.length+')');
+    uts.forEach(function(u){ L.push('- '+claudeCell(u.nombre)+((parseFloat(u.cantidad)>1) ? ' ×'+claudeNum(u.cantidad) : '')+(u.material ? ' ('+claudeCell(u.material)+')' : '')); });
+  }
+  const ovs = (DATA.ovens||[]).filter(function(o){ return o && o.name; });
+  if(ovs.length){
+    L.push(''); L.push('### Hornos y anafes ('+ovs.length+')');
+    ovs.forEach(function(o){
+      L.push('- '+claudeCell(o.name)+' · '+claudeCell(o.tipo||'horno')+(o.fuente ? ', '+claudeCell(o.fuente) : '')+(o.filas ? ', '+o.filas+' rejillas' : '')+(o.tempMax ? ', hasta '+o.tempMax+'°' : '')+((o.funciones||[]).length ? ' · funciones: '+o.funciones.map(claudeCell).join(', ') : ''));
+    });
+  }
+  // Ventas resumidas (sin clientes): por producto, últimos 90 días.
+  const desde = new Date(); desde.setDate(desde.getDate()-90);
+  const desdeStr = localDateStr(desde);
+  const prod = {}, meses = {};
+  const fila = function(nombre){ const k = String(nombre||'?'); if(!prod[k]) prod[k] = { ped:0, calle:0, fact:0, merma:0, mermaCosto:0 }; return prod[k]; };
+  let nPed = 0;
+  (DATA.orders||[]).forEach(function(o){
+    if(!o || o.status==='cancelado') return;
+    const d = String(o.deliveryDate || o.createdAt || '').slice(0, 10);
+    if(!d || d < desdeStr) return;
+    nPed++;
+    meses[d.slice(0, 7)] = (meses[d.slice(0, 7)]||0) + (parseFloat(o.total)||0);
+    (o.items||[]).forEach(function(it){
+      const f = fila(it.recipeName); const q = parseFloat(it.qty)||0;
+      f.ped += q; f.fact += q*(parseFloat(it.unitPrice)||0);
+    });
+  });
+  (DATA.quickSales||[]).forEach(function(v){
+    if(!v) return;
+    const d = String(v.ts||'').slice(0, 10);
+    if(!d || d < desdeStr) return;
+    const f = fila(v.recipeName); const q = parseFloat(v.qty)||0;
+    f.calle += q; f.fact += q*(parseFloat(v.unitPrice)||0);
+    meses[d.slice(0, 7)] = (meses[d.slice(0, 7)]||0) + q*(parseFloat(v.unitPrice)||0);
+  });
+  (DATA.mermas||[]).forEach(function(m){
+    if(!m) return;
+    const d = String(m.ts||'').slice(0, 10);
+    if(!d || d < desdeStr) return;
+    const f = fila(m.recipeName); f.merma += parseFloat(m.porciones)||0; f.mermaCosto += parseFloat(m.costo)||0;
+  });
+  L.push(''); L.push('## Ventas resumidas (desde '+desdeStr+')');
+  L.push('Pedidos no cancelados: '+nPed+'. Cantidades en la unidad de venta (unidad o paquete).');
+  const nombres = Object.keys(prod).sort(function(a,b){ return prod[b].fact-prod[a].fact; });
+  if(nombres.length){
+    L.push(''); L.push('| Producto | En pedidos | En la calle | Facturado | Mermas (costo) |');
+    L.push('|---|---|---|---|---|');
+    nombres.forEach(function(k){
+      const f = prod[k];
+      L.push('| '+claudeCell(k)+' | '+claudeNum(f.ped)+' | '+claudeNum(f.calle)+' | '+fmtMoney(f.fact)+' | '+(f.merma ? claudeNum(f.merma)+' ('+fmtMoney(f.mermaCosto)+')' : '')+' |');
+    });
+  }
+  const ms = Object.keys(meses).sort();
+  if(ms.length){ L.push(''); L.push('Facturado por mes: '+ms.map(function(m){ return m+' '+fmtMoney(meses[m]); }).join(' · ')); }
+  let out = L.join('\n');
+  if(out.length > CLAUDE_MD_MAX) out = out.slice(0, CLAUDE_MD_MAX)+'\n\n(Recortado: demasiados datos.)';
+  return out;
+}
+function claudeHeader(){
+  const d = new Date();
+  return '# Kobu Dulce: datos para Claude\n\nActualizado: '+d.toLocaleDateString('es-AR')+' '+d.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit',hour12:false})+
+    ' h. Lo genera la app sola (Avanzado → Claude). No incluye clientes, teléfonos, mails, notas de pedidos, chats ni claves.\n\n';
+}
+function claudeEnviar(force){
+  const c = webCreds();
+  if(!c || !syncEnabled()) return Promise.resolve(false);
+  const on = claudeVivoOn();
+  const prev = localStorage.getItem('kobuClaudeHash');
+  if(!on && !prev && !force) return Promise.resolve(false);
+  let md = '';
+  try{ md = on ? buildClaudeExportMd() : ''; }catch(e){ return Promise.resolve(false); }
+  const h = (on ? '1' : '0')+'_'+dataHash(md);
+  if(!force && prev===h) return Promise.resolve(false);
+  return fetch(c.url+'?key='+encodeURIComponent(c.key)+'&action=claude', {
+    method:'POST', headers:{ 'Content-Type':'text/plain' },
+    body: JSON.stringify({ on:on, md: on ? claudeHeader()+md : '' })
+  }).then(function(res){ return res.json(); }).then(function(j){
+    if(!j || !j.ok) return false;
+    localStorage.setItem('kobuClaudeHash', h);
+    localStorage.setItem('kobuClaudeTs', new Date().toISOString());
+    updateClaudeSwitch();
+    return true;
+  }).catch(function(){ return false; });
+}
+function updateClaudeSwitch(){
+  const sw = document.getElementById('claudeSwitch');
+  if(sw) sw.classList.toggle('on', claudeVivoOn());
+  const note = document.getElementById('claudeNote');
+  if(!note) return;
+  if(!claudeVivoOn()){ note.textContent = 'Recetas, stock, utensilios y ventas resumidas para consultarle. Sin clientes ni claves.'; return; }
+  const ts = localStorage.getItem('kobuClaudeTs');
+  const d = ts ? new Date(ts) : null;
+  note.textContent = (d && !isNaN(d)) ? ('Activo. Actualizado: '+d.toLocaleDateString('es-AR')+' '+d.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit',hour12:false})+' h.') : 'Activo. Se actualiza con cada sincronización.';
+}
+function toggleClaudeVivo(){
+  if(!webCreds()){ showToast('Primero configurá la sincronización'); return; }
+  DATA.settings.claudeVivo = !claudeVivoOn();
+  saveData(DATA);
+  updateClaudeSwitch();
+  claudeEnviar(true).then(function(ok){
+    if(ok) showToast(claudeVivoOn() ? 'Claude ya puede ver tus datos' : 'Claude dejó de ver tus datos');
+    else showToast('Se va a actualizar en la próxima sincronización');
+  });
+}
 function toggleSyncEnabled(){
   const cur = syncEnabled();
   localStorage.setItem('kobuSyncEnabled', cur ? 'false' : 'true');
@@ -8306,6 +8529,7 @@ function doSyncPush(url, key, silent){
       localStorage.setItem('kobuLastSyncedHash', dataHash(DATA));
       localStorage.setItem('kobuLastCloudHash', dataHash(DATA));
       updateSyncNote();
+      try{ claudeEnviar(false); }catch(e){}
       if(!silent) showToast('Subido a la nube');
     })
     .catch(function(err){ if(!silent) showToast('Error al subir: '+err.message); });

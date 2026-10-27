@@ -14832,13 +14832,15 @@ function buildFullAppContext(soloEstado){
 // Lo mismo que ve Claude en kobu-claude.md (recetas con ingredientes y pasos, preparaciones, stock y precios,
 // proveedores, moldes, bowls, utensilios, hornos, ventas) + pedidos, producción y economía. Si no entra en el cupo
 // del modelo, se resume: las recetas citadas o nombradas en la charla van completas y el resto en una línea.
-var AI_CTX_TOPES = [30000, 14000, 7000];
+var AI_CTX_TOPES = [30000, 14000, 7000, 3500, 1200];
+var AI_HIST_MAX = [40, 20, 10, 6, 4];
+var AI_TOKENS_MAX = 5600; // Groq gratis: 7000-8000 tokens por minuto (entrada); se deja margen
 function chatNorm(s){ return String(s==null?'':s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' ').trim(); }
 function aiCtxNivel(){
   try{
     const ts = parseInt(localStorage.getItem('kobuAiNivelTs')||'0', 10);
     if(!ts || Date.now()-ts > 12*3600*1000) return 0;
-    return Math.max(0, Math.min(2, parseInt(localStorage.getItem('kobuAiNivel')||'0', 10) || 0));
+    return Math.max(0, Math.min(4, parseInt(localStorage.getItem('kobuAiNivel')||'0', 10) || 0));
   }catch(e){ return 0; }
 }
 function aiCtxGuardarNivel(n){ try{ localStorage.setItem('kobuAiNivel', String(n)); localStorage.setItem('kobuAiNivelTs', String(Date.now())); }catch(e){} }
@@ -14867,7 +14869,7 @@ function chatFocusIds(session){
   return ids;
 }
 function buildAiDataContext(nivel, session){
-  const tope = AI_CTX_TOPES[Math.max(0, Math.min(2, nivel||0))];
+  const tope = AI_CTX_TOPES[Math.max(0, Math.min(4, nivel||0))];
   const estado = buildFullAppContext(true);
   let md = '';
   try{
@@ -14875,7 +14877,7 @@ function buildAiDataContext(nivel, session){
       md = buildClaudeExportMd();
       if(md.length <= tope) return { txt: md+'\n\n## Pedidos, producción y economía\n'+estado, compact:false };
     }
-    const foco = new Set(chatFocusIds(session).slice(0, nivel>=2 ? 2 : 6));
+    const foco = new Set(chatFocusIds(session).slice(0, nivel>=3 ? 1 : nivel>=2 ? 2 : 6));
     md = buildClaudeExportMd({ compact:true, focus:foco, max:tope });
   }catch(e){
     md = buildFullAppContext();
@@ -15132,6 +15134,30 @@ function sendChatMessage(){
     renderChatScreen();
   });
 }
+// Tamaño aproximado del pedido en tokens (texto en español con números: ~2,8 caracteres por token; foto ~1200).
+function aiEstimateTokens(messages){
+  let c = 0, img = 0;
+  (messages||[]).forEach(function(m){
+    if(Array.isArray(m.content)) m.content.forEach(function(x){ if(x && x.type==='text') c += String(x.text||'').length; else img++; });
+    else c += String(m.content||'').length;
+  });
+  return Math.round(c/2.8) + img*1200;
+}
+function aiBuildMessages(history, nivel){
+  const relevant = (history||[]).filter(function(m){ return (m.role==='user' || m.role==='model') && m.text!=='escribiendo...'; });
+  const h = relevant.slice(-AI_HIST_MAX[Math.max(0, Math.min(4, nivel))]);
+  const last = h.length-1;
+  const conFoto = last>=0 && h[last].role==='user' && !!h[last].image;
+  const msgs = h.map(function(m, i){
+    const role = m.role==='model' ? 'assistant' : 'user';
+    let text = String(m.text||'');
+    if(m.role==='model' && nivel>=1 && i<last-1 && text.length>1200) text = text.slice(0, 1200)+' […]';
+    if(m.image && i===last && m.role==='user') return { role:role, content:[{ type:'text', text: text || 'Analizá esta foto.' }, { type:'image_url', image_url:{ url:m.image } }] };
+    if(m.image) text = (text ? text+' ' : '')+'(mandó una foto)';
+    return { role:role, content:text };
+  });
+  return { messages:[{ role:'system', content: buildSystemPrompt(nivel) }].concat(msgs), hasImage:conFoto };
+}
 function callAi(history, nivel){
   nivel = (nivel==null) ? aiCtxNivel() : nivel;
   const url = localStorage.getItem('kobuSyncUrl');
@@ -15139,32 +15165,20 @@ function callAi(history, nivel){
   if(!url || !key){
     return Promise.reject(new Error('configurá "Sincronización (nube)" en Ajustes primero, el chat se conecta por ahí'));
   }
-  const relevant = history.filter(function(m){ return m.role==='user' || m.role==='model'; });
-  // Se mandan como mucho las últimas 5 imágenes por request (las más viejas quedan como texto) para no inflar el pedido.
-  let imgBudget = 5;
-  const withImages = relevant.slice().reverse().map(function(m){
-    if(m.image && imgBudget>0){ imgBudget--; return m; }
-    return (m.image && imgBudget<=0) ? Object.assign({}, m, {image:null}) : m;
-  }).reverse();
-  const hasImage = withImages.some(function(m){ return !!m.image; });
-  const model = hasImage ? KOBU_VISION_MODEL : currentAiModel();
-  const messages = [{ role:'system', content: buildSystemPrompt(nivel) }].concat(
-    withImages.map(function(m){
-      const role = m.role==='model' ? 'assistant' : 'user';
-      if(m.image){
-        return { role: role, content: [{ type:'text', text: m.text || 'Analizá esta foto.' }, { type:'image_url', image_url:{ url: m.image } }] };
-      }
-      return { role: role, content: m.text };
-    })
-  );
-  return aiChatWithFallback(url, key, model, messages)
+  let built = aiBuildMessages(history, nivel);
+  const model = built.hasImage ? KOBU_VISION_MODEL : currentAiModel();
+  // Groq gratis tiene un cupo chico por minuto: si no entra, se resume antes de mandar (no se espera al error).
+  if(!/^gemini/i.test(model)){
+    while(nivel<4 && aiEstimateTokens(built.messages) > AI_TOKENS_MAX){ nivel++; built = aiBuildMessages(history, nivel); }
+  }
+  return aiChatWithFallback(url, key, model, built.messages)
     .then(function(j){
-      if(nivel>0 && nivel!==aiCtxNivel()) aiCtxGuardarNivel(nivel);
       return j.reply || 'no obtuve respuesta, probá de nuevo.';
     })
     .catch(function(err){
-      // Si el modelo no acepta tanto texto, se reintenta con los datos más resumidos (y se recuerda por 12 h).
-      if(nivel<2 && aiErrorIsTooLarge(err)){ aiCtxGuardarNivel(nivel+1); return callAi(history, nivel+1); }
+      // Si igual no entra, se reintenta más resumido (y se recuerda por 12 h).
+      if(nivel<4 && aiErrorIsTooLarge(err)){ aiCtxGuardarNivel(nivel+1); return callAi(history, nivel+1); }
+      if(aiErrorIsTooLarge(err)) throw new Error('la pregunta y los datos no entran en el modelo gratis. Probá con una charla nueva (botón +) o citando solo lo necesario.');
       throw err;
     });
 }

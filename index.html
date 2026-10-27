@@ -1689,6 +1689,10 @@
       <div class="oe-headbody">
         <textarea class="input" id="import-recipe-text" style="min-height:140px;" placeholder="Pegá acá el texto de la receta..."></textarea>
         <button class="btn btn-ghost" onclick="pasteRecipeClipboard()"><span class="icon-slot" data-icon="clipboard" style="vertical-align:-2px;"></span> Pegar del portapapeles</button>
+        <div class="rowline" style="padding:2px 0;">
+          <span class="l">Ordenar con títulos y negritas<br><span style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);">Sin cambiar cantidades, pasos ni orden</span></span>
+          <div class="switch on" id="import-recipe-order" onclick="this.classList.toggle('on')"><div class="knob-sw"></div></div>
+        </div>
         <div class="btn-row">
           <button class="btn btn-ghost" style="flex:1;" onclick="closeImportRecipeModal()">Cancelar</button>
           <button class="btn btn-primary" style="flex:1;" id="importRecipeBtn" onclick="importRecipeWithAi()">Importar con IA</button>
@@ -1707,6 +1711,10 @@
       <div class="oe-headbody">
         <textarea class="input" id="import-prep-text" style="min-height:140px;" placeholder="Pegá acá el texto de la preparación..."></textarea>
         <button class="btn btn-ghost" onclick="pastePrepClipboard()"><span class="icon-slot" data-icon="clipboard" style="vertical-align:-2px;"></span> Pegar del portapapeles</button>
+        <div class="rowline" style="padding:2px 0;">
+          <span class="l">Ordenar con títulos y negritas<br><span style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);">Sin cambiar cantidades, pasos ni orden</span></span>
+          <div class="switch on" id="import-prep-order" onclick="this.classList.toggle('on')"><div class="knob-sw"></div></div>
+        </div>
         <div class="btn-row">
           <button class="btn btn-ghost" style="flex:1;" onclick="closeImportPrepModal()">Cancelar</button>
           <button class="btn btn-primary" style="flex:1;" id="importPrepBtn" onclick="importPreparationWithAi()">Importar con IA</button>
@@ -15207,7 +15215,9 @@ function callAiExtractRecipe(rawText, opts){
     (opts.chat ? ' Además agregá estos campos al objeto: "kind" ("receta" o "preparacion": preparacion si es una preparación base como crema, relleno, masa o cobertura), "ovenTemp" (°C, número), "ovenMinutes" (número), "ovenMode" (texto, ej. "Arriba/abajo"), "moldName" (el molde sugerido tal cual está escrito), "shelfLifeDays" (número). '+
       'Conservá el formato de los pasos: dejá las **negritas** tal cual; si los pasos están separados con subtítulos (por ejemplo "Masa", "Relleno", "Armado") y es una sola preparación, poné cada subtítulo como un paso aparte que empiece con "## ". '+
       'Cada paso sin el número adelante. Si un paso indica un tiempo concreto de horneado, reposo, enfriado o espera, agregá al final del paso " [[timer:SEGUNDOS]]" con ese tiempo en segundos (si es un rango, el menor). '+
-      'En "notes" poné las notas, consejos y el costo estimado si aparecen. No incluyas la pregunta final de confirmación.' : '');
+      'En "notes" poné las notas, consejos y el costo estimado si aparecen. No incluyas la pregunta final de confirmación.' : '')+
+    (opts.ordenar ? ' Ordená sin cambiar la receta: si los pasos no tienen subtítulos, agrupalos con subtítulos de sección (un paso aparte que empiece con "## ", por ejemplo "## Masa", "## Relleno", "## Horneado", "## Armado") y marcá con **negrita** las temperaturas, los tiempos, los puntos de la preparación y los avisos importantes. '+
+      'No cambies las cantidades, los ingredientes, el texto de los pasos (solo podés agregar las negritas y los subtítulos) ni el orden. No inventes ni saques nada. Si el texto ya tiene subtítulos, respetalos tal cual.' : '');
   return aiChatWithFallback(url, key, model, [{role:'system',content:sys},{role:'user',content:rawText}])
     .then(function(j){
       const raw = (j.reply||'').trim();
@@ -15224,44 +15234,26 @@ function importRecipeWithAi(){
   const text = document.getElementById('import-recipe-text').value.trim();
   if(!text){ showToast('Pegá el texto de la receta primero'); return; }
   const btn = document.getElementById('importRecipeBtn');
+  const sw = document.getElementById('import-recipe-order');
+  const ordenar = !sw || sw.classList.contains('on');
   btn.disabled = true; btn.textContent = 'importando...';
-  callAiExtractRecipe(text).then(function(parsed){
+  callAiExtractRecipe(text, { chat:true, ordenar:ordenar }).then(function(parsed){
+    const nd = aiRecipeToDraft(parsed, 'receta');
     openForm();
     const d = state.draft;
-    d.title = parsed.title || '';
-    d.timeMinutes = parsed.timeMinutes || '';
-    d.difficulty = ['fácil','media','difícil'].indexOf(parsed.difficulty)!==-1 ? parsed.difficulty : 'fácil';
-    d.yieldQty = parsed.yieldQty || '';
-    d.yieldUnit = parsed.yieldUnit || 'porciones';
-    d.tags = Array.isArray(parsed.tags) ? parsed.tags.filter(Boolean) : [];
-    d.notes = parsed.notes || '';
+    ['title','timeMinutes','difficulty','yieldQty','yieldUnit','tags','notes','components','finalSteps','ingredients','steps','ovenIds','ovenSettings','utensilIds','shelfLifeDays'].forEach(function(k){ d[k] = nd[k]; });
+    let unlinkedCount = 0;
+    const allIngs = (d.components && d.components.length) ? d.components.reduce(function(a, c){ return a.concat(c.ingredients||[]); }, []) : (d.ingredients||[]);
+    unlinkedCount = allIngs.filter(function(x){ return !x.priceId; }).length;
     const mapIngredients = function(list){
       return (Array.isArray(list) ? list : []).map(function(ing){
         const unit = normalizeUnit(ing.unit) || 'g';
-        return { priceId: matchIngredientPriceId(ing.name), name: ing.name||'', qty: (ing.qty!=null && ing.qty!=='') ? ing.qty : '', unit: unit, kind:'ingrediente' };
+        return { priceId: aiMatchPriceId(ing.name), name: ing.name||'', qty: (ing.qty!=null && ing.qty!=='') ? ing.qty : '', unit: unit, kind:'ingrediente' };
       });
     };
-    const parsedComponents = Array.isArray(parsed.components) ? parsed.components.filter(function(c){ return c && (c.name || (c.ingredients||[]).length || (c.steps||[]).length); }) : [];
-    let unlinkedCount = 0;
-    if(parsedComponents.length){
-      d.components = parsedComponents.map(function(c,i){
-        const ings = mapIngredients(c.ingredients);
-        unlinkedCount += ings.filter(function(x){ return !x.priceId; }).length;
-        return { id:'prep-'+Date.now()+'-'+i, name: c.name || ('Preparación '+(i+1)), ingredients: ings, steps: (Array.isArray(c.steps)?c.steps:[]).filter(Boolean) };
-      });
-      d.finalSteps = (Array.isArray(parsed.finalSteps) ? parsed.finalSteps : []).filter(Boolean);
-      d.ingredients = [];
-      d.steps = [];
-    } else {
-      d.components = [];
-      d.finalSteps = [];
-      d.ingredients = mapIngredients(parsed.ingredients);
-      d.steps = (Array.isArray(parsed.steps) ? parsed.steps : []).filter(Boolean);
-      unlinkedCount = d.ingredients.filter(function(x){ return !x.priceId; }).length;
-    }
     const parsedDietVariants = Array.isArray(parsed.dietVariants) ? parsed.dietVariants.filter(function(v){ return v && ((v.ingredients||[]).length || (v.steps||[]).length); }) : [];
     d._pendingDietVariants = parsedDietVariants.map(function(v){
-      return { type: v.type||'custom', label: v.label||'', ingredients: mapIngredients(v.ingredients), steps: (Array.isArray(v.steps)?v.steps:[]).filter(Boolean) };
+      return { type: v.type||'custom', label: v.label||'', ingredients: mapIngredients(v.ingredients), steps: (Array.isArray(v.steps)?v.steps:[]).map(aiCleanStep).filter(Boolean) };
     });
     fillFormFromDraft();
     closeImportRecipeModal();
@@ -15270,7 +15262,7 @@ function importRecipeWithAi(){
   }).catch(function(err){
     showToast(err.message || 'No se pudo importar la receta');
   }).finally(function(){
-    btn.disabled = false; btn.textContent = 'importar con IA';
+    btn.disabled = false; btn.textContent = 'Importar con IA';
   });
 }
 function openImportPrepModal(){
@@ -15292,30 +15284,23 @@ function importPreparationWithAi(){
   const text = document.getElementById('import-prep-text').value.trim();
   if(!text){ showToast('Pegá el texto de la preparación primero'); return; }
   const btn = document.getElementById('importPrepBtn');
+  const sw = document.getElementById('import-prep-order');
+  const ordenar = !sw || sw.classList.contains('on');
   btn.disabled = true; btn.textContent = 'importando...';
-  callAiExtractRecipe(text).then(function(parsed){
+  callAiExtractRecipe(text, { chat:true, ordenar:ordenar }).then(function(parsed){
+    const nd = aiRecipeToDraft(parsed, 'prep');
+    let ings = nd.ingredients||[], steps = nd.steps||[];
+    if(nd.components && nd.components.length){
+      ings = []; steps = [];
+      nd.components.forEach(function(c){ ings = ings.concat(c.ingredients||[]); if((c.steps||[]).length){ steps.push('## '+(c.name||'Preparación')); steps = steps.concat(c.steps); } });
+      if((nd.finalSteps||[]).length){ steps.push('## Armado'); steps = steps.concat(nd.finalSteps); }
+    }
     openLibraryPrepEditor();
     const d = state.draft;
-    const mapIngredients = function(list){
-      return (Array.isArray(list) ? list : []).map(function(ing){
-        const unit = normalizeUnit(ing.unit) || 'g';
-        return { priceId: matchIngredientPriceId(ing.name), name: ing.name||'', qty: (ing.qty!=null && ing.qty!=='') ? ing.qty : '', unit: unit, kind:'ingrediente' };
-      });
-    };
-    const parsedComponents = Array.isArray(parsed.components) ? parsed.components.filter(function(c){ return c && (c.name || (c.ingredients||[]).length || (c.steps||[]).length); }) : [];
-    d.title = parsed.title || (parsedComponents[0] && parsedComponents[0].name) || '';
-    if(!parsed.ingredients || !parsed.ingredients.length){
-      if(parsedComponents.length){
-        d.ingredients = mapIngredients(parsedComponents[0].ingredients);
-        d.steps = (Array.isArray(parsedComponents[0].steps) ? parsedComponents[0].steps : []).filter(Boolean);
-      } else {
-        d.ingredients = [];
-        d.steps = [];
-      }
-    } else {
-      d.ingredients = mapIngredients(parsed.ingredients);
-      d.steps = (Array.isArray(parsed.steps) ? parsed.steps : []).filter(Boolean);
-    }
+    d.title = nd.title || '';
+    d.ingredients = ings;
+    d.steps = steps.filter(Boolean);
+    if(nd.tags && nd.tags.length) d.tags = nd.tags;
     const unlinkedCount = d.ingredients.filter(function(x){ return !x.priceId; }).length;
     fillFormFromDraft();
     closeImportPrepModal();
@@ -15323,7 +15308,7 @@ function importPreparationWithAi(){
   }).catch(function(err){
     showToast(err.message || 'No se pudo importar la preparación');
   }).finally(function(){
-    btn.disabled = false; btn.textContent = 'importar con IA';
+    btn.disabled = false; btn.textContent = 'Importar con IA';
   });
 }
 

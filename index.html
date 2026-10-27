@@ -633,6 +633,35 @@
   .chat-avatar .icon-slot{ font-size:calc(11px + var(--kobu-font-boost, 0px)); color:var(--k-bg); }
   .chat-msg-actions{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
   .chat-msg.chat-md{ white-space:normal; max-width:88%; overflow-wrap:anywhere; }
+  .cite-chip{ display:inline-flex; align-items:center; gap:3px; padding:0 7px 0 5px; border-radius:999px; background:var(--k-card); color:var(--k-accent); font-weight:600; cursor:pointer; white-space:nowrap; line-height:1.55; vertical-align:baseline; border:1px solid var(--k-border); }
+  .cite-chip .icon-slot{ font-size:.9em; }
+  .chat-msg.user .cite-chip{ background:rgba(255,255,255,.18); color:inherit; border-color:rgba(255,255,255,.35); }
+  .chat-rcard{ display:flex; gap:10px; align-items:center; margin-top:8px; padding:10px; border-radius:12px; background:var(--k-card); border:1px solid var(--k-border); cursor:pointer; white-space:normal; }
+  .chat-rcard-ic{ width:42px; height:42px; border-radius:10px; background:var(--k-card2); color:var(--k-accent); display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:calc(20px + var(--kobu-font-boost, 0px)); }
+  .chat-rcard-t{ font-weight:700; color:var(--k-text); font-size:calc(13px + var(--kobu-font-boost, 0px)); line-height:1.25; }
+  .chat-rcard-m{ color:var(--k-muted); font-size:calc(11px + var(--kobu-font-boost, 0px)); margin-top:2px; }
+  .chat-rcard-a{ color:var(--k-accent); font-size:calc(11px + var(--kobu-font-boost, 0px)); font-weight:600; margin-top:3px; display:flex; align-items:center; gap:4px; }
+  .cite-tabs{ display:flex; gap:6px; overflow-x:auto; padding-bottom:2px; flex-shrink:0; }
+  .cite-tab{ flex-shrink:0; border:1px solid var(--k-border); background:var(--k-card); color:var(--k-text); border-radius:999px; padding:4px 10px; font-size:calc(11px + var(--kobu-font-boost, 0px)); cursor:pointer; }
+  .cite-tab.on{ background:var(--k-accent); color:var(--k-bg); border-color:var(--k-accent); }
+  .cite-list{ overflow-y:auto; min-height:120px; max-height:46vh; display:flex; flex-direction:column; }
+  .cite-item{ display:flex; align-items:center; gap:10px; padding:8px 2px; border-bottom:0.5px solid var(--k-border); cursor:pointer; text-align:left; background:none; border-left:none; border-right:none; border-top:none; color:var(--k-text); width:100%; }
+  .cite-item .icon-slot{ color:var(--k-accent); flex-shrink:0; }
+  .cite-item-n{ font-size:calc(12.5px + var(--kobu-font-boost, 0px)); }
+  .cite-item-s{ font-size:calc(10.5px + var(--kobu-font-boost, 0px)); color:var(--k-muted); }
+  .airc-box{ max-width:400px; padding:0; gap:0; overflow:hidden; display:flex; flex-direction:column; max-height:88vh; }
+  .airc-kind{ font-size:calc(10.5px + var(--kobu-font-boost, 0px)); letter-spacing:.06em; text-transform:uppercase; color:var(--k-muted); margin:0 0 2px; font-weight:700; }
+  .airc-chips{ display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-top:8px; }
+  .airc-chip{ display:inline-flex; align-items:center; gap:4px; padding:3px 9px; border-radius:999px; background:var(--k-card); color:var(--k-text); font-size:calc(11px + var(--kobu-font-boost, 0px)); }
+  .airc-chip .icon-slot{ color:var(--k-accent); }
+  .airc-body{ overflow-y:auto; padding:6px 16px 12px; flex:1; min-height:0; overscroll-behavior-y:contain; }
+  .airc-sec{ font-weight:700; color:var(--k-accent); font-size:calc(12.5px + var(--kobu-font-boost, 0px)); margin:14px 0 4px; display:flex; align-items:center; gap:6px; }
+  .airc-sub{ font-size:calc(11.5px + var(--kobu-font-boost, 0px)); font-weight:600; color:var(--k-accent); margin:8px 0 2px; }
+  .airc-miss{ color:var(--k-muted); font-size:calc(10.5px + var(--kobu-font-boost, 0px)); font-style:italic; }
+  .airc-note{ font-size:calc(12px + var(--kobu-font-boost, 0px)); color:var(--k-text); line-height:1.5; white-space:pre-wrap; margin:0; }
+  .airc-cost{ display:flex; justify-content:space-between; font-size:calc(12px + var(--kobu-font-boost, 0px)); padding:6px 0 0; color:var(--k-text); }
+  .airc-foot{ display:flex; gap:8px; padding:10px 16px 14px; border-top:1px solid var(--k-border); flex-shrink:0; }
+  .airc-foot .btn{ flex:1; }
   .chat-md .cmd-p{ margin:0 0 6px; }
   .chat-md > :last-child{ margin-bottom:0; }
   .chat-md > :first-child{ margin-top:0; }
@@ -1402,6 +1431,34 @@
   </div>
 
   <!-- UTENSIL EDIT MODAL -->
+  <div class="modal-overlay" id="chatCiteModal">
+    <div class="modal-box" style="padding:0;gap:0;max-width:360px;overflow:hidden;">
+      <div class="oe-headtint">
+        <p class="modal-msg" style="font-weight:600;margin:0;">Citar en el chat</p>
+        <p style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:2px 0 0;">Kobu IA va a ver todo el detalle de lo que cites</p>
+      </div>
+      <div class="oe-headbody">
+        <input class="input" id="citeSearch" placeholder="Buscar receta, molde, bowl, ingrediente…" oninput="renderChatCiteList()" autocomplete="off">
+        <div class="cite-tabs" id="citeTabs"></div>
+        <div class="cite-list" id="citeList"></div>
+        <button class="btn btn-ghost" onclick="closeChatCiteModal()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+  <div class="modal-overlay" id="aiRecipeModal">
+    <div class="modal-box airc-box">
+      <div class="oe-headtint">
+        <p class="airc-kind" id="airc-kind">Receta propuesta</p>
+        <p class="modal-msg" id="airc-title" style="font-weight:700;margin:0;font-size:calc(15px + var(--kobu-font-boost, 0px));"></p>
+        <div class="airc-chips" id="airc-chips"></div>
+      </div>
+      <div class="airc-body" id="airc-body"></div>
+      <div class="airc-foot">
+        <button class="btn btn-ghost" onclick="closeAiRecipeModal()">Cerrar</button>
+        <button class="btn btn-primary" id="airc-add" onclick="addChatRecipe()">Agregar a Recetas</button>
+      </div>
+    </div>
+  </div>
   <div class="modal-overlay" id="comboModal">
     <div class="modal-box" style="padding:0;gap:0;">
       <div class="oe-headtint">
@@ -2845,7 +2902,8 @@
         </div>
         <input type="file" id="chat-image-input" accept="image/*" style="display:none;" onchange="handleChatImageChange(this)">
         <button type="button" class="iconbtn" onclick="document.getElementById('chat-image-input').click()" title="adjuntar foto"><span class="icon-slot" data-icon="camera"></span></button>
-        <input id="chat-input" type="text" placeholder="preguntale algo a Kobu IA..." onkeydown="if(event.key==='Enter'){sendChatMessage();}">
+        <button type="button" class="iconbtn" id="chatCiteBtn" onclick="openChatCiteModal(false)" title="citar receta, molde, ingrediente…"><span class="icon-slot" data-icon="at"></span></button>
+        <input id="chat-input" type="text" placeholder="preguntale algo a Kobu IA..." onkeydown="if(event.key==='Enter'){sendChatMessage();}" oninput="chatInputAt(this)">
         <button class="iconbtn" onclick="sendChatMessage()"><span class="icon-slot" data-icon="send"></span></button>
       </div>
     </div>
@@ -3053,6 +3111,7 @@ const ICONS = {
   'cash': '<svg '+SVG_ATTRS+'><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/><line x1="6" y1="9" x2="6" y2="9"/><line x1="18" y1="15" x2="18" y2="15"/></svg>',
   'credit-card': '<svg '+SVG_ATTRS+'><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><line x1="6" y1="15" x2="10" y2="15"/></svg>',
   'check': '<svg '+SVG_ATTRS+'><path d="M5 12l5 5l10 -10"/></svg>',
+  'at': '<svg '+SVG_ATTRS+'><path d="M8 12a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/><path d="M16 12v1.5a2.5 2.5 0 0 0 5 0v-1.5a9 9 0 1 0 -5.5 8.28"/></svg>',
   'plus': '<svg '+SVG_ATTRS+'><path d="M12 5v14M5 12h14"/></svg>',
   'x': '<svg '+SVG_ATTRS+'><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg>',
   'camera': '<svg '+SVG_ATTRS+'><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>',
@@ -8278,7 +8337,9 @@ var CLAUDE_MD_MAX = 390000;
 function claudeVivoOn(){ return !!(DATA.settings && DATA.settings.claudeVivo===true); }
 function claudeCell(v){ return String(v==null?'':v).replace(/\|/g,'/').replace(/[\r\n]+/g,' ').trim(); }
 function claudeNum(n){ const x = Math.round((parseFloat(n)||0)*100)/100; return String(x).replace('.', ','); }
-function buildClaudeExportMd(){
+function buildClaudeExportMd(opts){
+  opts = opts || {};
+  const focus = opts.focus || null;
   const L = [];
   const recs = (DATA.recipes||[]).filter(function(r){ return r && r.title; });
   const normales = recs.filter(function(r){ return !isCombo(r); });
@@ -8287,7 +8348,20 @@ function buildClaudeExportMd(){
   const utOf = function(id){ return (DATA.utensils||[]).find(function(u){ return u.id===id; }); };
   const recOf = function(id){ return (DATA.recipes||[]).find(function(r){ return r.id===id; }); };
   L.push('## Recetas ('+normales.length+')');
+  if(opts.compact) L.push('(Resumidas: el detalle completo está solo en las marcadas con ###.)');
   normales.forEach(function(r){
+    if(opts.compact && !(focus && focus.has(r.id))){
+      let t = '- '+claudeCell(r.title);
+      try{
+        const c = computeRecipeCost(r, 1);
+        if(parseFloat(r.yieldQty)>0) t += ' · rinde '+claudeNum(r.yieldQty)+' '+claudeCell(r.yieldUnit||'unidades');
+        if(c.costPerUnit!=null) t += ' · costo/u '+fmtMoney(c.costPerUnit);
+        if(parseFloat(r.salePrice)>0) t += ' · precio '+fmtMoney(parseFloat(r.salePrice));
+        const st = recipeStockOf(r); if(st>0) t += ' · listo '+claudeNum(st);
+      }catch(e){}
+      L.push(t);
+      return;
+    }
     L.push(''); L.push('### '+claudeCell(r.title));
     const meta = [];
     try{
@@ -8336,6 +8410,7 @@ function buildClaudeExportMd(){
   if(preps.length){
     L.push(''); L.push('## Preparaciones base ('+preps.length+')');
     preps.forEach(function(p){
+      if(opts.compact && !(focus && focus.has(p.id))){ L.push('- '+claudeCell(p.name)); return; }
       L.push(''); L.push('### '+claudeCell(p.name));
       (p.ingredients||[]).forEach(function(i){ if(i && i.name) L.push('* '+claudeCell(i.name)+': '+claudeCell(i.qty)+' '+claudeCell(i.unit)); });
       let n = 0;
@@ -8438,7 +8513,8 @@ function buildClaudeExportMd(){
   const ms = Object.keys(meses).sort();
   if(ms.length){ L.push(''); L.push('Facturado por mes: '+ms.map(function(m){ return m+' '+fmtMoney(meses[m]); }).join(' · ')); }
   let out = L.join('\n');
-  if(out.length > CLAUDE_MD_MAX) out = out.slice(0, CLAUDE_MD_MAX)+'\n\n(Recortado: demasiados datos.)';
+  const max = opts.max || CLAUDE_MD_MAX;
+  if(out.length > max) out = out.slice(0, max)+'\n\n(Recortado: demasiados datos.)';
   return out;
 }
 function claudeHeader(){
@@ -13814,6 +13890,17 @@ function handleChatAction(msgId, actionIdx){
     }
   } else if(action.id==='dismiss'){
     msg.actions = null;
+  } else if(action.id==='recipe-confirm'){
+    session.messages.push({ role:'user', text:'Sí, confirmo' });
+    chatConfirmRecipe(session, msg, false);
+    return;
+  } else if(action.id==='recipe-change'){
+    msg.actions = null;
+    saveData(DATA);
+    renderChatScreen();
+    const inp = document.getElementById('chat-input');
+    if(inp){ inp.placeholder = '¿Qué le cambio?'; inp.focus(); }
+    return;
   } else if(action.id==='view-ai-diet-variant'){
     const payload = msg.aiDietVariant;
     msg.actions = null;
@@ -14086,6 +14173,15 @@ function shareChatSession(id){
 // Formato de las respuestas de la IA (Markdown simple). Primero se escapa TODO (nunca entra HTML de la respuesta);
 // recién después se dan formato a negrita, cursiva, subrayado (<u>), tachado, código, títulos, listas, separadores y tablas.
 function chatMdInline(s){
+  const chips = [];
+  s = String(s).replace(/@\[([^\]\n]{1,80})\]/g, function(m0, name){
+    const it = chatCiteFind(name);
+    chips.push(it ? chatCiteChipHtml(it) : '<b>'+name+'</b>');
+    return '\u0001'+(chips.length-1)+'\u0001';
+  });
+  return chatMdInlineFmt(s).replace(/\u0001(\d+)\u0001/g, function(m0, i){ return chips[+i] || ''; });
+}
+function chatMdInlineFmt(s){
   return String(s)
     .replace(/\\([\\`*_{}\[\]()#+\-.!|~])/g, function(m, c){ return '&#'+c.charCodeAt(0)+';'; })
     .replace(/`([^`]+)`/g, '<code>$1</code>')
@@ -14145,6 +14241,9 @@ function chatMdHtml(text){
   return out.join('');
 }
 function renderChatScreen(){
+  chatCiteCatCache = null;
+  const inpPh = document.getElementById('chat-input');
+  if(inpPh && inpPh.placeholder!=='preguntale algo a Kobu IA...' && !inpPh.value) inpPh.placeholder = 'preguntale algo a Kobu IA...';
   let session = activeChatSession();
   if(!session){
     session = findOrCreateActiveSession(state.chatRecipeId||null);
@@ -14173,12 +14272,12 @@ function renderChatScreen(){
         const actionsHtml = (m.actions && m.actions.length) ? '<div class="chat-msg-actions">'+m.actions.map(function(a,ai){
           return '<button type="button" class="btn '+(a.kind==='primary'?'':'btn-ghost')+'" style="font-size:calc(11.5px + var(--kobu-font-boost, 0px));padding:6px 10px;" onclick="handleChatAction(\''+m.id+'\','+ai+')">'+escapeHtml(a.label)+'</button>';
         }).join('')+'</div>' : '';
-        const bodyHtml = m.role==='model' ? chatMdHtml(m.text) : escapeHtml(m.text);
+        const bodyHtml = (m.role==='model' ? chatMdHtml(m.text) : escapeHtml(m.text)) + (m.recipeCard ? chatRecipeCardHtml(m) : '');
         const hasTable = bodyHtml.indexOf('<table')>-1 ? ' has-table' : '';
         return '<div class="chat-msg-row'+hasTable+'"><span class="chat-avatar"><span class="icon-slot" data-icon="paw"></span></span><div class="chat-msg '+m.role+(m.role==='model' ? ' chat-md' : '')+hasTable+'" style="transform-origin:bottom left;'+animStyle+'">'+bodyHtml+actionsHtml+'</div></div>';
       }
       const imgHtml = m.image ? '<img class="chat-msg-img" src="'+m.image+'">' : '';
-      return '<div class="chat-msg '+m.role+'" style="transform-origin:bottom right;'+animStyle+'">'+imgHtml+escapeHtml(m.text)+'</div>';
+      return '<div class="chat-msg '+m.role+'" style="transform-origin:bottom right;'+animStyle+'">'+imgHtml+chatUserTextHtml(m)+'</div>';
     }).join('');
   }
   const quickWrap = document.getElementById('chatQuickMenuWrap');
@@ -14190,6 +14289,333 @@ function renderChatScreen(){
   const wrap = document.getElementById('chat-list');
   wrap.scrollTop = wrap.scrollHeight;
 }
+/* ---- Citas con @ (27/10/2026) ---- */
+var chatCiteCatCache = null;
+var CITE_TIPOS = [ ['', 'Todo'], ['r', 'Recetas'], ['p', 'Preparaciones'], ['m', 'Moldes'], ['b', 'Bowls'], ['u', 'Utensilios'], ['o', 'Hornos'], ['i', 'Ingredientes'] ];
+var CITE_ICON = { r:'chef-hat', p:'flask', m:'muffin-tray', b:'bowl', u:'whisk', o:'oven', i:'wheat' };
+function chatCiteCatalog(){
+  if(chatCiteCatCache) return chatCiteCatCache;
+  const L = [];
+  (DATA.recipes||[]).forEach(function(r){ if(r && r.title) L.push({ t:'r', id:r.id, n:String(r.title), s: isCombo(r) ? 'Caja' : ((parseFloat(r.yieldQty)>0 ? 'Rinde '+r.yieldQty+' '+(r.yieldUnit||'') : 'Receta')) }); });
+  (DATA.preparationLibrary||[]).forEach(function(p){ if(p && p.name) L.push({ t:'p', id:p.id, n:String(p.name), s:'Preparación · '+((p.ingredients||[]).length)+' ingredientes' }); });
+  (DATA.utensils||[]).forEach(function(u){
+    if(!u || !u.nombre) return;
+    const c = utensilCatOf(u);
+    const t = c==='molde' ? 'm' : (c==='bowl' ? 'b' : 'u');
+    let sub = c==='molde' ? ('Molde '+(u.moldShape||'')+' '+moldDimsLabel(u)) : c==='bowl' ? ('Bowl'+(parseFloat(u.bowlDiam)>0 ? ' '+u.bowlDiam+' cm' : '')+(parseFloat(u.bowlCap)>0 ? ' · '+u.bowlCap+' ml' : '')) : 'Utensilio';
+    L.push({ t:t, id:u.id, n:String(u.nombre), s:sub.trim() });
+  });
+  (DATA.ovens||[]).forEach(function(o){ if(o && o.name) L.push({ t:'o', id:o.id, n:String(o.name), s:(o.tipo||'horno')+(o.fuente ? ' · '+o.fuente : '') }); });
+  (DATA.ingredientPrices||[]).forEach(function(p){ if(p && p.name) L.push({ t:'i', id:p.id, n:String(p.name), s:(p.type==='insumo' ? 'Insumo' : p.type==='subproducto' ? 'Subproducto' : 'Ingrediente')+' · stock '+(Math.round((parseFloat(p.stock)||0)*100)/100)+' '+(p.unit||'') }); });
+  chatCiteCatCache = L;
+  return L;
+}
+function chatCiteFind(nameEsc){
+  const k = chatNorm(nameEsc);
+  const cat = chatCiteCatalog();
+  return cat.find(function(x){ return chatNorm(escapeHtml(x.n))===k; }) || cat.find(function(x){ return chatNorm(x.n)===k; }) || null;
+}
+function chatCiteChipHtml(it){
+  return '<span class="cite-chip" onclick="chatOpenCite(\''+it.t+'\',\''+escapeHtml(String(it.id)).replace(/\\/g,'')+'\')"><span class="icon-slot" data-icon="'+(CITE_ICON[it.t]||'at')+'"></span>'+escapeHtml(it.n)+'</span>';
+}
+function chatUserTextHtml(m){
+  let html = escapeHtml(m.text);
+  const cites = (m.cites||[]).slice().sort(function(a,b){ return String(b.n).length-String(a.n).length; });
+  const chips = [];
+  cites.forEach(function(c){
+    const it = chatCiteCatalog().find(function(x){ return x.t===c.t && x.id===c.id; }) || { t:c.t, id:c.id, n:c.n };
+    const needle = escapeHtml('@'+c.n);
+    if(html.indexOf(needle)===-1) return;
+    chips.push(chatCiteChipHtml(it));
+    html = html.split(needle).join('\u0001'+(chips.length-1)+'\u0001');
+  });
+  return html.replace(/\u0001(\d+)\u0001/g, function(m0, i){ return chips[+i] || ''; });
+}
+function chatOpenCite(t, id){
+  try{
+    if(t==='r'){ if(DATA.recipes.some(function(r){ return r.id===id; })) openDetail(id); else showToast('Esa receta ya no existe'); }
+    else if(t==='p'){ if((DATA.preparationLibrary||[]).some(function(p){ return p.id===id; })) openPrepDetail(id); else showToast('Esa preparación ya no existe'); }
+    else if(t==='m' || t==='b' || t==='u'){ showScreen('utensils'); if((DATA.utensils||[]).some(function(u){ return u.id===id; })) setTimeout(function(){ openUtensilEditModal(id); }, 60); }
+    else if(t==='o'){ showScreen('ovens'); }
+    else if(t==='i'){ showScreen('ingredients'); if((DATA.ingredientPrices||[]).some(function(p){ return p.id===id; })) setTimeout(function(){ openStockEditModal(id); }, 60); }
+  }catch(e){}
+}
+var chatCiteTab = '';
+var chatCiteFromAt = false;
+function openChatCiteModal(fromAt){
+  chatCiteFromAt = !!fromAt;
+  chatCiteCatCache = null;
+  const s = document.getElementById('citeSearch');
+  if(s) s.value = '';
+  document.getElementById('chatCiteModal').classList.add('active');
+  renderChatCiteList();
+}
+function closeChatCiteModal(){
+  document.getElementById('chatCiteModal').classList.remove('active');
+  const inp = document.getElementById('chat-input');
+  if(inp) inp.focus();
+}
+function setChatCiteTab(t){ chatCiteTab = t; renderChatCiteList(); }
+function renderChatCiteList(){
+  const tabs = document.getElementById('citeTabs');
+  const cat = chatCiteCatalog();
+  if(tabs) tabs.innerHTML = CITE_TIPOS.filter(function(x){ return !x[0] || cat.some(function(c){ return c.t===x[0]; }); }).map(function(x){
+    return '<button type="button" class="cite-tab'+(chatCiteTab===x[0] ? ' on' : '')+'" onclick="setChatCiteTab(\''+x[0]+'\')">'+x[1]+'</button>';
+  }).join('');
+  const q = chatNorm((document.getElementById('citeSearch')||{}).value || '');
+  const list = cat.filter(function(c){ return (!chatCiteTab || c.t===chatCiteTab) && (!q || chatNorm(c.n).indexOf(q)>-1); }).slice(0, 80);
+  const box = document.getElementById('citeList');
+  if(!box) return;
+  box.innerHTML = list.length ? list.map(function(c, i){
+    return '<button type="button" class="cite-item" onclick="pickChatCite('+cat.indexOf(c)+')"><span class="icon-slot" data-icon="'+(CITE_ICON[c.t]||'at')+'"></span><span><div class="cite-item-n">'+escapeHtml(c.n)+'</div><div class="cite-item-s">'+escapeHtml(c.s||'')+'</div></span></button>';
+  }).join('') : '<p style="font-size:calc(11.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);text-align:center;margin:16px 0;">No hay nada con ese nombre</p>';
+  mountIcons();
+}
+function pickChatCite(idx){
+  const c = chatCiteCatalog()[idx];
+  if(!c) return;
+  const inp = document.getElementById('chat-input');
+  let v = inp.value;
+  if(chatCiteFromAt && /@$/.test(v)) v = v.slice(0, -1);
+  if(v && !/\s$/.test(v)) v += ' ';
+  inp.value = v+'@'+c.n+' ';
+  state.chatCites = (state.chatCites||[]).filter(function(x){ return !(x.t===c.t && x.id===c.id); }).concat([{ t:c.t, id:c.id, n:c.n }]);
+  closeChatCiteModal();
+}
+function chatInputAt(inp){
+  const v = inp.value;
+  if(/(^|\s)@$/.test(v)) openChatCiteModal(true);
+}
+
+/* ---- Recetas propuestas por la IA (27/10/2026) ---- */
+function chatRecipeAskKind(text){
+  const tail = String(text||'').slice(-260);
+  const m = tail.match(/¿?\s*confirm[aá]s\s+(esta|la)\s+(receta|preparaci[oó]n)\s*\??\s*\**\s*$/i);
+  if(!m) return null;
+  return /^prep/i.test(m[2]) ? 'prep' : 'receta';
+}
+function chatPendingRecipeAsk(session){
+  const msgs = (session && session.messages) || [];
+  for(let i = msgs.length-1; i>=0; i--){
+    const m = msgs[i];
+    if(m.role==='user') continue;
+    if(m.role==='model' && m.recipeAsk && m.actions && m.actions.length) return m;
+    return null;
+  }
+  return null;
+}
+function chatIsAffirmative(text){
+  const t = chatNorm(text).replace(/[!.,]+/g, ' ').replace(/\s+/g, ' ').trim();
+  if(!t || t.length>40) return false;
+  return /^(si|sip|si si|dale|ok|okey|okay|listo|perfecto|genial|de una|va|confirmo|confirmada|confirmado|esta bien|me gusta|asi esta bien|si confirmo|si dale|dale confirmo|si perfecto|si asi|si asi esta bien|si me gusta|si confirmala|confirmala)( (confirmo|confirmala|dale|gracias|perfecto|asi))*$/.test(t);
+}
+function chatConfirmRecipe(session, msg, typed){
+  msg.actions = null;
+  const kind = msg.recipeAsk || 'receta';
+  const wait = { id:'m-'+Date.now()+'-w', role:'model', text:'Armando la tarjeta de la '+(kind==='prep' ? 'preparación' : 'receta')+'...' };
+  session.messages.push(wait);
+  session.updatedAt = new Date().toISOString();
+  saveData(DATA);
+  renderChatScreen();
+  const src = String(msg.text||'').replace(/¿?\s*confirm[aá]s\s+(esta|la)\s+(receta|preparaci[oó]n)\s*\??\s*\**\s*$/i, '').replace(/@\[([^\]]+)\]/g, '$1');
+  callAiExtractRecipe(src, { chat:true }).then(function(parsed){
+    const draft = aiRecipeToDraft(parsed, kind);
+    const k = (parsed && /^prep/i.test(String(parsed.kind||''))) ? 'prep' : kind;
+    const i = session.messages.indexOf(wait);
+    const card = { id:'m-'+Date.now()+'-'+Math.random().toString(36).slice(2,6), role:'model',
+      text:(k==='prep' ? 'Preparación lista' : 'Receta lista')+': **'+draft.title+'**. Tocá la tarjeta para verla completa y agregarla.',
+      recipeCard:{ kind:k, draft:draft, savedId:null } };
+    if(i>-1) session.messages.splice(i, 1, card); else session.messages.push(card);
+    session.updatedAt = new Date().toISOString();
+    saveData(DATA);
+    renderChatScreen();
+  }).catch(function(err){
+    const i = session.messages.indexOf(wait);
+    const e = { role:'error', text:'No pude armar la tarjeta: '+((err && err.message) || 'error')+'. Probá de nuevo.' };
+    if(i>-1) session.messages.splice(i, 1, e); else session.messages.push(e);
+    msg.actions = [ { id:'recipe-confirm', label:'Sí, confirmar', kind:'primary' }, { id:'recipe-change', label:'Cambiar algo', kind:'ghost' } ];
+    saveData(DATA);
+    renderChatScreen();
+  });
+}
+function aiCleanStep(st){
+  let t = String(st==null ? '' : st).replace(/\r/g, '').trim();
+  if(!t) return '';
+  t = t.replace(/^\s*(?:paso\s*)?\d{1,2}\s*[.)-]\s+/i, '');
+  const secs = stepTimerSecs(t);
+  t = stepPlain(t).replace(/\[\[timer:[^\]]*\]\]/g, '').replace(/\s+$/, '').slice(0, 800);
+  if(/^#{1,6}\s+/.test(t)) return '## '+t.replace(/^#{1,6}\s+/, '').slice(0, 120);
+  return secs ? stepSetTimer(t, Math.min(secs, 86400)) : t;
+}
+function aiMatchPriceId(name){
+  const exact = matchIngredientPriceId(name);
+  if(exact) return exact;
+  const k = chatNorm(name);
+  if(!k) return null;
+  const f = (DATA.ingredientPrices||[]).find(function(p){ return chatNorm(p.name)===k; });
+  return f ? f.id : null;
+}
+function aiRecipeToDraft(parsed, kind){
+  parsed = (parsed && typeof parsed==='object') ? parsed : {};
+  const str = function(v, n){ return String(v==null ? '' : v).replace(/[\u0000-\u001f]/g, ' ').trim().slice(0, n||200); };
+  const num = function(v){ const x = parseFloat(String(v==null ? '' : v).replace(',', '.')); return isNaN(x) ? 0 : x; };
+  const mapIngs = function(list){
+    return (Array.isArray(list) ? list : []).slice(0, 80).filter(function(i){ return i && i.name; }).map(function(i){
+      const pid = aiMatchPriceId(i.name);
+      const pr = pid ? DATA.ingredientPrices.find(function(p){ return p.id===pid; }) : null;
+      const q = (i.qty!=null && i.qty!=='') ? (typeof i.qty==='number' ? String(Math.round(i.qty*100)/100) : str(i.qty, 20)) : '';
+      return { priceId:pid, name: pr ? pr.name : str(i.name, 80), qty:q, unit: normalizeUnit(i.unit) || 'g', kind: (pr && pr.type==='insumo') ? 'insumo' : 'ingrediente' };
+    });
+  };
+  const mapSteps = function(list){ return (Array.isArray(list) ? list : []).slice(0, 80).map(aiCleanStep).filter(Boolean); };
+  const d = emptyDraft();
+  d.title = str(parsed.title, 80) || (kind==='prep' ? 'Preparación nueva' : 'Receta nueva');
+  d.timeMinutes = Math.round(num(parsed.timeMinutes)) || '';
+  d.difficulty = ['fácil','media','difícil'].indexOf(parsed.difficulty)!==-1 ? parsed.difficulty : 'fácil';
+  d.yieldQty = num(parsed.yieldQty)>0 ? num(parsed.yieldQty) : '';
+  d.yieldUnit = str(parsed.yieldUnit, 30) || 'porciones';
+  d.tags = (Array.isArray(parsed.tags) ? parsed.tags : []).map(function(t){ return str(t, 30); }).filter(Boolean).slice(0, 6);
+  d.notes = str(parsed.notes, 3000);
+  const comps = (Array.isArray(parsed.components) ? parsed.components : []).filter(function(c){ return c && ((c.ingredients||[]).length || (c.steps||[]).length); }).slice(0, 8);
+  if(comps.length){
+    d.components = comps.map(function(c, i){ return { id:'prep-'+Date.now()+'-'+i, name: str(c.name, 60) || ('Preparación '+(i+1)), ingredients: mapIngs(c.ingredients), steps: mapSteps(c.steps) }; });
+    d.finalSteps = mapSteps(parsed.finalSteps);
+  } else {
+    d.ingredients = mapIngs(parsed.ingredients);
+    d.steps = mapSteps(parsed.steps);
+  }
+  const sl = num(parsed.shelfLifeDays);
+  d.shelfLifeDays = sl>0 ? Math.min(365, Math.round(sl)) : '';
+  // Horno: el primero cargado (o uno que se llame como el sugerido), con la temperatura y el tiempo sugeridos.
+  const temp = num(parsed.ovenTemp), mins = num(parsed.ovenMinutes);
+  const ovens = (DATA.ovens||[]).filter(function(o){ return o && (o.tipo||'horno')==='horno'; });
+  if((temp>0 || mins>0) && ovens.length){
+    const o = ovens[0];
+    try{
+      const pp = ovenParamsFor(o.id);
+      const v = defaultOvenValues(o.id);
+      if(temp>0) v.temp = Math.max(pp[0].min, Math.min(pp[0].max, Math.round(temp/5)*5));
+      if(mins>0) v.time = Math.max(pp[1].min, Math.min(pp[1].max, Math.round(mins)));
+      const modo = str(parsed.ovenMode, 40);
+      const opt = modo ? pp[2].options.find(function(x){ return chatNorm(x)===chatNorm(modo); }) : null;
+      if(opt) v.mode = opt;
+      d.ovenIds = [o.id];
+      d.ovenSettings = {}; d.ovenSettings[o.id] = v;
+    }catch(e){}
+  }
+  const moldN = chatNorm(parsed.moldName);
+  if(moldN){
+    const u = (DATA.utensils||[]).find(function(x){ return utensilCatOf(x)==='molde' && chatNorm(x.nombre)===moldN; }) ||
+      (DATA.utensils||[]).find(function(x){ return utensilCatOf(x)==='molde' && (chatNorm(x.nombre).indexOf(moldN)>-1 || moldN.indexOf(chatNorm(x.nombre))>-1); });
+    if(u) d.utensilIds = [u.id];
+  }
+  return d;
+}
+function chatRecipeCardHtml(m){
+  const rc = m.recipeCard || {};
+  const d = rc.draft || {};
+  const comps = (d.components && d.components.length) ? d.components : null;
+  const nIng = comps ? comps.reduce(function(a, c){ return a+(c.ingredients||[]).length; }, 0) : (d.ingredients||[]).length;
+  const nPasos = (comps ? comps.reduce(function(a, c){ return a.concat(c.steps||[]); }, []) : (d.steps||[])).concat(d.finalSteps||[]).filter(function(s){ return s && !isStepTitleText(s); }).length;
+  const meta = [];
+  if(parseFloat(d.yieldQty)>0) meta.push(d.yieldQty+' '+(d.yieldUnit||'porciones'));
+  meta.push(nIng+' ingredientes'); meta.push(nPasos+' pasos');
+  const exists = rc.savedId && (rc.kind==='prep' ? (DATA.preparationLibrary||[]).some(function(p){ return p.id===rc.savedId; }) : DATA.recipes.some(function(r){ return r.id===rc.savedId; }));
+  const accion = exists ? '<span class="icon-slot" data-icon="check"></span>Agregada a '+(rc.kind==='prep' ? 'Preparaciones' : 'Recetas') : 'Tocá para ver y agregar';
+  return '<div class="chat-rcard" onclick="openChatRecipeCard(\''+m.id+'\')"><span class="chat-rcard-ic"><span class="icon-slot" data-icon="'+(rc.kind==='prep' ? 'flask' : 'chef-hat')+'"></span></span>'+
+    '<span style="min-width:0;"><div class="chat-rcard-t">'+escapeHtml(d.title||'')+'</div><div class="chat-rcard-m">'+escapeHtml(meta.join(' · '))+'</div><div class="chat-rcard-a">'+accion+'</div></span></div>';
+}
+var aiRecipeOpenMsgId = null;
+function chatRecipeMsg(id){
+  const session = activeChatSession();
+  return session ? (session.messages||[]).find(function(m){ return m.id===id && m.recipeCard; }) : null;
+}
+function openChatRecipeCard(msgId){
+  const m = chatRecipeMsg(msgId);
+  if(!m) return;
+  aiRecipeOpenMsgId = msgId;
+  const rc = m.recipeCard, d = rc.draft;
+  const prep = rc.kind==='prep';
+  document.getElementById('airc-kind').textContent = prep ? 'Preparación propuesta' : 'Receta propuesta';
+  document.getElementById('airc-title').textContent = d.title || '';
+  const chips = [];
+  const chip = function(icon, t){ chips.push('<span class="airc-chip"><span class="icon-slot" data-icon="'+icon+'"></span>'+escapeHtml(t)+'</span>'); };
+  if(parseFloat(d.yieldQty)>0) chip('chef-hat', 'Rinde '+d.yieldQty+' '+(d.yieldUnit||'porciones'));
+  if(parseFloat(d.timeMinutes)>0) chip('stopwatch', d.timeMinutes+' min');
+  if(!prep && d.difficulty) chip('flame', capitalizeFirst(d.difficulty));
+  (d.ovenIds||[]).forEach(function(oid){
+    const o = (DATA.ovens||[]).find(function(x){ return x.id===oid; }); const v = (d.ovenSettings||{})[oid];
+    if(o && v) chip('oven', (o.name||'Horno')+': '+v.temp+'° · '+v.time+' min'+(v.mode ? ' · '+v.mode : ''));
+  });
+  (d.utensilIds||[]).forEach(function(uid){ const u = (DATA.utensils||[]).find(function(x){ return x.id===uid; }); if(u) chip('muffin-tray', u.nombre+(moldDimsLabel(u) ? ' '+moldDimsLabel(u) : '')); });
+  if(parseFloat(d.shelfLifeDays)>0) chip('calendar', 'Dura '+d.shelfLifeDays+' días');
+  document.getElementById('airc-chips').innerHTML = chips.join('');
+  const ingRows = function(list){
+    return (list||[]).map(function(i){
+      return '<div class="ing-row"><span>'+escapeHtml(i.name)+(i.priceId ? '' : ' <span class="airc-miss">no está en tu stock</span>')+'</span><span>'+escapeHtml(i.qty||'')+' '+escapeHtml(i.unit||'')+'</span></div>';
+    }).join('') || '<p class="airc-miss" style="margin:4px 0;">sin ingredientes</p>';
+  };
+  let html = '';
+  const comps = (d.components && d.components.length) ? d.components : null;
+  html += '<p class="airc-sec"><span class="icon-slot" data-icon="wheat"></span>Ingredientes</p>';
+  if(comps) comps.forEach(function(c){ html += '<p class="airc-sub">'+escapeHtml(c.name||'Preparación')+'</p>'+ingRows(c.ingredients); });
+  else html += ingRows(d.ingredients);
+  try{
+    const c = computeRecipeCost(d, 1);
+    if(c.total>0){
+      html += '<div class="airc-cost"><span>Costo estimado con tus precios</span><b>'+fmtMoney(c.total)+'</b></div>';
+      if(c.costPerUnit!=null && parseFloat(d.yieldQty)>0) html += '<div class="airc-cost" style="padding-top:2px;color:var(--k-muted);"><span>Por '+escapeHtml(d.yieldUnit||'unidad')+'</span><span>'+fmtMoney(c.costPerUnit)+'</span></div>';
+    }
+  }catch(e){}
+  html += '<p class="airc-sec"><span class="icon-slot" data-icon="book"></span>'+(comps ? 'Preparación' : 'Pasos')+'</p>';
+  if(comps) comps.forEach(function(c){ html += '<p class="airc-sub">'+escapeHtml(c.name||'Preparación')+'</p><div class="steps-list">'+dstepsHtml((c.steps||[]).filter(Boolean))+'</div>'; });
+  else html += '<div class="steps-list">'+dstepsHtml((d.steps||[]).filter(Boolean))+'</div>';
+  if((d.finalSteps||[]).length) html += '<p class="airc-sec">Armado final</p><div class="steps-list">'+dstepsHtml(d.finalSteps.filter(Boolean))+'</div>';
+  if(d.notes) html += '<p class="airc-sec"><span class="icon-slot" data-icon="pencil"></span>Notas</p><p class="airc-note">'+mdBoldToHtml(d.notes)+'</p>';
+  document.getElementById('airc-body').innerHTML = html;
+  document.getElementById('airc-body').scrollTop = 0;
+  const exists = rc.savedId && (prep ? (DATA.preparationLibrary||[]).some(function(p){ return p.id===rc.savedId; }) : DATA.recipes.some(function(r){ return r.id===rc.savedId; }));
+  document.getElementById('airc-add').textContent = exists ? (prep ? 'Ver preparación' : 'Ver receta') : (prep ? 'Agregar a Preparaciones' : 'Agregar a Recetas');
+  document.getElementById('aiRecipeModal').classList.add('active');
+  mountIcons();
+}
+function closeAiRecipeModal(){ document.getElementById('aiRecipeModal').classList.remove('active'); }
+function addChatRecipe(){
+  const m = chatRecipeMsg(aiRecipeOpenMsgId);
+  if(!m) { closeAiRecipeModal(); return; }
+  const rc = m.recipeCard, prep = rc.kind==='prep';
+  const exists = rc.savedId && (prep ? (DATA.preparationLibrary||[]).some(function(p){ return p.id===rc.savedId; }) : DATA.recipes.some(function(r){ return r.id===rc.savedId; }));
+  closeAiRecipeModal();
+  if(exists){ if(prep) openPrepDetail(rc.savedId); else openDetail(rc.savedId); return; }
+  const d = JSON.parse(JSON.stringify(rc.draft));
+  if(prep){
+    let ings = d.ingredients||[], steps = d.steps||[];
+    if(d.components && d.components.length){
+      ings = []; steps = [];
+      d.components.forEach(function(c){ ings = ings.concat(c.ingredients||[]); if((c.steps||[]).length){ steps.push('## '+(c.name||'Preparación')); steps = steps.concat(c.steps); } });
+      if((d.finalSteps||[]).length){ steps.push('## Armado'); steps = steps.concat(d.finalSteps); }
+    }
+    const entry = { id:'replib-'+Date.now(), name:d.title, icon:null, tags:d.tags||[], colorIdx:randomWarmColorIdx(), ingredients:ings, steps:steps.filter(Boolean) };
+    if(d.notes) entry.notes = d.notes;
+    DATA.preparationLibrary.push(entry);
+    rc.savedId = entry.id;
+  } else {
+    d.id = 'r-'+Date.now();
+    d.colorIdx = randomWarmColorIdx();
+    d.mediaMode = 'icono';
+    d.icon = 'chef-hat';
+    if(d.components && d.components.length){ d.ingredients = []; d.steps = []; }
+    if(d.shelfLifeDays==='') d.shelfLifeDays = null;
+    if(d.timeMinutes==='') d.timeMinutes = 0;
+    if(d.yieldQty==='') d.yieldQty = 0;
+    DATA.recipes.push(d);
+    rc.savedId = d.id;
+  }
+  saveData(DATA);
+  renderChatScreen();
+  showToast(prep ? 'Preparación agregada' : 'Receta agregada a tus recetas');
+}
+
 function sendQuickChatPrompt(text){
   closeChatQuickMenu();
   const input = document.getElementById('chat-input');
@@ -14218,8 +14644,9 @@ function chatQuickMenuOutsideClick(e){
   const wrap = document.getElementById('chatQuickMenuWrap');
   if(wrap && !wrap.contains(e.target)) closeChatQuickMenu();
 }
-function buildFullAppContext(){
+function buildFullAppContext(soloEstado){
   const parts = [];
+  if(!soloEstado){
   const recetasTxt = DATA.recipes.map(function(r){
     const c = computeRecipeCost(r,1);
     const precio = r.salePrice ? fmtMoney(r.salePrice) : 'sin precio';
@@ -14240,6 +14667,7 @@ function buildFullAppContext(){
   parts.push('Utensilios: '+(utensilios.length ? utensilios.map(function(u){ const d=moldDimsLabel(u); return u.nombre+(d?' ('+d+')':''); }).join(', ') : 'no hay utensilios cargados')+'.');
   const cocina = (DATA.ovens||[]).map(function(o){ return o.name+(o.fuente?' ('+o.fuente+')':''); }).join(', ');
   parts.push('Equipos de cocina: '+(cocina || 'no hay equipos cargados')+'.');
+  }
   const pendientes = (DATA.orders||[]).filter(function(o){ return o.status!=='entregado' && o.status!=='cancelado'; });
   const porEstado = {};
   pendientes.forEach(function(o){ porEstado[o.status] = (porEstado[o.status]||0)+1; });
@@ -14262,10 +14690,70 @@ function buildFullAppContext(){
   parts.push('Economía del mes actual: facturado '+fmtMoney(mes.totalRevenue)+', gastos '+fmtMoney(mes.totalExpenses)+', ganancia neta '+fmtMoney(mes.netProfit)+' ('+mes.deliveredCount+' pedidos entregados este mes). Total histórico: facturado '+fmtMoney(total.totalRevenue)+', ganancia neta '+fmtMoney(total.netProfit)+'.');
   return parts.join(' ');
 }
-function buildSystemPrompt(){
+// ---- Contexto de la IA (27/10/2026) ----
+// Lo mismo que ve Claude en kobu-claude.md (recetas con ingredientes y pasos, preparaciones, stock y precios,
+// proveedores, moldes, bowls, utensilios, hornos, ventas) + pedidos, producción y economía. Si no entra en el cupo
+// del modelo, se resume: las recetas citadas o nombradas en la charla van completas y el resto en una línea.
+var AI_CTX_TOPES = [30000, 14000, 7000];
+function chatNorm(s){ return String(s==null?'':s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' ').trim(); }
+function aiCtxNivel(){
+  try{
+    const ts = parseInt(localStorage.getItem('kobuAiNivelTs')||'0', 10);
+    if(!ts || Date.now()-ts > 12*3600*1000) return 0;
+    return Math.max(0, Math.min(2, parseInt(localStorage.getItem('kobuAiNivel')||'0', 10) || 0));
+  }catch(e){ return 0; }
+}
+function aiCtxGuardarNivel(n){ try{ localStorage.setItem('kobuAiNivel', String(n)); localStorage.setItem('kobuAiNivelTs', String(Date.now())); }catch(e){} }
+function aiErrorIsTooLarge(err){
+  const m = String((err && err.message) || '').toLowerCase();
+  return /too large|413|reduce your message|context length|context_length|maximum context|tokens per minute|\btpm\b|request entity/.test(m);
+}
+// Recetas y preparaciones de las que se está hablando: la del chat, las citadas con @ y las nombradas.
+function chatFocusIds(session){
+  const ids = [];
+  const add = function(id){ if(id && ids.indexOf(id)===-1) ids.push(id); };
+  if(session && session.recipeId) add(session.recipeId);
+  const msgs = (session && session.messages) || [];
+  const recientes = msgs.slice(-8);
+  recientes.slice().reverse().forEach(function(m){ (m.cites||[]).forEach(function(c){ if(c.t==='r' || c.t==='p') add(c.id); }); });
+  const items = (DATA.recipes||[]).filter(function(r){ return r && r.title && !isCombo(r); }).map(function(r){ return { id:r.id, n:chatNorm(r.title) }; })
+    .concat((DATA.preparationLibrary||[]).filter(function(p){ return p && p.name; }).map(function(p){ return { id:p.id, n:chatNorm(p.name) }; }))
+    .filter(function(x){ return x.n.length>=4; })
+    .sort(function(a,b){ return b.n.length-a.n.length; });
+  recientes.slice().reverse().forEach(function(m){
+    if(m.role!=='user' && m.role!=='model') return;
+    const t = chatNorm(m.text);
+    if(!t) return;
+    items.forEach(function(x){ if(t.indexOf(x.n)>-1) add(x.id); });
+  });
+  return ids;
+}
+function buildAiDataContext(nivel, session){
+  const tope = AI_CTX_TOPES[Math.max(0, Math.min(2, nivel||0))];
+  const estado = buildFullAppContext(true);
+  let md = '';
+  try{
+    if(nivel===0){
+      md = buildClaudeExportMd();
+      if(md.length <= tope) return { txt: md+'\n\n## Pedidos, producción y economía\n'+estado, compact:false };
+    }
+    const foco = new Set(chatFocusIds(session).slice(0, nivel>=2 ? 2 : 6));
+    md = buildClaudeExportMd({ compact:true, focus:foco, max:tope });
+  }catch(e){
+    md = buildFullAppContext();
+  }
+  return { txt: md+'\n\n## Pedidos, producción y economía\n'+estado, compact:true };
+}
+function buildSystemPrompt(nivel){
   const session = activeChatSession();
   const recipeId = session ? session.recipeId : state.chatRecipeId;
-  const appContext = buildFullAppContext();
+  const ctx = buildAiDataContext(nivel||0, session);
+  const appContext = '\n\n'+ctx.txt+'\n\n'+
+    'Cómo usar estos datos: cuando sugieras o armes algo, basate en lo que hay en stock, en sus moldes, bowls y horno, y en sus costos y precios reales. Si falta algo en stock, decilo. '+
+    (ctx.compact ? 'Algunas recetas están resumidas en una línea: si necesitás sus ingredientes o pasos, pedí que la citen con @. ' : '')+
+    'Cuando nombres una receta, preparación, molde, bowl, utensilio, horno o ingrediente que existe en la app, escribilo así: @[Nombre exacto] (por ejemplo @[Brownie clásico]). '+
+    'Cuando te pidan una receta o preparación nueva (o cambiar una), escribila completa: título con ###, rinde, molde y horno sugeridos de los que tiene (con temperatura y tiempo), ingredientes con cantidades exactas (g, ml o u) usando los mismos nombres de su stock cuando existan, pasos numerados (podés usar **negrita** y subtítulos ## para separar partes como masa, relleno o armado), notas y el costo estimado con sus precios. '+
+    'Terminá esa respuesta con una línea sola que diga exactamente "¿Confirmás esta receta?" (o "¿Confirmás esta preparación?" si es una preparación base como una crema, relleno, masa o cobertura). Si después te piden cambios, volvé a escribirla completa con los cambios y la misma pregunta al final.';
   const base = 'Sos el asistente de la app Kobu, para alguien que vende repostería/panadería casera. Tenés acceso a TODOS los datos cargados en la app (economía, stock de ingredientes e insumos, utensilios, cocina, recetas y pedidos) — usalos para responder cualquier pregunta sobre esos temas. Nunca digas que no tenés acceso a esta información, ya la tenés en el contexto de abajo. Si te mandan una foto, analizala con atención y respondé sobre lo que ves, relacionándolo con estos datos si aplica. Datos actuales de la app: '+appContext;
   if(recipeId){
     const r = DATA.recipes.find(function(x){ return x.id===recipeId; });
@@ -14324,6 +14812,17 @@ function sendChatMessage(){
   if(!session) return;
   const msg = {role:'user', text:text};
   if(pendingImage) msg.image = pendingImage;
+  const cites = (state.chatCites||[]).filter(function(c){ return text.indexOf('@'+c.n)>-1; });
+  if(cites.length) msg.cites = cites.slice(0, 12);
+  state.chatCites = [];
+  // "sí" / "confirmo" a una receta propuesta: se arma la tarjeta sin volver a preguntarle a la IA.
+  const pendiente = chatPendingRecipeAsk(session);
+  if(pendiente && !pendingImage && chatIsAffirmative(text)){
+    session.messages.push(msg);
+    input.value = '';
+    chatConfirmRecipe(session, pendiente, true);
+    return;
+  }
   session.messages.push(msg);
   state.chatPendingImage = null;
   renderChatImgPreview();
@@ -14404,7 +14903,13 @@ function sendChatMessage(){
   renderChatScreen();
   callAi(session.messages.slice(0,-1)).then(function(reply){
     session.messages.pop();
-    session.messages.push({role:'model', text:reply});
+    const out = { id:'m-'+Date.now()+'-'+Math.random().toString(36).slice(2,6), role:'model', text:reply };
+    const kind = chatRecipeAskKind(reply);
+    if(kind){
+      out.recipeAsk = kind;
+      out.actions = [ { id:'recipe-confirm', label:'Sí, confirmar', kind:'primary' }, { id:'recipe-change', label:'Cambiar algo', kind:'ghost' } ];
+    }
+    session.messages.push(out);
     session.updatedAt = new Date().toISOString();
     saveData(DATA);
     renderChatScreen();
@@ -14416,7 +14921,8 @@ function sendChatMessage(){
     renderChatScreen();
   });
 }
-function callAi(history){
+function callAi(history, nivel){
+  nivel = (nivel==null) ? aiCtxNivel() : nivel;
   const url = localStorage.getItem('kobuSyncUrl');
   const key = localStorage.getItem('kobuSyncKey');
   if(!url || !key){
@@ -14431,7 +14937,7 @@ function callAi(history){
   }).reverse();
   const hasImage = withImages.some(function(m){ return !!m.image; });
   const model = hasImage ? KOBU_VISION_MODEL : currentAiModel();
-  const messages = [{ role:'system', content: buildSystemPrompt() }].concat(
+  const messages = [{ role:'system', content: buildSystemPrompt(nivel) }].concat(
     withImages.map(function(m){
       const role = m.role==='model' ? 'assistant' : 'user';
       if(m.image){
@@ -14442,7 +14948,13 @@ function callAi(history){
   );
   return aiChatWithFallback(url, key, model, messages)
     .then(function(j){
+      if(nivel>0 && nivel!==aiCtxNivel()) aiCtxGuardarNivel(nivel);
       return j.reply || 'no obtuve respuesta, probá de nuevo.';
+    })
+    .catch(function(err){
+      // Si el modelo no acepta tanto texto, se reintenta con los datos más resumidos (y se recuerda por 12 h).
+      if(nivel<2 && aiErrorIsTooLarge(err)){ aiCtxGuardarNivel(nivel+1); return callAi(history, nivel+1); }
+      throw err;
     });
 }
 function openImportRecipeModal(){
@@ -14466,7 +14978,8 @@ function matchIngredientPriceId(name){
   const found = DATA.ingredientPrices.find(function(p){ return (p.name||'').trim().toLowerCase()===norm; });
   return found ? found.id : null;
 }
-function callAiExtractRecipe(rawText){
+function callAiExtractRecipe(rawText, opts){
+  opts = opts || {};
   const url = localStorage.getItem('kobuSyncUrl');
   const key = localStorage.getItem('kobuSyncKey');
   if(!url || !key){
@@ -14487,7 +15000,11 @@ function callAiExtractRecipe(rawText){
     'Si además hay pasos para combinar las preparaciones al final (armado, relleno final, decoración), ponelos en "finalSteps"; si no hay varias preparaciones, dejá "finalSteps" vacío. '+
     'Para "unit" de cada ingrediente usá preferentemente una de estas: '+unitList+'. Si no entra en ninguna, usá "u" y aclará la cantidad original dentro de "name". '+
     'Si además el texto trae, aparte de la receta normal, una versión "sin azúcar", "sin TACC"/"sin gluten", "sin lactosa" y/o "vegana" con sus propios ingredientes y/o pasos propios, agregá un objeto por cada una en "dietVariants": "type" tiene que ser exactamente uno de "azucar", "tacc", "lactosa", "vegano" o "custom" (si es otra restricción distinta), "label" es el nombre corto de esa variante (ej. "Sin azúcar"), e "ingredients"/"steps" son SOLO los datos propios de esa variante (si en el texto solo cambia un ingrediente, poné igual la lista completa de ingredientes de esa variante, no solo el que cambia). Si el texto no menciona ninguna variante dietaria, dejá "dietVariants" como un array vacío. '+
-    'Si un dato no aparece en el texto, dejalo vacío o en 0, no inventes cantidades ni pasos. Respondé en español.';
+    'Si un dato no aparece en el texto, dejalo vacío o en 0, no inventes cantidades ni pasos. Respondé en español.'+
+    (opts.chat ? ' Además agregá estos campos al objeto: "kind" ("receta" o "preparacion": preparacion si es una preparación base como crema, relleno, masa o cobertura), "ovenTemp" (°C, número), "ovenMinutes" (número), "ovenMode" (texto, ej. "Arriba/abajo"), "moldName" (el molde sugerido tal cual está escrito), "shelfLifeDays" (número). '+
+      'Conservá el formato de los pasos: dejá las **negritas** tal cual; si los pasos están separados con subtítulos (por ejemplo "Masa", "Relleno", "Armado") y es una sola preparación, poné cada subtítulo como un paso aparte que empiece con "## ". '+
+      'Cada paso sin el número adelante. Si un paso indica un tiempo concreto de horneado, reposo, enfriado o espera, agregá al final del paso " [[timer:SEGUNDOS]]" con ese tiempo en segundos (si es un rango, el menor). '+
+      'En "notes" poné las notas, consejos y el costo estimado si aparecen. No incluyas la pregunta final de confirmación.' : '');
   return aiChatWithFallback(url, key, model, [{role:'system',content:sys},{role:'user',content:rawText}])
     .then(function(j){
       const raw = (j.reply||'').trim();

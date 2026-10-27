@@ -14404,7 +14404,10 @@ function renderChatScreen(){
         const actionsHtml = (m.actions && m.actions.length) ? '<div class="chat-msg-actions">'+m.actions.map(function(a,ai){
           return '<button type="button" class="btn '+(a.kind==='primary'?'':'btn-ghost')+'" style="font-size:calc(11.5px + var(--kobu-font-boost, 0px));padding:6px 10px;" onclick="handleChatAction(\''+m.id+'\','+ai+')">'+escapeHtml(a.label)+'</button>';
         }).join('')+'</div>' : '';
-        const bodyHtml = (m.role==='model' ? chatMdHtml(m.text) : escapeHtml(m.text)) + (m.recipeCard ? chatRecipeCardHtml(m) : '');
+        const bodyHtml = (m.role==='model' ? chatMdHtml(m.waitTxt || m.text) : escapeHtml(m.text)) + (m.recipeCard ? chatRecipeCardHtml(m) : '');
+        let extraHtml = '';
+        if(m.role==='error' && m.retry) extraHtml += '<div class="chat-msg-actions"><button type="button" class="btn" style="font-size:calc(11.5px + var(--kobu-font-boost, 0px));padding:6px 10px;" onclick="chatRetry('+idx+')"><span class="icon-slot" data-icon="refresh" style="vertical-align:-2px;"></span> Reintentar</button></div>';
+        if(m.role==='model' && m.cortado) extraHtml += '<div class="chat-msg-actions"><button type="button" class="btn" style="font-size:calc(11.5px + var(--kobu-font-boost, 0px));padding:6px 10px;" onclick="chatContinue('+idx+')"'+(m._busy ? ' disabled' : '')+'>'+(m._busy ? 'Continuando…' : 'Continuar')+'</button></div>';
         const hasTable = bodyHtml.indexOf('<table')>-1 ? ' has-table' : '';
         let refreshHtml = '';
         if(chatRefreshable(m)){
@@ -14412,7 +14415,7 @@ function renderChatScreen(){
           refreshHtml = (upd && !isNaN(upd) ? '<span class="chat-upd">Actualizado con los precios del '+upd.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'})+' '+upd.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit',hour12:false})+'</span>' : '')+
             '<button type="button" class="chat-refresh" onclick="chatRefreshMsg('+idx+')"'+(m._busy ? ' disabled' : '')+'><span class="icon-slot" data-icon="refresh"></span>'+(m._busy ? 'Actualizando…' : 'Actualizar con precios de hoy')+'</button>';
         }
-        return '<div class="chat-msg-row'+hasTable+'"><span class="chat-avatar"><span class="icon-slot" data-icon="paw"></span></span><div class="chat-msg '+m.role+(m.role==='model' ? ' chat-md' : '')+hasTable+'" style="transform-origin:bottom left;'+animStyle+'">'+bodyHtml+actionsHtml+refreshHtml+'</div></div>';
+        return '<div class="chat-msg-row'+hasTable+'"><span class="chat-avatar"><span class="icon-slot" data-icon="paw"></span></span><div class="chat-msg '+m.role+(m.role==='model' ? ' chat-md' : '')+hasTable+'" style="transform-origin:bottom left;'+animStyle+'">'+bodyHtml+actionsHtml+extraHtml+(m.cortado ? '' : refreshHtml)+'</div></div>';
       }
       const imgHtml = m.image ? '<img class="chat-msg-img" src="'+m.image+'">' : '';
       return '<div class="chat-msg '+m.role+'" style="transform-origin:bottom right;'+animStyle+'">'+imgHtml+chatUserTextHtml(m)+'</div>';
@@ -14846,7 +14849,7 @@ function aiCtxNivel(){
 function aiCtxGuardarNivel(n){ try{ localStorage.setItem('kobuAiNivel', String(n)); localStorage.setItem('kobuAiNivelTs', String(Date.now())); }catch(e){} }
 function aiErrorIsTooLarge(err){
   const m = String((err && err.message) || '').toLowerCase();
-  return /too large|413|reduce your message|context length|context_length|maximum context|tokens per minute|\btpm\b|request entity/.test(m);
+  return /too large|\b413\b|reduce your message|context length|context_length|maximum context|request entity/.test(m);
 }
 // Recetas y preparaciones de las que se está hablando: la del chat, las citadas con @ y las nombradas.
 function chatFocusIds(session){
@@ -15112,12 +15115,24 @@ function sendChatMessage(){
       }
     }
   }
-  session.messages.push({role:'model', text:'escribiendo...'});
+  chatAskAi(session);
+}
+// Pide la respuesta a la IA para el último mensaje del usuario (enviar y Reintentar).
+function chatAskAi(session){
+  const wait = { role:'model', text:'escribiendo...' };
+  session.messages.push(wait);
   renderChatScreen();
-  callAi(session.messages.slice(0,-1)).then(function(reply){
-    session.messages.pop();
+  const hist = session.messages.slice(0, session.messages.indexOf(wait));
+  callAi(hist, null, { full:true, onWait:function(sec){
+    wait.waitTxt = 'Se llenó el cupo de este minuto. Reintento solo en '+sec+' s…';
+    renderChatScreen();
+  } }).then(function(res){
+    const i = session.messages.indexOf(wait);
+    if(i>-1) session.messages.splice(i, 1);
+    const reply = res.reply;
     const out = { id:'m-'+Date.now()+'-'+Math.random().toString(36).slice(2,6), role:'model', text:reply, ai:true };
-    const kind = chatRecipeAskKind(reply);
+    if(res.cortado) out.cortado = true;
+    const kind = res.cortado ? null : chatRecipeAskKind(reply);
     if(kind){
       out.recipeAsk = kind;
       out.actions = [ { id:'recipe-confirm', label:'Sí, confirmar', kind:'primary' }, { id:'recipe-change', label:'Cambiar algo', kind:'ghost' } ];
@@ -15127,11 +15142,52 @@ function sendChatMessage(){
     saveData(DATA);
     renderChatScreen();
   }).catch(function(err){
-    session.messages.pop();
-    session.messages.push({role:'error', text:'No se pudo conectar con la IA: '+err.message});
+    const i = session.messages.indexOf(wait);
+    if(i>-1) session.messages.splice(i, 1);
+    session.messages.push({ id:'m-'+Date.now()+'-e', role:'error', text:'No se pudo conectar con la IA: '+err.message, retry:true });
     session.updatedAt = new Date().toISOString();
     saveData(DATA);
     renderChatScreen();
+  });
+}
+// Reintentar: saca el error y vuelve a preguntar lo mismo.
+function chatRetry(idx){
+  const session = activeChatSession();
+  if(!session) return;
+  const m = session.messages[idx];
+  if(!m || m.role!=='error' || !m.retry) return;
+  session.messages.splice(idx, 1);
+  const last = session.messages[session.messages.length-1];
+  if(!last || last.role!=='user'){ saveData(DATA); renderChatScreen(); return; }
+  chatAskAi(session);
+}
+// Continuar: la respuesta se cortó por largo; se pide el resto y se pega a la misma respuesta.
+function chatContinue(idx){
+  const session = activeChatSession();
+  if(!session) return;
+  const m = session.messages[idx];
+  if(!m || !m.cortado || m._busy) return;
+  m._busy = true;
+  renderChatScreen();
+  const hist = session.messages.slice(0, idx+1).concat([{ role:'user', text:'Tu respuesta anterior se cortó. Seguí exactamente desde donde quedó, sin repetir nada de lo que ya escribiste y sin saludar ni explicar: empezá con la palabra o el renglón que seguía (si estabas en una tabla, seguí con el renglón siguiente).' }]);
+  callAi(hist, null, { full:true }).then(function(res){
+    delete m._busy;
+    let cont = String(res.reply||'');
+    const old = String(m.text||'');
+    const sep = (/\n$/.test(old) || /^\s/.test(cont)) ? '' : (/^[|#>]|^[-*•]\s|^\d{1,3}[.)]\s/.test(cont) ? '\n' : '');
+    m.text = old + sep + cont;
+    m.cortado = !!res.cortado;
+    if(!m.cortado){
+      const kind = chatRecipeAskKind(m.text);
+      if(kind){ m.recipeAsk = kind; m.actions = [ { id:'recipe-confirm', label:'Sí, confirmar', kind:'primary' }, { id:'recipe-change', label:'Cambiar algo', kind:'ghost' } ]; }
+    }
+    session.updatedAt = new Date().toISOString();
+    saveData(DATA);
+    renderChatScreen();
+  }).catch(function(err){
+    delete m._busy;
+    renderChatScreen();
+    showToast('No se pudo continuar: '+((err && err.message) || 'error'));
   });
 }
 // Tamaño aproximado del pedido en tokens (texto en español con números: ~2,8 caracteres por token; foto ~1200).
@@ -15158,7 +15214,17 @@ function aiBuildMessages(history, nivel){
   });
   return { messages:[{ role:'system', content: buildSystemPrompt(nivel) }].concat(msgs), hasImage:conFoto };
 }
-function callAi(history, nivel){
+function aiErrorIsRateLimited(err){
+  const m = String((err && err.message) || '').toLowerCase();
+  return !aiErrorIsTooLarge(err) && /429|rate limit|rate_limit|try again in|tokens per minute|requests per minute/.test(m);
+}
+function aiRetrySeconds(err){
+  const m = String((err && err.message) || '').match(/try again in\s*(?:(\d+)m)?\s*([\d.]+)\s*s/i);
+  const sec = m ? (parseInt(m[1]||'0', 10)*60 + parseFloat(m[2])) : 30;
+  return Math.max(5, Math.min(65, Math.ceil(sec)+1));
+}
+function callAi(history, nivel, opts){
+  opts = opts || {};
   nivel = (nivel==null) ? aiCtxNivel() : nivel;
   const url = localStorage.getItem('kobuSyncUrl');
   const key = localStorage.getItem('kobuSyncKey');
@@ -15173,11 +15239,20 @@ function callAi(history, nivel){
   }
   return aiChatWithFallback(url, key, model, built.messages)
     .then(function(j){
-      return j.reply || 'no obtuve respuesta, probá de nuevo.';
+      const reply = j.reply || 'no obtuve respuesta, probá de nuevo.';
+      return opts.full ? { reply:reply, cortado: !!(j.cortado && j.reply) } : reply;
     })
     .catch(function(err){
       // Si igual no entra, se reintenta más resumido (y se recuerda por 12 h).
-      if(nivel<4 && aiErrorIsTooLarge(err)){ aiCtxGuardarNivel(nivel+1); return callAi(history, nivel+1); }
+      if(nivel<4 && aiErrorIsTooLarge(err)){ aiCtxGuardarNivel(nivel+1); return callAi(history, nivel+1, opts); }
+      // Se llenó el cupo de este minuto: se espera lo que pide Groq y se reintenta solo (hasta 2 veces).
+      if(aiErrorIsRateLimited(err) && (opts.esperas||0) < 2){
+        const sec = aiRetrySeconds(err);
+        if(opts.onWait) try{ opts.onWait(sec); }catch(e){}
+        return new Promise(function(res){ setTimeout(res, sec*1000); }).then(function(){
+          return callAi(history, nivel, Object.assign({}, opts, { esperas:(opts.esperas||0)+1 }));
+        });
+      }
       if(aiErrorIsTooLarge(err)) throw new Error('la pregunta y los datos no entran en el modelo gratis. Probá con una charla nueva (botón +) o citando solo lo necesario.');
       throw err;
     });

@@ -862,6 +862,13 @@
   .cc-divs button.on{ background:#FBF3E7; color:#3a2a21; }
   .cc-divs button.otro{ font-size:calc(12.5px + var(--kobu-font-boost, 0px)); }
   .cc-back{ background:none; border:none; color:rgba(251,243,231,.78); font-size:calc(12.5px + var(--kobu-font-boost, 0px)); text-decoration:underline; cursor:pointer; padding:4px; align-self:center; font-family:inherit; }
+  .xl-sal-row{ display:flex; align-items:center; gap:6px; padding:6px 0; border-bottom:0.5px solid var(--k-border); font-size:calc(12px + var(--kobu-font-boost, 0px)); color:var(--k-text); }
+  .xl-sal-row input{ width:52px; text-align:center; padding:6px 4px; }
+  .xl-sal-row .xl-x{ margin-left:auto; color:var(--k-danger); cursor:pointer; }
+  .bk-sals{ display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
+  .bk-sal{ border:1px solid var(--k-border); background:var(--k-card); color:var(--k-text); border-radius:999px; padding:6px 12px; font-size:calc(12px + var(--kobu-font-boost, 0px)); cursor:pointer; }
+  .bk-sal.on{ background:var(--k-accent); border-color:var(--k-accent); color:var(--k-bg); font-weight:600; }
+  .xl-pill{ display:inline-block; margin-left:4px; padding:0 5px; border-radius:6px; background:var(--k-accent); color:var(--k-bg); font-size:.8em; font-weight:700; vertical-align:1px; }
   .ing-sep{ margin:10px 0 2px; padding-top:8px; border-top:1px dashed var(--k-border); font-size:calc(10.5px + var(--kobu-font-boost, 0px)); font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--k-muted); }
   /* ---- catalog ---- */
   /* ---- confirm modal ---- */
@@ -927,6 +934,11 @@
   .qs-tile-bar-fill{ height:100%; border-radius:8px; }
   .qs-tile-bar-label{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:calc(8.5px + var(--kobu-font-boost, 0px)); font-weight:600; color:var(--k-text); }
   .qs-tile-bar-label.on-fill{ color:#fff; }
+  .qs-pm{ display:flex; gap:4px; padding:4px; border-radius:14px; background:var(--k-card2); margin-bottom:8px; width:100%; box-sizing:border-box; }
+  .qs-pm button{ flex:1; min-width:0; display:flex; align-items:center; justify-content:center; gap:6px; height:40px; border:none; border-radius:10px; background:none; color:var(--k-muted); font-size:calc(12.5px + var(--kobu-font-boost, 0px)); font-weight:600; cursor:pointer; transition:background .2s, color .2s, box-shadow .2s; font-family:inherit; }
+  .qs-pm button .icon-slot{ font-size:calc(16px + var(--kobu-font-boost, 0px)); }
+  .qs-pm button.on.ef{ background:var(--k-success-bg); color:var(--k-success); box-shadow:0 1px 3px rgba(0,0,0,.10); }
+  .qs-pm button.on.tr{ background:var(--k-info-bg); color:var(--k-info); box-shadow:0 1px 3px rgba(0,0,0,.10); }
   .qs-pmswitch{ position:relative; width:100%; min-width:0; flex:1; box-sizing:border-box; border-radius:20px; padding:2px; height:32px; margin-bottom:8px; cursor:pointer; transition:background .2s; overflow:hidden; }
   .qs-pmswitch-thumb{ position:absolute; top:2px; width:calc(50% - 2px); height:28px; background:var(--k-card); border-radius:15px; transition:left .2s; }
   .qs-pmswitch-labels{ position:relative; display:flex; height:100%; align-items:center; }
@@ -1120,6 +1132,9 @@
   .wb-line{ padding:8px 0; border-bottom:1px dashed var(--k-border); }
   .wb-line .t{ display:flex; justify-content:space-between; gap:8px; font-size:calc(13px + var(--kobu-font-boost, 0px)); color:var(--k-text); }
   .wb-line .t small{ color:var(--k-muted); }
+  .wb-line.wb-opt{ padding-left:14px; border-left:2px solid var(--k-border); }
+  .wb-line.wb-opt .t{ font-size:calc(12px + var(--kobu-font-boost, 0px)); }
+  .mm-tam{ display:flex; justify-content:center; gap:6px; flex-wrap:wrap; }
   .wb-linkok{ font-size:calc(12px + var(--kobu-font-boost, 0px)); margin-top:4px; color:var(--k-success); display:flex; align-items:center; gap:4px; background:none; border:none; padding:0; cursor:pointer; font-family:inherit; text-align:left; }
   .wb-linkok u{ color:var(--k-muted); margin-left:4px; }
   .wb-sel{ width:100%; margin-top:6px; padding:8px 10px; border-radius:10px; border:1.5px solid var(--k-warning); background:var(--k-warning-bg); color:var(--k-text); font-size:calc(13px + var(--kobu-font-boost, 0px)); font-family:inherit; }
@@ -1204,6 +1219,10 @@
         <div id="bakeModalYieldRow" style="display:flex;justify-content:space-between;font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin-top:8px;"><span>1 tanda</span><span id="bakeModalYieldVal">—</span></div>
         <div style="display:flex;justify-content:space-between;font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin-top:3px;padding-bottom:8px;border-bottom:0.5px solid var(--k-border);"><span>Stock actual</span><span id="bakeModalStockVal">0</span></div>
         <div id="bakeModalNeededRow" style="display:none;justify-content:space-between;font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin-top:8px;padding-bottom:8px;border-bottom:0.5px solid var(--k-border);"><span>Tendrías que hacer</span><span id="bakeModalNeededVal" style="color:var(--k-text);font-weight:600;">0 tandas</span></div>
+        <div id="bakeModalSalWrap" style="display:none;margin-top:10px;">
+          <label style="font-size:calc(11.5px + var(--kobu-font-boost, 0px));color:var(--k-text);margin:0;">¿Qué salió de cada tanda?</label>
+          <div class="bk-sals" id="bakeModalSals"></div>
+        </div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
           <label id="bakeModalInputLabel" style="font-size:calc(11.5px + var(--kobu-font-boost, 0px));color:var(--k-text);margin:0;">Tandas que querés hacer</label>
           <input class="input" id="bakeModalInput" type="number" min="0" step="any" oninput="bakeModalCheckStock()" style="width:64px;text-align:center;border:none;border-bottom:1px solid var(--k-border);border-radius:0;background:none;padding:2px 4px;">
@@ -1367,6 +1386,7 @@
       </div>
       <div class="sc-headbody">
       <div class="field"><label>Cantidad disponible</label><input class="input" id="rsc-qty" type="number" step="any" min="0" placeholder="0"></div>
+      <div class="field" id="rsc-xlrow" style="display:none;"><label id="rsc-xllabel">XL disponibles</label><input class="input" id="rsc-xl" type="number" step="any" min="0" placeholder="0"></div>
       <p style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;">Esto solo corrige el número guardado — no genera ni modifica gastos ni afecta la economía de la receta.</p>
       <div class="btn-row">
         <button class="btn btn-ghost" onclick="closeRecipeStockCorrectModal()">Cancelar</button>
@@ -1494,6 +1514,7 @@
       <p class="modal-msg" style="font-weight:600;margin:0;">Anotar merma</p>
       <p id="mm-name" style="font-size:calc(12.5px + var(--kobu-font-boost, 0px));color:var(--k-accent);font-weight:600;margin:0;text-align:center;"></p>
       <p id="mm-stock" style="font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;text-align:center;"></p>
+      <div class="mm-tam" id="mm-tam" style="display:none;"></div>
       <div class="mm-qty">
         <button type="button" onclick="mermaStep(-1)" aria-label="Menos"><span class="icon-slot" data-icon="chevron-down"></span></button>
         <input class="input" id="mm-qty" type="number" min="1" step="1" inputmode="numeric" value="1" oninput="mermaRenderCost()">
@@ -2252,6 +2273,32 @@
           <div class="field" style="flex:1;"><label>Precio del paquete</label><input class="input" id="f-packPrice" type="number" min="0" placeholder="precio de la bolsa" oninput="syncSalePriceFromPack();updateFormCostPreview()"></div>
         </div>
         <div class="rowline" id="f-packProfitRow" style="display:none;"><span class="l">Ganancia por paquete</span><span id="f-packProfitPreview" style="font-weight:600;color:var(--k-accent);font-size:calc(12.5px + var(--kobu-font-boost, 0px));">$0</span></div>
+      </div>
+      <div class="grp-card" id="formXLCard">
+        <p class="section-title"><span class="badge-ic"><span class="icon-slot" data-icon="cake"></span></span>Dos tamaños: chico y XL (opcional)</p>
+        <div class="rowline" style="padding:2px 0;">
+          <span class="l">De esta receta salen chicos y XL<br><span style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);">Por ejemplo: 3 chicos, o 1 XL + 1 chico. Si siempre sale un solo tamaño, dejalo apagado.</span></span>
+          <div class="switch" id="f-xlOn" onclick="toggleFormXL()"><div class="knob-sw"></div></div>
+        </div>
+        <div id="f-xlBody" style="display:none;flex-direction:column;gap:10px;">
+          <div class="field"><label>Lo que dice "Rinde" (en Datos) es</label>
+            <div class="btn-row" id="f-xlBaseRow"><button type="button" class="btn" id="f-xlBaseC" style="flex:1;" onclick="setFormXLBase('chico')">Chicos</button><button type="button" class="btn" id="f-xlBaseX" style="flex:1;" onclick="setFormXLBase('xl')">XL</button></div>
+          </div>
+          <div class="btn-row">
+            <div class="field" style="flex:1;"><label>Peso del chico (g)</label><input class="input" id="f-xlPesoC" type="number" min="0" placeholder="ej. 270" oninput="setFormXL('pesoChico', this.value)"></div>
+            <div class="field" style="flex:1;"><label>Peso del XL (g)</label><input class="input" id="f-xlPesoX" type="number" min="0" placeholder="ej. 600" oninput="setFormXL('pesoXL', this.value)"></div>
+          </div>
+          <div class="btn-row">
+            <div class="field" style="flex:1;"><label id="f-xlPriceLbl">Precio del XL</label><input class="input" id="f-xlPrice" type="number" min="0" oninput="setFormXL('precio', this.value)"></div>
+            <div class="field" style="flex:1;"><label id="f-xlMoldLbl">Molde del XL</label><select class="input" id="f-xlMold" onchange="setFormXL('moldId', this.value)"></select></div>
+          </div>
+          <div class="field"><label>Qué te sale de una tanda</label><div id="f-xlSalidas"></div>
+            <button type="button" class="ut-add-row" onclick="addFormSalida()"><span class="icon-slot" data-icon="plus"></span>Agregar opción</button>
+            <p style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:4px 0 0;">Al hornear te aparecen estas opciones para elegir (si hay una sola, no te pregunta).</p>
+          </div>
+          <div class="rowline"><span class="l" id="f-xlCostLbl">Costo de un XL</span><span id="f-xlCost" style="font-weight:600;font-size:calc(12.5px + var(--kobu-font-boost, 0px));">—</span></div>
+          <div class="rowline"><span class="l" id="f-xlProfitLbl">Ganancia por XL</span><span id="f-xlProfit" style="font-weight:600;color:var(--k-accent);font-size:calc(12.5px + var(--kobu-font-boost, 0px));">—</span></div>
+        </div>
       </div>
     </div>
     <div class="btn-row formfoot" id="formDeleteRow" style="display:none;">
@@ -4489,7 +4536,7 @@ function renderRecipes(){
     const readyMark = r.readyToSell ? '<span class="ready-mark active"><span class="icon-slot" data-icon="check"></span></span>' : '<span class="ready-mark"></span>';
     const readyBtn = '<button type="button" class="iconbtn card-ready" onclick="event.stopPropagation();toggleReadyToSell(\''+r.id+'\')" title="lista para vender">'+readyMark+'</button>';
     const dragBtn = (unfiltered && r.favorite) ? '<button type="button" class="iconbtn card-drag" onclick="event.stopPropagation();" onpointerdown="event.stopPropagation();recipeDragStart(event,\''+r.id+'\')" title="mover"><span class="icon-slot" data-icon="grip"></span></button>' : '';
-    const stockBadge = '<span class="thumb-stock-badge" style="background:'+stockColor(recipeStockOf(r))+';" title="stock: '+recipeStockOf(r)+'" onclick="event.stopPropagation();handleRecipeStockBadgeTap(\''+r.id+'\')">'+recipeStockOf(r)+'</span>';
+    const stockBadge = '<span class="thumb-stock-badge" style="background:'+stockColor(recipeStockOf(r)+(recipeHas2(r) ? (Number(r.stock2)||0) : 0))+';" title="stock: '+escapeHtml(recipeStockText(r))+'" onclick="event.stopPropagation();handleRecipeStockBadgeTap(\''+r.id+'\')">'+recipeStockOf(r)+(recipeHas2(r) ? '<span class="xl-pill">'+(Number(r.stock2)||0)+' '+tamNombre(secTam(r))+'</span>' : '')+'</span>';
     const dietTypes = recipeDisplayDietTypes(r);
     const dietIcons = dietTypes.map(function(t){
       return '<span class="diet-icon-badge" style="background:color-mix(in srgb, '+t.meta.color+' 18%, transparent);" title="'+escapeHtml(t.meta.label)+'"><span class="icon-slot" data-icon="'+t.meta.icon+'" style="color:'+t.meta.color+';"></span></span>';
@@ -4929,6 +4976,7 @@ function fillFormFromDraft(){
   document.getElementById('f-salePrice').value = d.salePrice || '';
   document.getElementById('f-packSize').value = d.packSize || '';
   document.getElementById('f-packPrice').value = d.packPrice || '';
+  renderFormXL();
   state.draft.moldCalibrations = (d.moldCalibrations || []).map(function(c){ return Object.assign({}, c); });
   setMoldYieldMode(d.moldYieldMode || 'molde');
   renderMoldCalibRows();
@@ -5373,7 +5421,85 @@ function syncSalePriceFromPack(){
     priceEl.value = Math.round((packPrice/packSize)*100)/100;
   }
 }
+function renderFormXL(){
+  const d = state.draft;
+  if(!d || !document.getElementById('formXLCard')) return;
+  const on = !!(d.tam2 && d.tam2.on);
+  document.getElementById('f-xlOn').classList.toggle('on', on);
+  document.getElementById('f-xlBody').style.display = on ? 'flex' : 'none';
+  if(!on) return;
+  const base = d.tam2.base==='xl' ? 'xl' : 'chico', sec = base==='xl' ? 'chico' : 'xl';
+  document.getElementById('f-xlBaseC').className = 'btn '+(base==='chico' ? 'btn-primary' : 'btn-ghost');
+  document.getElementById('f-xlBaseX').className = 'btn '+(base==='xl' ? 'btn-primary' : 'btn-ghost');
+  document.getElementById('f-xlPesoC').value = d.tam2.pesoChico || '';
+  document.getElementById('f-xlPesoX').value = d.tam2.pesoXL || '';
+  document.getElementById('f-xlPrice').value = d.tam2.precio || '';
+  const nm = tamNombre(sec);
+  document.getElementById('f-xlPriceLbl').textContent = 'Precio del '+nm;
+  document.getElementById('f-xlMoldLbl').textContent = 'Molde del '+nm;
+  document.getElementById('f-xlCostLbl').textContent = 'Costo de un '+nm;
+  document.getElementById('f-xlProfitLbl').textContent = 'Ganancia por '+nm;
+  const sel = document.getElementById('f-xlMold');
+  sel.innerHTML = '<option value="">sin molde</option>'+utensilsSorted('molde').map(function(u){ const dm = moldDimsLabel(u); return '<option value="'+escapeHtml(u.id)+'">'+escapeHtml(u.nombre||'')+(dm?' ('+escapeHtml(dm)+')':'')+'</option>'; }).join('');
+  sel.value = d.tam2.moldId || '';
+  renderFormSalidas();
+  updateFormXLPreview();
+}
+function formXLDraft(){
+  const d = state.draft;
+  const y = parseFloat((document.getElementById('f-yieldQty')||{}).value) || d.yieldQty;
+  return Object.assign({}, d, { yieldQty:y });
+}
+function toggleFormXL(){
+  const d = state.draft;
+  if(!d) return;
+  if(!d.tam2){
+    const xlTxt = /xl/i.test(String(d.yieldUnit||'')+' '+String(d.title||''));
+    d.tam2 = { on:false, base: xlTxt ? 'xl' : 'chico', precio:null, pesoChico:null, pesoXL:null, moldId:null };
+  }
+  d.tam2.on = !d.tam2.on;
+  if(d.tam2.on && !(Array.isArray(d.salidas) && d.salidas.length)) d.salidas = defaultSalidas(formXLDraft());
+  renderFormXL();
+}
+function setFormXLBase(b){
+  const d = state.draft;
+  if(!d || !d.tam2) return;
+  if(d.tam2.base!==b){ d.tam2.base = b; d.salidas = defaultSalidas(formXLDraft()); }
+  renderFormXL();
+}
+function setFormXL(field, val){
+  const d = state.draft;
+  if(!d || !d.tam2) return;
+  d.tam2[field] = (field==='moldId') ? (val||null) : val;
+  updateFormXLPreview();
+}
+function renderFormSalidas(){
+  const d = state.draft, wrap = document.getElementById('f-xlSalidas');
+  if(!d || !wrap) return;
+  if(!Array.isArray(d.salidas)) d.salidas = [];
+  wrap.innerHTML = d.salidas.map(function(x, i){
+    return '<div class="xl-sal-row"><input class="input" type="number" min="0" step="1" value="'+(x.x||0)+'" oninput="setFormSalida('+i+',\'x\',this.value)"> XL <span style="color:var(--k-muted);">+</span> '+
+      '<input class="input" type="number" min="0" step="1" value="'+(x.c||0)+'" oninput="setFormSalida('+i+',\'c\',this.value)"> chicos'+
+      '<span class="xl-x icon-slot" data-icon="x" onclick="removeFormSalida('+i+')"></span></div>';
+  }).join('') || '<p style="font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:4px 0;">Sin opciones: se usan las de siempre.</p>';
+  mountIcons();
+}
+function setFormSalida(i, k, val){ const d = state.draft; if(d && d.salidas && d.salidas[i]) d.salidas[i][k] = Math.max(0, Math.round(parseFloat(val)||0)); }
+function addFormSalida(){ const d = state.draft; if(!d) return; if(!Array.isArray(d.salidas)) d.salidas = []; d.salidas.push({ c:0, x:1 }); renderFormSalidas(); }
+function removeFormSalida(i){ const d = state.draft; if(d && d.salidas){ d.salidas.splice(i, 1); renderFormSalidas(); } }
+function updateFormXLPreview(){
+  const d = state.draft, ce = document.getElementById('f-xlCost'), pe = document.getElementById('f-xlProfit');
+  if(!d || !ce || !d.tam2 || !d.tam2.on) return;
+  const fd = formXLDraft();
+  const c = computeRecipeCost(fd);
+  if(c.costPerUnit==null){ ce.textContent = 'completá "Rinde" arriba'; pe.textContent = '—'; return; }
+  const cost = c.costPerUnit*secEq(fd), price = parseFloat(d.tam2.precio);
+  ce.textContent = fmtMoney(cost);
+  pe.textContent = isNaN(price) ? 'falta el precio' : fmtMoney(price - cost);
+  pe.style.color = isNaN(price) ? 'var(--k-muted)' : ((price - cost)<0 ? 'var(--k-danger)' : 'var(--k-accent)');
+}
 function updateFormCostPreview(){
+  updateFormXLPreview();
   const costEl = document.getElementById('f-costPreview');
   const profitEl = document.getElementById('f-profitPreview');
   if(!costEl || !profitEl) return;
@@ -6070,6 +6196,14 @@ function saveRecipe(){
     return { id: c.id || ('mc-'+Date.now()+'-'+Math.random().toString(36).slice(2,6)), moldId:c.moldId, yieldQty:parseFloat(c.yieldQty), unitWeight:parseFloat(c.unitWeight) };
   });
   d.moldYieldMode = (state.draft.moldYieldMode==='corte') ? 'corte' : 'molde';
+  if(d.tam2 && d.tam2.on){
+    const num = function(id){ const v = parseFloat(document.getElementById(id).value); return v>0 ? v : null; };
+    d.tam2 = { on:true, base: d.tam2.base==='xl' ? 'xl' : 'chico', precio: num('f-xlPrice'), pesoChico: num('f-xlPesoC'), pesoXL: num('f-xlPesoX'), moldId: document.getElementById('f-xlMold').value || null };
+    d.salidas = recipeSalidas(d);
+    if(d.stock2==null) d.stock2 = 0;
+  } else if(d.tam2){
+    d.tam2.on = false;
+  }
   d.dietBaseType = d.isDietVariant ? null : (d.dietBaseType || null);
   d.quickNotes = d.quickNotes || [];
   if(d.mediaMode === 'icono'){ d.photo = null; } else { d.icon = null; }
@@ -6161,8 +6295,69 @@ function comboItems(r){
     return (cr && !isCombo(cr) && q>0) ? { r:cr, qty:q } : null;
   }).filter(Boolean);
 }
-function recipeStockOf(r){
+/* ===== TAMAÑOS: chico y XL (03/11/2026) =====
+   r.tam2 = {on, base:'chico'|'xl' (el tamaño de lo que rinde la receta), precio (del OTRO tamaño), pesoChico, pesoXL (g),
+   moldId (molde del otro tamaño)}; r.salidas = [{c, x}] (chicos y XL que salen de UNA tanda); r.stock = listos del tamaño
+   base y r.stock2 = listos del otro. Ítems de pedidos y ventas del otro tamaño: size 'xl' o 'chico' (sin size = el base).
+   Las recetas sin dos tamaños no cambian. */
+function recipeHas2(r){ return !!(r && !isCombo(r) && r.tam2 && r.tam2.on); }
+function baseTam(r){ return (r && r.tam2 && r.tam2.base==='xl') ? 'xl' : 'chico'; }
+function secTam(r){ return baseTam(r)==='xl' ? 'chico' : 'xl'; }
+function isSecSize(r, size){ return !!size && recipeHas2(r) && size===secTam(r); }
+function tamNombre(t){ return t==='xl' ? 'XL' : 'chico'; }
+function pesoTam(r, t){ const v = parseFloat(r && r.tam2 && (t==='xl' ? r.tam2.pesoXL : r.tam2.pesoChico)); return v>0 ? v : (t==='xl' ? 540 : 270); }
+function secEq(r){ return pesoTam(r, secTam(r)) / pesoTam(r, baseTam(r)); }
+function secPrecio(r){ const v = parseFloat(r && r.tam2 && r.tam2.precio); return v>0 ? v : null; }
+function secCost(r){ const c = computeRecipeCost(r, 1); return c.costPerUnit!=null ? c.costPerUnit*secEq(r) : null; }
+function sizeTitle(r, size){ return String((r && r.title) || '') + (isSecSize(r, size) ? ' '+tamNombre(size) : ''); }
+function defaultSalidas(r){
+  const y = Math.max(1, Math.round(parseFloat(r && r.yieldQty)||1));
+  if(baseTam(r)==='xl') return [{ c:1, x:y }, { c:0, x:y }];
+  const resto = Math.max(0, Math.round(y - pesoTam(r, 'xl')/pesoTam(r, 'chico')));
+  const out = [{ c:y, x:0 }];
+  if(resto>0) out.push({ c:resto, x:1 });
+  out.push({ c:0, x:1 });
+  return out;
+}
+function recipeSalidas(r){
+  if(!(r && r.tam2 && r.tam2.on)) return [];
+  const l = (Array.isArray(r.salidas) ? r.salidas : []).map(function(x){ return { c: Math.max(0, Math.round(Number(x && x.c)||0)), x: Math.max(0, Math.round(Number(x && x.x)||0)) }; })
+    .filter(function(x){ return x.c>0 || x.x>0; });
+  return l.length ? l : defaultSalidas(r);
+}
+function salidaLabel(x){
+  const p = [];
+  if(x.x>0) p.push(x.x+' XL');
+  if(x.c>0) p.push(x.c+(x.c===1 ? ' chico' : ' chicos'));
+  return p.join(' + ');
+}
+// Listos de un tamaño ('chico' o 'xl') de una receta con dos tamaños.
+function stockTam(r, t){ return t===baseTam(r) ? (Number(r.stock)||0) : (Number(r.stock2)||0); }
+// "Rinde chicos; XL a $9.000 (costo $2.100); por tanda: 3 chicos o 1 XL + 1 chico" (para la IA y la exportación).
+function tamResumen(r){
+  if(!recipeHas2(r)) return '';
+  const sc = secTam(r), pr = secPrecio(r), co = secCost(r);
+  return 'Dos tamaños: la receta rinde '+(baseTam(r)==='xl' ? 'XL' : 'chicos')+' ('+fmtQty(pesoTam(r, baseTam(r)))+' g) y también sale '+tamNombre(sc)+' ('+fmtQty(pesoTam(r, sc))+' g)'+
+    (pr ? ' a '+fmtMoney(pr) : ' sin precio')+(co!=null ? ' (costo '+fmtMoney(co)+')' : '')+'; por tanda sale: '+recipeSalidas(r).map(salidaLabel).join(' o ');
+}
+function recipeStockText(r){
+  if(!recipeHas2(r)) return String(recipeStockOf(r));
+  const c = stockTam(r, 'chico'), x = stockTam(r, 'xl');
+  return fmtQty(x)+' XL · '+fmtQty(c)+' chico'+(c===1?'':'s');
+}
+// Producto que se vende: la receta ("id") o su otro tamaño ("id|xl" / "id|chico").
+function sellKey(recipeId, size){ return recipeId ? (recipeId + (size ? '|'+size : '')) : ''; }
+function parseSellKey(k){ const m = String(k||'').split('|'); return { recipeId: m[0]||'', size: (m[1]==='xl' || m[1]==='chico') ? m[1] : '' }; }
+function sellOptionsHtml(selKey){
+  return recipesSorted().map(function(r){
+    let h = '<option value="'+r.id+'"'+(selKey===r.id?' selected':'')+'>'+escapeHtml(r.title)+(recipeSellsByPack(r)?' (paquete)':'')+'</option>';
+    if(recipeHas2(r)){ const k = r.id+'|'+secTam(r); h += '<option value="'+k+'"'+(selKey===k?' selected':'')+'>'+escapeHtml(sizeTitle(r, secTam(r)))+'</option>'; }
+    return h;
+  }).join('');
+}
+function recipeStockOf(r, size){
   if(!r) return 0;
+  if(isSecSize(r, size)) return Number(r.stock2)||0;
   if(isCombo(r)){
     const items = comboItems(r);
     if(!items.length) return 0;
@@ -6170,8 +6365,9 @@ function recipeStockOf(r){
   }
   return Number(r.stock)||0;
 }
-function addRecipeStock(r, delta){
+function addRecipeStock(r, delta, size){
   if(!r || !delta) return;
+  if(isSecSize(r, size)){ r.stock2 = roundQty(Math.max(0, (Number(r.stock2)||0) + delta)); return; }
   if(isCombo(r)){
     comboItems(r).forEach(function(ci){ ci.r.stock = roundQty(Math.max(0, (Number(ci.r.stock)||0) + delta*ci.qty)); });
     return;
@@ -6713,6 +6909,7 @@ function createDietVariant(baseId, type, customLabel){
   clone.variantLabel = meta.label;
   clone.quickNotes = [];
   clone.stock = 0;
+  if(clone.stock2!=null) clone.stock2 = 0;
   clone.favorite = false;
   clone.dietBaseType = null;
   DATA.recipes.push(clone);
@@ -6735,6 +6932,7 @@ function createDietVariantFromDetail(baseId, type, customLabel){
   clone.variantLabel = meta.label;
   clone.quickNotes = [];
   clone.stock = 0;
+  if(clone.stock2!=null) clone.stock2 = 0;
   clone.favorite = false;
   clone.dietBaseType = null;
   state.editingId = null;
@@ -6808,6 +7006,7 @@ function openAiDietVariantDraft(baseId, type, data){
   clone.variantLabel = meta.label;
   clone.quickNotes = [];
   clone.stock = 0;
+  if(clone.stock2!=null) clone.stock2 = 0;
   clone.favorite = false;
   clone.dietBaseType = null;
   const mapIngredients = function(list){
@@ -7207,6 +7406,11 @@ function buildRecipeExportText(r){
   lines.push('');
   lines.push('> Costo total del lote: '+fmtMoney(c.total));
   lines.push('> Costo unitario final: '+fmtMoney(c.costPerUnit));
+  if(recipeHas2(r)){
+    const co2 = secCost(r);
+    if(co2!=null) lines.push('> Costo '+tamNombre(secTam(r))+': '+fmtMoney(co2));
+    lines.push('> Por tanda sale: '+recipeSalidas(r).map(salidaLabel).join(' o '));
+  }
   lines.push('');
   lines.push('Ingredientes');
   lines.push.apply(lines, buildRecipeIngredientsTextLines(r));
@@ -7264,6 +7468,12 @@ function renderCostSection(r){
       html += '<div class="cost-sub"><span>Ganancia por '+escapeHtml(c.yieldUnit).replace(/s$/,'')+'</span><span>'+fmtMoney(r.salePrice - c.costPerUnit)+'</span></div>';
     }
   }
+  if(recipeHas2(r)){
+    const sc = secTam(r), co2 = secCost(r), pr2 = secPrecio(r);
+    if(co2!=null) html += '<div class="cost-sub"><span>Costo '+tamNombre(sc)+'</span><span>'+fmtMoney(co2)+'</span></div>';
+    if(pr2) html += '<div class="cost-sub"><span>Precio '+tamNombre(sc)+'</span><span>'+fmtMoney(pr2)+'</span></div>';
+    html += '<div class="cost-sub"><span>Stock actual</span><span>'+escapeHtml(recipeStockText(r))+'</span></div>';
+  } else
   html += '<div class="cost-sub"><span>Stock actual</span><span>'+(r.stock||0)+' '+escapeHtml(r.yieldUnit||'porciones')+'</span></div>';
   const missing = c.breakdown.filter(function(b){ return !b.matched || !b.convertible; });
   if(missing.length){
@@ -8381,7 +8591,8 @@ function buildClaudeExportMd(opts){
         if(parseFloat(r.yieldQty)>0) t += ' · rinde '+claudeNum(r.yieldQty)+' '+claudeCell(r.yieldUnit||'unidades');
         if(c.costPerUnit!=null) t += ' · costo/u '+fmtMoney(c.costPerUnit);
         if(parseFloat(r.salePrice)>0) t += ' · precio '+fmtMoney(parseFloat(r.salePrice));
-        const st = recipeStockOf(r); if(st>0) t += ' · listo '+claudeNum(st);
+        if(recipeHas2(r)){ t += ' · '+tamResumen(r)+' · listo '+recipeStockText(r); }
+        else { const st = recipeStockOf(r); if(st>0) t += ' · listo '+claudeNum(st); }
       }catch(e){}
       L.push(t);
       return;
@@ -8394,7 +8605,8 @@ function buildClaudeExportMd(opts){
       const c = computeRecipeCost(r, 1);
       meta.push('Costo de la tanda: '+fmtMoney(c.total)+(c.costPerUnit!=null ? ' · por unidad: '+fmtMoney(c.costPerUnit) : ''));
       if(parseFloat(r.salePrice)>0) meta.push('Precio de venta: '+fmtMoney(parseFloat(r.salePrice))+((parseFloat(r.packSize)>1 && parseFloat(r.packPrice)>0) ? ' · paquete de '+claudeNum(r.packSize)+': '+fmtMoney(parseFloat(r.packPrice)) : ''));
-      meta.push('Listo para vender ahora: '+claudeNum(recipeStockOf(r)));
+      if(recipeHas2(r)) meta.push(tamResumen(r));
+      meta.push('Listo para vender ahora: '+(recipeHas2(r) ? recipeStockText(r) : claudeNum(recipeStockOf(r))));
       if(parseFloat(r.shelfLifeDays)>0) meta.push('Dura: '+claudeNum(r.shelfLifeDays)+' días');
       const ovIds = Array.isArray(r.ovenIds) ? r.ovenIds : Object.keys(r.ovenSettings||{});
       ovIds.forEach(function(oid){
@@ -10021,31 +10233,33 @@ function webKeysForRecipe(recipeId, prefix){
   return Object.keys(L).filter(function(k){ return L[k]===recipeId && k.indexOf(prefix)===0; }).map(function(k){ return k.slice(prefix.length); });
 }
 // { price, src:'lista'|'pct'|null }
-function wholesaleInfo(recipeId){
+function wholesaleInfo(recipeId, size){
   const precios = kobuMayLista && kobuMayLista.precios || {};
-  const keys = webKeysForRecipe(recipeId, 'may:').concat(webKeysForRecipe(recipeId, 'menu:'));
+  const lk = sellKey(recipeId, size);
+  const keys = webKeysForRecipe(lk, 'may:').concat(webKeysForRecipe(lk, 'menu:')).map(function(k){ return k.split('~')[0]; });
   for(let i=0;i<keys.length;i++){
     if(Object.prototype.hasOwnProperty.call(precios, keys[i]) && precios[keys[i]]!=null) return { price: precios[keys[i]], src:'lista' };
   }
-  const normal = unitPriceForRecipe(recipeId);
+  const normal = unitPriceForRecipe(recipeId, size);
   if(normal==null) return { price:null, src:null };
   return { price: Math.max(0, Math.round(normal*(1-mayoristaPct()/100)/100)*100), src:'pct' };
 }
-function priceForOrderRecipe(recipeId, mayorista){ return mayorista ? wholesaleInfo(recipeId).price : unitPriceForRecipe(recipeId); }
+function priceForOrderRecipe(recipeId, mayorista, size){ return mayorista ? wholesaleInfo(recipeId, size).price : unitPriceForRecipe(recipeId, size); }
 function clientIsMayorista(c){ return !!(c && (c.tags||[]).some(function(t){ return String(t).trim().toLowerCase()==='mayorista'; })); }
 function orderIsMayorista(o){ return !!o && (o.mayorista!=null ? !!o.mayorista : !!(o.web && o.web.origen==='mayorista')); }
 // Texto debajo del total en modo Mayorista.
 function mayoristaNote(items){
-  const srcs = (items||[]).filter(function(it){ return it.recipeId; }).map(function(it){ return wholesaleInfo(it.recipeId).src; });
+  const srcs = (items||[]).filter(function(it){ return it.recipeId; }).map(function(it){ return wholesaleInfo(it.recipeId, it.size).src; });
   const fecha = kobuMayLista && kobuMayLista.fecha ? parseDateLoose(kobuMayLista.fecha) : null;
   const vig = fecha ? ' (vigente al '+fecha.toLocaleDateString('es-AR')+')' : '';
   if(!kobuMayLista) return 'Precios con −'+mayoristaPct()+'% (todavía no se pudo leer la lista mayorista)';
   if(srcs.length && srcs.every(function(x){ return x==='pct'; })) return 'Precios con −'+mayoristaPct()+'% (no están en la lista mayorista)';
   return 'Precios de la lista mayorista'+vig+(srcs.some(function(x){ return x==='pct'; }) ? ' · algunos con −'+mayoristaPct()+'%' : '');
 }
-function unitPriceForRecipe(recipeId){
+function unitPriceForRecipe(recipeId, size){
   const r = DATA.recipes.find(function(x){ return x.id===recipeId; });
   if(!r) return null;
+  if(isSecSize(r, size)) return secPrecio(r);
   if(recipeSellsByPack(r)) return r.packPrice;
   return r.salePrice!=null ? r.salePrice : null;
 }
@@ -10060,13 +10274,13 @@ function adjustPortionStockForOrder(order, direction){
     const r = DATA.recipes.find(function(x){ return x.id===it.recipeId; });
     if(!r) return;
     const rawQty = parseFloat(it.qty)||0;
-    const qty = recipeSellsByPack(r) ? rawQty*r.packSize : rawQty;
+    const qty = (recipeSellsByPack(r) && !isSecSize(r, it.size)) ? rawQty*r.packSize : rawQty;
     if(direction<0){
-      it.shortfall = roundQty(Math.max(0, qty - recipeStockOf(r)));
+      it.shortfall = roundQty(Math.max(0, qty - recipeStockOf(r, it.size)));
     } else {
       it.shortfall = 0;
     }
-    addRecipeStock(r, direction*qty);
+    addRecipeStock(r, direction*qty, it.size);
   });
 }
 function orderHasShortfall(o){
@@ -10121,13 +10335,16 @@ function recipeIngredientStockGaps(r, scale){
     return m;
   });
 }
-function registrarHorneada(recipeId, porciones){
+// opts.salida = {c, x} (chicos y XL de cada tanda) y opts.tandas: recetas con dos tamaños.
+function registrarHorneada(recipeId, porciones, opts){
   const r = DATA.recipes.find(function(x){ return x.id===recipeId; });
-  if(!r || !porciones || porciones<=0) return;
+  const sal = (opts && opts.salida && recipeHas2(r)) ? opts.salida : null;
+  const tandas = sal ? (Number(opts.tandas)||0) : 0;
+  if(!r || (sal ? !(tandas>0) : (!porciones || porciones<=0))) return;
   const willDeduct = DATA.settings.discountStockOnSale!==false;
   if(willDeduct){
     const yieldQty = r.yieldQty || 1;
-    const scale = porciones / yieldQty;
+    const scale = sal ? tandas : porciones / yieldQty;
     flatRecipeIngredients(r).forEach(function(ing){
       if(!ing.priceId) return;
       const perUnitQty = parseFloat(ing.qty);
@@ -10138,6 +10355,12 @@ function registrarHorneada(recipeId, porciones){
       resolved.cat.stock = roundQty(Math.max(0, (resolved.cat.stock||0) - resolved.qty));
     });
   }
+  if(sal){
+    const xlBase = baseTam(r)==='xl';
+    r.stock = roundQty((r.stock||0) + (xlBase ? sal.x : sal.c)*tandas);
+    r.stock2 = roundQty((Number(r.stock2)||0) + (xlBase ? sal.c : sal.x)*tandas);
+    return;
+  }
   r.stock = roundQty((r.stock||0) + porciones);
 }
 let bakeModalRecipeId = null;
@@ -10146,8 +10369,9 @@ function openBakeModal(id){
   if(!r) return;
   if(isCombo(r)){ showToast('Las cajas no se hornean: horneá lo que llevan'); return; }
   bakeModalRecipeId = id;
+  bakeSalIdx = 0;
   document.getElementById('bakeModalMsg').textContent = r.title;
-  document.getElementById('bakeModalStockVal').textContent = r.stock||0;
+  document.getElementById('bakeModalStockVal').textContent = recipeStockText(r);
   const input = document.getElementById('bakeModalInput');
   let neededTandas = null;
   if(state._bakeFromOrderId){
@@ -10176,9 +10400,25 @@ function openBakeModal(id){
     input.step = 'any';
     input.value = '';
   }
+  renderBakeSalidas();
   document.getElementById('bakeModal').classList.add('active');
   bakeModalCheckStock();
 }
+let bakeSalIdx = 0;
+function renderBakeSalidas(){
+  const r = DATA.recipes.find(function(x){ return x.id===bakeModalRecipeId; });
+  const wrap = document.getElementById('bakeModalSalWrap');
+  const sals = recipeSalidas(r);
+  if(!recipeHas2(r) || !sals.length){ wrap.style.display = 'none'; return; }
+  wrap.style.display = '';
+  if(bakeSalIdx>=sals.length) bakeSalIdx = 0;
+  document.getElementById('bakeModalSals').innerHTML = sals.map(function(x, i){
+    return '<button type="button" class="bk-sal'+(i===bakeSalIdx?' on':'')+'" onclick="setBakeSalida('+i+')">'+escapeHtml(salidaLabel(x))+'</button>';
+  }).join('');
+  const yr = document.getElementById('bakeModalYieldVal');
+  if(yr) yr.textContent = salidaLabel(sals[bakeSalIdx]);
+}
+function setBakeSalida(i){ bakeSalIdx = i; renderBakeSalidas(); }
 function closeBakeModal(){
   document.getElementById('bakeModal').classList.remove('active');
   bakeModalRecipeId = null;
@@ -10235,10 +10475,12 @@ function confirmBakeModal(){
   }
   const porciones = r.yieldQty ? roundQty(val*r.yieldQty) : val;
   const fromCook = state._bakeFromCook;
-  registrarHorneada(r.id, porciones);
+  const sals = recipeSalidas(r);
+  if(recipeHas2(r) && sals.length) registrarHorneada(r.id, null, { salida: sals[Math.min(bakeSalIdx, sals.length-1)], tandas: val });
+  else registrarHorneada(r.id, porciones);
   saveData(DATA);
   closeBakeModal();
-  showToast('Horneada registrada — stock actual: '+(r.stock||0));
+  showToast('Horneada registrada — stock actual: '+recipeStockText(r));
   reconcileRecipeOrderShortfalls(r.id);
   renderRecipes();
   if(document.getElementById('screen-quicksell')) renderQuickSellScreen();
@@ -10260,7 +10502,7 @@ function finishCookAndBake(e){
 function recipeStockShortfall(it){
   if(!it || !it.recipeId) return null;
   const r = DATA.recipes.find(function(x){ return x.id===it.recipeId; });
-  if(!r || isCombo(r)) return null;
+  if(!r || isCombo(r) || isSecSize(r, it.size)) return null;
   const rawQty = parseFloat(it.qty)||0;
   const qty = recipeSellsByPack(r) ? rawQty*r.packSize : rawQty;
   const stock = r.stock||0;
@@ -11003,10 +11245,10 @@ function reconcileRecipeOrderShortfalls(recipeId){
   DATA.orders.forEach(function(o){
     (o.items||[]).forEach(function(it){
       if(it.recipeId!==recipeId || !(it.shortfall>0)) return;
-      const avail = r.stock||0;
+      const avail = recipeStockOf(r, it.size);
       const cover = Math.min(avail, it.shortfall);
       if(cover>0){
-        r.stock = roundQty(avail-cover);
+        addRecipeStock(r, -cover, it.size);
         it.shortfall = roundQty(it.shortfall-cover);
       }
     });
@@ -11139,11 +11381,10 @@ function renderOrderItemRows(){
   const wrap = document.getElementById('of-items');
   const recipes = recipesSorted();
   wrap.innerHTML = state.orderDraft.items.map(function(it,i){
-    const opts = '<option value="">elegí una receta...</option>' +
-      recipes.map(function(r){ return '<option value="'+r.id+'" '+(it.recipeId===r.id?'selected':'')+'>'+escapeHtml(r.title)+(recipeSellsByPack(r)?' (paquete)':'')+'</option>'; }).join('');
+    const opts = '<option value="">elegí una receta...</option>' + sellOptionsHtml(sellKey(it.recipeId, it.size));
     const hasCustom = it.customPrice!=null;
     const priceOpen = hasCustom || it._priceOpen;
-    const catalogPrice = it.recipeId ? priceForOrderRecipe(it.recipeId, state.orderDraft.mayorista) : null;
+    const catalogPrice = it.recipeId ? priceForOrderRecipe(it.recipeId, state.orderDraft.mayorista, it.size) : null;
     const priceRow = priceOpen ? ('<div class="btn-row" style="padding-left:2px;">'+
       '<input class="input" style="flex:1;" type="number" min="0" placeholder="precio especial'+(catalogPrice!=null?' (catálogo '+fmtMoney(catalogPrice)+')':'')+'" value="'+(hasCustom?it.customPrice:'')+'" oninput="updateOrderItemPrice('+i+',this.value)">'+
       '<input class="input" style="flex:1;" type="text" placeholder="motivo (opcional)" value="'+escapeHtml(it.priceNote||'')+'" oninput="updateOrderItemPriceNote('+i+',this.value)">'+
@@ -11163,6 +11404,13 @@ function ofSetMayorista(on){ state.orderDraft.mayorista = !!on; state.orderDraft
 function addOrderItemRow(){ state.orderDraft.items.push({recipeId:'', qty:1, customPrice:null, priceNote:''}); renderOrderItemRows(); }
 function removeOrderItemRow(i){ state.orderDraft.items.splice(i,1); renderOrderItemRows(); }
 function updateOrderItem(i, field, val){
+  if(field==='recipeId'){
+    const sk = parseSellKey(val);
+    state.orderDraft.items[i].recipeId = sk.recipeId;
+    if(sk.size) state.orderDraft.items[i].size = sk.size; else delete state.orderDraft.items[i].size;
+    renderOrderItemRows();
+    return;
+  }
   state.orderDraft.items[i][field] = val;
   updateOrderTotalPreview();
   const spEl = document.getElementById('sp-'+i);
@@ -11197,7 +11445,7 @@ function updateOrderItemPriceNote(i, val){
 function updateOrderTotalPreview(){
   let total = 0, anyMissing = false;
   (state.orderDraft.items||[]).forEach(function(it){
-    const price = it.customPrice!=null ? it.customPrice : (it.recipeId ? priceForOrderRecipe(it.recipeId, state.orderDraft.mayorista) : null);
+    const price = it.customPrice!=null ? it.customPrice : (it.recipeId ? priceForOrderRecipe(it.recipeId, state.orderDraft.mayorista, it.size) : null);
     const qty = parseFloat(it.qty)||0;
     if(it.recipeId && price==null) anyMissing = true;
     else total += (price||0)*qty;
@@ -11232,9 +11480,10 @@ function saveOrder(){
   if(items.length===0){ showToast('Agregá al menos un item'); return; }
   const snapItems = items.map(function(it){
     const r = DATA.recipes.find(function(x){ return x.id===it.recipeId; });
-    const catalogPrice = priceForOrderRecipe(it.recipeId, state.orderDraft.mayorista);
+    const catalogPrice = priceForOrderRecipe(it.recipeId, state.orderDraft.mayorista, it.size);
     const unitPrice = it.customPrice!=null ? it.customPrice : catalogPrice;
-    const out = { recipeId:it.recipeId, recipeName: r?r.title:'(receta borrada)', qty:parseFloat(it.qty), unitPrice: unitPrice };
+    const out = { recipeId:it.recipeId, recipeName: r?sizeTitle(r, it.size):'(receta borrada)', qty:parseFloat(it.qty), unitPrice: unitPrice };
+    if(isSecSize(r, it.size)) out.size = it.size;
     if(it.customPrice!=null){
       out.customPrice = true;
       out.catalogPrice = catalogPrice;
@@ -11425,9 +11674,9 @@ function npRenderItems(){
   const may = !!state.newOrderDraft.mayorista;
   wrap.innerHTML = state.newOrderDraft.items.map(function(it,i){
     const r = DATA.recipes.find(function(x){ return x.id===it.recipeId; });
-    const name = r ? r.title : '(receta borrada)';
-    const packSuffix = recipeSellsByPack(r) ? ' paquete'+((it.qty||1)==1?'':'s') : '';
-    const pr = it.recipeId ? priceForOrderRecipe(it.recipeId, may) : null;
+    const name = r ? sizeTitle(r, it.size) : '(receta borrada)';
+    const packSuffix = (recipeSellsByPack(r) && !isSecSize(r, it.size)) ? ' paquete'+((it.qty||1)==1?'':'s') : '';
+    const pr = it.recipeId ? priceForOrderRecipe(it.recipeId, may, it.size) : null;
     return '<div class="no-item-row">'+
       '<span class="no-item-name">'+escapeHtml(name)+'</span>'+
       (pr!=null ? '<span class="no-item-price">'+fmtMoney(pr)+' c/u</span>' : '')+
@@ -11440,7 +11689,7 @@ function npRenderItems(){
 }
 function npStartAdd(){
   const recipes = recipesSorted();
-  const opts = '<option value="">elegí un producto...</option>'+recipes.map(function(r){ return '<option value="'+r.id+'">'+escapeHtml(r.title)+(recipeSellsByPack(r)?' (paquete)':'')+'</option>'; }).join('');
+  const opts = '<option value="">elegí un producto...</option>'+sellOptionsHtml('');
   document.getElementById('no-addform').innerHTML =
     '<div class="btn-row" style="margin-top:6px;">'+
       '<select class="input" id="no-newrecipe" style="flex:1;min-width:0;">'+opts+'</select>'+
@@ -11450,10 +11699,13 @@ function npStartAdd(){
   mountIcons();
 }
 function npConfirmAdd(){
-  const recipeId = document.getElementById('no-newrecipe').value;
+  const sk = parseSellKey(document.getElementById('no-newrecipe').value);
+  const recipeId = sk.recipeId;
   const qty = parseFloat(document.getElementById('no-newqty').value)||1;
   if(!recipeId){ showToast('Elegí un producto'); return; }
-  state.newOrderDraft.items.push({ recipeId:recipeId, qty:qty });
+  const nit = { recipeId:recipeId, qty:qty };
+  if(sk.size) nit.size = sk.size;
+  state.newOrderDraft.items.push(nit);
   document.getElementById('no-addform').innerHTML = '';
   npRenderItems();
 }
@@ -11474,7 +11726,7 @@ function npRecalcTotal(){
   npRenderMode();
   let raw = 0;
   (state.newOrderDraft.items||[]).forEach(function(it){
-    const price = it.recipeId ? priceForOrderRecipe(it.recipeId, state.newOrderDraft.mayorista) : null;
+    const price = it.recipeId ? priceForOrderRecipe(it.recipeId, state.newOrderDraft.mayorista, it.size) : null;
     raw += (price||0)*(parseFloat(it.qty)||0);
   });
   const coupon = npAppliedPercentCoupon();
@@ -11520,8 +11772,10 @@ function saveNewOrder(){
   if(items.length===0){ showToast('Agregá al menos un producto'); return; }
   const snapItems = items.map(function(it){
     const r = DATA.recipes.find(function(x){ return x.id===it.recipeId; });
-    const unitPrice = priceForOrderRecipe(it.recipeId, state.newOrderDraft.mayorista);
-    return { recipeId:it.recipeId, recipeName: r?r.title:'(receta borrada)', qty:parseFloat(it.qty), unitPrice: unitPrice };
+    const unitPrice = priceForOrderRecipe(it.recipeId, state.newOrderDraft.mayorista, it.size);
+    const out = { recipeId:it.recipeId, recipeName: r?sizeTitle(r, it.size):'(receta borrada)', qty:parseFloat(it.qty), unitPrice: unitPrice };
+    if(isSecSize(r, it.size)) out.size = it.size;
+    return out;
   });
   const rawTotal = snapItems.reduce(function(s,it){ return s + (it.unitPrice||0)*it.qty; }, 0);
   const appliedCoupon = npAppliedPercentCoupon();
@@ -11611,11 +11865,39 @@ function webLinksMap(){
 }
 function webNorm(s){ return (s||'').toString().normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9ñ ]+/g,' ').replace(/\s+/g,' ').trim(); }
 function webPrefix(origen){ return origen==='mayorista' ? 'may:' : 'menu:'; }
-function webRecipeExists(id){ return !!id && DATA.recipes.some(function(r){ return r.id===id; }); }
-// Receta vinculada a un producto de la web (mayorista sin vínculo propio usa el del menú).
-function webLinkFor(origen, key){
+// El vínculo puede ser la receta ("id") o su otro tamaño ("id|xl" / "id|chico").
+function webRecipeExists(id){
+  if(!id) return false;
+  const k = parseSellKey(id);
+  const r = DATA.recipes.find(function(x){ return x.id===k.recipeId; });
+  return !!r && (!k.size || isSecSize(r, k.size));
+}
+function webLinkRecipe(v){
+  const k = parseSellKey(v);
+  const r = DATA.recipes.find(function(x){ return x.id===k.recipeId; });
+  if(!r) return null;
+  const size = isSecSize(r, k.size) ? k.size : '';
+  return { r:r, size:size, title:sizeTitle(r, size) };
+}
+// Opción elegida en la web ("Sabor: Vainilla") → clave propia: "menu:budin-xl~sabor-vainilla".
+function webOptKey(key, detalle){ const sl = webNorm(detalle).replace(/ /g, '-').slice(0, 60); return sl ? key+'~'+sl : key; }
+function webItemOptKey(it){ return (it && it.detalle && String(it.key).indexOf('.')===-1) ? webOptKey(it.key, it.detalle) : ''; }
+// Todos los productos que se pueden vincular: cada receta y, si tiene dos tamaños, también el otro.
+function webSellKeysAll(){
+  const out = [];
+  DATA.recipes.slice().sort(function(a,b){ return (a.title||'').localeCompare(b.title||'', 'es'); }).forEach(function(r){
+    out.push(r.id);
+    if(recipeHas2(r)) out.push(r.id+'|'+secTam(r));
+  });
+  return out;
+}
+// Receta vinculada a un producto de la web (primero la de la opción elegida; mayorista sin vínculo propio usa el del menú).
+function webLinkFor(origen, key, detalle){
   const L = webLinksMap();
-  const cands = [webPrefix(origen)+key];
+  const cands = [];
+  const ok = webItemOptKey({ key:key, detalle:detalle });
+  if(ok){ cands.push(webPrefix(origen)+ok); if(origen==='mayorista') cands.push('menu:'+ok); }
+  cands.push(webPrefix(origen)+key);
   if(origen==='mayorista') cands.push('menu:'+key);
   for(let i=0;i<cands.length;i++){ if(webRecipeExists(L[cands[i]])) return L[cands[i]]; }
   return null;
@@ -11806,7 +12088,7 @@ function openWebReview(id){
   webInbox.sel = {
     client: matches.length ? matches[0].id : 'nuevo',
     fecha: p.fecha || '',
-    recipes: p.items.map(function(it){ return webLinkFor(p.origen, it.key) || ''; }),
+    recipes: p.items.map(function(it){ return webLinkFor(p.origen, it.key, it.detalle) || ''; }),
     cambiar: p.items.map(function(){ return false; })
   };
   webModal('webReviewModal').classList.add('active');
@@ -11820,9 +12102,12 @@ function webClientMatches(p){
 }
 function webNewClientName(p){ return webQuien(p)==='Sin nombre' ? 'Cliente web '+p.numero : webQuien(p); }
 function webRecipeOptions(sel, it){
-  const sug = webRecipeSuggestions(it.nombre, it.detalle);
-  const all = DATA.recipes.slice().sort(function(a,b){ return (a.title||'').localeCompare(b.title||'', 'es'); });
-  const opt = function(r){ return '<option value="'+r.id+'"'+(r.id===sel?' selected':'')+'>'+escapeHtml(r.title||'(sin nombre)')+'</option>'; };
+  // "Budín XL · Sabor: Vainilla" sugiere el XL de la receta de vainilla.
+  const txt = webNorm((it.nombre||'')+' '+(it.detalle||''));
+  const quiere = /\bxl\b/.test(txt) ? 'xl' : (/\bchic[oa]s?\b/.test(txt) ? 'chico' : '');
+  const sug = webRecipeSuggestions(it.nombre, it.detalle).map(function(r){ return sellKey(r.id, (quiere && recipeHas2(r) && secTam(r)===quiere) ? quiere : ''); });
+  const all = webSellKeysAll();
+  const opt = function(k){ const x = webLinkRecipe(k); return x ? '<option value="'+escapeHtml(k)+'"'+(k===sel?' selected':'')+'>'+escapeHtml(x.title||'(sin nombre)')+'</option>' : ''; };
   return '<option value="">Elegí la receta…</option>'+
     (sug.length ? '<optgroup label="Sugeridas">'+sug.map(opt).join('')+'</optgroup><optgroup label="Todas">' : '')+
     all.filter(function(r){ return sug.indexOf(r)===-1 || !sug.length; }).map(opt).join('')+(sug.length ? '</optgroup>' : '');
@@ -11843,7 +12128,8 @@ function renderWebReview(){
   const chip = s.client==='nuevo' ? '<span class="wb-chip new">CLIENTE NUEVO</span>' : '<span class="wb-chip ok">YA ESTÁ EN CLIENTES</span>';
   const lines = p.items.map(function(it, i){
     const rid = s.recipes[i];
-    const r = rid ? DATA.recipes.find(function(x){ return x.id===rid; }) : null;
+    const lr = rid ? webLinkRecipe(rid) : null;
+    const r = lr ? { title: lr.title } : null;
     const price = it.precio==null ? '<span style="color:var(--k-warning);">a consultar</span>' : fmtMoney(it.precio*it.qty);
     let link;
     if(r && !s.cambiar[i]){
@@ -11909,15 +12195,20 @@ function createOrderFromWeb(p, s, orderId){
     if(!client.tags.some(function(t){ return webNorm(t)==='mayorista'; })) client.tags.push('Mayorista');
   }
   const L = webLinksMap();
-  p.items.forEach(function(it, i){ if(s.recipes[i] && webLinkFor(p.origen, it.key)!==s.recipes[i]) L[webPrefix(p.origen)+it.key] = s.recipes[i]; });
+  // Un producto con opciones (Budín XL → sabor) se recuerda por opción: cada sabor es otra receta.
+  p.items.forEach(function(it, i){
+    if(!s.recipes[i] || webLinkFor(p.origen, it.key, it.detalle)===s.recipes[i]) return;
+    L[webPrefix(p.origen)+(webItemOptKey(it) || it.key)] = s.recipes[i];
+  });
   const items = p.items.map(function(it, i){
-    const r = DATA.recipes.find(function(x){ return x.id===s.recipes[i]; });
-    const out = { recipeId:r.id, recipeName:r.title, qty:it.qty, unitPrice: it.precio==null ? 0 : it.precio };
+    const lr = webLinkRecipe(s.recipes[i]);
+    const out = { recipeId:lr.r.id, recipeName:lr.title, qty:it.qty, unitPrice: it.precio==null ? 0 : it.precio };
+    if(lr.size) out.size = lr.size;
     if(it.detalle) out.detail = it.detalle;
     return out;
   });
   const willDeductPortions = DATA.settings.discountStockOnSale!==false;
-  if(willDeductPortions) resolveOrderBakeChoices(items.map(function(it){ return { recipeId:it.recipeId, qty:it.qty }; }));
+  if(willDeductPortions) resolveOrderBakeChoices(items.map(function(it){ return { recipeId:it.recipeId, qty:it.qty, size:it.size }; }));
   // Envío mayorista (lo calcula el script con la lista publicada: $3.000 en pedidos de menos de $45.000).
   const envio = may && isFinite(p.envio) && p.envio>0 && p.envio<=100000 ? Number(p.envio) : 0;
   const order = {
@@ -11967,22 +12258,36 @@ function renderWebLinks(){
   const m = webModal('webLinksModal');
   const prods = webInbox.productos || [];
   const L = webLinksMap();
-  const recipes = DATA.recipes.slice().sort(function(a,b){ return (a.title||'').localeCompare(b.title||'', 'es'); });
+  const keysAll = webSellKeysAll();
+  const optsFor = function(own){ return keysAll.map(function(k){ const x = webLinkRecipe(k); return x ? '<option value="'+escapeHtml(k)+'"'+(k===own?' selected':'')+'>'+escapeHtml(x.title||'(sin nombre)')+'</option>' : ''; }).join(''); };
+  const titleOf = function(k){ const x = webRecipeExists(L[k]) ? webLinkRecipe(L[k]) : null; return x ? x.title : ''; };
   let sin = 0, body = '';
+  const row = function(k, label, inh, sub){
+    const own = webRecipeExists(L[k]) ? L[k] : '';
+    if(!own && !inh) sin++;
+    return '<div class="wb-line'+(sub ? ' wb-opt' : '')+'"><div class="t"><span>'+label+'</span></div>'+
+      '<select class="wb-sel'+(own||inh?' ok':'')+'" data-k="'+escapeHtml(k)+'" onchange="setWebLink(this.dataset.k, this.value)"><option value="">'+(inh ? escapeHtml(inh) : 'Sin vincular')+'</option>'+optsFor(own)+'</select></div>';
+  };
   ['menu','mayorista'].forEach(function(origen){
     const list = prods.filter(function(x){ return x.origen===origen; });
     if(!list.length) return;
     body += '<div class="wb-sec">'+(origen==='menu' ? 'Menú' : 'Mayorista')+'</div>';
     body += list.map(function(x){
       const k = x.key;
-      const own = webRecipeExists(L[k]) ? L[k] : '';
       const base = k.replace(/^may:/, 'menu:');
-      const inherited = origen==='mayorista' && !own && webRecipeExists(L[base]) ? DATA.recipes.find(function(r){ return r.id===L[base]; }) : null;
-      if(!own && !inherited) sin++;
-      const first = inherited ? 'Igual que en el menú ('+escapeHtml(inherited.title)+')' : 'Sin vincular';
-      const opts = '<option value="">'+first+'</option>'+recipes.map(function(r){ return '<option value="'+r.id+'"'+(r.id===own?' selected':'')+'>'+escapeHtml(r.title||'(sin nombre)')+'</option>'; }).join('');
-      return '<div class="wb-line"><div class="t"><span>'+escapeHtml(x.nombre)+(x.detalle ? ' · '+escapeHtml(x.detalle) : '')+'</span></div>'+
-        '<select class="wb-sel'+(own||inherited?' ok':'')+'" data-k="'+escapeHtml(k)+'" onchange="setWebLink(this.dataset.k, this.value)">'+opts+'</select></div>';
+      const inhT = origen==='mayorista' ? titleOf(base) : '';
+      let h = row(k, escapeHtml(x.nombre)+(x.detalle ? ' · '+escapeHtml(x.detalle) : ''), inhT ? 'Igual que en el menú ('+inhT+')' : '', false);
+      // Opciones (por ejemplo los sabores del Budín XL): cada una puede ir a otra receta.
+      const ops = (Array.isArray(x.opciones) ? x.opciones : []).filter(function(o){ return typeof o==='string' && o.trim(); }).slice(0, 30);
+      const vistos = {};
+      ops.forEach(function(o){ vistos[webOptKey(k, o)] = o; });
+      Object.keys(L).forEach(function(lk){ if(lk.indexOf(k+'~')===0 && !vistos[lk]) vistos[lk] = capitalizeFirst(lk.slice(k.length+1).replace(/-/g, ' ')); });
+      const ok = Object.keys(vistos);
+      if(ok.length){
+        const padre = titleOf(k) || inhT;
+        h += ok.map(function(ck){ return row(ck, escapeHtml(vistos[ck]), padre ? 'Igual que '+x.nombre+' ('+padre+')' : '', true); }).join('');
+      }
+      return h;
     }).join('');
   });
   let sub;
@@ -12011,7 +12316,7 @@ function webCarryItemInfo(o, snapItems){
   const old = (o.items||[]).slice();
   let changed = false;
   snapItems.forEach(function(sn){
-    const k = old.findIndex(function(x){ return x.recipeId===sn.recipeId && (x.detail || o.web); });
+    const k = old.findIndex(function(x){ return x.recipeId===sn.recipeId && (x.size||'')===(sn.size||'') && (x.detail || o.web); });
     if(k===-1) return;
     if(old[k].detail) sn.detail = old[k].detail;
     if(o.web && !sn.customPrice && old[k].unitPrice!=null && old[k].unitPrice!==sn.unitPrice){ sn.unitPrice = old[k].unitPrice; changed = true; }
@@ -12445,7 +12750,7 @@ function openRecipeStockSummaryModal(baseId){
     return '<div class="ut-row" style="cursor:pointer;" onclick="closeRecipeStockSummaryModal();openRecipeStockCorrectModal(\''+r.id+'\')">'+
       (icon ? '<span class="ut-ic"><span class="icon-slot" data-icon="'+icon+'"></span></span>' : '<span class="ut-ic"><span class="icon-slot" data-icon="cookie"></span></span>')+
       '<div class="ut-info"><p class="nm">'+escapeHtml(icon ? r.variantLabel : 'Original')+'</p></div>'+
-      '<span style="font-weight:600;color:var(--k-text);">'+(r.stock||0)+'</span>'+
+      '<span style="font-weight:600;color:var(--k-text);">'+(recipeHas2(r) ? escapeHtml(recipeStockText(r)) : (r.stock||0))+'</span>'+
       '</div>';
   };
   document.getElementById('rss-list').innerHTML = rowHtml(base, null) + variants.map(function(v){ return rowHtml(v, dietVariantIcon(v.variantType)); }).join('');
@@ -12463,6 +12768,8 @@ function openRecipeStockCorrectModal(id){
   recipeStockCorrectId = id;
   document.getElementById('rsc-name').textContent = '— '+r.title+' · stock —';
   document.getElementById('rsc-qty').value = fmtQty(roundQty(r.stock||0));
+  const xr = document.getElementById('rsc-xlrow');
+  if(xr){ xr.style.display = recipeHas2(r) ? '' : 'none'; document.getElementById('rsc-xllabel').textContent = (secTam(r)==='xl' ? 'XL' : 'Chicos')+' disponibles'; document.getElementById('rsc-xl').value = fmtQty(roundQty(Number(r.stock2)||0)); }
   document.getElementById('recipeStockCorrectModal').classList.add('active');
   setTimeout(function(){ const el=document.getElementById('rsc-qty'); if(el){ el.focus(); el.select(); } }, 30);
 }
@@ -12476,6 +12783,10 @@ function saveRecipeStockCorrect(){
   const val = parseFloat((document.getElementById('rsc-qty').value||'').toString().replace(',','.'));
   if(isNaN(val) || val<0){ showToast('Poné una cantidad válida'); return; }
   r.stock = roundQty(val);
+  if(recipeHas2(r)){
+    const vx = parseFloat((document.getElementById('rsc-xl').value||'').toString().replace(',','.'));
+    if(!isNaN(vx) && vx>=0) r.stock2 = roundQty(vx);
+  }
   saveData(DATA);
   closeRecipeStockCorrectModal();
   reconcileRecipeOrderShortfalls(r.id);
@@ -12577,9 +12888,16 @@ function adjustReadyStock(id, delta){
   saveData(DATA);
   renderQuickSellScreen();
 }
-function selectQuickSellRecipe(id){
+function selectQuickSellRecipe(id, size){
   const r = DATA.recipes.find(function(x){ return x.id===id; });
   if(!r) return;
+  if(isSecSize(r, size)){
+    if(recipeStockOf(r, size)<=0){ showToast('No queda stock de '+sizeTitle(r, size)); return; }
+    if(!secPrecio(r)){ showToast(sizeTitle(r, size)+' no tiene precio cargado — poneselo en la receta'); return; }
+    state.quickSale = { recipeId:id, size:size, qty:1, payMethod:'efectivo', mode:'unit' };
+    renderQuickSellScreen();
+    return;
+  }
   if(recipeStockOf(r)<=0){ showToast(isCombo(r) ? ('No alcanza para armar '+r.title) : ('No queda stock de '+r.title)); return; }
   if(!r.salePrice && !(r.packSize>0 && r.packPrice>0)){ showToast(r.title+' no tiene precio cargado — poneselo en la receta antes de vender'); return; }
   const packMode = recipeSellsByPack(r);
@@ -12591,7 +12909,7 @@ function changeQuickSaleQty(delta){
   if(!state.quickSale) return;
   const r = DATA.recipes.find(function(x){ return x.id===state.quickSale.recipeId; });
   const mode = state.quickSale.mode||'unit';
-  let max = r ? recipeStockOf(r) : 999999;
+  let max = r ? recipeStockOf(r, state.quickSale.size) : 999999;
   if(mode==='pack' && r && r.packSize>0) max = Math.floor((r.stock||0)/r.packSize);
   if(max<1) max = 1;
   state.quickSale.qty = Math.max(1, Math.min(max, (state.quickSale.qty||1) + delta));
@@ -12608,33 +12926,35 @@ function registerQuickSale(){
   const r = DATA.recipes.find(function(x){ return x.id===qs.recipeId; });
   if(!r) return;
   const c = computeRecipeCost(r);
-  const mode = qs.mode==='pack' && r.packSize>0 && r.packPrice>0 ? 'pack' : 'unit';
+  const xl = isSecSize(r, qs.size);
+  const mode = !xl && qs.mode==='pack' && r.packSize>0 && r.packPrice>0 ? 'pack' : 'unit';
   const unitsPerSale = mode==='pack' ? r.packSize : 1;
   const totalUnits = qs.qty * unitsPerSale;
-  const unitPrice = mode==='pack' ? r.packPrice : (r.salePrice || 0);
+  const unitPrice = xl ? (secPrecio(r) || 0) : (mode==='pack' ? r.packPrice : (r.salePrice || 0));
   const willDeduct = DATA.settings.discountStockOnSale!==false;
   const entry = {
     id: 'qs-'+Date.now()+'-'+Math.random().toString(36).slice(2,7),
     recipeId: r.id,
-    recipeName: r.title,
+    recipeName: sizeTitle(r, xl ? qs.size : ''),
     qty: qs.qty,
     mode: mode,
     unitsDeducted: totalUnits,
     unitPrice: unitPrice,
-    unitCost: (c.costPerUnit || 0) * unitsPerSale,
+    unitCost: (c.costPerUnit || 0) * (xl ? secEq(r) : unitsPerSale),
     payMethod: qs.payMethod,
     ts: new Date().toISOString(),
     stockDeducted: willDeduct
   };
+  if(xl) entry.size = qs.size;
   DATA.quickSales.push(entry);
   if(willDeduct){
-    addRecipeStock(r, -totalUnits);
+    addRecipeStock(r, -totalUnits, entry.size);
   }
   state.quickSale = null;
   saveData(DATA);
-  const quedan = recipeStockOf(r);
-  if(quedan<=0) showToast('Venta registrada — sin stock de '+r.title);
-  else if(quedan<=2) showToast('Venta registrada — quedan '+quedan+' de '+r.title);
+  const quedan = recipeStockOf(r, entry.size);
+  if(quedan<=0) showToast('Venta registrada — sin stock de '+sizeTitle(r, entry.size));
+  else if(quedan<=2) showToast('Venta registrada — quedan '+quedan+' de '+sizeTitle(r, entry.size));
   else showToast('Venta registrada');
   renderQuickSellScreen();
 }
@@ -12645,7 +12965,7 @@ async function undoLastQuickSale(){
   const last = DATA.quickSales.pop();
   if(last.stockDeducted!==false){
     const r = DATA.recipes.find(function(x){ return x.id===last.recipeId; });
-    if(r) addRecipeStock(r, (last.unitsDeducted!=null ? last.unitsDeducted : last.qty));
+    if(r) addRecipeStock(r, (last.unitsDeducted!=null ? last.unitsDeducted : last.qty), last.size);
   }
   saveData(DATA);
   showToast('Venta deshecha');
@@ -12686,16 +13006,19 @@ function renderQuickSellScreen(){
     emptyMsg.style.display = '';
   } else {
     emptyMsg.style.display = 'none';
-    gridWrap.innerHTML = ready.map(function(r){
-      const stock = recipeStockOf(r);
-      const active = state.quickSale && state.quickSale.recipeId===r.id;
+    const tiles = [];
+    ready.forEach(function(r){ tiles.push({ r:r, size:'' }); if(recipeHas2(r)) tiles.push({ r:r, size:secTam(r) }); });
+    gridWrap.innerHTML = tiles.map(function(tl){
+      const r = tl.r, xl = !!tl.size;
+      const stock = recipeStockOf(r, tl.size);
+      const active = state.quickSale && state.quickSale.recipeId===r.id && (state.quickSale.size||'')===tl.size;
       const color = stockColor(stock);
       const pct = Math.max(stock>0?6:0, Math.min(100, stock*10));
-      const tilePrice = recipeSellsByPack(r) ? r.packPrice : r.salePrice;
-      const priceLabel = tilePrice ? (fmtMoney(tilePrice)+(recipeSellsByPack(r)?'/paquete':'')) : 'sin precio';
+      const tilePrice = xl ? secPrecio(r) : (recipeSellsByPack(r) ? r.packPrice : r.salePrice);
+      const priceLabel = tilePrice ? (fmtMoney(tilePrice)+(!xl && recipeSellsByPack(r)?'/paquete':'')) : 'sin precio';
       const priceStyle = tilePrice ? '' : 'color:var(--k-danger);';
-      return '<div class="qs-tile '+(active?'active':'')+(stock<=0?' out':'')+'" onclick="selectQuickSellRecipe(\''+r.id+'\')">'+
-        '<p class="qs-tile-name">'+escapeHtml(r.title)+'</p>'+
+      return '<div class="qs-tile '+(active?'active':'')+(stock<=0?' out':'')+'" onclick="selectQuickSellRecipe(\''+r.id+'\''+(xl?',\''+tl.size+'\'':'')+')">'+
+        '<p class="qs-tile-name">'+escapeHtml(r.title)+(xl ? '<span class="xl-pill">'+tamNombre(tl.size)+'</span>' : '')+'</p>'+
         '<p class="qs-tile-price" style="'+priceStyle+'">'+priceLabel+'</p>'+
         '<div class="qs-tile-bar">'+
           '<div class="qs-tile-bar-fill" style="width:'+pct+'%;background:'+color+';"></div>'+
@@ -12711,12 +13034,12 @@ function renderQuickSellScreen(){
     const r = DATA.recipes.find(function(x){ return x.id===state.quickSale.recipeId; });
     if(r){
       formCard.style.display = '';
-      document.getElementById('qs-form-title').textContent = r.title;
+      document.getElementById('qs-form-title').textContent = sizeTitle(r, state.quickSale.size);
       document.getElementById('qs-qty-value').textContent = state.quickSale.qty;
       const mode = state.quickSale.mode||'unit';
       const modeRow = document.getElementById('qs-mode-row');
       const qtyLabel = document.getElementById('qs-qty-label');
-      const hasPack = mode==='pack' && recipeSellsByPack(r);
+      const hasPack = mode==='pack' && recipeSellsByPack(r) && !isSecSize(r, state.quickSale.size);
       modeRow.style.display = 'none';
       modeRow.innerHTML = '';
       if(hasPack){
@@ -12727,12 +13050,9 @@ function renderQuickSellScreen(){
       const pm = state.quickSale.payMethod;
       const efectivoOn = pm==='efectivo';
       document.getElementById('qs-paymethod-row').innerHTML =
-        '<div class="qs-pmswitch" style="background:'+(efectivoOn?'var(--k-success-bg)':'var(--k-info-bg)')+';" onclick="setQuickSalePayMethod(\''+(efectivoOn?'transferencia':'efectivo')+'\')">'+
-          '<div class="qs-pmswitch-thumb" style="left:'+(efectivoOn?'2px':'calc(50% + 0px)')+';"></div>'+
-          '<div class="qs-pmswitch-labels">'+
-            '<span style="color:'+(efectivoOn?'var(--k-success)':'var(--k-text)')+';"><span class="icon-slot" data-icon="cash"></span>Efectivo</span>'+
-            '<span style="color:'+(efectivoOn?'var(--k-text)':'var(--k-info)')+';"><span class="icon-slot" data-icon="credit-card"></span>Transf.</span>'+
-          '</div>'+
+        '<div class="qs-pm" role="radiogroup" aria-label="Medio de pago">'+
+          '<button type="button" role="radio" aria-checked="'+efectivoOn+'" class="ef'+(efectivoOn?' on':'')+'" onclick="setQuickSalePayMethod(\'efectivo\')"><span class="icon-slot" data-icon="cash"></span>Efectivo</button>'+
+          '<button type="button" role="radio" aria-checked="'+(!efectivoOn)+'" class="tr'+(efectivoOn?'':' on')+'" onclick="setQuickSalePayMethod(\'transferencia\')"><span class="icon-slot" data-icon="credit-card"></span>Transferencia</button>'+
         '</div>';
     } else { formCard.style.display = 'none'; }
   } else {
@@ -12775,8 +13095,19 @@ function refreshBotSales(force){
   return botSales.promesa;
 }
 function botValidHorneada(v){
-  return v && v.tipo==='horneada' && typeof v.id==='string' && /^hb-bot-[\d-]{10,40}$/.test(v.id) && typeof v.recipeId==='string' && Number.isInteger(v.porciones) && v.porciones>=1 && v.porciones<=2000;
+  if(!(v && v.tipo==='horneada' && typeof v.id==='string' && /^hb-bot-[\d-]{10,40}$/.test(v.id) && typeof v.recipeId==='string')) return false;
+  if(botSalida(v)) return true;
+  return Number.isInteger(v.porciones) && v.porciones>=1 && v.porciones<=2000;
 }
+// Horneada de una receta con dos tamaños: {salida:{c, x}, tandas}.
+function botSalida(v){
+  const sl = v && v.salida;
+  if(!sl || typeof sl!=='object') return null;
+  const c = Number(sl.c), x = Number(sl.x), t = Number(v.tandas);
+  if(!(Number.isInteger(c) && Number.isInteger(x) && c>=0 && x>=0 && c<=50 && x<=50 && c+x>=1 && Number.isInteger(t) && t>=1 && t<=100)) return null;
+  return { c:c, x:x, tandas:t };
+}
+function botSize(v){ return (v && (v.size==='xl' || v.size==='chico')) ? v.size : ''; }
 // Mermas desde el bot (/mermas brownie 2 rota): bajan el stock listo una sola vez.
 function botValidMerma(v){
   return v && v.tipo==='merma' && typeof v.id==='string' && /^mm-bot-[\d-]{10,40}$/.test(v.id) && typeof v.recipeId==='string' && Number.isInteger(v.porciones) && v.porciones>=1 && v.porciones<=500;
@@ -12843,7 +13174,7 @@ function applyBotSales(ventas){
     const q = DATA.quickSales[idx];
     if(q.stockDeducted!==false){
       const r = DATA.recipes.find(function(x){ return x.id===q.recipeId; });
-      if(r) addRecipeStock(r, (q.unitsDeducted!=null ? q.unitsDeducted : q.qty));
+      if(r) addRecipeStock(r, (q.unitsDeducted!=null ? q.unitsDeducted : q.qty), q.size);
     }
     DATA.quickSales.splice(idx, 1);
     deshechas++;
@@ -12858,7 +13189,9 @@ function applyBotSales(ventas){
     const r = DATA.recipes.find(function(x){ return x.id===v.recipeId; });
     if(!r) return;
     if(isCombo(r)){ DATA.botProcesadas.push(v.id); procesadas[v.id] = true; return; } // una caja no se hornea
-    registrarHorneada(r.id, v.porciones);
+    const sal = botSalida(v);
+    if(sal && recipeHas2(r)) registrarHorneada(r.id, null, { salida:{ c:sal.c, x:sal.x }, tandas:sal.tandas });
+    else if(Number.isInteger(v.porciones) && v.porciones>=1 && v.porciones<=5000) registrarHorneada(r.id, v.porciones);
     DATA.botProcesadas.push(v.id); procesadas[v.id] = true;
     horneadas++;
   });
@@ -12868,7 +13201,7 @@ function applyBotSales(ventas){
     const r = DATA.recipes.find(function(x){ return x.id===v.recipeId; });
     if(r && !isCombo(r)){
       const ts = (typeof v.ts==='string' && !isNaN(new Date(v.ts).getTime())) ? v.ts : new Date().toISOString();
-      if(registrarMerma(r.id, v.porciones, String(v.motivo||''), { id:v.id, ts:ts, origen:'bot' })) mermas++;
+      if(registrarMerma(r.id, v.porciones, String(v.motivo||''), { id:v.id, ts:ts, origen:'bot', size:botSize(v) })) mermas++;
     }
     DATA.botProcesadas.push(v.id); procesadas[v.id] = true;
   });
@@ -12901,17 +13234,20 @@ function applyBotSales(ventas){
 function addBotQuickSale(v, r, payMethod, willDeduct){
   if(DATA.quickSales.some(function(q){ return q.id===v.id; })) return false;
   const c = computeRecipeCost(r);
-  const pack = v.mode==='pack' && r.packSize>0 && r.packPrice!=null;
+  const size = isSecSize(r, botSize(v)) ? botSize(v) : '';
+  const pack = !size && v.mode==='pack' && r.packSize>0 && r.packPrice!=null;
   const unitsPerSale = pack ? r.packSize : 1;
   const qty = parseFloat(v.qty)||1;
   const units = qty*unitsPerSale;
-  const price = v.recipeId===r.id && v.unitPrice>0 ? v.unitPrice : (pack ? r.packPrice : (r.salePrice||0));
-  DATA.quickSales.push({
-    id: v.id, recipeId: r.id, recipeName: r.title, qty: qty, mode: pack ? 'pack' : 'unit', unitsDeducted: units,
-    unitPrice: price, unitCost: (c.costPerUnit||0)*unitsPerSale, payMethod: payMethod==='transferencia' ? 'transferencia' : 'efectivo',
+  const price = v.recipeId===r.id && v.unitPrice>0 ? v.unitPrice : (size ? (secPrecio(r)||0) : (pack ? r.packPrice : (r.salePrice||0)));
+  const entry = {
+    id: v.id, recipeId: r.id, recipeName: sizeTitle(r, size), qty: qty, mode: pack ? 'pack' : 'unit', unitsDeducted: units,
+    unitPrice: price, unitCost: (c.costPerUnit||0)*unitsPerSale*(size ? secEq(r) : 1), payMethod: payMethod==='transferencia' ? 'transferencia' : 'efectivo',
     ts: v.ts && !isNaN(new Date(v.ts)) ? v.ts : new Date().toISOString(), stockDeducted: willDeduct, origen:'bot'
-  });
-  if(willDeduct) addRecipeStock(r, -units);
+  };
+  if(size) entry.size = size;
+  DATA.quickSales.push(entry);
+  if(willDeduct) addRecipeStock(r, -units, size);
   return true;
 }
 function botPendSel(v){
@@ -12924,13 +13260,14 @@ function botPendConfirm(id){
   const v = botSales.pendientes.find(function(x){ return x.id===id; });
   if(!v) return;
   const s = botPendSel(v);
-  const r = DATA.recipes.find(function(x){ return x.id===s.recipeId; });
+  const lr = s.recipeId ? webLinkRecipe(s.recipeId) : null;
+  const r = lr ? lr.r : null;
   if(!r){ showToast('Elegí cuál fue'); return; }
-  addBotQuickSale({ id:v.id, recipeId:null, qty:v.qty||1, mode:'unit', ts:v.ts }, r, s.pay, DATA.settings.discountStockOnSale!==false);
+  addBotQuickSale({ id:v.id, recipeId:null, qty:v.qty||1, mode:'unit', ts:v.ts, size:lr.size }, r, s.pay, DATA.settings.discountStockOnSale!==false);
   botSales.pendientes = botSales.pendientes.filter(function(x){ return x.id!==id; });
   delete botSales.sel[id];
   saveData(DATA);
-  showToast('Venta registrada: '+r.title);
+  showToast('Venta registrada: '+lr.title);
   renderQuickSellScreen();
 }
 async function botPendDismiss(id){
@@ -12956,11 +13293,12 @@ function renderBotPending(){
     list.map(function(v){
       const s = botPendSel(v);
       const hora = new Date(v.ts); const hm = isNaN(hora) ? '' : ' · '+hora.toLocaleTimeString('es-AR', { hour:'2-digit', minute:'2-digit' });
-      const cands = (v.candidatos||[]).map(function(id){ return DATA.recipes.find(function(r){ return r.id===id; }); }).filter(Boolean);
-      const chips = cands.map(function(r){
-        return '<button type="button" class="bp-chip'+(s.recipeId===r.id?' on':'')+(recipeStockOf(r)<=0?' off':'')+'" data-v="'+escapeHtml(v.id)+'" data-r="'+escapeHtml(r.id)+'" onclick="botPendChoose(this.dataset.v, this.dataset.r)">'+escapeHtml(r.title)+' ('+recipeStockOf(r)+')</button>';
+      const cands = (v.candidatos||[]).map(function(id){ return typeof id==='string' && webRecipeExists(id) ? webLinkRecipe(id) : null; }).filter(Boolean);
+      const chips = cands.map(function(x){
+        const k = sellKey(x.r.id, x.size), st = recipeStockOf(x.r, x.size);
+        return '<button type="button" class="bp-chip'+(s.recipeId===k?' on':'')+(st<=0?' off':'')+'" data-v="'+escapeHtml(v.id)+'" data-r="'+escapeHtml(k)+'" onclick="botPendChoose(this.dataset.v, this.dataset.r)">'+escapeHtml(x.title)+' ('+fmtQty(st)+')</button>';
       }).join('') || '<span style="font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);">Esos productos ya no están en Kobu.</span>';
-      const precio = s.recipeId ? (function(){ const r = DATA.recipes.find(function(x){ return x.id===s.recipeId; }); return r ? (recipeSellsByPack(r) ? r.packPrice : r.salePrice) : v.unitPrice; })() : v.unitPrice;
+      const precio = s.recipeId ? (function(){ const x = webLinkRecipe(s.recipeId); return x ? (x.size ? (secPrecio(x.r)||0) : (recipeSellsByPack(x.r) ? x.r.packPrice : x.r.salePrice)) : v.unitPrice; })() : v.unitPrice;
       const efe = s.pay!=='transferencia';
       return '<div class="bp-row">'+
         '<div class="bp-t"><span>'+escapeHtml(String(v.qty||1))+' '+escapeHtml(v.grupo||'Producto')+hm+'</span><span>'+fmtMoney((precio||0)*(v.qty||1))+'</span></div>'+
@@ -13556,7 +13894,8 @@ function aggregateIngredientNeeds(orders){
         if(!ing.name) return;
         const q = parseFloat((ing.qty||'').toString().replace(',','.'));
         if(isNaN(q)) return;
-        const totalQty = q * (parseFloat(oit.qty)||1);
+        const porTanda = isCombo(r) ? 1 : (parseFloat(r.yieldQty)>0 ? parseFloat(r.yieldQty) : 1);
+        const totalQty = q * (parseFloat(oit.qty)||1) * (isSecSize(r, oit.size) ? secEq(r) : 1) / porTanda;
         const resolved = resolvePurchaseTarget(ing, totalQty);
         const cat = resolved.cat;
         const key = cat ? cat.id : (ing.priceId || (ing.name.trim().toLowerCase()+'|'+(ing.unit||'').trim().toLowerCase()));
@@ -13597,10 +13936,14 @@ function computeProductionPlan(startDate, endDate){
       if(!it.recipeId) return;
       const r = DATA.recipes.find(function(x){ return x.id===it.recipeId; });
       if(!r) return;
-      const parts = isCombo(r) ? comboItems(r).map(function(ci){ return { r:ci.r, q:(parseFloat(it.qty)||0)*ci.qty }; }) : [{ r:r, q:(parseFloat(it.qty)||0) }];
+      // El otro tamaño cuenta en unidades del tamaño base (un XL = 2 chicos, según los pesos de la receta).
+      const sec = !isCombo(r) && isSecSize(r, it.size);
+      const n = parseFloat(it.qty)||0;
+      const parts = isCombo(r) ? comboItems(r).map(function(ci){ return { r:ci.r, q:n*ci.qty, n:n*ci.qty, sec:false }; }) : [{ r:r, q: sec ? n*secEq(r) : n, n:n, sec:sec }];
       parts.forEach(function(pt){
-        if(!recipeMap[pt.r.id]) recipeMap[pt.r.id] = { recipeId:pt.r.id, recipe:pt.r, qty:0 };
+        if(!recipeMap[pt.r.id]) recipeMap[pt.r.id] = { recipeId:pt.r.id, recipe:pt.r, qty:0, nBase:0, nSec:0 };
         recipeMap[pt.r.id].qty += pt.q;
+        if(pt.sec) recipeMap[pt.r.id].nSec += pt.n; else recipeMap[pt.r.id].nBase += pt.n;
       });
     });
   });
@@ -13610,6 +13953,15 @@ function computeProductionPlan(startDate, endDate){
   return { orders:orders, recipes:recipes, shortages:shortages, noDateOrders:noDateOrders };
 }
 function fmtNum(n){ return Number.isInteger(n) ? n : Math.round(n*100)/100; }
+// "x6" o, con dos tamaños, "4 chicos + 2 XL".
+function tamNombreN(t, n){ return t==='xl' ? 'XL' : (n===1 ? 'chico' : 'chicos'); }
+function prodQtyLabel(x){
+  if(!x || !recipeHas2(x.recipe) || !x.nSec) return 'x'+fmtNum(x ? x.qty : 0);
+  const b = baseTam(x.recipe), sc = secTam(x.recipe), out = [];
+  if(x.nBase) out.push(fmtNum(x.nBase)+' '+tamNombreN(b, x.nBase));
+  out.push(fmtNum(x.nSec)+' '+tamNombreN(sc, x.nSec));
+  return out.join(' + ');
+}
 function fuzzyMatchRecipeInText(text){
   const norm = function(s){ return (s||'').toLowerCase().normalize('NFD').replace(new RegExp('[̀-ͯ]','g'),'').trim(); };
   const t = norm(text);
@@ -13781,7 +14133,7 @@ function chatTextForWhatCanICook(){
 }
 function chatTextForWeekPlan(plan){
   if(plan.recipes.length===0) return 'No tenés pedidos confirmados pendientes de producir en los próximos 7 días.';
-  let txt = 'Para los próximos 7 días tenés que hacer: '+plan.recipes.map(function(x){ return 'x'+fmtNum(x.qty)+' '+x.recipe.title; }).join(', ')+'.';
+  let txt = 'Para los próximos 7 días tenés que hacer: '+plan.recipes.map(function(x){ return prodQtyLabel(x)+' '+x.recipe.title; }).join(', ')+'.';
   if(plan.shortages.length===0){
     txt += ' Con el stock actual te alcanza.';
   } else {
@@ -13985,7 +14337,7 @@ function renderProductionPanel(){
     html += '<p style="font-size:calc(12px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;">No hay producción pendiente en este rango.</p>';
   } else {
     html += plan.recipes.map(function(x){
-      return '<div class="rowline"><span class="l">'+escapeHtml(x.recipe.title)+'</span><span style="font-weight:600;">x'+fmtQty(x.qty)+'</span></div>';
+      return '<div class="rowline"><span class="l">'+escapeHtml(x.recipe.title)+'</span><span style="font-weight:600;">'+escapeHtml(String(prodQtyLabel(x)))+'</span></div>';
     }).join('');
   }
   if(calendarDayFilter){
@@ -14227,7 +14579,7 @@ function chatLiveValue(tipo, nameEsc){
       if(i) return (i.price==null || isNaN(i.price)) ? 'sin precio' : (fmtMoney(i.price)+(parseFloat(i.qty)>0 ? ' / '+n2(i.qty)+' '+(i.unit||'') : ''));
     } else if(tipo==='stock'){
       if(i) return n2(i.stock)+' '+(i.unit||'');
-      if(r) return n2(recipeStockOf(r))+' listos';
+      if(r) return (recipeHas2(r) ? recipeStockText(r) : n2(recipeStockOf(r)))+' listos';
     }
   }catch(e){}
   return null;
@@ -14794,7 +15146,7 @@ function buildFullAppContext(soloEstado){
     const precio = r.salePrice ? fmtMoney(r.salePrice) : 'sin precio';
     const costo = (c && c.costPerUnit) ? fmtMoney(c.costPerUnit) : 'sin costo calculado';
     const packTxt = recipeSellsByPack(r) ? (', se vende por paquete de '+r.packSize+' a '+fmtMoney(r.packPrice)) : '';
-    return r.title+' (precio '+precio+', costo '+costo+packTxt+(r.readyToSell?', lista para vender, stock actual '+recipeStockOf(r):'')+(isCombo(r)?', caja con: '+comboItems(r).map(function(ci){ return ci.qty+' '+ci.r.title; }).join(', '):'')+')';
+    return r.title+' (precio '+precio+', costo '+costo+packTxt+(recipeHas2(r) ? ', '+tamResumen(r) : '')+(r.readyToSell?', lista para vender, stock actual '+(recipeHas2(r) ? recipeStockText(r) : recipeStockOf(r)):'')+(isCombo(r)?', caja con: '+comboItems(r).map(function(ci){ return ci.qty+' '+ci.r.title; }).join(', '):'')+')';
   }).join(' | ');
   parts.push('Recetas: '+(recetasTxt || 'todavía no hay recetas cargadas')+'.');
   const fmtStockItem = function(p){
@@ -14818,7 +15170,7 @@ function buildFullAppContext(soloEstado){
   const plan = computeProductionPlan(todayStr(), addDaysStr(todayStr(), 6));
   if(plan.recipes.length){
     let prod = 'Producción pendiente (pedidos confirmados, todavía no elaborados) para los próximos 7 días: '+
-      plan.recipes.map(function(x){ return 'x'+(Number.isInteger(x.qty)?x.qty:Math.round(x.qty*100)/100)+' '+x.recipe.title; }).join(', ')+'.';
+      plan.recipes.map(function(x){ return prodQtyLabel(x)+' '+x.recipe.title; }).join(', ')+'.';
     if(plan.shortages.length){
       prod += ' Con el stock actual de ingredientes NO alcanza para esa producción, falta: '+
         plan.shortages.map(function(s){ return s.name+' (faltan '+(Math.round(s.missing*100)/100)+' '+s.unit+')'; }).join(', ')+'.';
@@ -16126,17 +16478,19 @@ function registrarMerma(recipeId, porciones, motivo, opts){
   const n = Math.round(Number(porciones)||0);
   if(!r || n<1) return null;
   if(!Array.isArray(DATA.mermas)) DATA.mermas = [];
-  const cu = mermaCostUnit(r);
-  const precio = Number(r.salePrice)||0;
+  const size = isSecSize(r, opts.size) ? opts.size : '';
+  const cu = mermaCostUnit(r) * (size ? secEq(r) : 1);
+  const precio = size ? (secPrecio(r)||0) : (Number(r.salePrice)||0);
   const e = {
     id: opts.id || ('mm-'+Date.now()+'-'+Math.floor(Math.random()*1e4)),
-    recipeId: r.id, recipeName: String(r.title||''), porciones: n,
+    recipeId: r.id, recipeName: sizeTitle(r, size), porciones: n,
     motivo: MERMA_MOTIVOS.some(function(x){ return x.v===motivo; }) ? motivo : 'otro',
     costo: Math.round(cu*n), precio: Math.round(precio*n),
     ts: opts.ts || new Date().toISOString()
   };
   if(opts.origen) e.origen = opts.origen;
-  addRecipeStock(r, -n);
+  if(size) e.size = size;
+  addRecipeStock(r, -n, size);
   DATA.mermas.push(e);
   if(DATA.mermas.length>2000) DATA.mermas.splice(0, DATA.mermas.length-2000);
   return e;
@@ -16144,16 +16498,31 @@ function registrarMerma(recipeId, porciones, motivo, opts){
 function openMermaModal(id){
   const r = DATA.recipes.find(function(x){ return x.id===id; });
   if(!r) return;
-  state._merma = { id:id, motivo:'rota' };
-  document.getElementById('mm-name').textContent = r.title || '';
-  const st = recipeStockOf(r);
-  document.getElementById('mm-stock').textContent = st>0 ? ('Hay '+st+' listas para vender') : 'No hay stock listo cargado (igual se anota)';
+  state._merma = { id:id, motivo:'rota', size:'' };
   document.getElementById('mm-qty').value = 1;
+  mermaRenderTam();
   mermaRenderChips();
   mermaRenderCost();
   document.getElementById('mermaModal').classList.add('active');
 }
 function closeMermaModal(){ document.getElementById('mermaModal').classList.remove('active'); state._merma = null; }
+// Recetas con dos tamaños: se elige de cuál fue la merma.
+function mermaRenderTam(){
+  const mm = state._merma;
+  const r = mm ? DATA.recipes.find(function(x){ return x.id===mm.id; }) : null;
+  if(!r) return;
+  document.getElementById('mm-name').textContent = sizeTitle(r, mm.size);
+  const st = recipeStockOf(r, mm.size);
+  document.getElementById('mm-stock').textContent = st>0 ? ('Hay '+fmtQty(st)+' listas para vender') : 'No hay stock listo cargado (igual se anota)';
+  const w = document.getElementById('mm-tam');
+  if(!recipeHas2(r)){ w.style.display = 'none'; w.innerHTML = ''; return; }
+  w.style.display = '';
+  const b = baseTam(r), sc = secTam(r);
+  w.innerHTML = [['', b], [sc, sc]].map(function(x){
+    return '<button type="button" class="chip'+(mm.size===x[0]?' active':'')+'" onclick="mermaSetTam(\''+x[0]+'\')">'+tamNombre(x[1])+' ('+fmtQty(stockTam(r, x[1]))+')</button>';
+  }).join('');
+}
+function mermaSetTam(sz){ if(state._merma){ state._merma.size = sz; mermaRenderTam(); mermaRenderCost(); } }
 function mermaRenderChips(){
   const cur = state._merma ? state._merma.motivo : '';
   document.getElementById('mm-chips').innerHTML = MERMA_MOTIVOS.map(function(m){
@@ -16171,15 +16540,15 @@ function mermaRenderCost(){
   const n = Math.max(0, parseInt(document.getElementById('mm-qty').value,10)||0);
   const el = document.getElementById('mm-cost');
   if(!r){ el.textContent = ''; return; }
-  const cu = mermaCostUnit(r);
+  const cu = mermaCostUnit(r) * (isSecSize(r, state._merma.size) ? secEq(r) : 1);
   el.innerHTML = cu>0 ? ('Costo perdido: <b>'+escapeHtml(fmtMoney(Math.round(cu*n)))+'</b>') : 'Sin costo calculado para esta receta';
 }
 function saveMerma(){
   if(!state._merma) return;
-  const id = state._merma.id, motivo = state._merma.motivo;
+  const id = state._merma.id, motivo = state._merma.motivo, size = state._merma.size;
   const n = parseInt(document.getElementById('mm-qty').value,10);
   if(!(n>=1 && n<=500)){ showToast('Cantidad: de 1 a 500'); return; }
-  const e = registrarMerma(id, n, motivo);
+  const e = registrarMerma(id, n, motivo, { size:size });
   if(!e) return;
   saveData(DATA);
   closeMermaModal();

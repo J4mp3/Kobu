@@ -1133,8 +1133,24 @@
   .wb-line .t{ display:flex; justify-content:space-between; gap:8px; font-size:calc(13px + var(--kobu-font-boost, 0px)); color:var(--k-text); }
   .wb-line .t small{ color:var(--k-muted); }
   .rt-mode{ display:flex; gap:8px; } .rt-mode .chip{ flex:1; text-align:center; padding:8px 10px; font-size:calc(11.5px + var(--kobu-font-boost, 0px)); }
-  .rt-row{ display:grid; grid-template-columns:1.25fr .8fr 1.35fr 26px; gap:8px; align-items:end; }
-  .rt-row.rt-row2{ grid-template-columns:1.25fr .8fr; }
+  .rt-row{ display:grid; grid-template-columns:1.35fr 1fr; gap:8px; align-items:end; }
+  .rt-row .input, .rt-op select.input{ width:100%; min-width:0; }
+  .rt-op .field label{ font-size:calc(10.5px + var(--kobu-font-boost, 0px)); }
+  .rt-tap{ width:100%; background:none; border:0; padding:0; font:inherit; color:inherit; text-align:left; cursor:pointer; }
+  .rt-tap b{ flex:0 0 auto; } .rt-tap b.rt-wide{ flex:1; }
+  .rt-res{ flex:1; min-width:0; text-align:right; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--k-muted); font-size:calc(11.5px + var(--kobu-font-boost, 0px)); }
+  .rt-chev{ color:var(--k-muted); display:flex; flex:none; }
+  .rt-fac{ display:flex; gap:6px; flex-wrap:wrap; align-items:center; font-size:calc(12px + var(--kobu-font-boost, 0px)); color:var(--k-text); }
+  .rt-fac .chip{ padding:6px 12px; font-size:calc(11.5px + var(--kobu-font-boost, 0px)); }
+  .rt-fac input.input{ width:64px; text-align:center; padding:7px 4px; }
+  #f-rtBody .chip{ transition:background .18s ease, color .18s ease; }
+  @keyframes rtIn{ from{ opacity:0; transform:translateY(-5px); } }
+  .rt-in > :not(.rt-op-top), .rt-new{ animation:rtIn .24s ease both; }
+  @keyframes rtPulse{ 50%{ color:var(--k-accent); } }
+  .rt-sum span.rt-pulse{ animation:rtPulse .5s ease; }
+  @media (prefers-reduced-motion: reduce){ .rt-in > :not(.rt-op-top), .rt-new, .rt-sum span.rt-pulse{ animation:none; } #f-rtBody .chip{ transition:none; } }
+  .rt-est.rt-del{ color:var(--k-danger); }
+  .rt-est{ align-self:flex-start; background:none; border:0; padding:2px 0; font:inherit; font-size:calc(11.5px + var(--kobu-font-boost, 0px)); font-weight:600; color:var(--k-accent); text-decoration:underline; cursor:pointer; }
   .rt-row .field label{ font-size:calc(10.5px + var(--kobu-font-boost, 0px)); }
   .rt-x{ color:var(--k-danger); display:flex; align-items:center; justify-content:center; height:38px; cursor:pointer; background:none; border:0; padding:0; }
   .rt-sub{ font-size:calc(11.5px + var(--kobu-font-boost, 0px)); font-weight:600; color:var(--k-text); margin:4px 0 -2px; }
@@ -1147,7 +1163,7 @@
   .rt-cnt input.input{ width:58px; text-align:center; padding:7px 4px; }
   .rt-cnt select.input{ flex:1; min-width:150px; }
   .rt-sum{ display:flex; justify-content:space-between; font-size:calc(12px + var(--kobu-font-boost, 0px)); color:var(--k-text); border-top:1px dashed var(--k-border); padding-top:8px; }
-  .rt-sum + .rt-sum{ border-top:0; padding-top:0; } .rt-sum span:last-child{ font-weight:600; }
+  .rt-sum + .rt-sum{ border-top:0; padding-top:4px; } .rt-sum span:last-child{ font-weight:600; }
   .rt-aviso{ display:flex; gap:8px; align-items:flex-start; background:var(--k-danger-bg); color:var(--k-danger); border-radius:10px; padding:8px 10px; font-size:calc(11px + var(--kobu-font-boost, 0px)); }
   .rt-aviso .icon-slot{ flex:none; margin-top:1px; }
   .wb-line.wb-opt{ padding-left:14px; border-left:2px solid var(--k-border); }
@@ -5440,7 +5456,7 @@ function rtFac(v){ const n = parseFloat(String(v==null ? '' : v).replace(',', '.
 function rtMoldName(id){ const u = id ? (DATA.utensils||[]).find(function(x){ return x.id===id; }) : null; return u ? String(u.nombre||'') : ''; }
 // Receta con un solo tamaño cuyo "Rinde" no coincide con ningún molde de referencia (no se elige ninguno solo).
 function rtConflicto(r){
-  if(!r || isCombo(r) || (r.tam2 && r.tam2.on) || r.moldU) return null;
+  if(!r || isCombo(r) || (r.tam2 && r.tam2.on) || r.moldU || r.rindeOk) return null;
   const yq = rtNum(r.yieldQty);
   const cal = (r.moldCalibrations||[]).filter(function(c){ return c && c.moldId && rtNum(c.yieldQty); });
   if(!yq || !cal.length || cal.some(function(c){ return Math.abs(rtNum(c.yieldQty)-yq)<1e-9; })) return null;
@@ -5474,7 +5490,7 @@ function rtFromRecipe(d){
   const realBc = (bc && cal.indexOf(bc)!==-1) ? JSON.parse(JSON.stringify(bc)) : null;
   const orig = JSON.parse(JSON.stringify({ yieldQty: d.yieldQty, yieldUnit: d.yieldUnit, moldYieldMode: d.moldYieldMode, tam2: d.tam2 || null, salidas: d.salidas || null, salidasOk: d.salidasOk || null, pesoU: d.pesoU || null, moldU: d.moldU || null }));
   orig.bc = realBc;
-  return { modo:modo, tams:tams, ops:ops, precio2: (d.tam2 && d.tam2.precio) || '', extras:extras, aviso:aviso, orig:orig, peso0: t0.peso, dirty:false };
+  return { modo:modo, tams:tams, ops:ops, precio2: (d.tam2 && d.tam2.precio) || '', extras:extras, aviso:aviso, orig:orig, peso0: t0.peso, dirty:false, ui:{ tam:null, op:null, anim:'' } };
 }
 function rtTiene2(rt){ return !!(rt && rt.tams.length>1); }
 function rtDec(v){ const n = rtNum(v); return n ? Math.min(Math.round(n*1000)/1000, 100000) : 0; }
@@ -5563,6 +5579,8 @@ function renderRT(){
   if(!d || !wrap) return;
   if(!d._rt) d._rt = rtFromRecipe(d);
   const rt = d._rt, has2 = rtTiene2(rt), corte = rt.modo==='corte';
+  const ui = rt.ui || (rt.ui = { tam:null, op:null, anim:'' });
+  const chev = function(open){ return '<span class="rt-chev icon-slot" data-icon="'+(open ? 'chevron-up' : 'chevron-down')+'"></span>'; };
   const t0 = rt.tams[0];
   const val = function(v){ return escapeHtml(v==null ? '' : String(v)); };
   let h = '<div class="field"><label>¿Cómo sale?</label><div class="rt-mode">'+
@@ -5570,51 +5588,93 @@ function renderRT(){
     '<button type="button" class="chip'+(corte?' active':'')+'" onclick="rtSetModo(\'corte\')">Se corta de una bandeja</button></div></div>';
   if(rt.aviso) h += '<div class="rt-aviso"><span class="icon-slot" data-icon="alert-triangle"></span><span>'+escapeHtml(rt.aviso)+'</span></div>';
   const baseW = has2 ? tamNombre(rt.tams[1].t==='chico' ? 'xl' : 'chico') : '';
-  if(!corte){
-    h += '<p class="rt-sub">'+(has2 ? 'Tamaños' : 'Tamaño')+'</p>';
-    h += '<div class="rt-row"><div class="field"><label>'+(has2 ? 'Tamaño '+baseW : 'Unidad de venta')+'</label><input class="input" value="'+val(t0.nombre)+'" placeholder="budín, porción..." oninput="rtSetTam(0,\'nombre\',this.value)"></div>'+
-      '<div class="field"><label>Peso c/u (g)</label><input class="input" type="number" min="0" value="'+val(t0.peso)+'" placeholder="ej. 270" oninput="rtSetTam(0,\'peso\',this.value)"></div>'+
-      '<div class="field"><label>Molde</label><select class="input" onchange="rtSetTam(0,\'moldId\',this.value)">'+rtMoldOptions(t0.moldId, 'sin molde')+'</select></div><span></span></div>';
-    if(has2){
-      const t1 = rt.tams[1];
-      h += '<div class="rt-row"><div class="field"><label>Otro tamaño</label><select class="input" onchange="rtSetSecTipo(this.value)"><option value="xl"'+(t1.t!=='chico'?' selected':'')+'>XL</option><option value="chico"'+(t1.t==='chico'?' selected':'')+'>chico</option></select></div>'+
-        '<div class="field"><label>Peso c/u (g)</label><input class="input" type="number" min="0" value="'+val(t1.peso)+'" placeholder="ej. 540" oninput="rtSetTam(1,\'peso\',this.value)"></div>'+
-        '<div class="field"><label>Molde</label><select class="input" onchange="rtSetTam(1,\'moldId\',this.value)">'+rtMoldOptions(t1.moldId, 'sin molde')+'</select></div>'+
-        '<button type="button" class="rt-x" aria-label="Quitar tamaño" onclick="rtRemoveTam()"><span class="icon-slot" data-icon="trash"></span></button></div>';
-    } else {
-      h += '<button type="button" class="ut-add-row" onclick="rtAddTam()"><span class="icon-slot" data-icon="plus"></span>Agregar otro tamaño (chico o XL)</button>';
-    }
+  const pesoF = function(i, ph){ return '<div class="field"><label>Peso c/u (g)</label><input class="input" type="number" min="0" value="'+val(rt.tams[i].peso)+'" placeholder="'+ph+'" oninput="rtSetTam('+i+',\'peso\',this.value)"></div>'; };
+  const moldF = function(i){ return '<div class="field"><label>Molde</label><select class="input" onchange="rtSetTam('+i+',\'moldId\',this.value)">'+rtMoldOptions(rt.tams[i].moldId, 'sin molde')+'</select></div>'; };
+  const nomF = function(lbl, ph){ return '<div class="field"><label>'+lbl+'</label><input class="input" value="'+val(t0.nombre)+'" placeholder="'+ph+'" oninput="rtSetTam(0,\'nombre\',this.value)"></div>'; };
+  if(!corte && has2){
+    const t1 = rt.tams[1];
+    h += '<p class="rt-sub">Tamaños</p>';
+    [0, 1].forEach(function(i){
+      const t = rt.tams[i], open = ui.tam===i;
+      const nm = i===0 ? baseW : tamNombre(t1.t==='chico' ? 'chico' : 'xl');
+      const res = (rtNum(t.peso) ? fmtQty(rtNum(t.peso))+' g' : 'falta el peso')+' · '+(rtMoldName(t.moldId) || 'sin molde');
+      const body = i===0 ? '<div class="rt-row">'+nomF('Se vende como', 'budín')+pesoF(0, 'ej. 270')+'</div>'+moldF(0)
+        : '<div class="rt-row"><div class="field"><label>Cuál</label><select class="input" onchange="rtSetSecTipo(this.value)"><option value="xl"'+(t1.t!=='chico'?' selected':'')+'>XL</option><option value="chico"'+(t1.t==='chico'?' selected':'')+'>chico</option></select></div>'+pesoF(1, 'ej. 540')+'</div>'+moldF(1)+
+          '<button type="button" class="rt-est rt-del" onclick="rtRemoveTam()">Quitar este tamaño</button>';
+      h += '<div class="rt-op rt-tam'+(open && ui.anim==='tam' ? ' rt-in' : '')+'"><button type="button" class="rt-op-top rt-tap" aria-expanded="'+open+'" onclick="rtToggleTam('+i+')"><b>'+(nm==='chico' ? 'Chico' : 'XL')+'</b><span class="rt-res">'+escapeHtml(res)+'</span>'+chev(open)+'</button>'+(open ? body : '')+'</div>';
+    });
+  } else if(!corte){
+    h += '<div class="rt-row">'+nomF('Unidad de venta', 'budín, porción...')+pesoF(0, 'ej. 270')+'</div>'+moldF(0);
   } else {
-    h += '<p class="rt-sub">Unidad</p><div class="rt-row rt-row2"><div class="field"><label>Se vende por</label><input class="input" value="'+val(t0.nombre)+'" placeholder="porción" oninput="rtSetTam(0,\'nombre\',this.value)"></div>'+
-      '<div class="field"><label>Peso c/u (g)</label><input class="input" type="number" min="0" value="'+val(t0.peso)+'" placeholder="ej. 110" oninput="rtSetTam(0,\'peso\',this.value)"></div></div>';
+    h += '<div class="rt-row">'+nomF('Se vende por', 'porción')+pesoF(0, 'ej. 110')+'</div>';
   }
-  h += '<button type="button" class="btn btn-ghost" onclick="rtEstimarPeso()">Estimar peso con mis ingredientes</button>';
+  h += '<button type="button" class="rt-est" onclick="rtEstimarPeso()">Estimar el peso con mis ingredientes</button>';
+  if(!corte && !has2) h += '<button type="button" class="ut-add-row" onclick="rtAddTam()"><span class="icon-slot" data-icon="plus"></span>Agregar otro tamaño (chico o XL)</button>';
   const many = rt.ops.length>1;
   if(corte) h += '<p class="rt-sub">Bandejas</p><p class="rt-hint">'+(many ? 'Al hornear elegís en qué bandeja. Kobu descuenta los ingredientes según la cantidad de receta. La primera es la de siempre (se usa para el costo).' : 'Si a veces usás otra bandeja, agregala: al hornear la elegís y Kobu descuenta los ingredientes según la cantidad de receta.')+'</p>';
   else if(many || has2) h += '<p class="rt-sub">Opciones de tanda</p><p class="rt-hint">'+(many ? 'Al hornear elegís cuál salió. La primera es la de siempre (se usa para el costo).' : 'Si a veces sale distinto (por ej. 1 XL + 1 chico), agregá otra opción.')+'</p>';
   rt.ops.forEach(function(o, i){
-    const top = '<div class="rt-op-top"><b>'+(corte ? escapeHtml(rtMoldName(o.m) || 'Bandeja '+(i+1)) : (many ? 'Opción '+(i+1) : 'Por tanda salen'))+'</b>'+
-      (many && i===0 ? '<span class="rt-tag">la de siempre</span>' : '')+
-      (i>0 ? '<button type="button" class="rt-x" aria-label="Quitar" onclick="rtRemoveOp('+i+')"><span class="icon-slot" data-icon="trash"></span></button>' : '')+'</div>';
+    const nuevo = ui.anim==='op' && i===rt.ops.length-1;
+    const tag = many && i===0 ? '<span class="rt-tag">la de siempre</span>' : '';
+    const del = i>0 ? '<button type="button" class="rt-x" aria-label="Quitar" onclick="rtRemoveOp('+i+')"><span class="icon-slot" data-icon="trash"></span></button>' : '';
+    if(has2 && !corte){
+      // Resumen ("1 XL + 1 chico"); los números aparecen al tocarlo.
+      const open = ui.op===i;
+      const bX = rt.tams[1].t==='chico';
+      const txt = salidaLabel({ x: bX ? rtInt(o.b) : rtInt(o.s), c: bX ? rtInt(o.s) : rtInt(o.b) }) || 'Sin cargar';
+      const bw = bX ? 'XL' : 'chicos', sw = bX ? 'chicos' : 'XL';
+      const body = '<div class="rt-cnt"><input class="input" type="number" min="0" step="1" value="'+val(o.b)+'" oninput="rtSetOp('+i+',\'b\',this.value)"> '+bw+
+        ' <input class="input" type="number" min="0" step="1" value="'+val(o.s)+'" oninput="rtSetOp('+i+',\'s\',this.value)"> '+sw+'</div>'+
+        (i>0 ? '<button type="button" class="rt-est rt-del" onclick="rtRemoveOp('+i+')">Quitar esta opción</button>' : '');
+      h += '<div class="rt-op rt-opt'+(nuevo ? ' rt-new' : '')+(open && ui.anim==='opOpen' ? ' rt-in' : '')+'"><button type="button" class="rt-op-top rt-tap" aria-expanded="'+open+'" onclick="rtToggleOp('+i+')"><b class="rt-wide">'+escapeHtml(txt)+'</b>'+tag+chev(open)+'</button>'+(open ? body : '')+'</div>';
+      return;
+    }
+    const top = '<div class="rt-op-top"><b>'+(corte ? escapeHtml(rtMoldName(o.m) || 'Bandeja '+(i+1)) : (many ? 'Opción '+(i+1) : 'Por tanda salen'))+'</b>'+tag+del+'</div>';
     let cnt;
     if(corte){
       cnt = '<div class="rt-cnt"><select class="input" onchange="rtSetOp('+i+',\'m\',this.value)">'+rtMoldOptions(o.m, 'elegí la bandeja')+'</select></div>'+
-        '<div class="rt-cnt"><input class="input" type="number" min="0" step="1" value="'+val(o.b)+'" oninput="rtSetOp('+i+',\'b\',this.value)"> '+escapeHtml(t0.nombre||'porciones')+' · receta ×<input class="input" inputmode="decimal" value="'+val(String(o.f==null?1:o.f).replace('.', ','))+'" oninput="rtSetOp('+i+',\'f\',this.value)"></div>';
-    } else if(has2){
-      const bw = tamNombre(rt.tams[1].t==='chico' ? 'xl' : 'chico'), sw = tamNombre(rt.tams[1].t==='chico' ? 'chico' : 'xl');
-      cnt = '<div class="rt-cnt"><input class="input" type="number" min="0" step="1" value="'+val(o.b)+'" oninput="rtSetOp('+i+',\'b\',this.value)"> '+(bw==='chico' ? 'chicos' : bw)+
-        ' <input class="input" type="number" min="0" step="1" value="'+val(o.s)+'" oninput="rtSetOp('+i+',\'s\',this.value)"> '+(sw==='chico' ? 'chicos' : sw)+'</div>';
+        '<div class="rt-cnt"><input class="input" type="number" min="0" step="1" value="'+val(o.b)+'" oninput="rtSetOp('+i+',\'b\',this.value)"> '+escapeHtml(t0.nombre||'porciones')+'</div>'+
+        '<div class="rt-fac">'+rtFacHtml(i)+'</div>';
     } else {
       cnt = '<div class="rt-cnt"><input class="input" type="number" min="0" step="any" value="'+val(o.b)+'" oninput="rtSetOp('+i+',\'b\',this.value)"> '+escapeHtml(t0.nombre||'porciones')+'</div>';
     }
-    h += '<div class="rt-op">'+top+cnt+'</div>';
+    h += '<div class="rt-op rt-opt'+(nuevo ? ' rt-new' : '')+'">'+top+cnt+'</div>';
   });
+  ui.anim = '';
   if(corte || has2 || many) h += '<button type="button" class="ut-add-row" onclick="rtAddOp()"><span class="icon-slot" data-icon="plus"></span>'+(corte ? 'Agregar bandeja' : 'Agregar opción')+'</button>';
   h += '<div id="f-rtSum"></div>';
   wrap.innerHTML = h;
   mountIcons();
   rtSync();
 }
+// "porciones" → "porción", "budines" → "budín", "alfajores" → "alfajor", "brownies" → "brownie".
+function unidadSingular(u){
+  const t = String(u||'').trim();
+  if(!t) return 'unidad';
+  return t.replace(/ciones$/i, 'ción').replace(/ines$/i, 'ín').replace(/([rlndjz])es$/i, '$1').replace(/([aeiouáéíóú])s$/i, '$1');
+}
+// Cantidad de receta de una bandeja: entera, ¾, ½ u otra (se escribe).
+var RT_FACS = [[1, 'Receta entera'], [0.75, '¾'], [0.5, '½']];
+function rtFacHtml(i){
+  const rt = state.draft && state.draft._rt, o = rt && rt.ops[i];
+  if(!o) return '';
+  const f = rtFac(o.f);
+  const otra = !!o._otra || !RT_FACS.some(function(x){ return Math.abs(x[0]-f)<1e-9; });
+  return 'Con '+RT_FACS.map(function(x){ return '<button type="button" class="chip'+(!otra && Math.abs(x[0]-f)<1e-9 ? ' active' : '')+'" onclick="rtSetOpF('+i+',\''+x[0]+'\')">'+x[1]+'</button>'; }).join('')+
+    '<button type="button" class="chip'+(otra ? ' active' : '')+'" onclick="rtSetOpF('+i+',\'otra\')">Otra</button>'+
+    (otra ? ' receta × <input class="input" inputmode="decimal" aria-label="Cantidad de receta" value="'+escapeHtml(String(f).replace('.', ','))+'" oninput="rtSetOp('+i+',\'f\',this.value)">' : '');
+}
+function rtPaintFac(i){ const box = document.querySelectorAll('#f-rtBody .rt-opt')[i]; const fc = box && box.querySelector('.rt-fac'); if(fc) fc.innerHTML = rtFacHtml(i); }
+function rtSetOpF(i, v){
+  const rt = state.draft && state.draft._rt, o = rt && rt.ops[i];
+  if(!o) return;
+  rt.dirty = true; o._fAuto = false;
+  if(v==='otra') o._otra = true; else { o._otra = false; o.f = rtFac(v); }
+  rtPaintFac(i);
+  rtSync();
+}
+function rtToggleTam(i){ const rt = state.draft && state.draft._rt; if(!rt) return; rt.ui.tam = rt.ui.tam===i ? null : i; rt.ui.anim = 'tam'; renderRT(); }
+function rtToggleOp(i){ const rt = state.draft && state.draft._rt; if(!rt) return; rt.ui.op = rt.ui.op===i ? null : i; rt.ui.anim = 'opOpen'; renderRT(); }
 function rtSumHtml(){
   const d = state.draft;
   if(!d || !d._rt) return '';
@@ -5624,7 +5684,7 @@ function rtSumHtml(){
     const b = baseTam(fd), sc = secTam(fd);
     return '<div class="rt-sum"><span>Costo de un '+tamNombre(b)+'</span><span>'+fmtMoney(c.costPerUnit)+'</span></div><div class="rt-sum"><span>Costo de un '+tamNombre(sc)+'</span><span>'+fmtMoney(c.costPerUnit*secEq(fd))+'</span></div>';
   }
-  return '<div class="rt-sum"><span>Costo por unidad ('+escapeHtml(String(fd.yieldUnit||'unidad'))+')</span><span>'+fmtMoney(c.costPerUnit)+'</span></div>';
+  return '<div class="rt-sum"><span>Costo por '+escapeHtml(unidadSingular(fd.yieldUnit))+'</span><span>'+fmtMoney(c.costPerUnit)+'</span></div>';
 }
 // Deja "Rinde" y "Unidad" (ocultos) al día: los usan el costo, el precio y la ficha mientras se edita.
 function rtSync(){
@@ -5635,7 +5695,11 @@ function rtSync(){
   if(yq) yq.value = o.yieldQty || '';
   if(yu) yu.value = o.yieldUnit;
   const sm = document.getElementById('f-rtSum');
-  if(sm) sm.innerHTML = rtSumHtml();
+  if(sm){
+    const antes = sm.textContent, nuevoH = rtSumHtml();
+    sm.innerHTML = nuevoH;
+    if(antes && antes!==sm.textContent) sm.querySelectorAll('.rt-sum span:last-child').forEach(function(x){ x.classList.add('rt-pulse'); });
+  }
   renderFormXL();
   updateFormCostPreview();
 }
@@ -5673,6 +5737,7 @@ function rtAddTam(){
   rt.dirty = true;
   const xlTxt = /\bxl\b/i.test(String(rt.tams[0].nombre||'')+' '+String(d.title||''));
   rt.tams.push({ t: xlTxt ? 'chico' : 'xl', peso:'', moldId:'' });
+  rt.ui.tam = 1; rt.ui.op = null; rt.ui.anim = 'tam';
   if(rt.ops.length<2){
     const b = rtInt(rt.ops[0] && rt.ops[0].b);
     rt.ops = [{ b:b||1, s:0, f:1, m:'' }, xlTxt ? { b:1, s:1, f:1, m:'' } : { b:Math.max(0, b-2), s:1, f:1, m:'' }];
@@ -5684,6 +5749,7 @@ function rtRemoveTam(){
   if(!rt || rt.tams.length<2) return;
   rt.dirty = true;
   rt.tams = rt.tams.slice(0, 1);
+  rt.ui.tam = null; rt.ui.op = null;
   rt.ops = rt.ops.map(function(o){ return Object.assign({}, o, { s:0 }); }).filter(function(o){ return rtInt(o.b)>0; });
   if(!rt.ops.length) rt.ops = [{ b:'', s:0, f:1, m:'' }];
   renderRT();
@@ -5694,12 +5760,12 @@ function rtSetOp(i, k, v){
   rt.dirty = true;
   const o = rt.ops[i];
   if(k==='m'){ o.m = String(v||''); renderRT(); return; }
-  if(k==='f'){ o.f = v; o._fAuto = false; }
+  if(k==='f'){ o.f = v; o._fAuto = false; o._otra = true; }
   else o[k] = v;
   // Bandeja nueva: la cantidad de receta se completa sola según las porciones (6 de 8 = ×0,75).
   if(k==='b' && i>0 && rt.modo==='corte' && o._fAuto!==false){
     const b0 = rtInt(rt.ops[0].b), b = rtInt(v);
-    if(b0 && b){ o.f = Math.round(b/b0*rtFac(rt.ops[0].f)*100)/100; o._fAuto = true; const inp = document.querySelectorAll('#f-rtBody .rt-op')[i]; const fi = inp && inp.querySelectorAll('input')[1]; if(fi) fi.value = String(o.f).replace('.', ','); }
+    if(b0 && b){ o.f = Math.round(b/b0*rtFac(rt.ops[0].f)*100)/100; o._fAuto = true; o._otra = false; rtPaintFac(i); }
   }
   rtSync();
 }
@@ -5707,6 +5773,7 @@ function rtAddOp(){
   const rt = state.draft && state.draft._rt;
   if(!rt) return;
   rt.dirty = true;
+  rt.ui.anim = 'op'; if(rtTiene2(rt) && rt.modo!=='corte') rt.ui.op = rt.ops.length;
   rt.ops.push(rt.modo==='corte' ? { b:'', s:0, f:1, m:'', _fAuto:true } : (rtTiene2(rt) ? { b:1, s:1, f:1, m:'' } : { b:'', s:0, f:1, m:'' }));
   renderRT();
 }
@@ -5715,6 +5782,7 @@ function rtRemoveOp(i){
   if(!rt || i<1 || !rt.ops[i]) return;
   rt.dirty = true;
   rt.ops.splice(i, 1);
+  rt.ui.op = null;
   renderRT();
 }
 function rtSetPrecio2(v){ const rt = state.draft && state.draft._rt; if(!rt) return; rt.precio2 = v; updateFormXLPreview(); }
@@ -5781,7 +5849,7 @@ function updateFormCostPreview(){
   const priceEl = document.getElementById('f-salePrice');
   const price = priceEl ? parseFloat(priceEl.value) : NaN;
   if(c.costPerUnit==null){
-    costEl.textContent = 'completá "Rinde" arriba';
+    costEl.textContent = 'completá cuánto sale de una tanda (en Datos)';
     costEl.style.color = 'var(--k-danger)';
     profitEl.textContent = '—';
     profitEl.style.color = 'var(--k-muted)';
@@ -6479,6 +6547,7 @@ function saveRecipe(){
   if(rtOut.salidas) d.salidas = rtOut.salidas; else delete d.salidas;
   if(rtOut.salidasOk) d.salidasOk = 1; else delete d.salidasOk;
   if(d.tam2 && d.tam2.on && d.stock2==null) d.stock2 = 0;
+  if(d._rt && d._rt.aviso) d.rindeOk = 1; // ya la revisó: el aviso de Inicio no vuelve
   delete d._rt;
   d.dietBaseType = d.isDietVariant ? null : (d.dietBaseType || null);
   d.quickNotes = d.quickNotes || [];
@@ -6636,6 +6705,12 @@ function salidaLabel(x, r){
 // Listos de un tamaño ('chico' o 'xl') de una receta con dos tamaños.
 function stockTam(r, t){ return t===baseTam(r) ? (Number(r.stock)||0) : (Number(r.stock2)||0); }
 // "Rinde chicos; XL a $9.000 (costo $2.100); por tanda: 3 chicos o 1 XL + 1 chico" (para la IA y la exportación).
+// "Por tanda sale: 8 porciones · Bandeja Tramontina o 6 porciones · Bandeja 19x19 · receta ×0,75" (un tamaño con opciones).
+function tandaResumen(r){
+  if(!r || recipeHas2(r)) return '';
+  const l = recipeSalidas(r);
+  return l.length>1 || (l.length===1 && (l[0].f || l[0].m)) ? 'Por tanda sale: '+l.map(function(x){ return salidaLabel(x, r); }).join(' o ') : '';
+}
 function tamResumen(r){
   if(!recipeHas2(r)) return '';
   const sc = secTam(r), pr = secPrecio(r), co = secCost(r);
@@ -7772,6 +7847,7 @@ function renderCostSection(r){
       html += '<div class="cost-sub"><span>Ganancia por '+escapeHtml(c.yieldUnit).replace(/s$/,'')+'</span><span>'+fmtMoney(r.salePrice - c.costPerUnit)+'</span></div>';
     }
   }
+  if(recipeSalidas(r).length>1) html += '<div class="cost-sub"><span>Por tanda sale</span><span style="text-align:right;">'+recipeSalidas(r).map(function(x){ return escapeHtml(salidaLabel(x, r)); }).join('<br>')+'</span></div>';
   if(recipeHas2(r)){
     const sc = secTam(r), co2 = secCost(r), pr2 = secPrecio(r);
     if(co2!=null) html += '<div class="cost-sub"><span>Costo '+tamNombre(sc)+'</span><span>'+fmtMoney(co2)+'</span></div>';
@@ -8895,6 +8971,7 @@ function buildClaudeExportMd(opts){
         if(parseFloat(r.yieldQty)>0) t += ' · rinde '+claudeNum(r.yieldQty)+' '+claudeCell(r.yieldUnit||'unidades');
         if(c.costPerUnit!=null) t += ' · costo/u '+fmtMoney(c.costPerUnit);
         if(parseFloat(r.salePrice)>0) t += ' · precio '+fmtMoney(parseFloat(r.salePrice));
+        if(tandaResumen(r)) t += ' · '+tandaResumen(r);
         if(recipeHas2(r)){ t += ' · '+tamResumen(r)+' · listo '+recipeStockText(r); }
         else { const st = recipeStockOf(r); if(st>0) t += ' · listo '+claudeNum(st); }
       }catch(e){}
@@ -8910,6 +8987,7 @@ function buildClaudeExportMd(opts){
       meta.push('Costo de la tanda: '+fmtMoney(c.total)+(c.costPerUnit!=null ? ' · por unidad: '+fmtMoney(c.costPerUnit) : ''));
       if(parseFloat(r.salePrice)>0) meta.push('Precio de venta: '+fmtMoney(parseFloat(r.salePrice))+((parseFloat(r.packSize)>1 && parseFloat(r.packPrice)>0) ? ' · paquete de '+claudeNum(r.packSize)+': '+fmtMoney(parseFloat(r.packPrice)) : ''));
       if(recipeHas2(r)) meta.push(tamResumen(r));
+      if(tandaResumen(r)) meta.push(tandaResumen(r));
       meta.push('Listo para vender ahora: '+(recipeHas2(r) ? recipeStockText(r) : claudeNum(recipeStockOf(r))));
       if(parseFloat(r.shelfLifeDays)>0) meta.push('Dura: '+claudeNum(r.shelfLifeDays)+' días');
       const ovIds = Array.isArray(r.ovenIds) ? r.ovenIds : Object.keys(r.ovenSettings||{});
@@ -15459,7 +15537,7 @@ function buildFullAppContext(soloEstado){
     const precio = r.salePrice ? fmtMoney(r.salePrice) : 'sin precio';
     const costo = (c && c.costPerUnit) ? fmtMoney(c.costPerUnit) : 'sin costo calculado';
     const packTxt = recipeSellsByPack(r) ? (', se vende por paquete de '+r.packSize+' a '+fmtMoney(r.packPrice)) : '';
-    return r.title+' (precio '+precio+', costo '+costo+packTxt+(recipeHas2(r) ? ', '+tamResumen(r) : '')+(r.readyToSell?', lista para vender, stock actual '+(recipeHas2(r) ? recipeStockText(r) : recipeStockOf(r)):'')+(isCombo(r)?', caja con: '+comboItems(r).map(function(ci){ return ci.qty+' '+ci.r.title; }).join(', '):'')+')';
+    return r.title+' (precio '+precio+', costo '+costo+packTxt+(recipeHas2(r) ? ', '+tamResumen(r) : '')+(tandaResumen(r) ? ', '+tandaResumen(r) : '')+(r.readyToSell?', lista para vender, stock actual '+(recipeHas2(r) ? recipeStockText(r) : recipeStockOf(r)):'')+(isCombo(r)?', caja con: '+comboItems(r).map(function(ci){ return ci.qty+' '+ci.r.title; }).join(', '):'')+')';
   }).join(' | ');
   parts.push('Recetas: '+(recetasTxt || 'todavía no hay recetas cargadas')+'.');
   const fmtStockItem = function(p){

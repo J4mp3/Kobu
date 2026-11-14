@@ -1132,6 +1132,24 @@
   .wb-line{ padding:8px 0; border-bottom:1px dashed var(--k-border); }
   .wb-line .t{ display:flex; justify-content:space-between; gap:8px; font-size:calc(13px + var(--kobu-font-boost, 0px)); color:var(--k-text); }
   .wb-line .t small{ color:var(--k-muted); }
+  .rt-mode{ display:flex; gap:8px; } .rt-mode .chip{ flex:1; text-align:center; padding:8px 10px; font-size:calc(11.5px + var(--kobu-font-boost, 0px)); }
+  .rt-row{ display:grid; grid-template-columns:1.25fr .8fr 1.35fr 26px; gap:8px; align-items:end; }
+  .rt-row.rt-row2{ grid-template-columns:1.25fr .8fr; }
+  .rt-row .field label{ font-size:calc(10.5px + var(--kobu-font-boost, 0px)); }
+  .rt-x{ color:var(--k-danger); display:flex; align-items:center; justify-content:center; height:38px; cursor:pointer; background:none; border:0; padding:0; }
+  .rt-sub{ font-size:calc(11.5px + var(--kobu-font-boost, 0px)); font-weight:600; color:var(--k-text); margin:4px 0 -2px; }
+  .rt-hint{ font-size:calc(10.5px + var(--kobu-font-boost, 0px)); color:var(--k-muted); margin:0; }
+  .rt-op{ border:1px solid var(--k-border); border-radius:12px; padding:10px; display:flex; flex-direction:column; gap:8px; background:var(--k-bg); }
+  .rt-op-top{ display:flex; align-items:center; gap:8px; font-size:calc(12px + var(--kobu-font-boost, 0px)); color:var(--k-text); } .rt-op-top b{ flex:1; }
+  .rt-op-top .rt-x{ height:auto; }
+  .rt-tag{ font-size:calc(9.5px + var(--kobu-font-boost, 0px)); font-weight:700; letter-spacing:.06em; text-transform:uppercase; background:var(--k-accent); color:var(--k-bg); border-radius:20px; padding:2px 8px; }
+  .rt-cnt{ display:flex; align-items:center; gap:6px; font-size:calc(12.5px + var(--kobu-font-boost, 0px)); color:var(--k-text); flex-wrap:wrap; }
+  .rt-cnt input.input{ width:58px; text-align:center; padding:7px 4px; }
+  .rt-cnt select.input{ flex:1; min-width:150px; }
+  .rt-sum{ display:flex; justify-content:space-between; font-size:calc(12px + var(--kobu-font-boost, 0px)); color:var(--k-text); border-top:1px dashed var(--k-border); padding-top:8px; }
+  .rt-sum + .rt-sum{ border-top:0; padding-top:0; } .rt-sum span:last-child{ font-weight:600; }
+  .rt-aviso{ display:flex; gap:8px; align-items:flex-start; background:var(--k-danger-bg); color:var(--k-danger); border-radius:10px; padding:8px 10px; font-size:calc(11px + var(--kobu-font-boost, 0px)); }
+  .rt-aviso .icon-slot{ flex:none; margin-top:1px; }
   .wb-line.wb-opt{ padding-left:14px; border-left:2px solid var(--k-border); }
   .wb-line.wb-opt .t{ font-size:calc(12px + var(--kobu-font-boost, 0px)); }
   .mm-tam{ display:flex; justify-content:center; gap:6px; flex-wrap:wrap; }
@@ -2169,10 +2187,14 @@
             <select class="input" id="f-difficulty"><option>fácil</option><option>media</option><option>difícil</option></select>
           </div>
         </div>
-        <div class="btn-row" id="f-yield-row">
+        <div class="btn-row" id="f-yield-row" style="display:none;">
           <div class="field" style="flex:1;"><label>Rinde (cantidad)</label><input class="input" id="f-yieldQty" type="number" min="0" placeholder="12" oninput="updateFormCostPreview()"></div>
           <div class="field" style="flex:1;"><label>Unidad de venta</label><input class="input" id="f-yieldUnit" placeholder="brownies, porciones..."></div>
         </div>
+      </div>
+      <div class="grp-card" id="formRindeCard">
+        <p class="section-title"><span class="badge-ic"><span class="icon-slot" data-icon="cake"></span></span>Qué sale de una tanda</p>
+        <div id="f-rtBody" style="display:flex;flex-direction:column;gap:10px;"></div>
       </div>
       <div class="grp-card" id="formDietBaseCard">
         <p class="section-title"><span class="badge-ic"><span class="icon-slot" data-icon="leaf"></span></span>Tipo de receta</p>
@@ -2198,7 +2220,7 @@
       <div class="grp-card" id="formMoldCard">
         <p class="section-title"><span class="badge-ic"><span class="icon-slot" data-icon="loaf-pan"></span></span>Molde (opcional)</p>
         <p style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;">Cargá esto para que Kobu pueda avisarte si un molde no es apto y estimar cuánto rinde con otro molde.</p>
-        <div class="field"><label>¿Cómo se porciona esta receta?</label>
+        <div class="field" id="f-moldMode-field" style="display:none;"><label>¿Cómo se porciona esta receta?</label>
           <div class="btn-row" style="gap:8px;">
             <button type="button" class="chip active" id="f-moldMode-molde" onclick="setMoldYieldMode('molde')" style="flex:1;text-align:center;">Por molde individual</button>
             <button type="button" class="chip" id="f-moldMode-corte" onclick="setMoldYieldMode('corte')" style="flex:1;text-align:center;">Por corte de bandeja</button>
@@ -2209,10 +2231,10 @@
           <div class="chiprow" id="f-moldShapes"></div>
           <p style="font-size:calc(10px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;">Elegí una o más. Si usás un molde de otra forma, Kobu te va a avisar.</p>
         </div>
-        <div class="field"><label>Moldes de referencia (para estimar rendimiento)</label>
-          <p style="font-size:calc(10px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;">Cargá uno por cada molde con el que ya probaste esta receta. Si en la ficha elegís uno de estos moldes, Kobu usa el dato real; si elegís otro, lo estima por tamaño.</p>
+        <div class="field"><label>Probé también con otro molde (opcional)</label>
+          <p style="font-size:calc(10px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:0;">El molde de siempre va en "Qué sale de una tanda". Acá cargá otros moldes con los que ya probaste la receta entera: si en la ficha elegís uno de estos, Kobu usa el dato real; si elegís otro, lo estima por tamaño.</p>
           <div id="f-moldCalibList" style="display:flex;flex-direction:column;gap:10px;"></div>
-          <button type="button" class="btn btn-ghost" onclick="addMoldCalibrationRow()"><span class="icon-slot" data-icon="plus" style="vertical-align:-2px;"></span> Agregar molde de referencia</button>
+          <button type="button" class="btn btn-ghost" onclick="addMoldCalibrationRow()"><span class="icon-slot" data-icon="plus" style="vertical-align:-2px;"></span> Agregar otro molde</button>
         </div>
       </div>
     </div>
@@ -2274,31 +2296,11 @@
         </div>
         <div class="rowline" id="f-packProfitRow" style="display:none;"><span class="l">Ganancia por paquete</span><span id="f-packProfitPreview" style="font-weight:600;color:var(--k-accent);font-size:calc(12.5px + var(--kobu-font-boost, 0px));">$0</span></div>
       </div>
-      <div class="grp-card" id="formXLCard">
-        <p class="section-title"><span class="badge-ic"><span class="icon-slot" data-icon="cake"></span></span>Dos tamaños: chico y XL (opcional)</p>
-        <div class="rowline" style="padding:2px 0;">
-          <span class="l">De esta receta salen chicos y XL<br><span style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);">Por ejemplo: 3 chicos, o 1 XL + 1 chico. Si siempre sale un solo tamaño, dejalo apagado.</span></span>
-          <div class="switch" id="f-xlOn" onclick="toggleFormXL()"><div class="knob-sw"></div></div>
-        </div>
-        <div id="f-xlBody" style="display:none;flex-direction:column;gap:10px;">
-          <div class="field"><label>Lo que dice "Rinde" (en Datos) es</label>
-            <div class="btn-row" id="f-xlBaseRow"><button type="button" class="btn" id="f-xlBaseC" style="flex:1;" onclick="setFormXLBase('chico')">Chicos</button><button type="button" class="btn" id="f-xlBaseX" style="flex:1;" onclick="setFormXLBase('xl')">XL</button></div>
-          </div>
-          <div class="btn-row">
-            <div class="field" style="flex:1;"><label>Peso del chico (g)</label><input class="input" id="f-xlPesoC" type="number" min="0" placeholder="ej. 270" oninput="setFormXL('pesoChico', this.value)"></div>
-            <div class="field" style="flex:1;"><label>Peso del XL (g)</label><input class="input" id="f-xlPesoX" type="number" min="0" placeholder="ej. 600" oninput="setFormXL('pesoXL', this.value)"></div>
-          </div>
-          <div class="btn-row">
-            <div class="field" style="flex:1;"><label id="f-xlPriceLbl">Precio del XL</label><input class="input" id="f-xlPrice" type="number" min="0" oninput="setFormXL('precio', this.value)"></div>
-            <div class="field" style="flex:1;"><label id="f-xlMoldLbl">Molde del XL</label><select class="input" id="f-xlMold" onchange="setFormXL('moldId', this.value)"></select></div>
-          </div>
-          <div class="field"><label>Qué te sale de una tanda</label><div id="f-xlSalidas"></div>
-            <button type="button" class="ut-add-row" onclick="addFormSalida()"><span class="icon-slot" data-icon="plus"></span>Agregar opción</button>
-            <p style="font-size:calc(10.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:4px 0 0;">Al hornear te aparecen estas opciones para elegir (si hay una sola, no te pregunta).</p>
-          </div>
-          <div class="rowline"><span class="l" id="f-xlCostLbl">Costo de un XL</span><span id="f-xlCost" style="font-weight:600;font-size:calc(12.5px + var(--kobu-font-boost, 0px));">—</span></div>
-          <div class="rowline"><span class="l" id="f-xlProfitLbl">Ganancia por XL</span><span id="f-xlProfit" style="font-weight:600;color:var(--k-accent);font-size:calc(12.5px + var(--kobu-font-boost, 0px));">—</span></div>
-        </div>
+      <div class="grp-card" id="formXLCard" style="display:none;">
+        <p class="section-title"><span class="badge-ic"><span class="icon-slot" data-icon="cake"></span></span><span id="f-xlTitle">Precio del XL</span></p>
+        <div class="field"><label id="f-xlPriceLbl">Precio del XL</label><input class="input" id="f-xlPrice" type="number" min="0" oninput="rtSetPrecio2(this.value)"></div>
+        <div class="rowline"><span class="l" id="f-xlCostLbl">Costo de un XL</span><span id="f-xlCost" style="font-weight:600;font-size:calc(12.5px + var(--kobu-font-boost, 0px));">—</span></div>
+        <div class="rowline"><span class="l" id="f-xlProfitLbl">Ganancia por XL</span><span id="f-xlProfit" style="font-weight:600;color:var(--k-accent);font-size:calc(12.5px + var(--kobu-font-boost, 0px));">—</span></div>
       </div>
     </div>
     <div class="btn-row formfoot" id="formDeleteRow" style="display:none;">
@@ -4381,13 +4383,16 @@ function renderHomeSummary(){
     msgs.push({ icon:'whisk', color:'var(--k-warning)', text: 'Para los próximos 7 días te falta '+firstShort.name+extraShort+' para la producción.', screen:'orders', tab:'produccion' });
   }
   fidHomeMsgs().forEach(function(m){ msgs.push(m); });
+  (DATA.recipes||[]).filter(function(r){ return rtConflicto(r); }).slice(0, 3).forEach(function(r){
+    msgs.push({ icon:'alert-triangle', color:'var(--k-warning)', text:'Revisá cuánto rinde '+r.title+': "Rinde" y el molde de referencia no coinciden. Tocá para abrirla.', recipe:r.id });
+  });
   if(cloudSyncConfigured()) msgs.push({ icon:'cloud', color:'var(--k-muted)', text: stripTags(cloudSyncStatusText()), screen:null });
   else if(backupIsOverdue()) msgs.push({ icon:'cloud', color:'var(--k-danger)', text: stripTags(backupReminderText()), screen:null });
   homeTickerMsgs = msgs;
   homeTickerIdx = 0;
   const dotsHtml = msgs.map(function(m,i){ return '<span class="home-ticker-dot'+(i===0?' active':'')+'"></span>'; }).join('');
   document.getElementById('homeSummaryBody').innerHTML =
-    '<div class="home-ticker" id="homeTickerBox" onclick="homeTickerClick()" style="cursor:'+((msgs[0].screen||msgs[0].client)?'pointer':'default')+';">'+
+    '<div class="home-ticker" id="homeTickerBox" onclick="homeTickerClick()" style="cursor:'+((msgs[0].screen||msgs[0].client||msgs[0].recipe)?'pointer':'default')+';">'+
       '<span class="icon-slot home-ticker-icon" id="homeTickerIcon" data-icon="'+msgs[0].icon+'" style="color:'+msgs[0].color+';"></span>'+
       '<span class="home-ticker-text" id="homeTickerText" style="color:'+msgs[0].color+';">'+escapeHtml(msgs[0].text)+'</span>'+
     '</div>'+
@@ -4415,7 +4420,7 @@ function advanceHomeTicker(){
     text.textContent = m.text;
     text.style.color = m.color;
     text.style.transform = 'translateX(10px)';
-    if(box) box.style.cursor = (m.screen || m.client) ? 'pointer' : 'default';
+    if(box) box.style.cursor = (m.screen || m.client || m.recipe) ? 'pointer' : 'default';
     requestAnimationFrame(function(){
       text.style.transform = 'translateX(0)';
       text.style.opacity = '1';
@@ -4428,6 +4433,7 @@ function advanceHomeTicker(){
 function homeTickerClick(){
   const m = homeTickerMsgs[homeTickerIdx];
   if(m && m.client){ openClientDetail(m.client); return; }
+  if(m && m.recipe){ if(DATA.recipes.some(function(r){ return r.id===m.recipe; })) openForm(m.recipe); return; }
   if(!m || !m.screen) return;
   if(m.tab) ordersTab = m.tab;
   showScreen(m.screen);
@@ -4976,9 +4982,11 @@ function fillFormFromDraft(){
   document.getElementById('f-salePrice').value = d.salePrice || '';
   document.getElementById('f-packSize').value = d.packSize || '';
   document.getElementById('f-packPrice').value = d.packPrice || '';
-  renderFormXL();
-  state.draft.moldCalibrations = (d.moldCalibrations || []).map(function(c){ return Object.assign({}, c); });
-  setMoldYieldMode(d.moldYieldMode || 'molde');
+  // "Qué sale de una tanda": se arma con lo guardado; abajo ("Probé también con otro molde") quedan los demás moldes.
+  d._rt = rtFromRecipe(d);
+  state.draft.moldCalibrations = d._rt.extras.map(function(c){ return Object.assign({}, c); });
+  setMoldYieldMode(d._rt.modo);
+  renderRT();
   renderMoldCalibRows();
   renderMoldShapeChips();
   updatePhotoPreview();
@@ -5064,7 +5072,7 @@ function renderMoldCalibRows(){
   }
   wrap.innerHTML = list.map(function(c, idx){
     const moldOptions = '<option value="">elegí un molde...</option>' + molds.map(function(u){
-      return '<option value="'+u.id+'"'+(u.id===c.moldId?' selected':'')+'>'+escapeHtml(u.nombre)+'</option>';
+      return '<option value="'+escapeHtml(u.id)+'"'+(u.id===c.moldId?' selected':'')+'>'+escapeHtml(u.nombre)+'</option>';
     }).join('');
     return '<div class="grp-card" style="gap:8px;">'+
       '<div class="btn-row" style="align-items:center;">'+
@@ -5421,79 +5429,342 @@ function syncSalePriceFromPack(){
     priceEl.value = Math.round((packPrice/packSize)*100)/100;
   }
 }
-function renderFormXL(){
+/* ===== QUÉ SALE DE UNA TANDA (14/11/2026) =====
+   Un solo lugar para el rinde: tamaños (nombre, peso, molde), opciones de tanda y, en recetas que se cortan de
+   bandeja, cada bandeja con sus porciones y la cantidad de receta (×0,75 = tres cuartos). En el borrador vive en
+   d._rt = { modo:'molde'|'corte', tams:[{nombre, peso, moldId} (+ {t:'xl'|'chico'} el segundo)], ops:[{b, s, f, m}],
+   precio2, extras (otros moldes probados), aviso }. Al guardar se pasa a los campos de siempre (rtToFields). */
+function rtNum(v){ const n = parseFloat(String(v==null ? '' : v).replace(',', '.')); return (isFinite(n) && n>0) ? n : null; }
+function rtInt(v){ const n = Math.round(parseFloat(String(v==null ? '' : v).replace(',', '.'))); return (isFinite(n) && n>0) ? Math.min(n, 999) : 0; }
+function rtFac(v){ const n = parseFloat(String(v==null ? '' : v).replace(',', '.').replace(/^[x×]\s*/i, '')); return (isFinite(n) && n>0 && n<=20) ? Math.round(n*1000)/1000 : 1; }
+function rtMoldName(id){ const u = id ? (DATA.utensils||[]).find(function(x){ return x.id===id; }) : null; return u ? String(u.nombre||'') : ''; }
+// Receta con un solo tamaño cuyo "Rinde" no coincide con ningún molde de referencia (no se elige ninguno solo).
+function rtConflicto(r){
+  if(!r || isCombo(r) || (r.tam2 && r.tam2.on) || r.moldU) return null;
+  const yq = rtNum(r.yieldQty);
+  const cal = (r.moldCalibrations||[]).filter(function(c){ return c && c.moldId && rtNum(c.yieldQty); });
+  if(!yq || !cal.length || cal.some(function(c){ return Math.abs(rtNum(c.yieldQty)-yq)<1e-9; })) return null;
+  return { yq:yq, c:cal[0] };
+}
+function rtFromRecipe(d){
+  const has2 = !!(d.tam2 && d.tam2.on && !isCombo(d));
+  const base = (d.tam2 && d.tam2.base==='xl') ? 'xl' : 'chico', sec = base==='xl' ? 'chico' : 'xl';
+  // Dos tamaños siempre "cada unidad en su molde" (en bandeja hay un solo tamaño).
+  const modo = (!has2 && d.moldYieldMode==='corte') ? 'corte' : 'molde';
+  const yq = rtNum(d.yieldQty);
+  const cal = (d.moldCalibrations||[]).filter(function(c){ return c && c.moldId; });
+  const pesoT = function(t){ return d.tam2 ? rtNum(t==='xl' ? d.tam2.pesoXL : d.tam2.pesoChico) : null; };
+  let bc = null, aviso = '';
+  const conf = rtConflicto(d);
+  if(d.moldU) bc = cal.find(function(c){ return c.moldId===d.moldU; }) || { moldId:d.moldU };
+  else if(has2) bc = cal.find(function(c){ return pesoT(base) && Math.abs((rtNum(c.unitWeight)||0)-pesoT(base))<1e-9; }) || cal.find(function(c){ return yq && Math.abs((rtNum(c.yieldQty)||0)-yq)<1e-9; }) || null;
+  else if(conf) aviso = '"Rinde" decía '+fmtQty(conf.yq)+' y el molde de referencia ('+(rtMoldName(conf.c.moldId)||'molde')+') decía '+fmtQty(conf.c.yieldQty)+'. Quedó '+fmtQty(conf.yq)+'. Si ese es el molde de siempre, elegilo acá; si no, queda abajo en "Probé también con otro molde".';
+  else bc = yq ? (cal.find(function(c){ return Math.abs((rtNum(c.yieldQty)||0)-yq)<1e-9; }) || null) : null;
+  const t0 = { nombre: d.yieldUnit || 'porciones', peso: (has2 ? pesoT(base) : rtNum(d.pesoU)) || (bc && rtNum(bc.unitWeight)) || '', moldId: modo==='molde' ? ((bc && bc.moldId) || '') : '' };
+  const tams = [t0];
+  if(has2) tams.push({ t:sec, peso: pesoT(sec) || '', moldId: d.tam2.moldId || '' });
+  const xl = base==='xl';
+  let ops = (has2 || d.salidasOk) ? recipeSalidas(d).map(function(x){
+    return { b: xl ? x.x : x.c, s: has2 ? (xl ? x.c : x.x) : 0, f: x.f || 1, m: x.m || '' };
+  }) : [];
+  if(!ops.length) ops = [{ b: yq || '', s:0, f:1, m:'' }];
+  if(modo==='corte' && !ops[0].m && bc) ops[0].m = bc.moldId;
+  // Los demás moldes quedan abajo ("Probé también con otro molde") tal cual estaban.
+  const extras = cal.filter(function(c){ return c!==bc; });
+  const realBc = (bc && cal.indexOf(bc)!==-1) ? JSON.parse(JSON.stringify(bc)) : null;
+  const orig = JSON.parse(JSON.stringify({ yieldQty: d.yieldQty, yieldUnit: d.yieldUnit, moldYieldMode: d.moldYieldMode, tam2: d.tam2 || null, salidas: d.salidas || null, salidasOk: d.salidasOk || null, pesoU: d.pesoU || null, moldU: d.moldU || null }));
+  orig.bc = realBc;
+  return { modo:modo, tams:tams, ops:ops, precio2: (d.tam2 && d.tam2.precio) || '', extras:extras, aviso:aviso, orig:orig, peso0: t0.peso, dirty:false };
+}
+function rtTiene2(rt){ return !!(rt && rt.tams.length>1); }
+function rtDec(v){ const n = rtNum(v); return n ? Math.min(Math.round(n*1000)/1000, 100000) : 0; }
+function rtExtras(d, rt, sinMolde){
+  return (state.draft && state.draft===d ? (d.moldCalibrations || []) : (rt.extras || [])).filter(function(c){
+    return c && c.moldId && parseFloat(c.yieldQty)>0 && parseFloat(c.unitWeight)>0 && !sinMolde[c.moldId];
+  }).map(function(c){ return { id: c.id || ('mc-'+Date.now()+'-'+Math.random().toString(36).slice(2,6)), moldId:c.moldId, yieldQty:parseFloat(c.yieldQty), unitWeight:parseFloat(c.unitWeight) }; });
+}
+function rtToFields(d, rt){
+  const out = {};
+  const o0 = rt.orig || null;
+  // Sin tocar la tarjeta: queda todo exactamente como estaba (solo puede cambiar el precio del otro tamaño).
+  if(o0 && !rt.dirty){
+    out.yieldQty = o0.yieldQty; out.yieldUnit = o0.yieldUnit; out.moldYieldMode = o0.moldYieldMode;
+    out.pesoU = o0.pesoU; out.moldU = o0.moldU; out.salidas = o0.salidas; out.salidasOk = o0.salidasOk;
+    if(o0.tam2) out.tam2 = Object.assign({}, o0.tam2, o0.tam2.on ? { precio: rtNum(rt.precio2) } : {});
+    const sin = {}; if(o0.bc) sin[o0.bc.moldId] = 1;
+    out.moldCalibrations = (o0.bc ? [Object.assign({}, o0.bc)] : []).concat(rtExtras(d, rt, sin));
+    return out;
+  }
+  const t0 = rt.tams[0] || {};
+  const has2 = rtTiene2(rt);
+  const sec = has2 ? (rt.tams[1].t==='chico' ? 'chico' : 'xl') : null;
+  const base = has2 ? (sec==='xl' ? 'chico' : 'xl') : ((d.tam2 && d.tam2.base==='xl') ? 'xl' : 'chico');
+  out.moldYieldMode = has2 ? 'molde' : rt.modo;
+  out.yieldUnit = String(t0.nombre||'').trim().slice(0, 40) || 'porciones';
+  const ops = rt.ops.map(function(o){ return { b: has2 ? rtInt(o.b) : rtDec(o.b), s: has2 ? rtInt(o.s) : 0, f: rtFac(o.f), m: (!has2 && rt.modo==='corte') ? String(o.m||'') : '' }; })
+    .filter(function(o){ return o.b + o.s > 0; });
+  const o1 = ops[0] || null;
+  out.yieldQty = o1 ? Math.round(o1.b/o1.f*1000)/1000 : 0;
+  out.pesoU = rtNum(t0.peso);
+  out.moldU = (has2 || rt.modo==='molde') ? (t0.moldId || null) : null;
+  if(has2){
+    const t1 = rt.tams[1];
+    out.tam2 = Object.assign({}, d.tam2 || {}, { on:true, base:base, precio: rtNum(rt.precio2),
+      pesoChico: base==='chico' ? rtNum(t0.peso) : rtNum(t1.peso), pesoXL: base==='xl' ? rtNum(t0.peso) : rtNum(t1.peso), moldId: t1.moldId || null });
+  } else if(d.tam2){
+    out.tam2 = Object.assign({}, d.tam2, { on:false });
+  }
+  const simple = !has2 && ops.length<=1 && (!o1 || (o1.f===1 && !o1.m));
+  out.salidas = simple ? null : ops.map(function(o){
+    const x = base==='xl' ? { c:o.s, x:o.b } : { c:o.b, x:o.s };
+    if(o.f!==1) x.f = o.f;
+    if(o.m) x.m = o.m;
+    return x;
+  });
+  out.salidasOk = (!has2 && !simple) ? 1 : null;
+  // Moldes para estimar con otro molde en la ficha: el de siempre (con la receta entera) + los otros probados.
+  const der = [];
+  const ob = o0 && o0.bc;
+  const nuevo = function(m, y, w){
+    // Si no cambió nada de ese molde, queda el mismo dato (con su id).
+    if(ob && ob.moldId===m && Math.abs((rtNum(ob.yieldQty)||0)-y)<1e-9 && Math.abs((rtNum(ob.unitWeight)||0)-w)<1e-9) return Object.assign({}, ob);
+    return { id:'mc-'+Date.now()+'-'+Math.random().toString(36).slice(2,6), moldId:m, yieldQty:y, unitWeight:w };
+  };
+  if(o1 && (has2 || rt.modo==='molde')){
+    const pb = rtNum(t0.peso);
+    if(t0.moldId && pb && out.yieldQty>0) der.push(nuevo(t0.moldId, out.yieldQty, pb));
+  } else if(o1){
+    const pp = rtNum(t0.peso);
+    ops.forEach(function(o){ if(o.m && pp && o.f===1 && !der.some(function(x){ return x.moldId===o.m; })) der.push(nuevo(o.m, o.b, pp)); });
+  }
+  // El molde de siempre de antes, si ya no se usa arriba, no se pierde: queda con los otros.
+  const sin = {}; der.forEach(function(x){ sin[x.moldId] = 1; });
+  const extras = rtExtras(d, rt, sin);
+  if(ob && !sin[ob.moldId] && !extras.some(function(c){ return c.moldId===ob.moldId; })) extras.unshift(Object.assign({}, ob));
+  out.moldCalibrations = der.concat(extras);
+  return out;
+}
+// Borrador con los campos ya armados (para mostrar costos mientras se edita).
+function rtDraft(){
   const d = state.draft;
-  if(!d || !document.getElementById('formXLCard')) return;
-  const on = !!(d.tam2 && d.tam2.on);
-  document.getElementById('f-xlOn').classList.toggle('on', on);
-  document.getElementById('f-xlBody').style.display = on ? 'flex' : 'none';
+  if(!d || !d._rt) return d;
+  const o = rtToFields(d, d._rt);
+  const x = Object.assign({}, d, { yieldQty:o.yieldQty, yieldUnit:o.yieldUnit, moldYieldMode:o.moldYieldMode });
+  if(o.tam2) x.tam2 = o.tam2;
+  if(o.salidas) x.salidas = o.salidas; else delete x.salidas;
+  if(o.salidasOk) x.salidasOk = 1; else delete x.salidasOk;
+  return x;
+}
+function rtMoldOptions(sel, vacio){
+  return '<option value="">'+escapeHtml(vacio)+'</option>'+utensilsSorted('molde').map(function(u){ const dm = moldDimsLabel(u); return '<option value="'+escapeHtml(u.id)+'"'+(u.id===sel?' selected':'')+'>'+escapeHtml(u.nombre||'')+(dm?' ('+escapeHtml(dm)+')':'')+'</option>'; }).join('');
+}
+function renderRT(){
+  const d = state.draft, wrap = document.getElementById('f-rtBody');
+  if(!d || !wrap) return;
+  if(!d._rt) d._rt = rtFromRecipe(d);
+  const rt = d._rt, has2 = rtTiene2(rt), corte = rt.modo==='corte';
+  const t0 = rt.tams[0];
+  const val = function(v){ return escapeHtml(v==null ? '' : String(v)); };
+  let h = '<div class="field"><label>¿Cómo sale?</label><div class="rt-mode">'+
+    '<button type="button" class="chip'+(corte?'':' active')+'" onclick="rtSetModo(\'molde\')">Cada unidad en su molde</button>'+
+    '<button type="button" class="chip'+(corte?' active':'')+'" onclick="rtSetModo(\'corte\')">Se corta de una bandeja</button></div></div>';
+  if(rt.aviso) h += '<div class="rt-aviso"><span class="icon-slot" data-icon="alert-triangle"></span><span>'+escapeHtml(rt.aviso)+'</span></div>';
+  const baseW = has2 ? tamNombre(rt.tams[1].t==='chico' ? 'xl' : 'chico') : '';
+  if(!corte){
+    h += '<p class="rt-sub">'+(has2 ? 'Tamaños' : 'Tamaño')+'</p>';
+    h += '<div class="rt-row"><div class="field"><label>'+(has2 ? 'Tamaño '+baseW : 'Unidad de venta')+'</label><input class="input" value="'+val(t0.nombre)+'" placeholder="budín, porción..." oninput="rtSetTam(0,\'nombre\',this.value)"></div>'+
+      '<div class="field"><label>Peso c/u (g)</label><input class="input" type="number" min="0" value="'+val(t0.peso)+'" placeholder="ej. 270" oninput="rtSetTam(0,\'peso\',this.value)"></div>'+
+      '<div class="field"><label>Molde</label><select class="input" onchange="rtSetTam(0,\'moldId\',this.value)">'+rtMoldOptions(t0.moldId, 'sin molde')+'</select></div><span></span></div>';
+    if(has2){
+      const t1 = rt.tams[1];
+      h += '<div class="rt-row"><div class="field"><label>Otro tamaño</label><select class="input" onchange="rtSetSecTipo(this.value)"><option value="xl"'+(t1.t!=='chico'?' selected':'')+'>XL</option><option value="chico"'+(t1.t==='chico'?' selected':'')+'>chico</option></select></div>'+
+        '<div class="field"><label>Peso c/u (g)</label><input class="input" type="number" min="0" value="'+val(t1.peso)+'" placeholder="ej. 540" oninput="rtSetTam(1,\'peso\',this.value)"></div>'+
+        '<div class="field"><label>Molde</label><select class="input" onchange="rtSetTam(1,\'moldId\',this.value)">'+rtMoldOptions(t1.moldId, 'sin molde')+'</select></div>'+
+        '<button type="button" class="rt-x" aria-label="Quitar tamaño" onclick="rtRemoveTam()"><span class="icon-slot" data-icon="trash"></span></button></div>';
+    } else {
+      h += '<button type="button" class="ut-add-row" onclick="rtAddTam()"><span class="icon-slot" data-icon="plus"></span>Agregar otro tamaño (chico o XL)</button>';
+    }
+  } else {
+    h += '<p class="rt-sub">Unidad</p><div class="rt-row rt-row2"><div class="field"><label>Se vende por</label><input class="input" value="'+val(t0.nombre)+'" placeholder="porción" oninput="rtSetTam(0,\'nombre\',this.value)"></div>'+
+      '<div class="field"><label>Peso c/u (g)</label><input class="input" type="number" min="0" value="'+val(t0.peso)+'" placeholder="ej. 110" oninput="rtSetTam(0,\'peso\',this.value)"></div></div>';
+  }
+  h += '<button type="button" class="btn btn-ghost" onclick="rtEstimarPeso()">Estimar peso con mis ingredientes</button>';
+  const many = rt.ops.length>1;
+  if(corte) h += '<p class="rt-sub">Bandejas</p><p class="rt-hint">'+(many ? 'Al hornear elegís en qué bandeja. Kobu descuenta los ingredientes según la cantidad de receta. La primera es la de siempre (se usa para el costo).' : 'Si a veces usás otra bandeja, agregala: al hornear la elegís y Kobu descuenta los ingredientes según la cantidad de receta.')+'</p>';
+  else if(many || has2) h += '<p class="rt-sub">Opciones de tanda</p><p class="rt-hint">'+(many ? 'Al hornear elegís cuál salió. La primera es la de siempre (se usa para el costo).' : 'Si a veces sale distinto (por ej. 1 XL + 1 chico), agregá otra opción.')+'</p>';
+  rt.ops.forEach(function(o, i){
+    const top = '<div class="rt-op-top"><b>'+(corte ? escapeHtml(rtMoldName(o.m) || 'Bandeja '+(i+1)) : (many ? 'Opción '+(i+1) : 'Por tanda salen'))+'</b>'+
+      (many && i===0 ? '<span class="rt-tag">la de siempre</span>' : '')+
+      (i>0 ? '<button type="button" class="rt-x" aria-label="Quitar" onclick="rtRemoveOp('+i+')"><span class="icon-slot" data-icon="trash"></span></button>' : '')+'</div>';
+    let cnt;
+    if(corte){
+      cnt = '<div class="rt-cnt"><select class="input" onchange="rtSetOp('+i+',\'m\',this.value)">'+rtMoldOptions(o.m, 'elegí la bandeja')+'</select></div>'+
+        '<div class="rt-cnt"><input class="input" type="number" min="0" step="1" value="'+val(o.b)+'" oninput="rtSetOp('+i+',\'b\',this.value)"> '+escapeHtml(t0.nombre||'porciones')+' · receta ×<input class="input" inputmode="decimal" value="'+val(String(o.f==null?1:o.f).replace('.', ','))+'" oninput="rtSetOp('+i+',\'f\',this.value)"></div>';
+    } else if(has2){
+      const bw = tamNombre(rt.tams[1].t==='chico' ? 'xl' : 'chico'), sw = tamNombre(rt.tams[1].t==='chico' ? 'chico' : 'xl');
+      cnt = '<div class="rt-cnt"><input class="input" type="number" min="0" step="1" value="'+val(o.b)+'" oninput="rtSetOp('+i+',\'b\',this.value)"> '+(bw==='chico' ? 'chicos' : bw)+
+        ' <input class="input" type="number" min="0" step="1" value="'+val(o.s)+'" oninput="rtSetOp('+i+',\'s\',this.value)"> '+(sw==='chico' ? 'chicos' : sw)+'</div>';
+    } else {
+      cnt = '<div class="rt-cnt"><input class="input" type="number" min="0" step="any" value="'+val(o.b)+'" oninput="rtSetOp('+i+',\'b\',this.value)"> '+escapeHtml(t0.nombre||'porciones')+'</div>';
+    }
+    h += '<div class="rt-op">'+top+cnt+'</div>';
+  });
+  if(corte || has2 || many) h += '<button type="button" class="ut-add-row" onclick="rtAddOp()"><span class="icon-slot" data-icon="plus"></span>'+(corte ? 'Agregar bandeja' : 'Agregar opción')+'</button>';
+  h += '<div id="f-rtSum"></div>';
+  wrap.innerHTML = h;
+  mountIcons();
+  rtSync();
+}
+function rtSumHtml(){
+  const d = state.draft;
+  if(!d || !d._rt) return '';
+  const fd = rtDraft(), c = computeRecipeCost(fd);
+  if(c.costPerUnit==null) return '<div class="rt-sum"><span>Costo por unidad</span><span style="color:var(--k-muted);">completá cuánto sale</span></div>';
+  if(rtTiene2(d._rt)){
+    const b = baseTam(fd), sc = secTam(fd);
+    return '<div class="rt-sum"><span>Costo de un '+tamNombre(b)+'</span><span>'+fmtMoney(c.costPerUnit)+'</span></div><div class="rt-sum"><span>Costo de un '+tamNombre(sc)+'</span><span>'+fmtMoney(c.costPerUnit*secEq(fd))+'</span></div>';
+  }
+  return '<div class="rt-sum"><span>Costo por unidad ('+escapeHtml(String(fd.yieldUnit||'unidad'))+')</span><span>'+fmtMoney(c.costPerUnit)+'</span></div>';
+}
+// Deja "Rinde" y "Unidad" (ocultos) al día: los usan el costo, el precio y la ficha mientras se edita.
+function rtSync(){
+  const d = state.draft;
+  if(!d || !d._rt) return;
+  const o = rtToFields(d, d._rt);
+  const yq = document.getElementById('f-yieldQty'), yu = document.getElementById('f-yieldUnit');
+  if(yq) yq.value = o.yieldQty || '';
+  if(yu) yu.value = o.yieldUnit;
+  const sm = document.getElementById('f-rtSum');
+  if(sm) sm.innerHTML = rtSumHtml();
+  renderFormXL();
+  updateFormCostPreview();
+}
+function rtSetModo(m){
+  const rt = state.draft && state.draft._rt;
+  if(!rt) return;
+  m = m==='corte' ? 'corte' : 'molde';
+  if(rt.modo===m) return;
+  rt.dirty = true;
+  if(m==='corte'){
+    // Bandeja: un solo tamaño; el molde de siempre pasa a ser la bandeja de la primera opción.
+    if(rt.tams.length>1) rt.tams = rt.tams.slice(0, 1);
+    rt.ops.forEach(function(o, i){ o.s = 0; if(i===0 && !o.m) o.m = rt.tams[0].moldId || ''; });
+    if(rt.tams[0].nombre==='' || /^(budin|budín)/i.test(rt.tams[0].nombre)) rt.tams[0].nombre = 'porciones';
+  } else {
+    if(!rt.tams[0].moldId && rt.ops[0] && rt.ops[0].m) rt.tams[0].moldId = rt.ops[0].m;
+    rt.ops.forEach(function(o){ o.m = ''; o.f = 1; });
+  }
+  rt.modo = m;
+  setMoldYieldMode(m);
+  renderRT();
+}
+function rtSetTam(i, k, v){
+  const rt = state.draft && state.draft._rt;
+  if(!rt || !rt.tams[i]) return;
+  rt.dirty = true;
+  rt.tams[i][k] = (k==='nombre' || k==='moldId') ? String(v||'') : v;
+  if(k==='moldId'){ renderRT(); return; }
+  rtSync();
+}
+function rtSetSecTipo(t){ const rt = state.draft && state.draft._rt; if(!rt || !rt.tams[1]) return; rt.dirty = true; rt.tams[1].t = t==='chico' ? 'chico' : 'xl'; renderRT(); }
+function rtAddTam(){
+  const d = state.draft, rt = d && d._rt;
+  if(!rt || rt.tams.length>1) return;
+  rt.dirty = true;
+  const xlTxt = /\bxl\b/i.test(String(rt.tams[0].nombre||'')+' '+String(d.title||''));
+  rt.tams.push({ t: xlTxt ? 'chico' : 'xl', peso:'', moldId:'' });
+  if(rt.ops.length<2){
+    const b = rtInt(rt.ops[0] && rt.ops[0].b);
+    rt.ops = [{ b:b||1, s:0, f:1, m:'' }, xlTxt ? { b:1, s:1, f:1, m:'' } : { b:Math.max(0, b-2), s:1, f:1, m:'' }];
+  }
+  renderRT();
+}
+function rtRemoveTam(){
+  const rt = state.draft && state.draft._rt;
+  if(!rt || rt.tams.length<2) return;
+  rt.dirty = true;
+  rt.tams = rt.tams.slice(0, 1);
+  rt.ops = rt.ops.map(function(o){ return Object.assign({}, o, { s:0 }); }).filter(function(o){ return rtInt(o.b)>0; });
+  if(!rt.ops.length) rt.ops = [{ b:'', s:0, f:1, m:'' }];
+  renderRT();
+}
+function rtSetOp(i, k, v){
+  const rt = state.draft && state.draft._rt;
+  if(!rt || !rt.ops[i]) return;
+  rt.dirty = true;
+  const o = rt.ops[i];
+  if(k==='m'){ o.m = String(v||''); renderRT(); return; }
+  if(k==='f'){ o.f = v; o._fAuto = false; }
+  else o[k] = v;
+  // Bandeja nueva: la cantidad de receta se completa sola según las porciones (6 de 8 = ×0,75).
+  if(k==='b' && i>0 && rt.modo==='corte' && o._fAuto!==false){
+    const b0 = rtInt(rt.ops[0].b), b = rtInt(v);
+    if(b0 && b){ o.f = Math.round(b/b0*rtFac(rt.ops[0].f)*100)/100; o._fAuto = true; const inp = document.querySelectorAll('#f-rtBody .rt-op')[i]; const fi = inp && inp.querySelectorAll('input')[1]; if(fi) fi.value = String(o.f).replace('.', ','); }
+  }
+  rtSync();
+}
+function rtAddOp(){
+  const rt = state.draft && state.draft._rt;
+  if(!rt) return;
+  rt.dirty = true;
+  rt.ops.push(rt.modo==='corte' ? { b:'', s:0, f:1, m:'', _fAuto:true } : (rtTiene2(rt) ? { b:1, s:1, f:1, m:'' } : { b:'', s:0, f:1, m:'' }));
+  renderRT();
+}
+function rtRemoveOp(i){
+  const rt = state.draft && state.draft._rt;
+  if(!rt || i<1 || !rt.ops[i]) return;
+  rt.dirty = true;
+  rt.ops.splice(i, 1);
+  renderRT();
+}
+function rtSetPrecio2(v){ const rt = state.draft && state.draft._rt; if(!rt) return; rt.precio2 = v; updateFormXLPreview(); }
+// Peso por unidad estimado con los ingredientes (con ~12% de pérdida al hornear), para la opción de siempre.
+function rtEstimarPeso(){
+  flushActiveComponent();
+  const d = state.draft, rt = d && d._rt;
+  if(!rt) return;
+  const o = rt.ops[0] || {};
+  const b = rtInt(o.b), sN = rtTiene2(rt) ? rtInt(o.s) : 0, f = rtFac(o.f);
+  if(!b && !sN){ showToast('Primero cargá cuánto sale de una tanda'); return; }
+  const raw = recipeRawWeightGrams(d);
+  if(!raw.hasData){ showToast('No pude estimarlo — cargá los ingredientes en una unidad de peso (g, kg) o volumen (ml, l)'); return; }
+  const W = raw.total*BAKE_LOSS_FACTOR*f;
+  let pb;
+  if(sN){
+    const ps = rtNum(rt.tams[1].peso);
+    if(!ps){ showToast('Cargá primero el peso del '+tamNombre(rt.tams[1].t)+' y vuelvo a estimar el otro'); return; }
+    pb = b ? (W - sN*ps)/b : null;
+  } else pb = W/b;
+  if(!(pb>0)){ showToast('No me dan las cuentas: revisá cuánto sale y el peso del otro tamaño'); return; }
+  rt.dirty = true;
+  rt.tams[0].peso = Math.round(pb);
+  renderRT();
+  showToast('Estimado ~'+Math.round(pb)+'g por unidad (asumiendo ~12% de pérdida al hornear)'+(raw.skippedSome ? ' — algunos ingredientes en unidades no convertibles (ej. "u") no se contaron' : '')+'. Corregilo cuando peses el resultado real.');
+}
+// Precio del otro tamaño (pestaña Precio): se ve solo con dos tamaños.
+function renderFormXL(){
+  const d = state.draft, card = document.getElementById('formXLCard');
+  if(!d || !card) return;
+  const rt = d._rt, on = rtTiene2(rt);
+  card.style.display = on ? '' : 'none';
   if(!on) return;
-  const base = d.tam2.base==='xl' ? 'xl' : 'chico', sec = base==='xl' ? 'chico' : 'xl';
-  document.getElementById('f-xlBaseC').className = 'btn '+(base==='chico' ? 'btn-primary' : 'btn-ghost');
-  document.getElementById('f-xlBaseX').className = 'btn '+(base==='xl' ? 'btn-primary' : 'btn-ghost');
-  document.getElementById('f-xlPesoC').value = d.tam2.pesoChico || '';
-  document.getElementById('f-xlPesoX').value = d.tam2.pesoXL || '';
-  document.getElementById('f-xlPrice').value = d.tam2.precio || '';
-  const nm = tamNombre(sec);
+  const nm = tamNombre(rt.tams[1].t==='chico' ? 'chico' : 'xl');
+  document.getElementById('f-xlTitle').textContent = 'Precio del '+nm;
   document.getElementById('f-xlPriceLbl').textContent = 'Precio del '+nm;
-  document.getElementById('f-xlMoldLbl').textContent = 'Molde del '+nm;
   document.getElementById('f-xlCostLbl').textContent = 'Costo de un '+nm;
   document.getElementById('f-xlProfitLbl').textContent = 'Ganancia por '+nm;
-  const sel = document.getElementById('f-xlMold');
-  sel.innerHTML = '<option value="">sin molde</option>'+utensilsSorted('molde').map(function(u){ const dm = moldDimsLabel(u); return '<option value="'+escapeHtml(u.id)+'">'+escapeHtml(u.nombre||'')+(dm?' ('+escapeHtml(dm)+')':'')+'</option>'; }).join('');
-  sel.value = d.tam2.moldId || '';
-  renderFormSalidas();
+  const pi = document.getElementById('f-xlPrice');
+  if(document.activeElement!==pi) pi.value = rt.precio2 || '';
   updateFormXLPreview();
 }
-function formXLDraft(){
-  const d = state.draft;
-  const y = parseFloat((document.getElementById('f-yieldQty')||{}).value) || d.yieldQty;
-  return Object.assign({}, d, { yieldQty:y });
-}
-function toggleFormXL(){
-  const d = state.draft;
-  if(!d) return;
-  if(!d.tam2){
-    const xlTxt = /xl/i.test(String(d.yieldUnit||'')+' '+String(d.title||''));
-    d.tam2 = { on:false, base: xlTxt ? 'xl' : 'chico', precio:null, pesoChico:null, pesoXL:null, moldId:null };
-  }
-  d.tam2.on = !d.tam2.on;
-  if(d.tam2.on && !(Array.isArray(d.salidas) && d.salidas.length)) d.salidas = defaultSalidas(formXLDraft());
-  renderFormXL();
-}
-function setFormXLBase(b){
-  const d = state.draft;
-  if(!d || !d.tam2) return;
-  if(d.tam2.base!==b){ d.tam2.base = b; d.salidas = defaultSalidas(formXLDraft()); }
-  renderFormXL();
-}
-function setFormXL(field, val){
-  const d = state.draft;
-  if(!d || !d.tam2) return;
-  d.tam2[field] = (field==='moldId') ? (val||null) : val;
-  updateFormXLPreview();
-}
-function renderFormSalidas(){
-  const d = state.draft, wrap = document.getElementById('f-xlSalidas');
-  if(!d || !wrap) return;
-  if(!Array.isArray(d.salidas)) d.salidas = [];
-  wrap.innerHTML = d.salidas.map(function(x, i){
-    return '<div class="xl-sal-row"><input class="input" type="number" min="0" step="1" value="'+(x.x||0)+'" oninput="setFormSalida('+i+',\'x\',this.value)"> XL <span style="color:var(--k-muted);">+</span> '+
-      '<input class="input" type="number" min="0" step="1" value="'+(x.c||0)+'" oninput="setFormSalida('+i+',\'c\',this.value)"> chicos'+
-      '<span class="xl-x icon-slot" data-icon="x" onclick="removeFormSalida('+i+')"></span></div>';
-  }).join('') || '<p style="font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin:4px 0;">Sin opciones: se usan las de siempre.</p>';
-  mountIcons();
-}
-function setFormSalida(i, k, val){ const d = state.draft; if(d && d.salidas && d.salidas[i]) d.salidas[i][k] = Math.max(0, Math.round(parseFloat(val)||0)); }
-function addFormSalida(){ const d = state.draft; if(!d) return; if(!Array.isArray(d.salidas)) d.salidas = []; d.salidas.push({ c:0, x:1 }); renderFormSalidas(); }
-function removeFormSalida(i){ const d = state.draft; if(d && d.salidas){ d.salidas.splice(i, 1); renderFormSalidas(); } }
+function formXLDraft(){ return rtDraft(); }
 function updateFormXLPreview(){
   const d = state.draft, ce = document.getElementById('f-xlCost'), pe = document.getElementById('f-xlProfit');
-  if(!d || !ce || !d.tam2 || !d.tam2.on) return;
-  const fd = formXLDraft();
+  if(!d || !ce || !rtTiene2(d._rt)) return;
+  const fd = rtDraft();
   const c = computeRecipeCost(fd);
-  if(c.costPerUnit==null){ ce.textContent = 'completá "Rinde" arriba'; pe.textContent = '—'; return; }
-  const cost = c.costPerUnit*secEq(fd), price = parseFloat(d.tam2.precio);
+  if(c.costPerUnit==null){ ce.textContent = 'completá cuánto sale de una tanda'; pe.textContent = '—'; return; }
+  const cost = c.costPerUnit*secEq(fd), price = parseFloat(d._rt.precio2);
   ce.textContent = fmtMoney(cost);
   pe.textContent = isNaN(price) ? 'falta el precio' : fmtMoney(price - cost);
   pe.style.color = isNaN(price) ? 'var(--k-muted)' : ((price - cost)<0 ? 'var(--k-danger)' : 'var(--k-accent)');
@@ -5982,7 +6253,9 @@ function applyLibraryFormMode(){
     updateIconPreview();
   }
   document.getElementById('f-timediff-row').style.display = on ? 'none' : '';
-  document.getElementById('f-yield-row').style.display = on ? 'none' : '';
+  document.getElementById('f-yield-row').style.display = 'none';
+  const rtCard = document.getElementById('formRindeCard');
+  if(rtCard) rtCard.style.display = on ? 'none' : '';
   document.getElementById('f-title-label').textContent = on ? 'Nombre de la preparación' : 'Título';
   document.getElementById('f-title').placeholder = on ? 'ej. Merengue italiano' : 'ej. Brownie clásico';
   const tagsLabel = document.getElementById('f-tags-label');
@@ -6196,14 +6469,17 @@ function saveRecipe(){
     return { id: c.id || ('mc-'+Date.now()+'-'+Math.random().toString(36).slice(2,6)), moldId:c.moldId, yieldQty:parseFloat(c.yieldQty), unitWeight:parseFloat(c.unitWeight) };
   });
   d.moldYieldMode = (state.draft.moldYieldMode==='corte') ? 'corte' : 'molde';
-  if(d.tam2 && d.tam2.on){
-    const num = function(id){ const v = parseFloat(document.getElementById(id).value); return v>0 ? v : null; };
-    d.tam2 = { on:true, base: d.tam2.base==='xl' ? 'xl' : 'chico', precio: num('f-xlPrice'), pesoChico: num('f-xlPesoC'), pesoXL: num('f-xlPesoX'), moldId: document.getElementById('f-xlMold').value || null };
-    d.salidas = recipeSalidas(d);
-    if(d.stock2==null) d.stock2 = 0;
-  } else if(d.tam2){
-    d.tam2.on = false;
-  }
+  // "Qué sale de una tanda" → los campos de siempre (rinde, unidad, moldes, dos tamaños, opciones de tanda).
+  const rtOut = rtToFields(d, d._rt || rtFromRecipe(d));
+  d.yieldQty = rtOut.yieldQty; d.yieldUnit = rtOut.yieldUnit; d.moldYieldMode = rtOut.moldYieldMode;
+  d.moldCalibrations = rtOut.moldCalibrations;
+  if(rtOut.pesoU) d.pesoU = rtOut.pesoU; else delete d.pesoU;
+  if(rtOut.moldU) d.moldU = rtOut.moldU; else delete d.moldU;
+  if(rtOut.tam2) d.tam2 = rtOut.tam2;
+  if(rtOut.salidas) d.salidas = rtOut.salidas; else delete d.salidas;
+  if(rtOut.salidasOk) d.salidasOk = 1; else delete d.salidasOk;
+  if(d.tam2 && d.tam2.on && d.stock2==null) d.stock2 = 0;
+  delete d._rt;
   d.dietBaseType = d.isDietVariant ? null : (d.dietBaseType || null);
   d.quickNotes = d.quickNotes || [];
   if(d.mediaMode === 'icono'){ d.photo = null; } else { d.icon = null; }
@@ -6319,17 +6595,43 @@ function defaultSalidas(r){
   out.push({ c:0, x:1 });
   return out;
 }
+// Opciones de tanda: {c, x} = chicos y XL (en recetas de un tamaño, solo el del tamaño base); f = cantidad de receta
+// (0.75 = tres cuartos; sin f = entera); m = molde o bandeja de esa opción.
 function recipeSalidas(r){
-  if(!(r && r.tam2 && r.tam2.on)) return [];
-  const l = (Array.isArray(r.salidas) ? r.salidas : []).map(function(x){ return { c: Math.max(0, Math.round(Number(x && x.c)||0)), x: Math.max(0, Math.round(Number(x && x.x)||0)) }; })
-    .filter(function(x){ return x.c>0 || x.x>0; });
-  return l.length ? l : defaultSalidas(r);
+  if(!r || isCombo(r)) return [];
+  const has2 = !!(r.tam2 && r.tam2.on);
+  // Un tamaño: solo las opciones guardadas por "Qué sale de una tanda" (salidasOk); las que quedaron de cuando
+  // "Dos tamaños" estaba prendido no cuentan.
+  if(!has2 && !r.salidasOk) return [];
+  const xl = baseTam(r)==='xl';
+  const nn = function(v){ const n = Number(v); return (isFinite(n) && n>0) ? (has2 ? Math.round(n) : Math.round(n*1000)/1000) : 0; };
+  const l = (Array.isArray(r.salidas) ? r.salidas : []).map(function(x){
+    const o = { c: nn(x && x.c), x: nn(x && x.x) };
+    if(!has2){ if(xl) o.c = 0; else o.x = 0; }
+    const f = parseFloat(x && x.f);
+    if(isFinite(f) && f>0 && f<=20 && Math.abs(f-1)>1e-9) o.f = Math.round(f*1000)/1000;
+    if(x && typeof x.m==='string' && x.m) o.m = x.m;
+    return o;
+  }).filter(function(x){ return x.c>0 || x.x>0; });
+  if(has2) return l.length ? l : defaultSalidas(r);
+  return l;
 }
-function salidaLabel(x){
-  const p = [];
-  if(x.x>0) p.push(x.x+' XL');
-  if(x.c>0) p.push(x.c+(x.c===1 ? ' chico' : ' chicos'));
-  return p.join(' + ');
+function salidaLabel(x, r){
+  r = (r && typeof r==='object') ? r : null;
+  let t;
+  if(r && !recipeHas2(r)){
+    const n = baseTam(r)==='xl' ? x.x : x.c;
+    t = fmtQty(n)+' '+(r.yieldUnit || 'porciones');
+  } else {
+    const p = [];
+    if(x.x>0) p.push(x.x+' XL');
+    if(x.c>0) p.push(x.c+(x.c===1 ? ' chico' : ' chicos'));
+    t = p.join(' + ');
+  }
+  const extra = [];
+  if(x.m){ const u = (DATA.utensils||[]).find(function(u){ return u.id===x.m; }); if(u && u.nombre) extra.push(String(u.nombre)); }
+  if(x.f && Math.abs(x.f-1)>1e-9) extra.push('receta ×'+String(Math.round(x.f*100)/100).replace('.', ','));
+  return t + (extra.length ? ' · '+extra.join(' · ') : '');
 }
 // Listos de un tamaño ('chico' o 'xl') de una receta con dos tamaños.
 function stockTam(r, t){ return t===baseTam(r) ? (Number(r.stock)||0) : (Number(r.stock2)||0); }
@@ -6338,7 +6640,7 @@ function tamResumen(r){
   if(!recipeHas2(r)) return '';
   const sc = secTam(r), pr = secPrecio(r), co = secCost(r);
   return 'Dos tamaños: la receta rinde '+(baseTam(r)==='xl' ? 'XL' : 'chicos')+' ('+fmtQty(pesoTam(r, baseTam(r)))+' g) y también sale '+tamNombre(sc)+' ('+fmtQty(pesoTam(r, sc))+' g)'+
-    (pr ? ' a '+fmtMoney(pr) : ' sin precio')+(co!=null ? ' (costo '+fmtMoney(co)+')' : '')+'; por tanda sale: '+recipeSalidas(r).map(salidaLabel).join(' o ');
+    (pr ? ' a '+fmtMoney(pr) : ' sin precio')+(co!=null ? ' (costo '+fmtMoney(co)+')' : '')+'; por tanda sale: '+recipeSalidas(r).map(function(x){ return salidaLabel(x, r); }).join(' o ');
 }
 function recipeStockText(r){
   if(!recipeHas2(r)) return String(recipeStockOf(r));
@@ -7409,7 +7711,9 @@ function buildRecipeExportText(r){
   if(recipeHas2(r)){
     const co2 = secCost(r);
     if(co2!=null) lines.push('> Costo '+tamNombre(secTam(r))+': '+fmtMoney(co2));
-    lines.push('> Por tanda sale: '+recipeSalidas(r).map(salidaLabel).join(' o '));
+    lines.push('> Por tanda sale: '+recipeSalidas(r).map(function(x){ return salidaLabel(x, r); }).join(' o '));
+  } else if(recipeSalidas(r).length>1){
+    lines.push('> Por tanda sale: '+recipeSalidas(r).map(function(x){ return salidaLabel(x, r); }).join(' o '));
   }
   lines.push('');
   lines.push('Ingredientes');
@@ -10338,13 +10642,14 @@ function recipeIngredientStockGaps(r, scale){
 // opts.salida = {c, x} (chicos y XL de cada tanda) y opts.tandas: recetas con dos tamaños.
 function registrarHorneada(recipeId, porciones, opts){
   const r = DATA.recipes.find(function(x){ return x.id===recipeId; });
-  const sal = (opts && opts.salida && recipeHas2(r)) ? opts.salida : null;
+  const sal = (opts && opts.salida && (recipeHas2(r) || recipeSalidas(r).length)) ? opts.salida : null;
   const tandas = sal ? (Number(opts.tandas)||0) : 0;
   if(!r || (sal ? !(tandas>0) : (!porciones || porciones<=0))) return;
+  const fac = sal && Number(sal.f)>0 && Number(sal.f)<=20 ? Number(sal.f) : 1;
   const willDeduct = DATA.settings.discountStockOnSale!==false;
   if(willDeduct){
     const yieldQty = r.yieldQty || 1;
-    const scale = sal ? tandas : porciones / yieldQty;
+    const scale = sal ? tandas*fac : porciones / yieldQty;
     flatRecipeIngredients(r).forEach(function(ing){
       if(!ing.priceId) return;
       const perUnitQty = parseFloat(ing.qty);
@@ -10357,8 +10662,8 @@ function registrarHorneada(recipeId, porciones, opts){
   }
   if(sal){
     const xlBase = baseTam(r)==='xl';
-    r.stock = roundQty((r.stock||0) + (xlBase ? sal.x : sal.c)*tandas);
-    r.stock2 = roundQty((Number(r.stock2)||0) + (xlBase ? sal.c : sal.x)*tandas);
+    r.stock = roundQty((r.stock||0) + ((xlBase ? sal.x : sal.c)||0)*tandas);
+    if(recipeHas2(r)) r.stock2 = roundQty((Number(r.stock2)||0) + ((xlBase ? sal.c : sal.x)||0)*tandas);
     return;
   }
   r.stock = roundQty((r.stock||0) + porciones);
@@ -10409,16 +10714,19 @@ function renderBakeSalidas(){
   const r = DATA.recipes.find(function(x){ return x.id===bakeModalRecipeId; });
   const wrap = document.getElementById('bakeModalSalWrap');
   const sals = recipeSalidas(r);
-  if(!recipeHas2(r) || !sals.length){ wrap.style.display = 'none'; return; }
+  if(!sals.length || (!recipeHas2(r) && sals.length<2)){ wrap.style.display = 'none'; return; }
   wrap.style.display = '';
   if(bakeSalIdx>=sals.length) bakeSalIdx = 0;
   document.getElementById('bakeModalSals').innerHTML = sals.map(function(x, i){
-    return '<button type="button" class="bk-sal'+(i===bakeSalIdx?' on':'')+'" onclick="setBakeSalida('+i+')">'+escapeHtml(salidaLabel(x))+'</button>';
+    return '<button type="button" class="bk-sal'+(i===bakeSalIdx?' on':'')+'" onclick="setBakeSalida('+i+')">'+escapeHtml(salidaLabel(x, r))+'</button>';
   }).join('');
   const yr = document.getElementById('bakeModalYieldVal');
-  if(yr) yr.textContent = salidaLabel(sals[bakeSalIdx]);
+  if(yr) yr.textContent = salidaLabel(sals[bakeSalIdx], r);
+  bakeModalCheckStock();
 }
 function setBakeSalida(i){ bakeSalIdx = i; renderBakeSalidas(); }
+// Cantidad de receta de la opción elegida al hornear (bandeja chica = ×0,75).
+function bakeSalFactor(r){ const sals = recipeSalidas(r); const x = sals.length ? sals[Math.min(bakeSalIdx, sals.length-1)] : null; return x && x.f>0 ? x.f : 1; }
 function closeBakeModal(){
   document.getElementById('bakeModal').classList.remove('active');
   bakeModalRecipeId = null;
@@ -10430,10 +10738,12 @@ function bakeModalCheckStock(){
   const warn = document.getElementById('bakeModalStockWarn');
   if(!r){ warn.style.display = 'none'; return; }
   const val = parseFloat(document.getElementById('bakeModalInput').value);
-  const max = maxProducibleTandas(r);
+  const fx = bakeSalFactor(r);
+  const max0 = maxProducibleTandas(r);
+  const max = max0==null ? null : Math.floor(max0/fx + 1e-9);
   if(max!=null && !isNaN(val) && val>max){
     const unitLabel = r.yieldQty ? ('tanda'+(max===1?'':'s')) : (r.yieldUnit||'porciones');
-    const gaps = recipeIngredientStockGaps(r, val);
+    const gaps = recipeIngredientStockGaps(r, val*fx);
     const gapNames = gaps.map(function(g){ return g.name; });
     const baseMsg = max>0 ? ('Solo alcanza para '+max+' '+unitLabel+'.') : 'No alcanza el stock.';
     document.getElementById('bakeModalStockWarnText').textContent = baseMsg;
@@ -10455,8 +10765,9 @@ function bakeModalCheckStock(){
 function bakeModalUseMax(){
   const r = DATA.recipes.find(function(x){ return x.id===bakeModalRecipeId; });
   if(!r) return;
-  const max = maxProducibleTandas(r);
-  if(max==null) return;
+  const max0 = maxProducibleTandas(r);
+  if(max0==null) return;
+  const max = Math.floor(max0/bakeSalFactor(r) + 1e-9);
   document.getElementById('bakeModalInput').value = max;
   bakeModalCheckStock();
 }
@@ -10465,10 +10776,12 @@ function confirmBakeModal(){
   if(!r) return;
   const val = parseFloat(document.getElementById('bakeModalInput').value);
   if(isNaN(val) || val<=0){ showToast(r.yieldQty ? 'Ingresá cuántas tandas querés hacer' : 'Ingresá cuántas porciones salieron'); return; }
-  const max = maxProducibleTandas(r);
+  const fx = bakeSalFactor(r);
+  const max0 = maxProducibleTandas(r);
+  const max = max0==null ? null : Math.floor(max0/fx + 1e-9);
   if(max!=null && val>max){
     const unitLabel = r.yieldQty ? ('tanda'+(max===1?'':'s')) : (r.yieldUnit||'porciones');
-    const gapNames = recipeIngredientStockGaps(r, val).map(function(g){ return g.name; });
+    const gapNames = recipeIngredientStockGaps(r, val*fx).map(function(g){ return g.name; });
     const baseMsg = max>0 ? ('Solo alcanza para '+max+' '+unitLabel+'.') : 'No alcanza el stock.';
     showToast(baseMsg + (gapNames.length ? (' Falta stock de '+joinListEs(gapNames)+'.') : ''));
     return;
@@ -10476,7 +10789,7 @@ function confirmBakeModal(){
   const porciones = r.yieldQty ? roundQty(val*r.yieldQty) : val;
   const fromCook = state._bakeFromCook;
   const sals = recipeSalidas(r);
-  if(recipeHas2(r) && sals.length) registrarHorneada(r.id, null, { salida: sals[Math.min(bakeSalIdx, sals.length-1)], tandas: val });
+  if(sals.length) registrarHorneada(r.id, null, { salida: sals[Math.min(bakeSalIdx, sals.length-1)], tandas: val });
   else registrarHorneada(r.id, porciones);
   saveData(DATA);
   closeBakeModal();
@@ -13103,9 +13416,9 @@ function botValidHorneada(v){
 function botSalida(v){
   const sl = v && v.salida;
   if(!sl || typeof sl!=='object') return null;
-  const c = Number(sl.c), x = Number(sl.x), t = Number(v.tandas);
-  if(!(Number.isInteger(c) && Number.isInteger(x) && c>=0 && x>=0 && c<=50 && x<=50 && c+x>=1 && Number.isInteger(t) && t>=1 && t<=100)) return null;
-  return { c:c, x:x, tandas:t };
+  const c = Number(sl.c), x = Number(sl.x), t = Number(v.tandas), f = sl.f==null ? 1 : Number(sl.f);
+  if(!(Number.isInteger(c) && Number.isInteger(x) && c>=0 && x>=0 && c<=50 && x<=50 && c+x>=1 && Number.isInteger(t) && t>=1 && t<=100 && f>0 && f<=20)) return null;
+  return { c:c, x:x, f:f, tandas:t };
 }
 function botSize(v){ return (v && (v.size==='xl' || v.size==='chico')) ? v.size : ''; }
 // Mermas desde el bot (/mermas brownie 2 rota): bajan el stock listo una sola vez.
@@ -13190,7 +13503,7 @@ function applyBotSales(ventas){
     if(!r) return;
     if(isCombo(r)){ DATA.botProcesadas.push(v.id); procesadas[v.id] = true; return; } // una caja no se hornea
     const sal = botSalida(v);
-    if(sal && recipeHas2(r)) registrarHorneada(r.id, null, { salida:{ c:sal.c, x:sal.x }, tandas:sal.tandas });
+    if(sal && (recipeHas2(r) || recipeSalidas(r).length)) registrarHorneada(r.id, null, { salida:{ c:sal.c, x:sal.x, f:sal.f }, tandas:sal.tandas });
     else if(Number.isInteger(v.porciones) && v.porciones>=1 && v.porciones<=5000) registrarHorneada(r.id, v.porciones);
     DATA.botProcesadas.push(v.id); procesadas[v.id] = true;
     horneadas++;

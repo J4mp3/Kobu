@@ -1899,7 +1899,7 @@
     <div class="modal-box" style="max-width:340px;text-align:left;">
       <p class="modal-msg" style="font-weight:600;display:flex;align-items:center;gap:8px;margin:0;"><span class="icon-slot" data-icon="paw"></span>Tarjeta de fidelidad</p>
       <p style="margin:0;font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);">Un sello por pedido entregado (solo clientes, nunca mayoristas). Al completar la tarjeta vuelve a 0 y el historial sigue. Lo que cambies acá se ve en la página para sumarse y en la tarjeta de cada cliente; el premio que alguien ya ganó lo conserva.</p>
-      <div class="field"><label>Sellos para el descuento</label><div class="btn-row"><input class="input" id="fc-desc" type="number" min="1" max="29" step="1"><input class="input" id="fc-pct" type="number" min="1" max="50" step="1"><span style="align-self:center;">%</span></div></div>
+      <div class="field"><label>Sello que viene con descuento (esa compra ya lo tiene)</label><div class="btn-row"><input class="input" id="fc-desc" type="number" min="2" max="29" step="1"><input class="input" id="fc-pct" type="number" min="1" max="50" step="1"><span style="align-self:center;">%</span></div></div>
       <div class="field"><label>Sellos para el regalo (completa la tarjeta)</label><input class="input" id="fc-regalo" type="number" min="4" max="12" step="1"></div>
       <div class="field"><label>Regalo</label><input class="input" id="fc-regaloTxt" maxlength="40" placeholder="Budín chico gratis"></div>
       <div class="field"><label>Avisarme y mandarle "Hoy está para un budín" a los</label><div class="btn-row"><input class="input" id="fc-dias" type="number" min="7" max="180" step="1"><span style="align-self:center;white-space:nowrap;">días sin comprar</span></div></div>
@@ -3714,6 +3714,28 @@ function migrateWebLinks(d){
 // Ventas con sabor pendiente del bot de Telegram que se descartaron en Vender (ids).
 function migrateBotDismissed(d){
   if(!Array.isArray(d.botDismissed)) d.botDismissed = [];
+}
+// Tarjeta (16/11/2026): el % pasa a ser de la compra que suma el sello `desc` (se gana con el anterior).
+// Quien ya está en el sello anterior y todavía no lo tiene, lo recibe ahora. Solo toca tarjetas sin f.dc.
+// Corre UNA vez (settings.fidDescAntes viaja con los datos) después de sincronizar al abrir: fidDescAlDia().
+function migrateFidDescAntes(d){
+  const cfg = fidCfg(d.settings);
+  (d.clients||[]).forEach(function(c){
+    const f = c && c.fid;
+    if(!f || typeof f!=='object' || clientIsMayorista(c) || f.dc!=null || !Array.isArray(f.hist)) return;
+    const sellos = parseInt(f.sellos, 10) || 0, ciclos = parseInt(f.ciclos, 10) || 0;
+    if(sellos < cfg.desc-1) return;
+    const cps = Array.isArray(c.coupons) ? c.coupons : [];
+    let p1 = false, u = false;
+    for(let i=0;i<f.hist.length;i++){ const e = f.hist[i]; if(!e || e.t==='p2') break; if(e.t==='u' && e.k==='desc') u = true; if(e.t==='p1') p1 = true; }
+    // Solo cuenta lo de esta vuelta: un cupón viejo sin usar de la tarjeta anterior no le quita el de ahora.
+    const tiene = p1 && (u || cps.some(function(cp){ return cp && cp.fid==='desc' && !cp.usadoEn; }));
+    if(tiene || (p1 && sellos>=cfg.desc)){ f.dc = ciclos; return; }
+    if(sellos!==cfg.desc-1) return;
+    c.coupons = cps.concat([{ id:'ccp-fid-'+Date.now()+'-'+Math.floor(Math.random()*1e6)+'-d', fid:'desc', type:'percent', value:cfg.pct, label:'Tarjeta: '+cfg.pct+'% off', ciclo:ciclos }]);
+    f.dc = ciclos;
+    f.hist.unshift({ t:'p1', v:cfg.pct, ts:new Date().toISOString() });
+  });
 }
 // Mermas (porciones listas que no se vendieron): [{id, recipeId, recipeName, porciones, motivo, costo, precio, ts, origen?}]
 function migrateMermas(d){
@@ -9225,7 +9247,17 @@ function updateBotResumen(){
   }catch(e){}
 }
 // Al abrir: si el resumen para el bot (recetas, lista de compras) cambió (ej. app nueva), se guarda y se sube.
+// Cambio de la tarjeta del 16/11/2026 (ver migrateFidDescAntes): una sola vez, con los datos ya sincronizados.
+function fidDescAlDia(){
+  try{
+    if(!DATA.settings || DATA.settings.fidDescAntes) return;
+    migrateFidDescAntes(DATA);
+    DATA.settings.fidDescAntes = 1;
+    saveData(DATA);
+  }catch(e){}
+}
 function kobuBotResumenAlDia(){
+  fidDescAlDia();
   try{
     const antes = JSON.stringify(DATA.botResumen||null);
     updateBotResumen();
@@ -17411,7 +17443,8 @@ function exitCook(){
    TARJETA DE FIDELIDAD
    Un sello por pedido entregado (también a mano o escaneando la tarjeta del cliente).
    Solo clientes: los mayoristas nunca suman. Premios = cupones del cliente con `fid`
-   ('desc' = % de descuento que se aplica solo en el próximo pedido, 'regalo' = completa
+   ('desc' = % de descuento de la compra que suma el sello `desc`: se gana con el sello anterior y se
+   aplica solo en el próximo pedido; f.dc = ciclo en el que ya se dio. 'regalo' = completa
    la tarjeta, vuelve a 0 y el historial sigue). La tarjeta de Google Wallet la arma el
    script con c.fid.token (el cliente se suma desde la página y queda en "Pendientes").
    ========================================================= */
@@ -17430,11 +17463,12 @@ function setClientsTab(tab){
   if(th) th.classList.toggle('right', clientsTab==='mayoristas');
   renderClientsScreen();
 }
-function fidCfg(){
-  const s = (DATA.settings && DATA.settings.fid && typeof DATA.settings.fid==='object') ? DATA.settings.fid : {};
+function fidCfg(st){
+  if(!st) st = DATA.settings;
+  const s = (st && st.fid && typeof st.fid==='object') ? st.fid : {};
   const n = function(v, d, lo, hi){ v = parseInt(v, 10); return (isFinite(v) && v>=lo && v<=hi) ? v : d; };
   const regalo = n(s.regalo, 10, 4, 12);
-  return { desc: Math.min(n(s.desc, 5, 1, 29), regalo-1), pct: n(s.pct, 5, 1, 50), regalo: regalo,
+  return { desc: Math.min(parseInt(s.desc, 10)===1 ? 2 : n(s.desc, 5, 2, 29), regalo-1), pct: n(s.pct, 5, 1, 50), regalo: regalo,
     regaloTxt: (typeof s.regaloTxt==='string' && s.regaloTxt.trim()) ? s.regaloTxt.trim().slice(0, 40) : 'Budín chico gratis',
     dias: n(s.dias, 30, 7, 180) };
 }
@@ -17459,6 +17493,27 @@ function cuponesActivos(c, orderId){
   return ((c && c.coupons) || []).filter(function(cp){ return cp && (!cp.usadoEn || (orderId && cp.usadoEn===orderId)); });
 }
 function fidCupon(c, kind){ return cuponesActivos(c).find(function(cp){ return cp.fid===kind; }) || null; }
+// Historial de la vuelta actual de la tarjeta (desde el último "completó la tarjeta"): ¿ganó el %? ¿lo usó?
+function fidDescCiclo(f){
+  let p1 = false, u = false, uViejo = false;
+  for(let i=0;i<f.hist.length;i++){
+    const e = f.hist[i]; if(!e || e.t==='p2') break;
+    if(e.t==='p1') p1 = true;
+    if(e.t==='u' && e.k==='desc'){ if(e.c==null) uViejo = true; else if(e.c===f.ciclos) u = true; }
+  }
+  return { p1:p1, usado: u || (uViejo && p1) };
+}
+// El % sin usar de la vuelta actual (los cupones de antes del 16/11 no tienen `ciclo`: cuentan si lo ganó en esta vuelta).
+function fidCuponDesc(c, f, p1){
+  if(p1==null) p1 = fidDescCiclo(f).p1;
+  return cuponesActivos(c).find(function(cp){ return cp.fid==='desc' && (cp.ciclo!=null ? cp.ciclo===f.ciclos : p1); }) || null;
+}
+// ¿Ya tiene (o ya usó) el % de la vuelta actual?
+function fidDescDado(c, f){
+  if(f.dc!=null && f.dc===f.ciclos) return true;
+  const h = fidDescCiclo(f);
+  return h.usado || !!fidCuponDesc(c, f, h.p1);
+}
 // +1 sello. Devuelve el premio ganado ('' si no hay).
 function fidSumar(c, motivo, orderId){
   const f = fidEnsure(c), cfg = fidCfg();
@@ -17467,8 +17522,10 @@ function fidSumar(c, motivo, orderId){
   fidHistPush(f, e);
   let premio = '';
   c.coupons = c.coupons || [];
-  if(f.sellos===cfg.desc && !fidCupon(c, 'desc')){
-    c.coupons.push({ id:'ccp-fid-'+Date.now()+'-d', fid:'desc', type:'percent', value:cfg.pct, label:'Tarjeta: '+cfg.pct+'% off' });
+  // El % es de la compra que suma el sello `desc`: se gana con el anterior y se aplica en ese pedido.
+  if((f.sellos===cfg.desc-1 || f.sellos===cfg.desc) && !fidDescDado(c, f)){
+    c.coupons.push({ id:'ccp-fid-'+Date.now()+'-d', fid:'desc', type:'percent', value:cfg.pct, label:'Tarjeta: '+cfg.pct+'% off', ciclo:f.ciclos });
+    f.dc = f.ciclos;
     fidHistPush(f, { t:'p1', v:cfg.pct });
     premio = cfg.pct+'% de descuento en el próximo pedido';
   }
@@ -17486,7 +17543,7 @@ function fidSumar(c, motivo, orderId){
 function fidQuitar(c, orderId){
   const f = fidOf(c); if(!f || !(f.sellos>0)) return false;
   const cfg = fidCfg();
-  if(f.sellos===cfg.desc){ const cp = fidCupon(c, 'desc'); if(cp) c.coupons = c.coupons.filter(function(x){ return x!==cp; }); }
+  if(f.sellos===cfg.desc-1){ const cp = fidCuponDesc(c, f); if(cp){ c.coupons = c.coupons.filter(function(x){ return x!==cp; }); delete f.dc; } }
   f.sellos -= 1; f.total = Math.max(0, (parseInt(f.total, 10) || 0) - 1);
   const e = { t:'-' }; if(orderId) e.o = orderId;
   fidHistPush(f, e);
@@ -17503,7 +17560,7 @@ function fidAlEntregar(o){
   const manual = o.selloSi===true ? null : f.hist.find(function(e){ return e.t==='+' && e.m==='manual' && !e.o && Date.now()-new Date(e.ts).getTime() < 12*3600000; });
   if(manual){ manual.o = o.id; return ''; }
   const premio = fidSumar(c, 'pedido', o.id);
-  return premio ? c.name+' completó '+(f.sellos===0 ? 'la tarjeta' : fidCfg().desc+' sellos')+': '+premio : 'Sello para '+c.name+' · '+f.sellos+' de '+fidCfg().regalo;
+  return premio ? (f.sellos===0 ? c.name+' completó la tarjeta: ' : c.name+' ganó ')+premio : 'Sello para '+c.name+' · '+f.sellos+' de '+fidCfg().regalo;
 }
 // Switch "Suma sello en la tarjeta" del pedido. Arranca apagado si en las últimas 12 h ya le sumaste un sello a mano.
 function fidSelloReciente(c){
@@ -17584,7 +17641,7 @@ function fidMarcarCupones(c, orderId, applied){
   (c.coupons||[]).forEach(function(cp){
     if(!cp) return;
     if(ids.indexOf(cp.id)>-1){
-      if(cp.usadoEn!==orderId){ cp.usadoEn = orderId; const f = cp.fid ? fidOf(c) : null; if(f) fidHistPush(f, { t:'u', k:cp.fid, v:couponDisplayLabel(cp), o:orderId }); }
+      if(cp.usadoEn!==orderId){ cp.usadoEn = orderId; const f = cp.fid ? fidOf(c) : null; if(f){ const e = { t:'u', k:cp.fid, v:couponDisplayLabel(cp), o:orderId }; if(cp.ciclo!=null) e.c = cp.ciclo; fidHistPush(f, e); } }
     } else if(cp.usadoEn===orderId) delete cp.usadoEn;
   });
   // Los de la cuponera ya usados se guardan como mucho 10 (los más viejos se borran).
@@ -17691,7 +17748,7 @@ function fidDotsHtml(f){
 }
 function fidFaltaTxt(f){
   const cfg = fidCfg();
-  if(f.sellos<cfg.desc){ const k = cfg.desc-f.sellos; return 'Falta'+(k>1?'n ':' ')+k+' para el '+cfg.pct+'% de descuento'; }
+  if(f.sellos<cfg.desc-1){ const k = cfg.desc-f.sellos; return 'Faltan '+k+' para el sello '+cfg.desc+', que viene con '+cfg.pct+'% de descuento'; }
   const k = cfg.regalo-f.sellos; return 'Falta'+(k>1?'n ':' ')+k+' para '+cfg.regaloTxt.charAt(0).toLowerCase()+cfg.regaloTxt.slice(1);
 }
 function renderClientFidCard(c){
@@ -17817,7 +17874,7 @@ function fidDeshacerUltimo(c){
     const cp = fidCupon(c, 'regalo'); if(cp) c.coupons = c.coupons.filter(function(x){ return x!==cp; });
   } else {
     f.sellos = Math.max(0, f.sellos-1);
-    if(quitados.some(function(e){ return e.t==='p1'; })){ const cp = fidCupon(c, 'desc'); if(cp) c.coupons = c.coupons.filter(function(x){ return x!==cp; }); }
+    if(quitados.some(function(e){ return e.t==='p1'; })){ const cp = fidCuponDesc(c, f, true); if(cp) c.coupons = c.coupons.filter(function(x){ return x!==cp; }); delete f.dc; }
   }
   f.total = Math.max(0, (f.total||0)-1);
   f.hist.splice(0, i+1);
@@ -17849,7 +17906,7 @@ function saveFidCfg(){
   const g = function(id){ return document.getElementById(id).value; };
   const desc = parseInt(g('fc-desc'), 10), regalo = parseInt(g('fc-regalo'), 10);
   if(!(regalo>=4 && regalo<=12)){ showToast('Sellos para el regalo: de 4 a 12'); return; }
-  if(!(desc>=1 && desc<regalo)){ showToast('El descuento tiene que llegar antes que el regalo'); return; }
+  if(!(desc>=2 && desc<regalo)){ showToast(desc<2 ? 'El descuento va desde el sello 2' : 'El descuento tiene que llegar antes que el regalo'); return; }
   DATA.settings.fid = { desc:desc, pct:parseInt(g('fc-pct'), 10), regalo:regalo, regaloTxt:String(g('fc-regaloTxt')||'').trim().slice(0, 40), dias:parseInt(g('fc-dias'), 10) };
   DATA.settings.fid = fidCfg(); // normalizado
   saveData(DATA); closeFidCfg(); showToast('Tarjeta guardada');
@@ -18218,6 +18275,7 @@ applyTheme(DATA.settings.theme);
 state.stack = ['splash'];
 render();
 setTimeout(function(){ if(state.stack[state.stack.length-1]==='splash'){ goHome(); handleNotificationGoto(); } }, 2100);
+if(!syncEnabled() || !localStorage.getItem('kobuSyncUrl') || !localStorage.getItem('kobuSyncKey')) fidDescAlDia();
 autoPullOnOpen();
 setInterval(function(){ if(document.hidden || state.stack[state.stack.length-1]!=='home') return; renderHomeSummary(); }, 60000);
 document.addEventListener('visibilitychange', function(){ if(!document.hidden && state.stack[state.stack.length-1]==='home') renderHomeSummary(); });

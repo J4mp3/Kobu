@@ -354,6 +354,11 @@
   .rc-tt .t{ margin:0; font-size:calc(13px + var(--kobu-font-boost, 0px)); font-weight:500; color:var(--k-text); display:flex; align-items:center; gap:4px; flex-wrap:wrap; }
   .rc-tt .s{ margin:2px 0 0; font-size:calc(11px + var(--kobu-font-boost, 0px)); color:var(--k-muted); }
   .rc-btns{ display:flex; flex-direction:column; gap:2px; flex-shrink:0; }
+  .rc-cols{ display:flex; gap:4px; background:none; border:none; padding:0; cursor:pointer; font-family:inherit; flex-shrink:0; }
+  .rc-col{ display:flex; flex-direction:column; align-items:center; justify-content:center; min-width:44px; border-radius:9px; padding:4px 5px 3px; background:var(--k-success-bg); color:var(--k-success); }
+  .rc-col b{ font-size:calc(17px + var(--kobu-font-boost, 0px)); line-height:1; font-weight:700; }
+  .rc-col i{ font-style:normal; font-size:calc(9.5px + var(--kobu-font-boost, 0px)); font-weight:600; margin-top:2px; white-space:nowrap; }
+  .rc-col.w{ background:var(--k-warning-bg); color:var(--k-warning); } .rc-col.d{ background:var(--k-danger-bg); color:var(--k-danger); } .rc-col.i{ background:var(--k-card2); color:var(--k-muted); }
   .rc-btns .iconbtn{ width:26px; height:26px; padding:0; display:flex; align-items:center; justify-content:center; }
   .rc-btns .ready-mark{ width:15px; height:15px; }
   .empty .icon-slot{ font-size:calc(30px + var(--kobu-font-boost, 0px)); margin-bottom:8px; color:var(--k-border); }
@@ -417,6 +422,33 @@
   .no-headbody{ padding:14px 16px; }
   .no-title{ text-align:left; font-weight:500; font-size:calc(14px + var(--kobu-font-boost, 0px)); color:var(--k-text); margin:0 0 8px; }
   .no-headrow{ display:flex; gap:6px; }
+  /* Elegir cliente con buscador (23/11/2026) */
+  .cp-wrap{ position:relative; flex:1; min-width:0; }
+  .cp-btn{ width:100%; height:38px; display:flex; align-items:center; gap:8px; background:var(--k-card); border:0.5px solid var(--k-border); border-radius:10px; padding:0 10px 0 5px; cursor:pointer; font-family:inherit; color:var(--k-text); text-align:left; }
+  .no-headtint .cp-btn{ border:none; }
+  .cp-btn .cp-ph{ color:var(--k-muted); font-size:calc(12.5px + var(--kobu-font-boost, 0px)); flex:1; padding-left:5px; }
+  .cp-btn .cp-chev{ color:var(--k-muted); font-size:calc(14px + var(--kobu-font-boost, 0px)); margin-left:auto; flex-shrink:0; }
+  .cp-av{ width:28px; height:28px; border-radius:50%; background:var(--k-card2); color:var(--k-accent); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:calc(11px + var(--kobu-font-boost, 0px)); flex-shrink:0; letter-spacing:.02em; }
+  .cp-av.may{ background:var(--k-accent); color:var(--k-bg); }
+  .cp-nm{ flex:1; min-width:0; display:flex; flex-direction:column; line-height:1.15; }
+  .cp-nm b{ font-weight:600; font-size:calc(12.5px + var(--kobu-font-boost, 0px)); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .cp-nm span{ font-size:calc(10.5px + var(--kobu-font-boost, 0px)); color:var(--k-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .cp-nm mark{ background:var(--k-warning-bg); color:inherit; border-radius:3px; padding:0 1px; }
+  .cp-panel{ position:absolute; left:0; right:-88px; top:44px; z-index:30; background:var(--k-card); border:0.5px solid var(--k-border); border-radius:14px; box-shadow:0 10px 28px rgba(0,0,0,.16); padding:8px; display:flex; flex-direction:column; gap:6px; animation:cpIn .16s ease; }
+  @keyframes cpIn{ from{ opacity:0; transform:translateY(-4px); } to{ opacity:1; transform:none; } }
+  @media (prefers-reduced-motion: reduce){ .cp-panel{ animation:none; } }
+  .cp-search{ display:flex; align-items:center; gap:6px; background:var(--k-card2); border-radius:10px; padding:0 10px; }
+  .cp-search .icon-slot{ color:var(--k-muted); font-size:calc(14px + var(--kobu-font-boost, 0px)); }
+  .cp-search input{ flex:1; min-width:0; border:none; outline:none; background:transparent; font-family:inherit; font-size:calc(13px + var(--kobu-font-boost, 0px)); color:var(--k-text); padding:9px 0; }
+  .cp-list{ max-height:min(280px, 45vh); overflow-y:auto; display:flex; flex-direction:column; gap:2px; }
+  .cp-item{ display:flex; align-items:center; gap:9px; padding:6px; border-radius:10px; cursor:pointer; background:none; border:none; font-family:inherit; color:var(--k-text); text-align:left; width:100%; }
+  .cp-item:hover, .cp-item.on{ background:var(--k-card2); }
+  .cp-chip{ font-size:calc(9.5px + var(--kobu-font-boost, 0px)); font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--k-accent); background:var(--k-card2); border-radius:6px; padding:2px 6px; flex-shrink:0; }
+  .cp-item.on .cp-chip{ background:var(--k-card); }
+  .cp-empty{ font-size:calc(11.5px + var(--kobu-font-boost, 0px)); color:var(--k-muted); text-align:center; padding:10px 4px; }
+  .cp-new{ display:flex; align-items:center; justify-content:center; gap:6px; border:1.5px dashed var(--k-border); border-radius:10px; padding:9px; background:none; color:var(--k-accent); font-family:inherit; font-size:calc(12px + var(--kobu-font-boost, 0px)); cursor:pointer; }
+  .cp-full .cp-panel{ right:0; }
+  .cp-full .cp-btn{ height:46px; background:var(--k-card2); border:none; }
   .no-headrow .input{ background:var(--k-card); }
   .no-iconbtn{ width:38px; height:38px; flex-shrink:0; border-radius:10px; background:none; border:0.5px solid var(--k-border); color:var(--k-accent); display:flex; align-items:center; justify-content:center; cursor:pointer; }
   .no-headtint .no-iconbtn{ background:var(--k-card); border:none; }
@@ -969,6 +1001,7 @@
   .qs-tile.active{ box-shadow:inset 0 0 0 2px var(--k-accent); }
   .qs-tile.out{ opacity:.6; }
   .qs-tile-name{ margin:0; font-size:calc(12.5px + var(--kobu-font-boost, 0px)); color:var(--k-text); }
+  .qs-col{ margin:6px auto 0; min-width:56px; }
   .qs-tile-price{ margin:1px 0 6px; font-size:calc(11.5px + var(--kobu-font-boost, 0px)); color:var(--k-accent); font-weight:500; }
   .qs-tile-bar{ position:relative; height:15px; background:var(--k-border); border-radius:8px; overflow:hidden; }
   .qs-tile-bar-fill{ height:100%; border-radius:8px; }
@@ -1293,7 +1326,7 @@
   <div class="modal-overlay" id="bakeModal">
     <div class="modal-box" style="text-align:left;padding:0;gap:0;">
       <div class="bk-headtint">
-        <p class="bk-title">Registrar horneada</p>
+        <p class="bk-title" id="bakeModalTitle">Registrar horneada</p>
       </div>
       <div class="bk-headbody">
         <p id="bakeModalMsg" style="text-align:left;font-weight:700;font-size:calc(13px + var(--kobu-font-boost, 0px));color:var(--k-text);margin:0;"></p>
@@ -1301,7 +1334,7 @@
         <div style="display:flex;justify-content:space-between;font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin-top:3px;padding-bottom:8px;border-bottom:0.5px solid var(--k-border);"><span>Stock actual</span><span id="bakeModalStockVal">0</span></div>
         <div id="bakeModalNeededRow" style="display:none;justify-content:space-between;font-size:calc(11px + var(--kobu-font-boost, 0px));color:var(--k-muted);margin-top:8px;padding-bottom:8px;border-bottom:0.5px solid var(--k-border);"><span>Tendrías que hacer</span><span id="bakeModalNeededVal" style="color:var(--k-text);font-weight:600;">0 tandas</span></div>
         <div id="bakeModalSalWrap" style="display:none;margin-top:10px;">
-          <label style="font-size:calc(11.5px + var(--kobu-font-boost, 0px));color:var(--k-text);margin:0;">¿Qué salió de cada tanda?</label>
+          <label style="font-size:calc(11.5px + var(--kobu-font-boost, 0px));color:var(--k-text);margin:0;" id="bakeModalSalLbl">¿Qué salió de cada tanda?</label>
           <div class="bk-sals" id="bakeModalSals"></div>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
@@ -1319,9 +1352,10 @@
           <button type="button" id="bakeModalUseMaxBtn" onclick="bakeModalUseMax()" style="display:block;width:100%;text-align:center;margin-top:6px;background:none;border:none;padding:0;color:var(--k-accent);font-size:calc(11px + var(--kobu-font-boost, 0px));font-weight:600;cursor:pointer;">Usar el máximo posible</button>
         </div>
         <div class="btn-row" style="margin-top:16px;">
-          <button class="btn btn-ghost" style="flex:1;" onclick="closeBakeModal()">Cancelar</button>
-          <button class="btn btn-primary" style="flex:1;" onclick="confirmBakeModal()">Hornear</button>
+          <button class="btn btn-ghost" style="flex:1;" id="bakeModalCancelBtn" onclick="closeBakeModal()">Cancelar</button>
+          <button class="btn btn-primary" style="flex:1;" id="bakeModalOkBtn" onclick="confirmBakeModal()">Registrar</button>
         </div>
+        <button type="button" id="bakeModalSkipBtn" onclick="finishCookSinRegistrar()" style="display:none;width:100%;margin-top:10px;background:none;border:none;color:var(--k-muted);font-family:inherit;font-size:calc(11.5px + var(--kobu-font-boost, 0px));text-decoration:underline;cursor:pointer;">Terminar sin sumar al stock</button>
       </div>
     </div>
   </div>
@@ -2045,7 +2079,8 @@
       <div class="no-headtint">
         <p class="no-title" id="no-title">Nuevo pedido</p>
         <div class="no-headrow">
-          <select class="input" id="no-client" style="flex:1;" onchange="npClientChange(this.value)"></select>
+          <select class="input" id="no-client" style="display:none;" onchange="npClientChange(this.value)" aria-hidden="true" tabindex="-1"></select>
+          <div class="cp-wrap" id="no-cpick"></div>
           <button type="button" class="no-iconbtn" id="no-datebtn" onclick="npToggleDate(this)" aria-label="Fecha de entrega"><span class="icon-slot" data-icon="calendar"></span></button>
           <button type="button" class="no-iconbtn" id="no-notebtn" onclick="npToggleNote(this)" aria-label="Nota interna"><span class="icon-slot" data-icon="pencil"></span></button>
         </div>
@@ -2402,7 +2437,6 @@
     <div class="grp-card">
       <div style="display:flex;gap:8px;">
         <button class="cook-btn-sm no-combo" style="flex:1;" onclick="startCook(state.currentId)"><span class="icon-slot" data-icon="flame"></span> Cocinar</button>
-        <button class="cook-btn-sm ghost no-combo" style="flex:1;" onclick="openBakeModal(state.currentId)"><span class="icon-slot" data-icon="flame"></span> Hornear</button>
         <button class="cook-btn-sm ghost" style="flex:1;" onclick="openMermaModal(state.currentId)"><span class="icon-slot" data-icon="trash"></span> Merma</button>
       </div>
       <div class="d-actions-bare">
@@ -3079,9 +3113,6 @@
           <button type="button" id="cook-timer-stopbtn" onclick="stopCookTimer(event)"><span class="icon-slot" data-icon="x"></span></button>
         </div>
         <button type="button" class="cook-nextprep" id="cook-nextprep-btn" onclick="cookNextPrep(event)"><b><span class="icon-slot" data-icon="arrow-right"></span>Seguir con la próxima preparación</b><span class="np-name"></span></button>
-        <button type="button" class="cook-finish-btn" id="cook-bake-finish-btn" style="background:var(--k-card2);color:var(--k-bg);margin-bottom:8px;" onclick="finishCookAndBake(event)">
-          <span class="icon-slot" data-icon="package"></span> Registrar horneada y finalizar
-        </button>
         <button type="button" class="cook-finish-btn" id="cook-finish-btn" onclick="finishCook(event)">
           <span class="icon-slot" data-icon="chef-hat"></span> Finalizar
         </button>
@@ -3176,7 +3207,8 @@
       <p class="section-title"><span class="badge-ic"><span class="icon-slot" data-icon="users"></span></span>Cliente</p>
       <div class="field">
         <label>Cliente</label>
-        <select class="input" id="of-client" onchange="onOrderClientPick(this.value)"></select>
+        <select class="input" id="of-client" style="display:none;" onchange="onOrderClientPick(this.value)" aria-hidden="true" tabindex="-1"></select>
+        <div class="cp-wrap cp-full" id="of-cpick"></div>
       </div>
       <div id="of-newclient-form"></div>
       <div class="field"><label>Fecha de entrega (opcional)</label><input class="input" id="of-deliverydate" type="date"></div>
@@ -4784,13 +4816,17 @@ function rcRowHtml(r, x){
   }).join('');
   const precio = parseFloat(r.salePrice)>0 ? fmtMoney(parseFloat(r.salePrice)) : 'Sin precio';
   const sub = x.prueba && !(parseFloat(r.salePrice)>0) ? 'Sin precio todavía' : precio+(x.v90 ? ' · '+fmtQty(x.v90)+' vendido'+(x.v90===1?'':'s') : '');
-  const st = recipeHas2(r) ? recipeStockText(r) : fmtQty(x.stock)+' listo'+(x.stock===1?'':'s');
-  let pill;
-  if(x.prueba && x.stock<=0) pill = '<span class="rc-pill i">en prueba</span>';
-  else if(x.stock>0) pill = '<span class="rc-pill'+(x.stock<=2 ? ' w' : '')+'">'+escapeHtml(st)+'</span>';
-  else if(x.hornear) pill = '<span class="rc-pill d"><span class="icon-slot" data-icon="flame"></span>hornear</span>';
-  else pill = '<span class="rc-pill i">sin stock</span>';
-  pill = pill.replace('<span class="rc-pill', '<button type="button" title="stock" onclick="event.stopPropagation();handleRecipeStockBadgeTap(\''+r.id+'\')" class="rc-pill').replace(/<\/span>$/, '</button>');
+  // Stock en columnas: número grande y abajo el tamaño (una columna por tamaño).
+  const nivel = function(n){ return n>2 ? '' : n>0 ? ' w' : (x.prueba ? ' i' : (x.hornear ? ' d' : ' i')); };
+  const col = function(n, lbl){ return '<span class="rc-col'+nivel(n)+'"><b>'+escapeHtml(fmtQty(n))+'</b><i>'+escapeHtml(lbl)+'</i></span>'; };
+  let cols;
+  if(recipeHas2(r)){
+    const nx = stockTam(r, 'xl'), nc = stockTam(r, 'chico');
+    cols = col(nx, 'XL') + col(nc, nc===1 ? 'chico' : 'chicos');
+  } else {
+    cols = col(x.stock, x.stock>0 ? (x.stock===1 ? 'listo' : 'listos') : (x.prueba ? 'prueba' : (x.hornear ? 'hornear' : 'listos')));
+  }
+  const pill = '<button type="button" class="rc-cols" title="stock" onclick="event.stopPropagation();handleRecipeStockBadgeTap(\''+r.id+'\')">'+cols+'</button>';
   const dim = !x.prueba && x.stock<=0 && !x.hornear;
   return '<div class="rc-row'+(dim ? ' dim' : '')+'" data-id="'+r.id+'" onclick="openDetail(\''+r.id+'\')">'+
     '<div class="thumb" style="'+bg+'">'+mediaIconHtml(r,'thumb-icon')+'</div>'+
@@ -9450,7 +9486,7 @@ function toggleSyncEnabled(){
   showToast(cur ? 'Sincronización desactivada en este dispositivo' : 'Sincronización activada');
 }
 // Versión de esta copia de la app (para saber si un celular quedó con una vieja): cambiarla en cada entrega.
-var KOBU_APP_VERSION = '44 · 23/11/2026';
+var KOBU_APP_VERSION = '45 · 23/11/2026';
 // ---- Versión de la app y código de los datos (Avanzado → Versión y datos) ----
 var kobuVerNueva = null, kobuVerUlt = 0, kobuVerEstado = '', kobuVerTimer = null;
 // Código corto de los datos (6 letras/números): igual en dos celulares = mismos datos.
@@ -11111,6 +11147,12 @@ function openBakeModal(id){
   if(isCombo(r)){ showToast('Las cajas no se hornean: horneá lo que llevan'); return; }
   bakeModalRecipeId = id;
   bakeSalIdx = 0;
+  const fromCook = !!state._bakeFromCook, fromOrder = !!state._bakeFromOrderId;
+  document.getElementById('bakeModalTitle').textContent = fromCook ? '¿Qué salió del horno?' : 'Registrar horneada';
+  document.getElementById('bakeModalOkBtn').textContent = fromCook ? 'Sumar al stock' : (fromOrder ? 'Hornear' : 'Registrar');
+  document.getElementById('bakeModalCancelBtn').textContent = fromCook ? 'Volver' : 'Cancelar';
+  document.getElementById('bakeModalSkipBtn').style.display = fromCook ? 'block' : 'none';
+  document.getElementById('bakeModalSalLbl').textContent = '¿Qué salió de cada tanda?';
   document.getElementById('bakeModalMsg').textContent = r.title;
   document.getElementById('bakeModalStockVal').textContent = recipeStockText(r);
   const input = document.getElementById('bakeModalInput');
@@ -11132,7 +11174,7 @@ function openBakeModal(id){
   if(r.yieldQty){
     document.getElementById('bakeModalYieldRow').style.display = 'flex';
     document.getElementById('bakeModalYieldVal').textContent = r.yieldQty+' '+(r.yieldUnit||'porciones');
-    document.getElementById('bakeModalInputLabel').textContent = 'Tandas que querés hacer';
+    document.getElementById('bakeModalInputLabel').textContent = state._bakeFromOrderId ? 'Tandas que querés hacer' : 'Tandas que salieron';
     input.step = '1';
     input.value = neededTandas!=null ? neededTandas : 1;
   } else {
@@ -11168,6 +11210,7 @@ function closeBakeModal(){
   bakeModalRecipeId = null;
   state._bakeFromOrderId = null;
   state._bakeFromCook = false;
+  const sk = document.getElementById('bakeModalSkipBtn'); if(sk) sk.style.display = 'none';
 }
 function bakeModalCheckStock(){
   const r = DATA.recipes.find(function(x){ return x.id===bakeModalRecipeId; });
@@ -12085,6 +12128,7 @@ function populateOrderClientSelect(){
     clients.map(function(c){ return '<option value="'+c.id+'" '+(state.orderDraft.clientId===c.id?'selected':'')+'>'+escapeHtml(c.name)+'</option>'; }).join('') +
     '<option value="__new__">+ nuevo cliente</option>';
   sel.innerHTML = opts;
+  cpRender('of', state.orderDraft.clientId || null);
 }
 function onOrderClientPick(val){
   if(val==='__new__'){
@@ -12324,6 +12368,103 @@ function npPopulateClientSelect(selectId){
   sel.innerHTML = '<option value="">Elegir cliente...</option>' +
     clients.map(function(c){ return '<option value="'+c.id+'" '+(selectId===c.id?'selected':'')+'>'+escapeHtml(c.name)+'</option>'; }).join('') +
     '<option value="__new__">+ Añadir cliente</option>';
+  cpRender('no', selectId || null);
+}
+/* ---- Elegir cliente con buscador (pedido nuevo y formulario de pedido) ----
+   El <select> queda escondido (mismo valor y mismo onchange); esto es lo que se ve. */
+var cpState = { pre:null, q:'', idx:0 };
+function cpSelectOf(pre){ return document.getElementById(pre==='of' ? 'of-client' : 'no-client'); }
+function cpIniciales(n){ const p = String(n||'').trim().split(/\s+/).filter(Boolean); return ((p[0]||'?').charAt(0) + (p.length>1 ? p[p.length-1].charAt(0) : '')).toUpperCase(); }
+function cpSub(c){
+  const x = [];
+  if(c.company) x.push(c.company);
+  if(c.phone) x.push(c.phone);
+  return x.join(' · ');
+}
+function cpRender(pre, selId){
+  const wrap = document.getElementById(pre+'-cpick'); if(!wrap) return;
+  const c = selId ? DATA.clients.find(function(x){ return x.id===selId; }) : null;
+  const may = c && clientIsMayorista(c);
+  wrap.innerHTML = '<button type="button" class="cp-btn" onclick="cpOpen(\''+pre+'\')" aria-haspopup="listbox">'+
+    (c ? '<span class="cp-av'+(may?' may':'')+'">'+escapeHtml(cpIniciales(c.name))+'</span><span class="cp-nm"><b>'+escapeHtml(c.name)+'</b>'+(cpSub(c) ? '<span>'+escapeHtml(cpSub(c))+'</span>' : '')+'</span>'
+       : '<span class="cp-av"><span class="icon-slot" data-icon="users"></span></span><span class="cp-ph">Elegir cliente</span>')+
+    '<span class="cp-chev icon-slot" data-icon="chevron-down"></span></button>';
+  mountIcons();
+}
+function cpOpen(pre){
+  if(cpState.pre===pre){ cpClose(); return; }
+  cpClose();
+  cpState = { pre:pre, q:'', idx:0 };
+  const wrap = document.getElementById(pre+'-cpick'); if(!wrap) return;
+  const p = document.createElement('div');
+  p.className = 'cp-panel'; p.id = 'cp-panel';
+  p.innerHTML = '<div class="cp-search"><span class="icon-slot" data-icon="search"></span><input id="cp-q" placeholder="Buscar por nombre o empresa" autocomplete="off" oninput="cpFiltrar(this.value)" onkeydown="cpKey(event)"></div><div class="cp-list" id="cp-list" role="listbox"></div>'+
+    '<button type="button" class="cp-new" onclick="cpNuevo()"><span class="icon-slot" data-icon="plus"></span>Añadir cliente</button>';
+  wrap.appendChild(p);
+  cpLista();
+  mountIcons();
+  setTimeout(function(){ const q = document.getElementById('cp-q'); if(q) q.focus(); document.addEventListener('pointerdown', cpFuera, true); }, 30);
+}
+function cpFuera(e){ const p = document.getElementById('cp-panel'); const w = cpState.pre ? document.getElementById(cpState.pre+'-cpick') : null; if(p && w && !w.contains(e.target)) cpClose(); }
+function cpClose(){
+  const p = document.getElementById('cp-panel'); if(p) p.remove();
+  document.removeEventListener('pointerdown', cpFuera, true);
+  cpState = { pre:null, q:'', idx:0 };
+}
+function cpMatches(q){
+  const n = normalizeMatchText(q), dig = String(q||'').replace(/\D/g, '');
+  const all = clientsSorted();
+  if(!n) return all;
+  return all.filter(function(c){
+    return normalizeMatchText(c.name).indexOf(n)!==-1 || normalizeMatchText(c.company).indexOf(n)!==-1 || (dig.length>=3 && String(c.phone||'').replace(/\D/g, '').indexOf(dig)!==-1);
+  }).sort(function(a, b){
+    const sa = normalizeMatchText(a.name).indexOf(n)===0 ? 0 : 1, sb = normalizeMatchText(b.name).indexOf(n)===0 ? 0 : 1;
+    return sa - sb;
+  });
+}
+function cpResaltar(txt, q){
+  const t = String(txt||''), n = normalizeMatchText(q);
+  if(!n) return escapeHtml(t);
+  const i = normalizeMatchText(t).indexOf(n);
+  if(i===-1) return escapeHtml(t);
+  return escapeHtml(t.slice(0, i))+'<mark>'+escapeHtml(t.slice(i, i+n.length))+'</mark>'+escapeHtml(t.slice(i+n.length));
+}
+function cpLista(){
+  const list = document.getElementById('cp-list'); if(!list) return;
+  const arr = cpMatches(cpState.q);
+  const sel = cpSelectOf(cpState.pre); const cur = sel ? sel.value : '';
+  if(cpState.idx>=arr.length) cpState.idx = Math.max(0, arr.length-1);
+  list.innerHTML = arr.length ? arr.map(function(c, i){
+    const may = clientIsMayorista(c);
+    return '<button type="button" class="cp-item'+(i===cpState.idx && cpState.q ? ' on' : '')+(c.id===cur ? ' on' : '')+'" role="option" onclick="cpElegir(\''+c.id+'\')">'+
+      '<span class="cp-av'+(may?' may':'')+'">'+escapeHtml(cpIniciales(c.name))+'</span>'+
+      '<span class="cp-nm"><b>'+cpResaltar(c.name, cpState.q)+'</b>'+(c.company ? '<span>'+cpResaltar(c.company, cpState.q)+(c.phone ? ' · '+escapeHtml(c.phone) : '')+'</span>' : (c.phone ? '<span>'+escapeHtml(c.phone)+'</span>' : ''))+'</span>'+
+      (may ? '<span class="cp-chip">Mayorista</span>' : '')+'</button>';
+  }).join('') : '<p class="cp-empty">No hay clientes con "'+escapeHtml(cpState.q)+'". Tocá Añadir cliente para cargarlo.</p>';
+}
+function cpFiltrar(v){ cpState.q = v; cpState.idx = 0; cpLista(); }
+function cpKey(e){
+  const arr = cpMatches(cpState.q);
+  if(e.key==='ArrowDown'){ e.preventDefault(); cpState.idx = Math.min(arr.length-1, cpState.idx+1); cpLista(); }
+  else if(e.key==='ArrowUp'){ e.preventDefault(); cpState.idx = Math.max(0, cpState.idx-1); cpLista(); }
+  else if(e.key==='Enter'){ e.preventDefault(); if(arr[cpState.idx]) cpElegir(arr[cpState.idx].id); }
+  else if(e.key==='Escape'){ e.preventDefault(); cpClose(); }
+}
+function cpElegir(id){
+  const pre = cpState.pre;
+  const sel = cpSelectOf(pre); if(!sel) return;
+  cpClose();
+  sel.value = id;
+  if(pre==='of'){ onOrderClientPick(id); cpRender('of', id); }
+  else { npClientChange(id); cpRender('no', id); }
+}
+function cpNuevo(){
+  const pre = cpState.pre, q = cpState.q;
+  cpClose();
+  if(pre==='of'){ const sel = cpSelectOf('of'); if(sel) sel.value = '__new__'; onOrderClientPick('__new__'); return; }
+  npClientChange('__new__');
+  // Lo que escribiste en el buscador queda como nombre del cliente nuevo.
+  const nm = document.getElementById('acm-name'); if(nm && q && !nm.value) nm.value = q.trim().slice(0, 80);
 }
 function npClientChange(val){
   if(val==='__new__'){
@@ -13767,13 +13908,10 @@ function renderQuickSellScreen(){
       const priceLabel = tilePrice ? (fmtMoney(tilePrice)+(!xl && recipeSellsByPack(r)?'/paquete':'')) : 'sin precio';
       const priceStyle = tilePrice ? '' : 'color:var(--k-danger);';
       return '<div class="qs-tile '+(active?'active':'')+(stock<=0?' out':'')+'" onclick="selectQuickSellRecipe(\''+r.id+'\''+(xl?',\''+tl.size+'\'':'')+')">'+
-        '<p class="qs-tile-name">'+escapeHtml(r.title)+(xl ? '<span class="xl-pill">'+tamNombre(tl.size)+'</span>' : '')+'</p>'+
+        '<p class="qs-tile-name">'+escapeHtml(r.title)+'</p>'+
         '<p class="qs-tile-price" style="'+priceStyle+'">'+priceLabel+'</p>'+
-        '<div class="qs-tile-bar">'+
-          '<div class="qs-tile-bar-fill" style="width:'+pct+'%;background:'+color+';"></div>'+
-          '<span class="qs-tile-bar-label">stock '+stock+'</span>'+
-          '<span class="qs-tile-bar-label on-fill" aria-hidden="true" style="clip-path:inset(0 '+(100-pct)+'% 0 0);">stock '+stock+'</span>'+
-        '</div>'+
+        // Stock en columna (igual que en Inicio): número grande y abajo el tamaño.
+        '<span class="rc-col qs-col'+(stock>2 ? '' : stock>0 ? ' w' : ' d')+'"><b>'+escapeHtml(fmtQty(stock))+'</b><i>'+escapeHtml(recipeHas2(r) ? (tl.size ? tamNombreN(tl.size, stock) : tamNombreN(baseTam(r), stock)) : (stock===1 ? 'listo' : 'listos'))+'</i></span>'+
       '</div>';
     }).join('');
   }
@@ -16529,7 +16667,7 @@ function startCook(id){
     renderCookPicker();
   } else {
     const soloSteps = (r.components && r.components.length===1) ? (r.components[0].steps||[]).filter(Boolean) : (r.steps||[]).filter(Boolean);
-    if(!soloSteps.length){ showToast('Esta receta no tiene pasos cargados'); return; }
+    if(!soloSteps.length){ state.cookRecipeId = null; showToast('Esta receta no tiene pasos: anotá qué salió del horno'); state._bakeFromCook = false; openBakeModal(id); return; }
     if(r.components && r.components.length===1) state.cookComponentKey = 0;
     state.cookStep = 0;
     showScreen('cook');
@@ -16626,8 +16764,6 @@ function renderCookStep(){
   const isLast = idx === steps.length-1;
   const trulyDone = isCookTrulyDone();
   document.getElementById('cook-finish-btn').style.display = (isLast && trulyDone) ? 'flex' : 'none';
-  const bakeFinishBtn = document.getElementById('cook-bake-finish-btn');
-  if(bakeFinishBtn) bakeFinishBtn.style.display = (isLast && trulyDone) ? 'flex' : 'none';
   document.getElementById('cook-tapzone-right').style.display = (isLast && trulyDone) ? 'none' : '';
   const nextLabel = document.getElementById('cook-next-label');
   const nextText = document.getElementById('cook-next-text');
@@ -16652,9 +16788,17 @@ function nextCookStep(){
 function prevCookStep(){
   if(state.cookStep>0){ state.cookStep--; renderCookStep(); }
 }
+// Finalizar el modo paso a paso: recién acá se pregunta qué salió del horno (y se suma al stock solo si lo confirmás).
 function finishCook(e){
   if(e) e.stopPropagation();
   const rid = state.cookRecipeId;
+  const r = DATA.recipes.find(function(x){ return x.id===rid; });
+  if(r && !isCombo(r)){ finishCookAndBake(); return; }
+  finishCookSinRegistrar();
+}
+function finishCookSinRegistrar(){
+  const rid = state.cookRecipeId;
+  if(document.getElementById('bakeModal').classList.contains('active')) closeBakeModal();
   showToast('¡Listo! buen trabajo');
   exitCook();
   askCookNote(rid);

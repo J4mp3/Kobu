@@ -315,7 +315,47 @@
   .diet-icon-badge{ width:16px; height:16px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
   .diet-icon-badge .icon-slot{ font-size:10px; }
   .empty{ display:flex; flex-direction:column; align-items:center; text-align:center; width:100%; padding:40px 10px; color:var(--k-muted); font-size:calc(12.5px + var(--kobu-font-boost, 0px)); }
-  #recipeList.home-list-hidden, #prepCardList.home-list-hidden{ display:none !important; }
+  #recipeList.home-list-hidden, #prepCardList.home-list-hidden, #recipeFilterBar.home-list-hidden{ display:none !important; }
+  .ver-box{ display:flex; gap:8px; }
+  .ver-col{ flex:1; min-width:0; display:flex; flex-direction:column; align-items:center; gap:6px; background:var(--k-card2); border-radius:12px; padding:12px 6px; text-align:center; }
+  .ver-lbl{ font-size:calc(10.5px + var(--kobu-font-boost, 0px)); letter-spacing:.12em; text-transform:uppercase; color:var(--k-muted); font-weight:600; }
+  .ver-code{ font-size:calc(20px + var(--kobu-font-boost, 0px)); font-weight:700; color:var(--k-accent); letter-spacing:.06em; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .ver-chip{ font-size:calc(10.5px + var(--kobu-font-boost, 0px)); font-weight:600; border-radius:20px; padding:3px 9px; background:var(--k-card); color:var(--k-muted); }
+  .ver-chip.ok{ background:var(--k-success-bg); color:var(--k-success); } .ver-chip.w{ background:var(--k-warning-bg); color:var(--k-warning); } .ver-chip.d{ background:var(--k-danger-bg); color:var(--k-danger); }
+  .ver-hint{ font-size:calc(10.5px + var(--kobu-font-boost, 0px)); color:var(--k-muted); margin:0; }
+  .app-new-banner{ position:fixed; left:12px; right:12px; bottom:calc(84px + env(safe-area-inset-bottom, 0px)); z-index:120; display:none; align-items:center; gap:10px; background:var(--k-accent); color:var(--k-bg); border-radius:14px; padding:10px 12px; box-shadow:0 6px 20px rgba(0,0,0,.18); font-size:calc(12px + var(--kobu-font-boost, 0px)); }
+  .app-new-banner.show{ display:flex; }
+  .app-new-banner button{ font-family:inherit; }
+  /* Inicio: recetas por tipo + filtro de estado (23/11/2026) */
+  .rc-bar{ display:flex; background:var(--k-card2); border-radius:12px; padding:3px; gap:2px; margin:2px 0 4px; }
+  .rc-bar button{ flex:1 1 0; min-width:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; font-family:inherit; font-size:calc(10.5px + var(--kobu-font-boost, 0px)); color:var(--k-accent); padding:6px 2px 5px; border-radius:9px; border:none; background:none; cursor:pointer; white-space:nowrap; line-height:1.15; transition:background .18s ease; }
+  .rc-bar button .icon-slot{ font-size:calc(14px + var(--kobu-font-boost, 0px)); }
+  .rc-bar button b{ font-weight:700; font-size:calc(12.5px + var(--kobu-font-boost, 0px)); }
+  .rc-bar button.on{ background:var(--k-card); box-shadow:0 1px 3px rgba(0,0,0,.08); font-weight:600; }
+  .rc-bar button.ko{ color:var(--k-danger); }
+  .rc-hint{ font-size:calc(11px + var(--kobu-font-boost, 0px)); color:var(--k-muted); margin:0 4px 2px; }
+  .rc-sec{ display:flex; flex-direction:column; gap:6px; }
+  .rc-head{ display:flex; align-items:center; gap:8px; padding:10px 4px 2px; color:var(--k-accent); font-weight:600; font-size:calc(13.5px + var(--kobu-font-boost, 0px)); background:none; border:none; font-family:inherit; cursor:pointer; text-align:left; width:100%; }
+  .rc-head > .icon-slot{ font-size:calc(18px + var(--kobu-font-boost, 0px)); }
+  .rc-head .n{ color:var(--k-muted); font-weight:500; font-size:calc(12px + var(--kobu-font-boost, 0px)); }
+  .rc-head .r{ margin-left:auto; display:flex; align-items:center; gap:6px; }
+  .rc-head .rc-chev{ color:var(--k-muted); font-size:calc(15px + var(--kobu-font-boost, 0px)); }
+  .rc-sec.closed .rc-list, #recipeList .rc-sec.closed .rc-list{ display:none; }
+  .rc-list{ display:flex; flex-direction:column; gap:6px; }
+  .rc-pill{ border-radius:20px; padding:3px 9px; font-size:calc(10.5px + var(--kobu-font-boost, 0px)); font-weight:600; background:var(--k-success-bg); color:var(--k-success); white-space:nowrap; border:none; font-family:inherit; display:inline-flex; align-items:center; gap:3px; }
+  .rc-pill .icon-slot{ font-size:calc(10px + var(--kobu-font-boost, 0px)); }
+  .rc-pill.w{ background:var(--k-warning-bg); color:var(--k-warning); } .rc-pill.d{ background:var(--k-danger-bg); color:var(--k-danger); } .rc-pill.i{ background:var(--k-card2); color:var(--k-muted); }
+  button.rc-pill{ cursor:pointer; }
+  .rc-row{ display:flex; align-items:center; gap:10px; background:var(--k-card); border:0.5px solid var(--k-border); border-radius:12px; padding:8px 6px 8px 9px; cursor:pointer; }
+  .rc-row.dim{ opacity:.62; }
+  .rc-row .thumb{ width:40px; height:40px; }
+  .rc-row .thumb .thumb-icon{ font-size:calc(19px + var(--kobu-font-boost, 0px)); }
+  .rc-tt{ flex:1; min-width:0; }
+  .rc-tt .t{ margin:0; font-size:calc(13px + var(--kobu-font-boost, 0px)); font-weight:500; color:var(--k-text); display:flex; align-items:center; gap:4px; flex-wrap:wrap; }
+  .rc-tt .s{ margin:2px 0 0; font-size:calc(11px + var(--kobu-font-boost, 0px)); color:var(--k-muted); }
+  .rc-btns{ display:flex; flex-direction:column; gap:2px; flex-shrink:0; }
+  .rc-btns .iconbtn{ width:26px; height:26px; padding:0; display:flex; align-items:center; justify-content:center; }
+  .rc-btns .ready-mark{ width:15px; height:15px; }
   .empty .icon-slot{ font-size:calc(30px + var(--kobu-font-boost, 0px)); margin-bottom:8px; color:var(--k-border); }
   /* ---- detail ---- */
   .hero{ width:100%; height:150px; border-radius:14px; background-size:cover; background-position:center; flex-shrink:0; position:relative; overflow:hidden; }
@@ -1029,8 +1069,9 @@
     .topbar h1{ font-size:calc(17px + var(--kobu-font-boost, 0px)); }
     .screen{ padding:14px 32px 40px; max-width:1200px; margin:0 auto; width:100%; }
     .formtabs-bar{ --ftpad:32px; top:-14px; margin-top:-14px; padding-top:16px; }
-    #recipeList, #prepCardList{ display:grid !important; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:12px; }
-    #recipeList .card, #prepCardList .card{ flex-direction:column; align-items:stretch; padding:0; overflow:hidden; }
+    #prepCardList{ display:grid !important; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:12px; }
+    #recipeList .rc-list{ display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:8px; }
+    #prepCardList .card{ flex-direction:column; align-items:stretch; padding:0; overflow:hidden; }
     #recipeList .card .thumb, #prepCardList .card .thumb{ width:100%; height:120px; border-radius:0; }
     #recipeList .card .thumb-icon, #prepCardList .card .thumb-icon{ font-size:calc(42px + var(--kobu-font-boost, 0px)); }
     #recipeList .card .card-drag, #prepCardList .card .card-drag{ position:absolute; top:6px; left:6px; z-index:2; background:rgba(255,255,255,.85); border-radius:50%; width:26px; height:26px; padding:6px; color:var(--k-accent); }
@@ -1203,6 +1244,12 @@
 <div id="app">
 
   <div id="toast"></div>
+  <div id="appNewBanner" class="app-new-banner" role="status">
+    <span class="icon-slot" data-icon="refresh"></span>
+    <span style="flex:1;">Hay una versión nueva de la app.</span>
+    <button onclick="kobuActualizarApp()" style="background:var(--k-bg);color:var(--k-accent);border:none;border-radius:8px;padding:6px 12px;font-size:calc(11.5px + var(--kobu-font-boost, 0px));font-weight:600;cursor:pointer;">Actualizar</button>
+    <button class="iconbtn" aria-label="Cerrar" onclick="document.getElementById('appNewBanner').classList.remove('show')" style="color:var(--k-bg);"><span class="icon-slot" data-icon="x"></span></button>
+  </div>
   <div id="updateBanner" class="update-banner">
     <span>Hay una versión nueva de Kobu.</span>
     <div style="display:flex;gap:6px;align-items:center;flex-shrink:0;">
@@ -2155,6 +2202,7 @@
         <div class="chiprow" id="tagChips" style="justify-content:center;"></div>
       </div>
     </div>
+    <div id="recipeFilterBar" class="home-list-hidden"></div>
     <div id="recipeList" style="display:flex;flex-direction:column;gap:8px;"></div>
     <div id="prepCardList" class="home-list-hidden" style="display:flex;flex-direction:column;gap:8px;"></div>
   </div>
@@ -2197,6 +2245,10 @@
           </div>
         </div>
         <div class="field"><label id="f-title-label">Título</label><input class="input" id="f-title" placeholder="ej. Brownie clásico"></div>
+        <div class="btn-row" id="f-cat-row">
+          <div class="field" style="flex:1;"><label>Tipo (para ordenarla en Inicio)</label><select class="input" id="f-cat"></select></div>
+          <div class="field" style="flex:1;"><label>Estado</label><select class="input" id="f-prueba"><option value="">Automático</option><option value="1">En prueba</option><option value="0">Se vende</option></select></div>
+        </div>
         <div class="btn-row" id="f-timediff-row">
           <div class="field" style="flex:1;"><label>Tiempo (min)</label><input class="input" id="f-time" type="number" min="0" placeholder="45"></div>
           <div class="field" style="flex:1;"><label>Dificultad</label>
@@ -2654,6 +2706,15 @@
         <span class="l"><span class="icon-slot" data-icon="trash" style="vertical-align:-2px;margin-right:6px;color:var(--k-danger);"></span><span style="color:var(--k-danger);">Zona de peligro</span></span>
         <span class="icon-slot" data-icon="arrow-left" style="transform:rotate(180deg);color:var(--k-muted);"></span>
       </div>
+    </div>
+    <div class="grp-card" id="verCard">
+      <p class="section-title"><span class="badge-ic"><span class="icon-slot" data-icon="refresh"></span></span>Versión y datos</p>
+      <div class="ver-box">
+        <div class="ver-col"><span class="ver-lbl">App</span><span class="ver-code" id="verApp"></span><span class="ver-chip" id="verAppChip"></span></div>
+        <div class="ver-col"><span class="ver-lbl">Tus datos</span><span class="ver-code" id="verData"></span><span class="ver-chip" id="verDataChip"></span></div>
+      </div>
+      <p class="ver-hint">Si dos celulares muestran los mismos dos códigos, tienen la misma app y exactamente los mismos datos. El código de los datos cambia apenas cambia algo (se revisa cada 5 segundos).</p>
+      <button type="button" class="btn btn-ghost" id="verBtn" onclick="kobuVersionRevisar(true)"><span class="icon-slot" data-icon="refresh" style="vertical-align:-2px;"></span> Buscar actualización</button>
     </div>
   </div>
 
@@ -4550,6 +4611,7 @@ function applyHomeTabUI(){
   renderDietFilterChips();
   document.getElementById('recipeList').classList.toggle('home-list-hidden', !isRecetas);
   document.getElementById('prepCardList').classList.toggle('home-list-hidden', !isPreps);
+  const rcBar = document.getElementById('recipeFilterBar'); if(rcBar) rcBar.classList.toggle('home-list-hidden', !isRecetas);
 }
 function renderRecipes(){
   renderTagChips();
@@ -4565,34 +4627,193 @@ function renderRecipes(){
     if(activeDietFilter && activeDietFilter!=='original' && !recipeHasDietType(r, activeDietFilter)) return false;
     return true;
   });
-  const favs = filtered.filter(function(r){ return r.favorite; });
-  const rest = filtered.filter(function(r){ return !r.favorite; }).sort(function(a,b){ return (a.title||'').localeCompare(b.title||'', 'es', {sensitivity:'base'}); });
-  const list = favs.concat(rest);
+  rcRenderList(filtered);
+}
+/* ---- Inicio: recetas por tipo y por estado (23/11/2026) ----
+   Tipo: r.cat (una de RC_CATS) o automático por el nombre / el peso. Estado: r.prueba (true = en prueba,
+   false = se vende; sin elegir = en prueba si no tiene precio y nunca se vendió). */
+var RC_CATS = [
+  { k:'budines', n:'Budines', ic:'budin-clasico' },
+  { k:'xl', n:'Budines XL', ic:'budin-glaseado' },
+  { k:'barras', n:'Brownies y lemonies', ic:'chocolate' },
+  { k:'salados', n:'Salados', ic:'croissant' },
+  { k:'panes', n:'Panes', ic:'bread-loaf-sliced' },
+  { k:'cajas', n:'Cajas', ic:'gift' },
+  { k:'otras', n:'Otras', ic:'cookie' }
+];
+var RC_ESTADOS = [
+  { k:'todas', n:'Todas', ic:'list' },
+  { k:'fav', n:'Favoritas', ic:'star' },
+  { k:'listas', n:'Listas', ic:'check' },
+  { k:'hornear', n:'Hornear', ic:'flame' },
+  { k:'prueba', n:'Prueba', ic:'flask' }
+];
+var rcEstado = 'todas';
+try{ const e0 = localStorage.getItem('kobuHomeEstado'); if(e0 && RC_ESTADOS.some(function(x){ return x.k===e0; })) rcEstado = e0; }catch(e){}
+function rcCatValida(k){ return RC_CATS.some(function(c){ return c.k===k; }); }
+// Peso de una unidad (el del tamaño base): para reconocer los budines XL.
+function rcPesoUnidad(r){
+  const v = [r.pesoU, recipeHas2(r) ? pesoTam(r, baseTam(r)) : null].concat((r.moldCalibrations||[]).map(function(c){ return c && c.unitWeight; }))
+    .map(function(x){ return parseFloat(x); }).filter(function(x){ return x>0; });
+  return v.length ? v[0] : 0;
+}
+function recipeCatAuto(r){
+  if(isCombo(r)) return 'cajas';
+  const t = normalizeMatchText(r.title), u = normalizeMatchText(r.yieldUnit);
+  if(/(^|\s)(pan|panes|pancito|pancitos)(\s|$)/.test(t)) return 'panes';
+  if(/skon|scon|chipa|salad|empanada|focaccia|grisin/.test(t)) return 'salados';
+  if(/brownie|lemonie|blondie|barrita|bandeja/.test(t)) return 'barras';
+  if(/budin|bizcochuelo|cake|torta/.test(t)){
+    if(/(^|\s)xl(\s|$)/.test(t) || /(^|\s)xl(\s|$)/.test(u) || (recipeHas2(r) && baseTam(r)==='xl') || rcPesoUnidad(r)>=450) return 'xl';
+    return 'budines';
+  }
+  if(r.moldYieldMode==='corte') return 'barras';
+  return 'otras';
+}
+function recipeCat(r){ return (r && rcCatValida(r.cat)) ? r.cat : recipeCatAuto(r); }
+// Unidades vendidas por receta (pedidos no cancelados + ventas en la calle) en los últimos `dias`.
+function rcVentas(dias){
+  const desde = Date.now() - dias*86400000, out = {};
+  const suma = function(id, q){ if(id && q>0) out[id] = (out[id]||0) + q; };
+  (DATA.orders||[]).forEach(function(o){
+    if(!o || o.status==='cancelado') return;
+    const t = new Date(o.deliveredAt || o.createdAt || 0).getTime();
+    if(!(t>=desde)) return;
+    (o.items||[]).forEach(function(it){ suma(it && it.recipeId, Number(it.qty)||0); });
+  });
+  (DATA.quickSales||[]).forEach(function(q){
+    const t = new Date(q && q.ts || 0).getTime();
+    if(t>=desde) suma(q.recipeId, Number(q.qty)||0);
+  });
+  return out;
+}
+function rcStockTotal(r){ return (Number(recipeStockOf(r))||0) + (recipeHas2(r) ? (Number(r.stock2)||0) : 0); }
+function recipeEnPrueba(r, vTotal){
+  if(r.prueba===true) return true;
+  if(r.prueba===false || isCombo(r)) return false;
+  return !(parseFloat(r.salePrice)>0) && !(vTotal>0);
+}
+// Sin stock y se vende seguido (3 o más en los últimos 30 días): conviene hornearla.
+function recipeParaHornear(r, info){ return !info.prueba && !isCombo(r) && info.stock<=0 && info.v30>=3; }
+function setRecipeEstado(k){
+  rcEstado = RC_ESTADOS.some(function(x){ return x.k===k; }) ? k : 'todas';
+  try{ localStorage.setItem('kobuHomeEstado', rcEstado); }catch(e){}
+  renderRecipes();
+}
+function rcCerradas(){ try{ return JSON.parse(localStorage.getItem('kobuHomeCatCerradas')||'{}') || {}; }catch(e){ return {}; } }
+function toggleRecipeCat(k){
+  const c = rcCerradas();
+  if(c[k]) delete c[k]; else c[k] = 1;
+  try{ localStorage.setItem('kobuHomeCatCerradas', JSON.stringify(c)); }catch(e){}
+  const sec = document.querySelector('#recipeList .rc-sec[data-cat="'+k+'"]');
+  if(sec){ sec.classList.toggle('closed', !!c[k]); const ch = sec.querySelector('.rc-chev'); if(ch){ ch.setAttribute('data-icon', c[k] ? 'chevron-down' : 'chevron-up'); ch.innerHTML = ''; mountIcons(); } }
+}
+function rcRenderList(filtered){
+  const bar = document.getElementById('recipeFilterBar');
   const el = document.getElementById('recipeList');
-  if(list.length===0){
+  const isRecetas = homeTab==='recetas';
+  if(bar) bar.classList.toggle('home-list-hidden', !isRecetas);
+  const v90 = rcVentas(90), v30 = rcVentas(30), vAll = rcVentas(36500);
+  const info = {};
+  filtered.forEach(function(r){
+    const x = { stock: rcStockTotal(r), v90: v90[r.id]||0, v30: v30[r.id]||0, cat: recipeCat(r) };
+    x.prueba = recipeEnPrueba(r, vAll[r.id]||0);
+    x.hornear = recipeParaHornear(r, x);
+    info[r.id] = x;
+  });
+  const enEstado = function(r, k){
+    const x = info[r.id];
+    if(k==='fav') return !!r.favorite;
+    if(k==='listas') return x.stock>0;
+    if(k==='hornear') return x.hornear;
+    if(k==='prueba') return x.prueba;
+    return true;
+  };
+  if(bar){
+    bar.innerHTML = '<div class="rc-bar">'+RC_ESTADOS.map(function(e){
+      const n = filtered.filter(function(r){ return enEstado(r, e.k); }).length;
+      return '<button type="button" class="'+(rcEstado===e.k ? 'on' : '')+(e.k==='hornear' ? ' ko' : '')+'" onclick="setRecipeEstado(\''+e.k+'\')" aria-pressed="'+(rcEstado===e.k)+'"><span class="icon-slot" data-icon="'+e.ic+'"></span>'+e.n+'<b>'+n+'</b></button>';
+    }).join('')+'</div>';
+  }
+  if(DATA.recipes.filter(function(r){ return !r.isDietVariant; }).length===0){
     el.innerHTML = '<div class="empty"><span class="icon-slot" data-icon="cookie"></span>Todavía no hay recetas por acá.<br>Tocá "Añadir receta" para cargar la primera.</div>';
     mountIcons();
     return;
   }
-  el.innerHTML = list.map(function(r){
-    const bg = r.photo ? ('background-image:url('+r.photo+')') : ('background:'+(placeholderBg(r.colorIdx)));
-    const favBtn = '<button type="button" class="iconbtn card-fav" onclick="event.stopPropagation();toggleFavorite(\''+r.id+'\')" title="favorita"><span class="icon-slot" data-icon="star" style="color:'+(r.favorite?'var(--k-accent)':'var(--k-border)')+';"></span></button>';
-    const readyMark = r.readyToSell ? '<span class="ready-mark active"><span class="icon-slot" data-icon="check"></span></span>' : '<span class="ready-mark"></span>';
-    const readyBtn = '<button type="button" class="iconbtn card-ready" onclick="event.stopPropagation();toggleReadyToSell(\''+r.id+'\')" title="lista para vender">'+readyMark+'</button>';
-    const dragBtn = (unfiltered && r.favorite) ? '<button type="button" class="iconbtn card-drag" onclick="event.stopPropagation();" onpointerdown="event.stopPropagation();recipeDragStart(event,\''+r.id+'\')" title="mover"><span class="icon-slot" data-icon="grip"></span></button>' : '';
-    const stockBadge = '<span class="thumb-stock-badge" style="background:'+stockColor(recipeStockOf(r)+(recipeHas2(r) ? (Number(r.stock2)||0) : 0))+';" title="stock: '+escapeHtml(recipeStockText(r))+'" onclick="event.stopPropagation();handleRecipeStockBadgeTap(\''+r.id+'\')">'+recipeStockOf(r)+(recipeHas2(r) ? '<span class="xl-pill">'+(Number(r.stock2)||0)+' '+tamNombre(secTam(r))+'</span>' : '')+'</span>';
-    const dietTypes = recipeDisplayDietTypes(r);
-    const dietIcons = dietTypes.map(function(t){
-      return '<span class="diet-icon-badge" style="background:color-mix(in srgb, '+t.meta.color+' 18%, transparent);" title="'+escapeHtml(t.meta.label)+'"><span class="icon-slot" data-icon="'+t.meta.icon+'" style="color:'+t.meta.color+';"></span></span>';
-    }).join('');
-    return '<div class="card" data-id="'+r.id+'" data-fav="'+(r.favorite?1:0)+'" onclick="openDetail(\''+r.id+'\')">'+
-      dragBtn + favBtn + readyBtn +
-      '<div class="thumb" style="'+bg+'">'+mediaIconHtml(r,'thumb-icon')+stockBadge+'</div>'+
-      '<div class="meta"><p class="t">'+escapeHtml(r.title)+dietIcons+'</p>'+
-      '<p class="s">'+(r.timeMinutes||'-')+' min · '+escapeHtml(r.difficulty||'')+'</p></div>'+
-      '</div>';
-  }).join('');
+  const list = filtered.filter(function(r){ return enEstado(r, rcEstado); });
+  if(list.length===0){
+    const txt = { fav:'No tenés recetas favoritas. Tocá la estrella de una receta para sumarla.', listas:'No hay nada listo para vender.', hornear:'Nada urgente para hornear.', prueba:'No hay recetas en prueba.', todas:'No hay recetas con ese filtro.' }[rcEstado];
+    el.innerHTML = '<div class="empty"><span class="icon-slot" data-icon="cookie"></span>'+escapeHtml(txt)+'</div>';
+    mountIcons();
+    return;
+  }
+  // Dentro de cada tipo: primero lo que hay listo, después lo que hay que hornear, después lo más vendido.
+  const orden = function(a, b){
+    const A = info[a.id], B = info[b.id];
+    return ((B.stock>0)-(A.stock>0)) || ((B.hornear?1:0)-(A.hornear?1:0)) || ((A.prueba?1:0)-(B.prueba?1:0)) || (B.v90-A.v90) || (a.title||'').localeCompare(b.title||'', 'es', {sensitivity:'base'});
+  };
+  const cerradas = rcCerradas(), filtrando = rcEstado!=='todas';
+  let h = '';
+  if(filtrando) h += '<p class="rc-hint">Mostrando '+list.length+' de '+filtered.length+' · tocá Todas para ver el resto</p>';
+  RC_CATS.forEach(function(c){
+    const arr = list.filter(function(r){ return info[r.id].cat===c.k; }).sort(orden);
+    if(!arr.length) return;
+    const listos = arr.reduce(function(a, r){ return a + (info[r.id].stock>0 ? info[r.id].stock : 0); }, 0);
+    const horn = arr.filter(function(r){ return info[r.id].hornear; }).length;
+    const prueba = arr.every(function(r){ return info[r.id].prueba; });
+    let pills = '';
+    if(prueba) pills = '<span class="rc-pill i">en prueba</span>';
+    else {
+      if(listos) pills += '<span class="rc-pill">'+fmtQty(listos)+' listo'+(listos===1?'':'s')+'</span>';
+      if(horn) pills += '<span class="rc-pill d">'+horn+' hornear</span>';
+      if(!listos && !horn) pills = '<span class="rc-pill i">sin stock</span>';
+    }
+    const closed = !filtrando && !!cerradas[c.k];
+    h += '<div class="rc-sec'+(closed ? ' closed' : '')+'" data-cat="'+c.k+'">'+
+      '<button type="button" class="rc-head" onclick="toggleRecipeCat(\''+c.k+'\')" aria-expanded="'+(!closed)+'"><span class="icon-slot" data-icon="'+c.ic+'"></span>'+escapeHtml(c.n)+' <span class="n">'+arr.length+'</span>'+
+      '<span class="r">'+pills+(filtrando ? '' : '<span class="rc-chev icon-slot" data-icon="'+(closed ? 'chevron-down' : 'chevron-up')+'"></span>')+'</span></button>'+
+      '<div class="rc-list">'+arr.map(function(r){ return rcRowHtml(r, info[r.id], v90); }).join('')+'</div></div>';
+  });
+  el.innerHTML = h;
   mountIcons();
+}
+function rcRowHtml(r, x){
+  const bg = r.photo ? ('background-image:url('+r.photo+')') : ('background:'+(placeholderBg(r.colorIdx)));
+  const dietIcons = recipeDisplayDietTypes(r).map(function(t){
+    return '<span class="diet-icon-badge" style="background:color-mix(in srgb, '+t.meta.color+' 18%, transparent);" title="'+escapeHtml(t.meta.label)+'"><span class="icon-slot" data-icon="'+t.meta.icon+'" style="color:'+t.meta.color+';"></span></span>';
+  }).join('');
+  const precio = parseFloat(r.salePrice)>0 ? fmtMoney(parseFloat(r.salePrice)) : 'Sin precio';
+  const sub = x.prueba && !(parseFloat(r.salePrice)>0) ? 'Sin precio todavía' : precio+(x.v90 ? ' · '+fmtQty(x.v90)+' vendido'+(x.v90===1?'':'s') : '');
+  const st = recipeHas2(r) ? recipeStockText(r) : fmtQty(x.stock)+' listo'+(x.stock===1?'':'s');
+  let pill;
+  if(x.prueba && x.stock<=0) pill = '<span class="rc-pill i">en prueba</span>';
+  else if(x.stock>0) pill = '<span class="rc-pill'+(x.stock<=2 ? ' w' : '')+'">'+escapeHtml(st)+'</span>';
+  else if(x.hornear) pill = '<span class="rc-pill d"><span class="icon-slot" data-icon="flame"></span>hornear</span>';
+  else pill = '<span class="rc-pill i">sin stock</span>';
+  pill = pill.replace('<span class="rc-pill', '<button type="button" title="stock" onclick="event.stopPropagation();handleRecipeStockBadgeTap(\''+r.id+'\')" class="rc-pill').replace(/<\/span>$/, '</button>');
+  const dim = !x.prueba && x.stock<=0 && !x.hornear;
+  return '<div class="rc-row'+(dim ? ' dim' : '')+'" data-id="'+r.id+'" onclick="openDetail(\''+r.id+'\')">'+
+    '<div class="thumb" style="'+bg+'">'+mediaIconHtml(r,'thumb-icon')+'</div>'+
+    '<div class="rc-tt"><p class="t">'+escapeHtml(r.title)+dietIcons+'</p><p class="s">'+escapeHtml(sub)+'</p></div>'+
+    pill+
+    '<div class="rc-btns">'+
+      '<button type="button" class="iconbtn" onclick="event.stopPropagation();toggleFavorite(\''+r.id+'\')" title="favorita" aria-pressed="'+(!!r.favorite)+'"><span class="icon-slot" data-icon="star" style="color:'+(r.favorite?'var(--k-accent)':'var(--k-border)')+';"></span></button>'+
+      '<button type="button" class="iconbtn" onclick="event.stopPropagation();toggleReadyToSell(\''+r.id+'\')" title="lista para vender">'+(r.readyToSell ? '<span class="ready-mark active"><span class="icon-slot" data-icon="check"></span></span>' : '<span class="ready-mark"></span>')+'</button>'+
+    '</div></div>';
+}
+// Formulario: tipo y estado de la receta.
+function rcFillFormCat(d){
+  const sel = document.getElementById('f-cat'), pr = document.getElementById('f-prueba');
+  if(!sel || !pr) return;
+  const auto = RC_CATS.find(function(c){ return c.k===recipeCatAuto(d); });
+  sel.innerHTML = '<option value="">Automático ('+escapeHtml(auto ? auto.n : 'Otras')+')</option>'+RC_CATS.map(function(c){ return '<option value="'+c.k+'">'+escapeHtml(c.n)+'</option>'; }).join('');
+  sel.value = rcCatValida(d.cat) ? d.cat : '';
+  pr.value = d.prueba===true ? '1' : (d.prueba===false ? '0' : '');
+}
+function rcReadFormCat(d){
+  const sel = document.getElementById('f-cat'), pr = document.getElementById('f-prueba');
+  if(sel){ if(rcCatValida(sel.value)) d.cat = sel.value; else delete d.cat; }
+  if(pr){ if(pr.value==='1') d.prueba = true; else if(pr.value==='0') d.prueba = false; else delete d.prueba; }
 }
 let recipeDrag = null;
 function recipeDragStart(e, id){
@@ -5013,6 +5234,7 @@ function fillFormFromDraft(){
   document.getElementById('f-title').value = d.title || '';
   document.getElementById('f-time').value = d.timeMinutes || '';
   document.getElementById('f-difficulty').value = d.difficulty || 'fácil';
+  rcFillFormCat(d);
   document.getElementById('f-yieldQty').value = d.yieldQty || '';
   document.getElementById('f-yieldUnit').value = d.yieldUnit || 'porciones';
   document.getElementById('f-notes').value = d.notes || '';
@@ -6343,6 +6565,7 @@ function applyLibraryFormMode(){
     updateIconPreview();
   }
   document.getElementById('f-timediff-row').style.display = on ? 'none' : '';
+  const catRow = document.getElementById('f-cat-row'); if(catRow) catRow.style.display = on ? 'none' : '';
   document.getElementById('f-yield-row').style.display = 'none';
   const rtCard = document.getElementById('formRindeCard');
   if(rtCard) rtCard.style.display = on ? 'none' : '';
@@ -6541,6 +6764,7 @@ function saveRecipe(){
   if(d.components && d.components.length){ d.ingredients = []; d.steps = []; }
   d.timeMinutes = parseInt(document.getElementById('f-time').value) || 0;
   d.difficulty = document.getElementById('f-difficulty').value;
+  rcReadFormCat(d);
   d.yieldQty = parseFloat(document.getElementById('f-yieldQty').value) || 0;
   d.yieldUnit = document.getElementById('f-yieldUnit').value.trim() || 'porciones';
   d.notes = document.getElementById('f-notes').value;
@@ -7739,8 +7963,22 @@ function computeRecipeCost(r, scale){
   const energyCost = computeEnergyCost(r);
   total += energyCost;
   const yieldQty = (parseFloat(r.yieldQty) || 0) * scale;
-  const costPerUnit = yieldQty>0 ? total/yieldQty : null;
+  // Dos tamaños con "la de siempre" mezclada (1 XL + 2 chicos): el costo se reparte por peso entre todo lo que sale.
+  const yEq = rindeEqBase(r);
+  const costPerUnit = (yEq ? yEq*scale : yieldQty)>0 ? total/(yEq ? yEq*scale : yieldQty) : null;
   return { groups:groups, breakdown:breakdown, total:total, costPerUnit:costPerUnit, yieldQty:yieldQty, yieldUnit:r.yieldUnit||'unidades', energyCost:energyCost };
+}
+// Cuántas unidades del tamaño base "valen" lo que sale en la tanda de siempre (el otro tamaño cuenta según su peso).
+// null si la receta no tiene dos tamaños o si la tanda de siempre trae un solo tamaño (ahí alcanza con "Rinde").
+function rindeEqBase(r){
+  if(!recipeHas2(r)) return null;
+  const s0 = recipeSalidas(r)[0];
+  if(!s0) return null;
+  const xl = baseTam(r)==='xl', b = xl ? s0.x : s0.c, sc = xl ? s0.c : s0.x;
+  if(!(sc>0)) return null;
+  const f = s0.f>0 ? s0.f : 1;
+  const eq = (b + sc*secEq(r))/f;
+  return eq>0 ? eq : null;
 }
 function fmtMoney(n){ if(n==null || isNaN(n)) return '-'; return '$'+ (Math.round(n*100)/100).toLocaleString('es-AR'); }
 function roundQty(n){ if(n==null || isNaN(n)) return 0; return Math.round(n*10000)/10000; }
@@ -8119,6 +8357,7 @@ async function openAdvancedScreen(){
     advSettingsUnlocked = true;
   }
   showScreen('advanced');
+  kobuVerIniciar();
 }
 function openAdvDetail(section){
   state.advSection = section;
@@ -9210,11 +9449,74 @@ function toggleSyncEnabled(){
   document.getElementById('syncEnabledSwitch').classList.toggle('on', !cur);
   showToast(cur ? 'Sincronización desactivada en este dispositivo' : 'Sincronización activada');
 }
+// Versión de esta copia de la app (para saber si un celular quedó con una vieja): cambiarla en cada entrega.
+var KOBU_APP_VERSION = '44 · 23/11/2026';
+// ---- Versión de la app y código de los datos (Avanzado → Versión y datos) ----
+var kobuVerNueva = null, kobuVerUlt = 0, kobuVerEstado = '', kobuVerTimer = null;
+// Código corto de los datos (6 letras/números): igual en dos celulares = mismos datos.
+function kobuDatosCodigo(){
+  const h = dataHash(DATA).split('_');
+  let n = parseInt(h[0], 36); if(!isFinite(n)) n = 0;
+  n = (Math.abs(n) ^ (Number(h[1])||0)*2654435761) >>> 0;
+  const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let c = ''; for(let i=0;i<6;i++){ c += A[n % 32]; n = Math.floor(n/32) ^ (i*7919); n = n>>>0; }
+  return c.slice(0,3)+'-'+c.slice(3);
+}
+function kobuDatosEstado(){
+  if(!syncEnabled() || !localStorage.getItem('kobuSyncUrl')) return { t:'Sin sincronizar', c:'' };
+  if(localStorage.getItem('kobuLastSyncedHash')===dataHash(DATA)) return { t:'Igual a la nube', c:'ok' };
+  return { t:'Con cambios sin subir', c:'w' };
+}
+// Busca la versión publicada (index.html) y la compara con esta. force = aunque se haya revisado hace poco.
+function kobuVersionRevisar(force){
+  if(!/^https?:/.test(location.protocol) || !window.fetch) { kobuVerEstado = 'sin'; kobuVerPintar(); return Promise.resolve(null); }
+  if(!force && Date.now()-kobuVerUlt < 10*60000) return Promise.resolve(kobuVerNueva);
+  kobuVerUlt = Date.now();
+  if(force){ kobuVerEstado = 'buscando'; kobuVerPintar(); }
+  const u = location.pathname.replace(/[^/]*$/, '') + 'index.html?nc=' + Date.now();
+  return fetch(u, { cache:'no-store' }).then(function(r){ return r.ok ? r.text() : ''; }).then(function(t){
+    const m = /var KOBU_APP_VERSION = '([^'<>]{1,40})'/.exec(t || '');
+    if(!m){ kobuVerEstado = 'sin'; kobuVerPintar(); return null; }
+    kobuVerNueva = m[1]!==KOBU_APP_VERSION ? m[1] : null;
+    kobuVerEstado = kobuVerNueva ? 'nueva' : 'ok';
+    const b = document.getElementById('appNewBanner');
+    if(b) b.classList.toggle('show', !!kobuVerNueva);
+    if(force && !kobuVerNueva) showToast('Tenés la última versión');
+    kobuVerPintar();
+    return kobuVerNueva;
+  }).catch(function(){ kobuVerEstado = 'sin'; kobuVerPintar(); return null; });
+}
+function kobuActualizarApp(){
+  try{ sessionStorage.setItem('kobuActualizando', '1'); }catch(e){}
+  location.reload();
+}
+function kobuVerPintar(){
+  const a = document.getElementById('verApp'); if(!a) return;
+  a.textContent = KOBU_APP_VERSION.split(' · ')[0];
+  const ac = document.getElementById('verAppChip');
+  const est = { ok:['Al día','ok'], nueva:['Hay una nueva: '+String(kobuVerNueva||'').split(' · ')[0],'d'], buscando:['Revisando...',''], sin:['Sin revisar',''] }[kobuVerEstado] || [KOBU_APP_VERSION.split(' · ')[1] || '', ''];
+  ac.textContent = est[0]; ac.className = 'ver-chip'+(est[1] ? ' '+est[1] : '');
+  document.getElementById('verData').textContent = kobuDatosCodigo();
+  const de = kobuDatosEstado(), dc = document.getElementById('verDataChip');
+  dc.textContent = de.t; dc.className = 'ver-chip'+(de.c ? ' '+de.c : '');
+  const btn = document.getElementById('verBtn');
+  if(btn){ btn.innerHTML = kobuVerNueva ? '<span class="icon-slot" data-icon="refresh" style="vertical-align:-2px;"></span> Actualizar ahora' : '<span class="icon-slot" data-icon="refresh" style="vertical-align:-2px;"></span> Buscar actualización'; btn.setAttribute('onclick', kobuVerNueva ? 'kobuActualizarApp()' : 'kobuVersionRevisar(true)'); mountIcons(); }
+}
+function kobuVerIniciar(){
+  kobuVerPintar();
+  clearInterval(kobuVerTimer);
+  kobuVerTimer = setInterval(function(){
+    if(state.stack[state.stack.length-1]!=='advanced'){ clearInterval(kobuVerTimer); kobuVerTimer = null; return; }
+    if(!document.hidden) kobuVerPintar();
+  }, 5000);
+  kobuVersionRevisar(false);
+}
 function syncNoteText(){
+  const ver = '<br><span style="color:var(--k-muted);">Versión de la app: '+KOBU_APP_VERSION+'</span>';
   const last = localStorage.getItem('kobuLastSync');
-  if(!last) return '<span style="color:var(--k-muted);">Todavía no sincronizaste.</span>';
+  if(!last) return '<span style="color:var(--k-muted);">Todavía no sincronizaste.</span>'+ver;
   const d = new Date(last);
-  return '<span style="color:var(--k-muted);">Última sincronización: '+d.toLocaleDateString('es-AR')+' '+d.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})+'.</span>';
+  return '<span style="color:var(--k-muted);">Última sincronización: '+d.toLocaleDateString('es-AR')+' '+d.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})+'.</span>'+ver;
 }
 function updateSyncNote(){
   const el = document.getElementById('syncNote');
@@ -18311,6 +18613,10 @@ setInterval(function(){ if(document.hidden || state.stack[state.stack.length-1]!
 document.addEventListener('visibilitychange', function(){ if(!document.hidden && state.stack[state.stack.length-1]==='home') renderHomeSummary(); });
 // Aviso de nueva versión: desactivado por ahora (queda como opción para activar más adelante).
 // checkForUpdate();
+// Versión nueva publicada: se revisa al abrir y al volver a la app (cada 10 min como mucho) y aparece "Actualizar".
+setTimeout(function(){ kobuVersionRevisar(false); }, 4000);
+document.addEventListener('visibilitychange', function(){ if(!document.hidden) kobuVersionRevisar(false); });
+try{ if(sessionStorage.getItem('kobuActualizando')){ sessionStorage.removeItem('kobuActualizando'); setTimeout(function(){ showToast('App actualizada: versión '+KOBU_APP_VERSION.split(' · ')[0]); }, 2600); } }catch(e){}
 </script>
 
 </body>

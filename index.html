@@ -9256,8 +9256,32 @@ function fidDescAlDia(){
     saveData(DATA);
   }catch(e){}
 }
+// 23/11/2026: una compra del bot de más de 30 días se volvía a cargar en cada apertura (stock y gasto repetidos,
+// todos con el mismo id de gasto). Se deja uno solo y se descuenta el stock de las copias.
+function botComprasDuplicadasReparar(d){
+  if(!d || !Array.isArray(d.expenses)) return 0;
+  const vistos = {}; let quitadas = 0;
+  d.expenses = d.expenses.filter(function(e){
+    const id = e && typeof e.id==='string' ? e.id : '';
+    if(!/^exp-cp-bot-/.test(id)) return true;
+    if(!vistos[id]){ vistos[id] = true; return true; }
+    const p = e.priceId ? (d.ingredientPrices||[]).find(function(x){ return x.id===e.priceId; }) : null;
+    const pk = Number(e.pkgs);
+    if(p && pk>0){ const ref = p.qty>0 ? p.qty : 1; p.stock = Math.max(0, roundQty((Number(p.stock)||0) - pk*ref)); }
+    quitadas++;
+    return false;
+  });
+  return quitadas;
+}
+function botComprasAlDia(){
+  try{
+    const n = botComprasDuplicadasReparar(DATA);
+    if(n){ saveData(DATA); try{ renderIngredientPrices(); refreshIngredientPickers(); }catch(e){} showToast(n===1 ? 'Se corrigió 1 compra del bot que se había cargado de más' : 'Se corrigieron '+n+' compras del bot que se habían cargado de más'); }
+  }catch(e){}
+}
 function kobuBotResumenAlDia(){
   fidDescAlDia();
+  botComprasAlDia();
   try{
     const antes = JSON.stringify(DATA.botResumen||null);
     updateBotResumen();
@@ -9311,7 +9335,7 @@ function adoptCloudData(parsed){
   updateSyncNote();
   render();
   // Lo que mandó el bot mientras tanto se vuelve a aplicar sobre los datos recién bajados.
-  setTimeout(function(){ try{ refreshBotSales(true); }catch(e){} }, 500);
+  setTimeout(function(){ try{ refreshBotSales(true); }catch(e){} botComprasAlDia(); }, 500);
 }
 function syncPush(){
   if(!syncEnabled()){ showToast('Sincronización desactivada en este dispositivo. Activala en Ajustes.'); return; }
@@ -13570,7 +13594,13 @@ function applyBotCompra(v){
 function botValidSale(v){
   return v && typeof v.id==='string' && /^qs-bot-[\d-]{10,40}$/.test(v.id) && v.tipo==='venta' && Number.isInteger(v.qty) && v.qty>=1 && v.qty<=50;
 }
+// Hora (ms) del id del bot (qs-bot-<ms>-n, hb-bot-…, cp-bot-…, mm-bot-…).
+function botIdMs(id){ const m = /^(?:qs|hb|cp|mm)-bot-(\d{10,16})/.exec(String(id||'')); return m ? Number(m[1]) : 0; }
+var BOT_VIGENCIA_DIAS = 20;
+function botVigente(v){ const t = botIdMs(v && v.id); return !t || Date.now()-t < BOT_VIGENCIA_DIAS*86400000; }
 function applyBotSales(ventas){
+  // Lo anotado hace más de 20 días ya se aplicó (o se descartó): nunca se vuelve a aplicar.
+  ventas = (ventas||[]).filter(botVigente);
   const ids = {};
   (DATA.quickSales||[]).forEach(function(q){ if(q && q.id) ids[q.id] = true; });
   const dismissed = {};
@@ -18275,7 +18305,7 @@ applyTheme(DATA.settings.theme);
 state.stack = ['splash'];
 render();
 setTimeout(function(){ if(state.stack[state.stack.length-1]==='splash'){ goHome(); handleNotificationGoto(); } }, 2100);
-if(!syncEnabled() || !localStorage.getItem('kobuSyncUrl') || !localStorage.getItem('kobuSyncKey')) fidDescAlDia();
+if(!syncEnabled() || !localStorage.getItem('kobuSyncUrl') || !localStorage.getItem('kobuSyncKey')){ fidDescAlDia(); botComprasAlDia(); }
 autoPullOnOpen();
 setInterval(function(){ if(document.hidden || state.stack[state.stack.length-1]!=='home') return; renderHomeSummary(); }, 60000);
 document.addEventListener('visibilitychange', function(){ if(!document.hidden && state.stack[state.stack.length-1]==='home') renderHomeSummary(); });

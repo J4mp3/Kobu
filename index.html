@@ -316,6 +316,55 @@
   .diet-icon-badge .icon-slot{ font-size:10px; }
   .empty{ display:flex; flex-direction:column; align-items:center; text-align:center; width:100%; padding:40px 10px; color:var(--k-muted); font-size:calc(12.5px + var(--kobu-font-boost, 0px)); }
   #recipeList.home-list-hidden, #prepCardList.home-list-hidden, #recipeFilterBar.home-list-hidden{ display:none !important; }
+  /* Ayuda (?) */
+  .kh-help{ background:var(--k-accent) !important; color:var(--k-bg) !important; width:26px !important; height:26px !important; min-width:26px; border-radius:50%; padding:0; margin-right:4px; display:flex; align-items:center; justify-content:center; position:relative; }
+  .kh-q{ font-weight:800; font-size:calc(14px + var(--kobu-font-boost, 0px)); line-height:1; font-family:inherit; }
+  .kh-help::after{ content:""; position:absolute; inset:-4px; border-radius:50%; border:2px solid var(--k-accent); opacity:0; animation:khRing 2.4s ease-out 1.5s 3; pointer-events:none; }
+  @keyframes khRing{ 0%{ transform:scale(.8); opacity:.7; } 100%{ transform:scale(1.4); opacity:0; } }
+  #helpModal{ z-index:290; align-items:flex-start; }
+  .kh-box{ text-align:left; max-width:400px; margin-top:64px; gap:12px; animation:khIn .26s cubic-bezier(.2,.8,.2,1); max-height:calc(100vh - 90px); overflow-y:auto; }
+  @keyframes khIn{ from{ opacity:0; transform:translateY(-10px) scale(.97); } to{ opacity:1; transform:none; } }
+  .kh-title{ margin:0; font-size:calc(17px + var(--kobu-font-boost, 0px)); font-weight:700; color:var(--k-text); display:flex; align-items:center; gap:8px; }
+  .kh-q.big{ width:26px; height:26px; border-radius:50%; background:var(--k-accent); color:var(--k-bg); display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .kh-srch{ display:flex; align-items:center; gap:8px; background:var(--k-card2); border-radius:12px; padding:0 6px 0 12px; }
+  .kh-srch input{ flex:1; min-width:0; border:none; outline:none; background:transparent; font-family:inherit; font-size:calc(14px + var(--kobu-font-boost, 0px)); color:var(--k-text); padding:12px 0; }
+  .kh-srch button{ width:32px; height:32px; border-radius:50%; border:none; background:var(--k-accent); color:var(--k-bg); display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; }
+  .kh-res{ display:flex; flex-direction:column; gap:6px; }
+  .kh-res:empty{ display:none; }
+  .kh-nota{ margin:0; font-size:calc(12px + var(--kobu-font-boost, 0px)); color:var(--k-muted); display:flex; align-items:center; gap:8px; }
+  .kh-hit{ display:flex; align-items:center; gap:10px; background:var(--k-card2); border-radius:12px; padding:10px 12px; border:none; width:100%; text-align:left; color:var(--k-text); font-family:inherit; font-size:calc(13px + var(--kobu-font-boost, 0px)); cursor:pointer; animation:khPop .25s ease both; }
+  .kh-hit small{ display:block; color:var(--k-muted); font-size:calc(11px + var(--kobu-font-boost, 0px)); margin-top:1px; }
+  .kh-hit > .icon-slot{ margin-left:auto; color:var(--k-accent); flex-shrink:0; }
+  @keyframes khPop{ from{ opacity:0; transform:translateY(4px); } to{ opacity:1; transform:none; } }
+  .kh-dots{ display:inline-flex; gap:3px; } .kh-dots i{ width:6px; height:6px; border-radius:50%; background:var(--k-accent); animation:khBlink 1s infinite; } .kh-dots i:nth-child(2){ animation-delay:.15s; } .kh-dots i:nth-child(3){ animation-delay:.3s; }
+  @keyframes khBlink{ 0%,100%{ opacity:.25; } 50%{ opacity:1; } }
+  .kh-here{ display:flex; align-items:center; justify-content:center; gap:8px; border:1.5px solid var(--k-accent); background:none; color:var(--k-accent); border-radius:12px; padding:11px; font-family:inherit; font-size:calc(13.5px + var(--kobu-font-boost, 0px)); font-weight:600; cursor:pointer; }
+  .kh-all{ display:flex; flex-direction:column; gap:4px; border-top:0.5px solid var(--k-border); padding-top:8px; }
+  .kh-sec{ margin:4px 0 0; font-size:calc(10.5px + var(--kobu-font-boost, 0px)); letter-spacing:.12em; text-transform:uppercase; color:var(--k-muted); font-weight:600; }
+  .kh-sug{ display:flex; flex-wrap:wrap; gap:6px; }
+  .kh-sug button{ border:none; background:var(--k-card2); color:var(--k-accent); border-radius:20px; padding:6px 11px; font-family:inherit; font-size:calc(11.5px + var(--kobu-font-boost, 0px)); cursor:pointer; }
+  .kh-close{ background:none; border:none; color:var(--k-muted); font-family:inherit; font-size:calc(13px + var(--kobu-font-boost, 0px)); padding:4px; cursor:pointer; text-decoration:underline; }
+  .kh-spot{ position:fixed; z-index:300; border-radius:14px; box-shadow:0 0 0 9999px rgba(40,12,12,.6); pointer-events:none; opacity:0; transition:top .38s cubic-bezier(.2,.8,.2,1), left .38s cubic-bezier(.2,.8,.2,1), width .38s cubic-bezier(.2,.8,.2,1), height .38s cubic-bezier(.2,.8,.2,1), opacity .25s; }
+  .kh-spot.show{ opacity:1; }
+  .kh-spot.nada{ top:50% !important; left:50% !important; width:0 !important; height:0 !important; }
+  .kh-spot::after{ content:""; position:absolute; inset:-5px; border-radius:17px; border:2px solid #F3C9C2; animation:khPulse 1.6s ease-in-out infinite; }
+  .kh-spot.nada::after{ display:none; }
+  @keyframes khPulse{ 0%,100%{ opacity:.9; transform:scale(1); } 50%{ opacity:.25; transform:scale(1.03); } }
+  .kh-tip{ position:fixed; left:max(12px, calc(50% - 200px)); right:max(12px, calc(50% - 200px)); z-index:302; background:var(--k-card); border-radius:16px; padding:14px 14px 12px; box-shadow:0 14px 36px rgba(0,0,0,.28); display:flex; flex-direction:column; gap:7px; opacity:0; transform:translateY(8px); pointer-events:none; transition:top .38s cubic-bezier(.2,.8,.2,1), opacity .25s, transform .25s; }
+  .kh-tip.show{ opacity:1; transform:none; pointer-events:auto; }
+  .kh-k{ font-size:calc(10.5px + var(--kobu-font-boost, 0px)); letter-spacing:.1em; text-transform:uppercase; color:var(--k-muted); font-weight:600; display:flex; justify-content:space-between; gap:8px; padding-right:26px; }
+  .kh-t{ margin:0; font-size:calc(15px + var(--kobu-font-boost, 0px)); font-weight:700; color:var(--k-text); }
+  .kh-p{ margin:0; font-size:calc(13px + var(--kobu-font-boost, 0px)); line-height:1.45; color:var(--k-text); opacity:.85; }
+  .kh-tap{ display:inline-flex; align-items:center; gap:6px; font-size:calc(11.5px + var(--kobu-font-boost, 0px)); color:var(--k-accent); font-weight:600; }
+  .kh-nav{ display:flex; align-items:center; gap:8px; margin-top:2px; }
+  .kh-dotsrow{ display:flex; gap:4px; flex:1; flex-wrap:wrap; } .kh-dotsrow i{ width:6px; height:6px; border-radius:50%; background:var(--k-border); transition:background .2s, width .2s; }
+  .kh-dotsrow i.on{ background:var(--k-accent); width:16px; border-radius:3px; }
+  .kh-b{ border:none; border-radius:10px; padding:8px 12px; font-family:inherit; font-size:calc(12.5px + var(--kobu-font-boost, 0px)); font-weight:600; cursor:pointer; }
+  .kh-b.gh{ background:var(--k-card2); color:var(--k-text); } .kh-b.pr{ background:var(--k-accent); color:var(--k-bg); }
+  .kh-x{ position:absolute; top:8px; right:8px; width:28px; height:28px; border:none; background:none; color:var(--k-muted); cursor:pointer; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+  #khDone{ z-index:305; }
+  .kh-ok{ width:44px; height:44px; border-radius:50%; background:var(--k-success-bg); color:var(--k-success); display:flex; align-items:center; justify-content:center; margin:0 auto; font-size:22px; }
+  @media (prefers-reduced-motion: reduce){ .kh-spot, .kh-tip, .kh-box, .kh-hit{ transition:none; animation:none; } .kh-spot::after, .kh-help::after{ animation:none; } }
   .ver-box{ display:flex; gap:8px; }
   .ver-col{ flex:1; min-width:0; display:flex; flex-direction:column; align-items:center; gap:6px; background:var(--k-card2); border-radius:12px; padding:12px 6px; text-align:center; }
   .ver-lbl{ font-size:calc(10.5px + var(--kobu-font-boost, 0px)); letter-spacing:.12em; text-transform:uppercase; color:var(--k-muted); font-weight:600; }
@@ -1291,6 +1340,35 @@
     </div>
   </div>
 
+  <!-- AYUDA -->
+  <div class="modal-overlay" id="helpModal">
+    <div class="modal-box kh-box" role="dialog" aria-modal="true" aria-labelledby="khTitle">
+      <p class="kh-title" id="khTitle"><span class="kh-q big">?</span>¿En qué necesitás ayuda?</p>
+      <form class="kh-srch" onsubmit="khEnviar(event)"><input id="khIn" placeholder="Ej. cargar recetas, hacer un pedido" autocomplete="off" oninput="khEscribir(this.value)" aria-label="¿En qué necesitás ayuda?"><button type="submit" aria-label="Buscar ayuda"><span class="icon-slot" data-icon="arrow-right"></span></button></form>
+      <div id="khRes" class="kh-res" aria-live="polite"></div>
+      <button type="button" class="kh-here" onclick="khEstaPagina()"><span class="icon-slot" data-icon="sparkles"></span><span id="khHereTxt">Esta página</span></button>
+      <div class="kh-all" id="khAll"></div>
+      <button type="button" class="kh-close" onclick="closeHelp()">Cerrar</button>
+    </div>
+  </div>
+  <div class="modal-overlay" id="khDone">
+    <div class="modal-box" style="text-align:center;max-width:300px;">
+      <span class="kh-ok"><span class="icon-slot" data-icon="check"></span></span>
+      <p style="font-weight:700;font-size:calc(15px + var(--kobu-font-boost, 0px));margin:6px 0 0;color:var(--k-text);">¡Listo!</p>
+      <p id="khDoneP" style="margin:0;font-size:calc(12.5px + var(--kobu-font-boost, 0px));color:var(--k-muted);"></p>
+      <button class="btn btn-primary" onclick="closeKhDone()">Entendido</button>
+    </div>
+  </div>
+  <div id="khSpot" class="kh-spot"></div>
+  <div id="khTip" class="kh-tip" role="dialog" aria-live="polite">
+    <button type="button" class="kh-x" aria-label="Salir de la guía" onclick="khEnd()"><span class="icon-slot" data-icon="x"></span></button>
+    <div class="kh-k"><span id="khTipG"></span><span id="khTipN"></span></div>
+    <p class="kh-t" id="khTipT"></p>
+    <p class="kh-p" id="khTipP"></p>
+    <span class="kh-tap" id="khTipTap"><span class="icon-slot" data-icon="sparkles"></span>Tocalo para seguir</span>
+    <div class="kh-nav"><div class="kh-dotsrow" id="khTipD"></div><button type="button" class="kh-b gh" id="khPrev" onclick="khStep(-1)">Anterior</button><button type="button" class="kh-b pr" id="khNext" onclick="khStep(1)">Siguiente</button></div>
+  </div>
+
   <!-- CONFIRM MODAL -->
   <div class="modal-overlay" id="confirmModal">
     <div class="modal-box" style="padding:0;gap:0;">
@@ -2178,7 +2256,8 @@
   <div class="topbar" id="topbar" style="display:none;">
     <button class="iconbtn" id="backBtn" onclick="handleBack()" style="visibility:hidden;"><span class="icon-slot" data-icon="arrow-left"></span></button>
     <h1><span class="icon-slot topbar-title-icon" id="screenTitleIcon" data-icon="home"></span><span id="screenTitle">Inicio</span></h1>
-    <div style="display:flex;gap:2px;">
+    <div style="display:flex;gap:2px;align-items:center;">
+      <button class="iconbtn kh-help" id="helpBtn" onclick="openHelp()" title="ayuda" aria-label="Ayuda"><span class="kh-q">?</span></button>
       <button class="iconbtn" id="scanCardBtn" onclick="openFidScan()" title="escanear tarjeta" style="display:none;"><span class="icon-slot" data-icon="scan-qr"></span></button>
       <button class="iconbtn" id="themeToggleBtn" onclick="handleThemeToggleClick()" title="cambiar tema"><span class="icon-slot" data-icon="moonstars"></span></button>
       <button class="iconbtn" id="globalSearchBtn" onclick="openGlobalSearch()" title="buscar"><span class="icon-slot" data-icon="search"></span></button>
@@ -9486,7 +9565,7 @@ function toggleSyncEnabled(){
   showToast(cur ? 'Sincronización desactivada en este dispositivo' : 'Sincronización activada');
 }
 // Versión de esta copia de la app (para saber si un celular quedó con una vieja): cambiarla en cada entrega.
-var KOBU_APP_VERSION = '45 · 23/11/2026';
+var KOBU_APP_VERSION = '46 · 23/11/2026';
 // ---- Versión de la app y código de los datos (Avanzado → Versión y datos) ----
 var kobuVerNueva = null, kobuVerUlt = 0, kobuVerEstado = '', kobuVerTimer = null;
 // Código corto de los datos (6 letras/números): igual en dos celulares = mismos datos.
@@ -18747,6 +18826,402 @@ armBackTrap();
    ========================================================= */
 mountIcons();
 applyFontScale();
+/* =========================================================
+   AYUDA (botón ? de arriba)
+   "¿En qué necesitás ayuda?": se escribe lo que se busca (palabras clave al instante; con Enter, la IA de Kobu
+   elige la guía si las palabras no alcanzan) o "Esta página" explica la pantalla actual. Cada guía es un recorrido:
+   ilumina el botón o campo de cada paso y lo explica. Un paso puede navegar (go) y pedir que lo toques (tap).
+   Recorrer una guía nunca guarda nada: a lo sumo abre una ventana o un formulario vacío.
+   ========================================================= */
+var khTour = null, khAiSeq = 0;
+function khHome(){ goTab('home'); if(homeTab!=='recetas') setHomeTab('recetas'); }
+function khOrders(tab){ goTab('orders'); try{ setOrdersTab(tab||'pedidos'); }catch(e){} }
+function khSettings(){ goTab('settings'); }
+function khScreen(n){ goTab('settings'); showScreen(n); }
+function khReceta(){
+  const rs = (DATA.recipes||[]).filter(function(r){ return !r.isDietVariant && !isCombo(r); });
+  return rs.find(function(r){ return (r.steps||[]).filter(Boolean).length || (r.components||[]).length; }) || rs[0] || null;
+}
+function khDetalle(){ const r = khReceta(); if(r) openDetail(r.id); else khHome(); }
+function khCerrarVentanas(){ ['newOrderModal','comboModal','importRecipeModal','addClientModal'].forEach(function(id){ const m = document.getElementById(id); if(m) m.classList.remove('active'); }); }
+var KH_GUIAS = {
+  receta: { s:'Recetas', n:'Cargar una receta', d:'Del Inicio al formulario, campo por campo', k:['receta','recetas','cargar receta','nueva receta','agregar receta','añadir receta','crear receta'], pasos:[
+    { go:function(){ khCerrarVentanas(); khHome(); }, sel:'#homeTileRecetas', t:'Entrá a Recetas', x:'En Inicio tocá "Recetas": se ven tus recetas y los botones para cargar.' },
+    { sel:'#recetasActionsRow .homeaction-btn.primary', t:'Tocá "Añadir receta"', x:'Abre el formulario vacío. Nada se guarda hasta que toques "Guardar receta".', tap:true },
+    { go:function(){ if(state.stack[state.stack.length-1]!=='form') openForm(); switchFormTab('datos'); }, sel:'#mediaTabsRow', t:'Ícono o foto', x:'Elegí un ícono o sacale una foto: es lo que se ve en Inicio y en Vender.' },
+    { sel:'#f-title', t:'Nombre', x:'El nombre aparece en Inicio, en Vender, en los pedidos y en la web.' },
+    { sel:'#f-cat-row', t:'Tipo y estado', x:'Dejalos en Automático: Kobu la ubica sola (Budines, XL, Panes…). Si la estás probando, marcala "En prueba".' },
+    { sel:'#formRindeCard', t:'Qué sale de una tanda', x:'Cómo sale (cada unidad en su molde o cortada de una bandeja), unidad de venta, peso, molde y cuántas salen. Con esto se calculan el costo y el stock.' },
+    { go:function(){ switchFormTab('ingr'); }, sel:'#formTabsBar', t:'Ingredientes', x:'En la pestaña Ingredientes sumá cada uno con su cantidad. Si está en Stock, toma el precio solo.' },
+    { go:function(){ switchFormTab('pasos'); }, sel:'#formTabsBar', t:'Pasos', x:'Escribí los pasos. Con "Título" armás secciones y cada paso puede tener su timer para el modo Cocinar.' },
+    { go:function(){ switchFormTab('precio'); }, sel:'#f-salePrice', t:'Precio', x:'Precio de venta. Abajo ves el costo y la ganancia. Si vendés por paquete o tiene otro tamaño, también va acá.' },
+    { sel:'#formSaveBtn', t:'Guardá', x:'Listo: aparece en Inicio, en su sección, con su precio y su stock.' }
+  ]},
+  importar: { s:'Recetas', n:'Importar una receta', d:'Pegá un texto o una foto y la IA la carga', k:['importar','pegar receta','foto de receta','copiar receta','texto'], pasos:[
+    { go:function(){ khCerrarVentanas(); khHome(); }, sel:'#recetasActionsRow [onclick^="openImportRecipeModal"]', t:'Importar receta', x:'Pegá la receta escrita (de WhatsApp, de una web, de tus notas) o subí una foto. La IA arma ingredientes, pasos, horno y molde.' },
+    { sel:'#recetasActionsRow [onclick^="openImportRecipeModal"]', t:'Revisala antes de guardar', x:'Después se abre el formulario con todo cargado: revisá cantidades y el "Qué sale de una tanda" y guardá.' }
+  ]},
+  caja: { s:'Recetas', n:'Armar una caja o combo', d:'Productos juntos con su precio', k:['caja','combo','regalo','box','pack'], pasos:[
+    { go:function(){ khCerrarVentanas(); khHome(); }, sel:'#recetasActionsRow [onclick^="openComboModal"]', t:'Caja / combo', x:'Armá una caja con productos que ya tenés: elegís cuáles y cuántos de cada uno.' },
+    { sel:'#recetasActionsRow [onclick^="openComboModal"]', t:'Precio y stock', x:'Te muestra lo que costaría por separado, el costo con packaging y cuántas cajas podés armar con lo que hay. Al venderla descuenta cada producto.' }
+  ]},
+  cocinar: { s:'Recetas', n:'Cocinar y sumar al stock', d:'Modo paso a paso y "¿Qué salió del horno?"', k:['cocinar','hornear','horneada','tanda','modo cocina','paso a paso','sumar stock','registrar'], pasos:[
+    { go:khDetalle, sel:'#screen-detail .cook-btn-sm.no-combo', t:'Cocinar', x:'Desde la ficha de una receta tocá "Cocinar": los pasos en grande, con timers, precalentado, voz y calculadora.' },
+    { sel:'#screen-detail .cook-btn-sm.no-combo', t:'Recorrerla no toca nada', x:'Podés mirar el modo y salir: el stock no cambia.' },
+    { sel:'#screen-detail .cook-btn-sm.no-combo', t:'Finalizar', x:'En el último paso tocá "Finalizar": te pregunta qué salió del horno (2 XL, 1 XL + 2 chicos…) y cuántas tandas. Con "Sumar al stock" suma lo listo y descuenta los ingredientes. Si solo mirabas, "Terminar sin sumar al stock".' }
+  ]},
+  merma: { s:'Recetas', n:'Anotar una merma', d:'Regalos, degustación, algo que se rompió o venció', k:['merma','mermas','se rompio','vencido','regale','degustacion','tirar'], pasos:[
+    { go:khDetalle, sel:'#screen-detail .cook-btn-sm.ghost', t:'Merma', x:'En la ficha de la receta tocá "Merma": elegís cuántas y por qué (regalo, degustación, rota, vencida). Baja el stock listo.' },
+    { go:function(){ khScreen('reports'); }, sel:'#rep-acc-mermas', t:'Dónde se ven', x:'En Reportes aparece cuánto perdiste en mermas en el período.' }
+  ]},
+  inicio: { s:'Recetas', n:'Ver el stock y qué hornear', d:'Filtros y stock del Inicio', k:['stock','listos','hornear','filtro','filtros','favorita','favoritas','prueba','que hay','cuanto hay','agotado','secciones'], pasos:[
+    { go:khHome, sel:'#recipeFilterBar', t:'Filtros', x:'Todas, Favoritas, Listas (con stock), Hornear (sin stock y se venden seguido) y Prueba.' },
+    { sel:'#recipeList .rc-head', t:'Secciones por tipo', x:'Las recetas se agrupan por tipo. Tocá el título de una sección para abrirla o cerrarla.' },
+    { sel:'#recipeList .rc-cols', t:'Stock en columnas', x:'El número grande es lo listo para vender; con dos tamaños ves XL y chicos por separado. Tocalo para corregirlo.' },
+    { sel:'#recipeList .rc-btns', t:'Favorita y lista para vender', x:'La estrella la suma a Favoritas. El círculo la marca "lista para vender": así aparece en Vender y en la web.' }
+  ]},
+  pedido: { s:'Pedidos', n:'Hacer un pedido', d:'Cliente, productos, fecha y guardar', k:['pedido','pedidos','encargo','anotar pedido','nuevo pedido','orden','encargar'], pasos:[
+    { go:function(){ khCerrarVentanas(); khOrders('pedidos'); }, sel:'#screen-orders .addbtn', t:'Nuevo pedido', x:'En Pedidos tocá "Nuevo pedido".', tap:true },
+    { go:function(){ if(!document.getElementById('newOrderModal').classList.contains('active')) openNewOrderModal(); }, sel:'#no-cpick', t:'Elegí el cliente', x:'Escribí parte del nombre o de la empresa. Si es nuevo, "Añadir cliente" lo crea con lo que escribiste.' },
+    { sel:'#no-mode', t:'Cliente o Mayorista', x:'Con un mayorista se pone solo en Mayorista y usa los precios de la lista mayorista.' },
+    { sel:'#newOrderModal .no-addtrigger, #no-items', t:'Productos', x:'Sumá cada producto y la cantidad. Si el cliente tiene el % de la tarjeta, se tilda solo.' },
+    { sel:'#no-datebtn', t:'Fecha de entrega', x:'El calendario pone el día de entrega; así aparece en Inicio cuando toca.' },
+    { sel:'#no-notebtn', t:'Nota y seña', x:'El lápiz agrega una nota interna. Si te dejaron una seña, cargala y te muestra el saldo.' },
+    { sel:'#no-submitBtn', t:'Guardá', x:'Queda Confirmado. Si falta stock te avisa y podés hornear para cubrirlo.' }
+  ]},
+  estados: { s:'Pedidos', n:'Avanzar y entregar un pedido', d:'Estados, entregar y la tarjeta', k:['estado','entregar','entregado','listo','cancelar pedido','marcar','preparacion'], pasos:[
+    { go:function(){ khCerrarVentanas(); khOrders('pedidos'); }, sel:'#orderList', t:'Tus pedidos', x:'Ordenados por fecha de entrega. Tocá uno para abrirlo.' },
+    { sel:'#orderList', t:'Estados', x:'Pendiente → Confirmado → En preparación → Listo → Entregado. Al entregarlo descuenta el stock (si no lo hizo antes) y suma el sello de la tarjeta.' },
+    { sel:'#orderCalToggleBtn', t:'Calendario y buscador', x:'El calendario muestra qué se entrega cada día; el buscador encuentra un pedido por nombre.' }
+  ]},
+  web: { s:'Pedidos', n:'Pedidos de la web', d:'Aceptarlos y vincular productos', k:['web','pagina','página','pedidos web','menu online','bandeja'], pasos:[
+    { go:function(){ khCerrarVentanas(); khOrders('pedidos'); }, sel:'#webInboxBanner', t:'Bandeja de la web', x:'Cuando entra un pedido de la página aparece este aviso. Tocalo para verlo.' },
+    { go:khSettings, sel:'#screen-settings [onclick^="openWebInbox"]', t:'Aceptar', x:'Al aceptarlo se crea el pedido con el cliente y los precios de la web. Ahí también vinculás cada producto de la web con su receta.' }
+  ]},
+  clientes: { s:'Pedidos', n:'Clientes', d:'Buscar, cargar y ver su historial', k:['cliente','clientes','contacto','telefono','mayorista','cumpleaños'], pasos:[
+    { go:function(){ khCerrarVentanas(); khOrders('clientes'); }, sel:'#ordersTileClientes', t:'Clientes', x:'En Pedidos, la pestaña Clientes tiene a todos, separados de los Mayoristas.' },
+    { sel:'#clientSearchInput', t:'Buscá', x:'Por nombre, teléfono o etiqueta.' },
+    { sel:'#screen-orders [onclick^="openAddClientModal"]', t:'Cargar uno nuevo', x:'Nombre, teléfono, mail, empresa, cumpleaños y etiquetas. La etiqueta "Mayorista" lo pasa a esa lista.' },
+    { sel:'#clientList', t:'La ficha', x:'Tocá un cliente para ver lo que compró, sus cupones y su tarjeta de sellos.' }
+  ]},
+  tarjeta: { s:'Pedidos', n:'Tarjeta de fidelidad', d:'Sellos, premios y escanear', k:['tarjeta','sello','sellos','fidelidad','premio','descuento','wallet','escanear','qr'], pasos:[
+    { go:function(){ khCerrarVentanas(); khHome(); }, sel:'#scanCardBtn', t:'Escanear la tarjeta', x:'En Inicio, este botón abre la cámara: escaneás el QR de la tarjeta del cliente y le sumás el sello.' },
+    { go:function(){ khOrders('pedidos'); }, sel:'#orderList', t:'Sellos solos', x:'Cada pedido entregado suma un sello. En el pedido podés apagar "Suma sello en la tarjeta" si no corresponde.' },
+    { go:function(){ khOrders('clientes'); }, sel:'#fidAltasBanner', t:'Pendientes', x:'Quien se sumó desde la página aparece en "Pendientes por registrar" para vincularlo con su cliente.' },
+    { go:khSettings, sel:'#screen-settings [onclick^="openFidCfg"]', t:'Premios', x:'Acá elegís en qué sello viene el % de descuento y en cuál el regalo. La compra que suma el sello del descuento ya lo tiene.' }
+  ]},
+  produccion: { s:'Pedidos', n:'Producción', d:'Qué hornear para los pedidos', k:['produccion','producción','que hornear','planificar','semana'], pasos:[
+    { go:function(){ khCerrarVentanas(); khOrders('produccion'); }, sel:'#ordersTileProduccion', t:'Producción', x:'Suma lo que piden los pedidos que vienen y te dice cuántas tandas hacer de cada receta y qué ingredientes te faltan.' }
+  ]},
+  vender: { s:'Vender', n:'Vender en la calle', d:'Venta rápida y cierre de caja', k:['vender','venta','ventas','calle','feria','cobrar','caja del dia','cierre','efectivo','transferencia'], pasos:[
+    { go:function(){ khCerrarVentanas(); goTab('quicksell'); }, sel:'#qs-ready-grid', t:'Elegí el producto', x:'Están los que marcaste "lista para vender", con su stock.' },
+    { sel:'#qs-form-card, #qs-ready-grid', t:'Cantidad y pago', x:'Elegí cuántos, si es por unidad o paquete y si te pagaron en efectivo o transferencia. "Registrar" descuenta el stock.' },
+    { sel:'#screen-quicksell .qs-totalbar', t:'Cierre de caja', x:'Abajo ves lo vendido hoy. Tocalo para cerrar el día con lo que hay en efectivo y en transferencias.' }
+  ]},
+  compras: { s:'Compras', n:'Lista de compras', d:'Armarla y pasar lo comprado al stock', k:['compras','comprar','lista de compras','super','mercado','faltan ingredientes'], pasos:[
+    { go:function(){ khCerrarVentanas(); goTab('shopping'); }, sel:'#shopTabRow', t:'Comprar e Historial', x:'"Comprar" es la lista de hoy; "Historial" guarda las compras anteriores.' },
+    { sel:'#shopAddCaret', t:'Agregar', x:'Sumá los ingredientes de una receta (por cuántas tandas) o un ingrediente suelto.' },
+    { sel:'#shop-list', t:'Tildá lo que comprás', x:'Al terminar se guarda en el historial y desde ahí lo pasás al stock con su precio.' }
+  ]},
+  stock: { s:'Ajustes', n:'Stock de ingredientes', d:'Precios, cantidades y proveedores', k:['ingrediente','ingredientes','insumo','insumos','precio de','proveedor','stock de','repuse','compre','packaging'], pasos:[
+    { go:function(){ khCerrarVentanas(); khSettings(); }, sel:'#screen-settings .settings-tile[onclick*="ingredients"]', t:'Stock', x:'En Ajustes, "Stock" tiene tus ingredientes, insumos y subproductos.', tap:true },
+    { go:function(){ khScreen('ingredients'); }, sel:'#stockTabCard', t:'Ingredientes e insumos', x:'Ingredientes (harina, huevos…) e insumos (bolsas, moldes descartables).' },
+    { sel:'#screen-ingredients [onclick^="openIngredientCreateModal"]', t:'Cargar uno', x:'Nombre, cuánto trae el paquete y el precio. Kobu calcula el costo por gramo para tus recetas.' },
+    { sel:'#ingredientPriceList', t:'Reponer y proveedores', x:'Tocá uno para sumar una compra: guarda el precio, el proveedor y te dice dónde conviene comprar.' }
+  ]},
+  cocina: { s:'Ajustes', n:'Hornos y gastos fijos', d:'Para el costo de la energía', k:['horno','hornos','gas','luz','energia','gastos fijos','kwh'], pasos:[
+    { go:function(){ khCerrarVentanas(); khScreen('ovens'); }, sel:'#gf-kwh', t:'Gastos fijos', x:'Precio del kWh y del gas: con eso suma la energía al costo de cada receta.' },
+    { sel:'#ovenList', t:'Tus hornos', x:'Cada horno con su potencia y modos. En la receta elegís temperatura, tiempo y rejilla.' }
+  ]},
+  utensilios: { s:'Ajustes', n:'Moldes, bowls y utensilios', d:'Para calcular rindes y escalar recetas', k:['molde','moldes','bowl','bowls','utensilio','utensilios','bandeja','medidas'], pasos:[
+    { go:function(){ khCerrarVentanas(); khScreen('utensils'); }, sel:'#moldList', t:'Moldes', x:'Con las medidas, Kobu calcula cuánto entra en cada uno y te ayuda a pasar una receta de un molde a otro.' },
+    { sel:'#bowlList', t:'Bowls y utensilios', x:'También guardás bowls y utensilios. Se arrastran de una lista a otra.' }
+  ]},
+  reportes: { s:'Ajustes', n:'Reportes', d:'Ventas, gastos, ganancias y mermas', k:['reporte','reportes','ganancia','ganancias','cuanto vendi','balance','excel','estadisticas'], pasos:[
+    { go:function(){ khCerrarVentanas(); khScreen('reports'); }, sel:'#reportsPeriodChips', t:'Período', x:'Elegí semana, mes o año.' },
+    { sel:'#bal-revenue', t:'Balance', x:'Lo que entró, lo que gastaste y lo que te quedó.' },
+    { sel:'#rep-acc-recetas', t:'Por receta', x:'Qué se vendió más y qué te deja más. Abajo, mermas y dónde conviene comprar.' }
+  ]},
+  webeditor: { s:'Ajustes', n:'Editar la web', d:'Menú, precios y lista mayorista', k:['editar web','precios web','menu','menú','lista mayorista','publicar'], pasos:[
+    { go:function(){ khCerrarVentanas(); khSettings(); }, sel:'#screen-settings [onclick^="openWebEditor"]', t:'Editar la web', x:'Cambiás productos, fotos, precios y la lista mayorista, y lo publicás desde acá.' },
+    { sel:'#webStockSwitch', t:'Stock en la web', x:'Prendido, la web muestra lo que tenés listo para vender.' }
+  ]},
+  telegram: { s:'Ajustes', n:'Bot de Telegram', d:'Ventas, horneadas y compras desde el chat', k:['telegram','bot','chat bot'], pasos:[
+    { go:function(){ khCerrarVentanas(); khSettings(); }, sel:'#screen-settings [onclick^="connectTelegram"]', t:'Conectar', x:'Conectás el bot y desde Telegram anotás ventas, horneadas (/hornee), mermas, compras y ves el stock.' }
+  ]},
+  ajustes: { s:'Ajustes', n:'Ajustes generales', d:'Tema, letra, avisos y cómo se descuenta el stock', k:['ajustes','tema','color','letra','tamaño de letra','notificaciones','avisos','sonido'], pasos:[
+    { go:function(){ khCerrarVentanas(); khSettings(); }, sel:'#themeSwatches', t:'Apariencia', x:'Color de la app y tamaño de letra.' },
+    { sel:'#discountStockSwitch', t:'Stock', x:'"Descontar stock al vender" y "Sumar costo al reponer stock" deciden qué hace Kobu con el stock y los gastos.' },
+    { sel:'#notifEnabledSwitch', t:'Avisos y timers', x:'Notificaciones y el sonido de los timers del modo Cocinar.' }
+  ]},
+  sincro: { s:'Ajustes', n:'Sincronizar y versión', d:'Que todos los celulares tengan lo mismo', k:['sincronizar','sincronizacion','nube','version','versión','actualizar','celular','backup','copia'], pasos:[
+    { go:function(){ khCerrarVentanas(); khSettings(); }, sel:'#screen-settings .settings-tile[onclick^="openAdvancedScreen"]', t:'Avanzado', x:'Con contraseña. Ahí están la sincronización, el backup y "Versión y datos".' },
+    { sel:'#screen-settings .settings-tile[onclick^="openAdvancedScreen"]', t:'Versión y datos', x:'Si dos celulares muestran los mismos dos códigos, tienen la misma app y los mismos datos. Cuando hay una versión nueva aparece "Actualizar".' }
+  ]},
+  asistente: { s:'General', n:'Asistente IA y buscador', d:'Preguntarle a Kobu y buscar cualquier cosa', k:['ia','asistente','preguntar','chat','buscar','buscador','lupa'], pasos:[
+    { go:function(){ khCerrarVentanas(); khHome(); }, sel:'#chatPawBtn', t:'Kobu IA', x:'Preguntale costos, cómo escalar una receta o qué hornear: usa tus datos reales.' },
+    { sel:'#globalSearchBtn', t:'Buscador', x:'Busca recetas, ingredientes, clientes y pedidos desde cualquier pantalla.' },
+    { sel:'#themeToggleBtn', t:'Modo oscuro', x:'Cambia entre claro y oscuro.' }
+  ]}
+};
+var KH_PAGINAS = {
+  home: function(){ return [
+    { sel:'#homeSummaryCard', t:'Cómo va el día', x:'Kobu te resume lo importante: entregas, faltantes, cumpleaños y avisos.' },
+    { sel:'#homeTileCard', t:'Recetas y Preparaciones', x:'Cambiá entre tus recetas y las preparaciones base (cremas, glasé…).' },
+    { keepGo:true, go:function(){ if(homeTab!=='recetas') setHomeTab('recetas'); }, sel:'#recetasActionsRow', t:'Cargar', x:'Añadir receta, importarla de un texto o una foto, o armar una caja / combo.' },
+    { sel:'#recipeFilterBar', t:'Filtros', x:'Todas, Favoritas, Listas, Hornear y Prueba, cada uno con su cantidad.' },
+    { sel:'#recipeList .rc-row', t:'Cada receta', x:'Precio, cuánto se vendió y el stock en columnas. Tocala para ver la ficha y cocinarla.' },
+    { sel:'#navbar', t:'Barra de abajo', x:'Inicio, Pedidos, Vender (la huellita), Lista de compras y Ajustes.' }
+  ]; },
+  form: function(){ return KH_GUIAS.receta.pasos.slice(2); },
+  detail: function(){ return [
+    { sel:'#d-hero', t:'La receta', x:'Nombre, foto y etiquetas.' },
+    { sel:'#screen-detail .cook-btn-sm.no-combo', t:'Cocinar', x:'Modo paso a paso. Al Finalizar te pregunta qué salió del horno y suma al stock si lo confirmás.' },
+    { sel:'#screen-detail .cook-btn-sm.ghost', t:'Merma', x:'Anotá lo que se regaló, se rompió o venció.' },
+    { sel:'#d-scale-btn', t:'Escalar', x:'Multiplicá la receta (×2, ×0,5…) o pasala a otro molde.' },
+    { sel:'#d-ingredients', t:'Ingredientes y pasos', x:'Con las cantidades de la escala elegida.' },
+    { sel:'#d-cost', t:'Costo', x:'Cuánto te sale la tanda y cada unidad, con ingredientes y energía.' },
+    { sel:'#qn-input', t:'Notas rápidas', x:'Anotá algo de esta receta (también por voz).' }
+  ]; },
+  cook: function(){ return [
+    { sel:'#cook-text', t:'El paso', x:'Tocá la derecha para avanzar y la izquierda para volver. También podés decir "siguiente" o "atrás".' },
+    { sel:'#cook-timers', t:'Timers', x:'Si el paso tiene tiempo, aparece su timer. Podés tener varios a la vez.' },
+    { sel:'#cookVoiceBtn', t:'Voz', x:'Manejás la receta hablando, con las manos ocupadas.' },
+    { sel:'#cookCalcBtn', t:'Calculadora', x:'Para cuentas rápidas sin salir de la receta.' },
+    { sel:'#cook-dots', t:'Al final', x:'En el último paso aparece "Finalizar": pregunta qué salió del horno y suma al stock solo si lo confirmás.' }
+  ]; },
+  orders: function(){
+    if(ordersTab==='clientes') return KH_GUIAS.clientes.pasos.slice(1);
+    if(ordersTab==='produccion') return KH_GUIAS.produccion.pasos;
+    return [
+      { sel:'#ordersTileCard', t:'Pedidos, Clientes y Producción', x:'Las tres partes de esta pantalla.' },
+      { sel:'#screen-orders .addbtn', t:'Nuevo pedido', x:'Carga rápida: cliente, productos, fecha y listo.' },
+      { sel:'#orderSearchInput', t:'Buscar', x:'Encontrá un pedido por cliente o producto.' },
+      { sel:'#orderCalToggleBtn', t:'Calendario', x:'Mirá qué se entrega cada día.' },
+      { sel:'#orderList', t:'Tus pedidos', x:'Tocá uno para verlo, cambiarle el estado o editarlo. Al entregarlo suma el sello de la tarjeta.' }
+    ];
+  },
+  orderform: function(){ return [
+    { sel:'#of-cpick', t:'Cliente', x:'Buscalo escribiendo el nombre o la empresa.' },
+    { sel:'#of-mode', t:'Cliente o Mayorista', x:'Cambia los precios a los de la lista mayorista.' },
+    { sel:'#of-items', t:'Productos', x:'Sumá cada producto con su cantidad.' },
+    { sel:'#of-deposit', t:'Seña', x:'Lo que ya te pagaron; abajo ves el saldo.' },
+    { sel:'#of-savebtn', t:'Guardar', x:'Guarda el pedido con los cambios.' }
+  ]; },
+  quicksell: function(){ return KH_GUIAS.vender.pasos; },
+  shopping: function(){ return KH_GUIAS.compras.pasos; },
+  settings: function(){ return [
+    { sel:'#themeSwatches', t:'Apariencia', x:'Color de la app y tamaño de letra.' },
+    { sel:'#screen-settings .settings-tile', t:'Negocio', x:'Cocina, Utensilios, Stock, Conversión, Reportes y Avanzado.' },
+    { sel:'#screen-settings [onclick^="openWebEditor"]', t:'La web', x:'Pedidos web, editar la web, stock en la web y descuento mayorista.' },
+    { sel:'#screen-settings [onclick^="openFidCfg"]', t:'Tarjeta de fidelidad', x:'Sellos y premios.' },
+    { sel:'#screen-settings [onclick^="connectTelegram"]', t:'Telegram', x:'El bot para anotar desde el chat.' },
+    { sel:'#discountStockSwitch', t:'Stock y avisos', x:'Cómo se descuenta el stock, notificaciones y sonido de timers.' }
+  ]; },
+  ingredients: function(){ return KH_GUIAS.stock.pasos.slice(1); },
+  ovens: function(){ return KH_GUIAS.cocina.pasos; },
+  utensils: function(){ return KH_GUIAS.utensilios.pasos; },
+  reports: function(){ return KH_GUIAS.reportes.pasos; },
+  conversion: function(){ return [
+    { sel:'#unitConversionList', t:'Conversiones', x:'Cuántos gramos tiene una taza, una cucharada o una unidad de cada ingrediente.' },
+    { sel:'#uc-name', t:'Sumar una', x:'Agregá tu propia medida (ej. "1 huevo = 55 g").' }
+  ]; },
+  clientdetail: function(){ return [
+    { sel:'#cd-contactRow', t:'Contacto', x:'Teléfono, mail y cumpleaños.' },
+    { sel:'#cd-fid', t:'Tarjeta', x:'Sus sellos, premios e historial. Podés sumarle o quitarle un sello a mano.' },
+    { sel:'#cd-coupons', t:'Cupones', x:'Los cupones que tiene para usar.' },
+    { sel:'#cd-orders', t:'Pedidos', x:'Todo lo que te compró.' }
+  ]; },
+  advanced: function(){ return [
+    { sel:'#screen-advanced .grp-card', t:'Avanzado', x:'Sincronización, notificaciones, IA, backup y zona de peligro.' },
+    { sel:'#verCard', t:'Versión y datos', x:'Si dos celulares muestran los mismos dos códigos, tienen la misma app y los mismos datos.' }
+  ]; },
+  coupons: function(){ return [ { sel:'#couponCatalogList', t:'Cuponera', x:'Tus cupones (2x1, % off, regalo). Se los asignás a un cliente desde su ficha y se usan una vez.' } ]; },
+  chat: function(){ return [
+    { sel:'#chat-input', t:'Preguntale a Kobu', x:'Costos, cómo escalar, qué hornear o cualquier duda: responde con tus datos.' },
+    { sel:'#chatQuickMenuBtn', t:'Atajos', x:'Preguntas armadas y la opción de mandar una foto.' }
+  ]; },
+  prepdetail: function(){ return [ { sel:'#pd-hero', t:'Preparación base', x:'Una crema, glasé o masa que usás en varias recetas: se suma a una receta desde su formulario.' } ]; }
+};
+function khPantalla(){ return state.stack[state.stack.length-1]; }
+function khPantallaNombre(){ const c = khPantalla(); return c==='orders' ? (ordersTab==='clientes' ? 'Clientes' : ordersTab==='produccion' ? 'Producción' : 'Pedidos') : (TITLES[c] || 'esta pantalla'); }
+// Palabras clave: guías ordenadas por coincidencia.
+function khBuscar(q){
+  const n = normalizeMatchText(q).trim(); if(!n) return [];
+  const pal = n.split(/\s+/).filter(function(w){ return w.length>2; });
+  return Object.keys(KH_GUIAS).map(function(id){
+    const g = KH_GUIAS[id]; let sc = 0;
+    g.k.forEach(function(k){ const kk = normalizeMatchText(k); if(n.indexOf(kk)!==-1) sc += 3 + kk.length/4; else if(pal.some(function(w){ return kk.indexOf(w)===0 || w.indexOf(kk)===0; })) sc += 2; });
+    pal.forEach(function(w){ if(normalizeMatchText(g.n+' '+g.d).indexOf(w)!==-1) sc += 1; });
+    return { id:id, sc:sc };
+  }).filter(function(x){ return x.sc>0; }).sort(function(a, b){ return b.sc - a.sc; });
+}
+function openHelp(){
+  khEnd();
+  document.getElementById('khHereTxt').textContent = 'Esta página ('+khPantallaNombre()+')';
+  document.getElementById('khIn').value = '';
+  document.getElementById('khRes').innerHTML = '';
+  khRenderSug();
+  document.getElementById('helpModal').classList.add('active');
+  mountIcons();
+  setTimeout(function(){ const i = document.getElementById('khIn'); if(i) try{ i.focus({ preventScroll:true }); }catch(e){} }, 250);
+}
+function closeHelp(){ document.getElementById('helpModal').classList.remove('active'); khAiSeq++; }
+function khRenderSug(){
+  const secs = {};
+  Object.keys(KH_GUIAS).forEach(function(id){ const g = KH_GUIAS[id]; (secs[g.s] = secs[g.s] || []).push(id); });
+  document.getElementById('khAll').innerHTML = Object.keys(secs).map(function(s){
+    return '<p class="kh-sec">'+escapeHtml(s)+'</p><div class="kh-sug">'+secs[s].map(function(id){ return '<button type="button" onclick="khStart(\''+id+'\')">'+escapeHtml(KH_GUIAS[id].n)+'</button>'; }).join('')+'</div>';
+  }).join('');
+}
+function khHits(ids, nota){
+  return (nota ? '<p class="kh-nota">'+nota+'</p>' : '')+ids.slice(0, 3).map(function(id){
+    const g = KH_GUIAS[id];
+    return '<button type="button" class="kh-hit" onclick="khStart(\''+id+'\')"><span><b>'+escapeHtml(g.n)+'</b><small>'+escapeHtml(g.d)+' · '+g.pasos.length+' paso'+(g.pasos.length===1?'':'s')+'</small></span><span class="icon-slot" data-icon="arrow-right"></span></button>';
+  }).join('');
+}
+function khEscribir(v){
+  const el = document.getElementById('khRes'); khAiSeq++;
+  if(!v.trim()){ el.innerHTML = ''; return; }
+  const r = khBuscar(v);
+  el.innerHTML = r.length ? khHits(r.map(function(x){ return x.id; })) : '<p class="kh-nota">Tocá la flecha y Kobu lo interpreta.</p>';
+  mountIcons();
+}
+// Enter / flecha: si las palabras clave no alcanzan, le pregunta a la IA de Kobu qué guía corresponde.
+async function khEnviar(e){
+  if(e) e.preventDefault();
+  const q = document.getElementById('khIn').value.trim(), el = document.getElementById('khRes');
+  if(!q) return;
+  const r = khBuscar(q);
+  if(r.length && (r.length===1 || r[0].sc >= r[1].sc*1.6)){ khStart(r[0].id); return; }
+  const url = localStorage.getItem('kobuSyncUrl'), key = localStorage.getItem('kobuSyncKey');
+  if(!url || !key || typeof callAi!=='function'){
+    el.innerHTML = r.length ? khHits(r.map(function(x){ return x.id; }), 'Estas son las que más se parecen:') : '<p class="kh-nota">No encontré una guía para eso. Elegí una de abajo o tocá "Esta página".</p>';
+    mountIcons(); return;
+  }
+  const seq = ++khAiSeq;
+  el.innerHTML = '<p class="kh-nota kh-pensando"><span class="kh-dots"><i></i><i></i><i></i></span>Kobu está entendiendo lo que necesitás…</p>';
+  const cat = Object.keys(KH_GUIAS).map(function(id){ return id+': '+KH_GUIAS[id].n+' ('+KH_GUIAS[id].d+')'; }).join('\n');
+  const prompt = 'Sos la ayuda de la app Kobu (repostería). La persona escribió: "'+q.replace(/"/g, "'").slice(0, 300)+'". Estas son las guías disponibles (id: nombre):\n'+cat+'\nRespondé SOLO con los ids de las guías que la ayudan, de la más útil a la menos, separados por coma (máximo 3). Si ninguna sirve, respondé NINGUNA.';
+  let ids = [];
+  try{
+    const reply = await callAi([{ role:'user', text:prompt }], 4);
+    ids = String(reply||'').toLowerCase().split(/[^a-z]+/).filter(function(x, i, a){ return KH_GUIAS[x] && a.indexOf(x)===i; });
+  }catch(err){ ids = []; }
+  if(seq!==khAiSeq) return;
+  if(!ids.length) ids = r.map(function(x){ return x.id; });
+  el.innerHTML = ids.length ? khHits(ids, 'Para "'+escapeHtml(q.slice(0, 60))+'" te sirve:') : '<p class="kh-nota">No encontré una guía para eso. Elegí una de abajo o tocá "Esta página".</p>';
+  mountIcons();
+}
+function khStart(id){ const g = KH_GUIAS[id]; if(g) khRun(g.n, g.pasos); }
+function khEstaPagina(){
+  const c = khPantalla(), f = KH_PAGINAS[c];
+  const pasos = f ? f() : [{ sel:'#topbar', t:khPantallaNombre(), x:'Desde acá volvés atrás con la flecha. Escribí en la ayuda lo que querés hacer y te guío.' }];
+  // Ya estás en la pantalla: no se vuelve a navegar (salvo pasos que cambian algo dentro de ella).
+  khRun('Esta página: '+khPantallaNombre(), pasos.map(function(p){ return p.keepGo ? p : Object.assign({}, p, { go:null }); }));
+}
+function khRun(nombre, pasos){
+  closeHelp();
+  khTour = { nombre:nombre, pasos:pasos, i:0 };
+  document.body.classList.add('kh-on');
+  khPaso();
+}
+// Primer elemento visible que coincide con el paso.
+function khTarget(sel){
+  if(!sel) return null;
+  let list = []; try{ list = Array.from(document.querySelectorAll(sel)); }catch(e){ return null; }
+  return list.find(function(el){ const r = el.getBoundingClientRect(); return r.width>0 && r.height>0 && getComputedStyle(el).visibility!=='hidden'; }) || null;
+}
+function khPaso(){
+  if(!khTour) return;
+  const s = khTour.pasos[khTour.i];
+  const antes = khPantalla();
+  if(s.go){ try{ s.go(); }catch(e){} }
+  const espera = (khPantalla()!==antes || s.go) ? 380 : 40;
+  document.getElementById('khTip').classList.remove('show');
+  setTimeout(function(){
+    if(!khTour) return;
+    let el = khTarget(s.sel);
+    // La pantalla puede estar entrando todavía: se reintenta un par de veces antes de mostrar el cartel sin marca.
+    if(!el && s.sel && !s._r){ s._r = 1; setTimeout(function(){ khPaso2(s); }, 300); return; }
+    delete s._r;
+    if(el){
+      const r = el.getBoundingClientRect();
+      if(r.top < 70 || r.bottom > window.innerHeight - 160) el.scrollIntoView({ block:'center', behavior:'smooth' });
+      setTimeout(function(){ khPintar(el, s); }, (r.top < 70 || r.bottom > window.innerHeight - 160) ? 420 : 0);
+    } else khPintar(null, s);
+  }, espera);
+}
+function khPaso2(s){
+  if(!khTour || khTour.pasos[khTour.i]!==s) return;
+  let el = khTarget(s.sel);
+  if(!el && s._r < 3){ s._r++; setTimeout(function(){ khPaso2(s); }, 300); return; }
+  delete s._r;
+  if(el){
+    const r = el.getBoundingClientRect(), mover = r.top < 70 || r.bottom > window.innerHeight - 160;
+    if(mover) el.scrollIntoView({ block:'center', behavior:'smooth' });
+    setTimeout(function(){ khPintar(el, s); }, mover ? 420 : 0);
+  } else khPintar(null, s);
+}
+function khPintar(el, s){
+  if(!khTour) return;
+  const spot = document.getElementById('khSpot'), tip = document.getElementById('khTip');
+  khTour.el = el;
+  if(el){
+    const r = el.getBoundingClientRect(), pad = 6;
+    spot.style.top = (r.top - pad)+'px'; spot.style.left = (r.left - pad)+'px';
+    spot.style.width = (r.width + pad*2)+'px'; spot.style.height = (r.height + pad*2)+'px';
+    spot.classList.add('show'); spot.classList.remove('nada');
+  } else { spot.classList.add('show', 'nada'); }
+  document.getElementById('khTipG').textContent = khTour.nombre;
+  document.getElementById('khTipN').textContent = 'Paso '+(khTour.i+1)+' de '+khTour.pasos.length;
+  document.getElementById('khTipT').textContent = s.t;
+  document.getElementById('khTipP').textContent = s.x;
+  document.getElementById('khTipTap').style.display = s.tap && el ? '' : 'none';
+  document.getElementById('khTipD').innerHTML = khTour.pasos.map(function(_, k){ return '<i class="'+(k===khTour.i ? 'on' : '')+'"></i>'; }).join('');
+  document.getElementById('khPrev').style.visibility = khTour.i ? 'visible' : 'hidden';
+  document.getElementById('khNext').textContent = khTour.i===khTour.pasos.length-1 ? 'Terminar' : 'Siguiente';
+  requestAnimationFrame(function(){
+    const th = tip.offsetHeight, vh = window.innerHeight;
+    let top;
+    if(el){ const r = el.getBoundingClientRect(); top = (r.bottom + 14 + th < vh - 12) ? r.bottom + 14 : Math.max(12, r.top - th - 14); }
+    else top = Math.max(12, (vh - th)/2);
+    tip.style.top = top+'px';
+    tip.classList.add('show');
+  });
+}
+function khStep(d){
+  if(!khTour) return;
+  const n = khTour.i + d;
+  if(n >= khTour.pasos.length){ const nm = khTour.nombre; khEnd(); khFin(nm); return; }
+  if(n < 0) return;
+  khTour.i = n; khPaso();
+}
+function khEnd(){
+  khTour = null;
+  document.body.classList.remove('kh-on');
+  const sp = document.getElementById('khSpot'), tp = document.getElementById('khTip');
+  if(sp) sp.classList.remove('show'); if(tp) tp.classList.remove('show');
+}
+function khFin(nm){
+  document.getElementById('khDoneP').textContent = 'Terminaste "'+nm.replace(/^Esta página: /, '')+'". Cuando quieras, el ? de arriba te vuelve a guiar.';
+  document.getElementById('khDone').classList.add('active');
+}
+function closeKhDone(){ document.getElementById('khDone').classList.remove('active'); }
+// En un paso "Tocalo", tocar el elemento real también avanza (después de que haga lo suyo).
+document.addEventListener('click', function(e){
+  if(!khTour || !khTour.el) return;
+  const s = khTour.pasos[khTour.i];
+  if(s && s.tap && khTour.el.contains(e.target)){ const i0 = khTour.i; setTimeout(function(){ if(khTour && khTour.i===i0) khStep(1); }, 350); }
+}, true);
+window.addEventListener('resize', function(){ if(khTour && khTour.el) khPintar(khTour.el, khTour.pasos[khTour.i]); });
+window.addEventListener('scroll', function(){ if(khTour && khTour.el && document.getElementById('khTip').classList.contains('show')) khPintar(khTour.el, khTour.pasos[khTour.i]); }, { passive:true, capture:true });
+document.addEventListener('keydown', function(e){
+  if(!khTour) return;
+  if(e.key==='Escape') khEnd(); else if(e.key==='ArrowRight') khStep(1); else if(e.key==='ArrowLeft') khStep(-1);
+});
+window.addEventListener('popstate', function(){ if(khTour) khEnd(); });
+
 applyTheme(DATA.settings.theme);
 state.stack = ['splash'];
 render();

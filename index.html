@@ -2516,6 +2516,7 @@
     <div class="grp-card">
       <div style="display:flex;gap:8px;">
         <button class="cook-btn-sm no-combo" style="flex:1;" onclick="startCook(state.currentId)"><span class="icon-slot" data-icon="flame"></span> Cocinar</button>
+        <button class="cook-btn-sm ghost no-combo" id="d-bakeBtn" style="flex:1;" onclick="openBakeModal(state.currentId)"><span class="icon-slot" data-icon="oven"></span> Hornear</button>
         <button class="cook-btn-sm ghost" style="flex:1;" onclick="openMermaModal(state.currentId)"><span class="icon-slot" data-icon="trash"></span> Merma</button>
       </div>
       <div class="d-actions-bare">
@@ -9565,7 +9566,7 @@ function toggleSyncEnabled(){
   showToast(cur ? 'Sincronización desactivada en este dispositivo' : 'Sincronización activada');
 }
 // Versión de esta copia de la app (para saber si un celular quedó con una vieja): cambiarla en cada entrega.
-var KOBU_APP_VERSION = '46 · 23/11/2026';
+var KOBU_APP_VERSION = '47 · 24/11/2026';
 // ---- Versión de la app y código de los datos (Avanzado → Versión y datos) ----
 var kobuVerNueva = null, kobuVerUlt = 0, kobuVerEstado = '', kobuVerTimer = null;
 // Código corto de los datos (6 letras/números): igual en dos celulares = mismos datos.
@@ -18865,13 +18866,14 @@ var KH_GUIAS = {
     { go:function(){ khCerrarVentanas(); khHome(); }, sel:'#recetasActionsRow [onclick^="openComboModal"]', t:'Caja / combo', x:'Armá una caja con productos que ya tenés: elegís cuáles y cuántos de cada uno.' },
     { sel:'#recetasActionsRow [onclick^="openComboModal"]', t:'Precio y stock', x:'Te muestra lo que costaría por separado, el costo con packaging y cuántas cajas podés armar con lo que hay. Al venderla descuenta cada producto.' }
   ]},
-  cocinar: { s:'Recetas', n:'Cocinar y sumar al stock', d:'Modo paso a paso y "¿Qué salió del horno?"', k:['cocinar','hornear','horneada','tanda','modo cocina','paso a paso','sumar stock','registrar'], pasos:[
-    { go:khDetalle, sel:'#screen-detail .cook-btn-sm.no-combo', t:'Cocinar', x:'Desde la ficha de una receta tocá "Cocinar": los pasos en grande, con timers, precalentado, voz y calculadora.' },
-    { sel:'#screen-detail .cook-btn-sm.no-combo', t:'Recorrerla no toca nada', x:'Podés mirar el modo y salir: el stock no cambia.' },
-    { sel:'#screen-detail .cook-btn-sm.no-combo', t:'Finalizar', x:'En el último paso tocá "Finalizar": te pregunta qué salió del horno (2 XL, 1 XL + 2 chicos…) y cuántas tandas. Con "Sumar al stock" suma lo listo y descuenta los ingredientes. Si solo mirabas, "Terminar sin sumar al stock".' }
+  cocinar: { s:'Recetas', n:'Cocinar, hornear y sumar al stock', d:'Paso a paso, o anotar rápido lo que salió', k:['cocinar','hornear','horneada','tanda','modo cocina','paso a paso','sumar stock','registrar','ya hornee'], pasos:[
+    { go:khDetalle, sel:'#screen-detail [onclick^="startCook"]', t:'Cocinar', x:'Desde la ficha de una receta tocá "Cocinar": los pasos en grande, con timers, precalentado, voz y calculadora.' },
+    { sel:'#screen-detail [onclick^="startCook"]', t:'Recorrerla no toca nada', x:'Podés mirar el modo y salir: el stock no cambia.' },
+    { sel:'#d-bakeBtn', t:'Hornear', x:'Si ya la horneaste sin el paso a paso, "Hornear" anota rápido lo que salió (qué opción de tanda y cuántas). Nada se suma hasta que tocás "Registrar"; con "Cancelar" sale sin cambios.' },
+    { sel:'#screen-detail [onclick^="startCook"]', t:'Finalizar', x:'En el último paso tocá "Finalizar": te pregunta qué salió del horno (2 XL, 1 XL + 2 chicos…) y cuántas tandas. Con "Sumar al stock" suma lo listo y descuenta los ingredientes. Si solo mirabas, "Terminar sin sumar al stock".' }
   ]},
   merma: { s:'Recetas', n:'Anotar una merma', d:'Regalos, degustación, algo que se rompió o venció', k:['merma','mermas','se rompio','vencido','regale','degustacion','tirar'], pasos:[
-    { go:khDetalle, sel:'#screen-detail .cook-btn-sm.ghost', t:'Merma', x:'En la ficha de la receta tocá "Merma": elegís cuántas y por qué (regalo, degustación, rota, vencida). Baja el stock listo.' },
+    { go:khDetalle, sel:'#screen-detail [onclick^="openMermaModal"]', t:'Merma', x:'En la ficha de la receta tocá "Merma": elegís cuántas y por qué (regalo, degustación, rota, vencida). Baja el stock listo.' },
     { go:function(){ khScreen('reports'); }, sel:'#rep-acc-mermas', t:'Dónde se ven', x:'En Reportes aparece cuánto perdiste en mermas en el período.' }
   ]},
   inicio: { s:'Recetas', n:'Ver el stock y qué hornear', d:'Filtros y stock del Inicio', k:['stock','listos','hornear','filtro','filtros','favorita','favoritas','prueba','que hay','cuanto hay','agotado','secciones'], pasos:[
@@ -18976,8 +18978,9 @@ var KH_PAGINAS = {
   form: function(){ return KH_GUIAS.receta.pasos.slice(2); },
   detail: function(){ return [
     { sel:'#d-hero', t:'La receta', x:'Nombre, foto y etiquetas.' },
-    { sel:'#screen-detail .cook-btn-sm.no-combo', t:'Cocinar', x:'Modo paso a paso. Al Finalizar te pregunta qué salió del horno y suma al stock si lo confirmás.' },
-    { sel:'#screen-detail .cook-btn-sm.ghost', t:'Merma', x:'Anotá lo que se regaló, se rompió o venció.' },
+    { sel:'#screen-detail [onclick^="startCook"]', t:'Cocinar', x:'Modo paso a paso. Al Finalizar te pregunta qué salió del horno y suma al stock si lo confirmás.' },
+    { sel:'#d-bakeBtn', t:'Hornear', x:'Para anotar rápido una horneada ya hecha: elegís qué salió y cuántas tandas, y "Registrar" lo suma al stock.' },
+    { sel:'#screen-detail [onclick^="openMermaModal"]', t:'Merma', x:'Anotá lo que se regaló, se rompió o venció.' },
     { sel:'#d-scale-btn', t:'Escalar', x:'Multiplicá la receta (×2, ×0,5…) o pasala a otro molde.' },
     { sel:'#d-ingredients', t:'Ingredientes y pasos', x:'Con las cantidades de la escala elegida.' },
     { sel:'#d-cost', t:'Costo', x:'Cuánto te sale la tanda y cada unidad, con ingredientes y energía.' },
